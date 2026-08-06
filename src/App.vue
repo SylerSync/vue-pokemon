@@ -8,7 +8,8 @@ import Tab from 'primevue/tab';
   <Tabs>
         <TabList>
             <Tab><router-link to="/home">Home</router-link></Tab>
-            <Tab><router-link to="/wildPokemon">Pokedex</router-link></Tab>
+            <Tab><router-link to="/wildPokemon">Wild Pokemon</router-link></Tab>
+            <Tab><router-link to="/dex">Pokedex</router-link></Tab>
         </TabList>
   </Tabs>
   <router-view />
