@@ -1,17 +1,17 @@
 <script setup>
-import Button from 'primevue/button';
+import Tabs from 'primevue/tabs';
+import TabList from 'primevue/tablist';
+import Tab from 'primevue/tab';
 </script>
 
 <template>
-  <router-link to="/home">Home</router-link>
-  <Button>Verify</Button>
-  <h1>You did it!</h1>
-  <p>
-    Visit <a href="https://vuejs.org/" target="_blank" rel="noopener">vuejs.org</a> to read the
-    documentation
-  </p>
-  <br />
-  <router-view />
+  <Tabs>
+        <TabList>
+            <Tab><router-link to="/home">Home</router-link></Tab>
+            <Tab><router-link to="/wildPokemon">Pokedex</router-link></Tab>
+        </TabList>
+  </Tabs>
+  <router-view />
 </template>
 
 <style scoped></style>
