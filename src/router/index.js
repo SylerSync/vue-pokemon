@@ -6,6 +6,11 @@ const routes = [
     path: '/home',
     name: 'Home',
     component: () => import('../views/HomeView.vue')
+  },
+  {
+    path: '/dex',
+    name: 'Pokedex',
+    component: () => import('../views/PokedexView.vue')
   }
 ]
 

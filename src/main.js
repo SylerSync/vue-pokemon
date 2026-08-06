@@ -13,7 +13,7 @@ app.use(pinia)
 app.use(router)
 app.use(PrimeVue,{
     theme: {
-        preset: Aura
+        preset: Aura,
     },
     license: import.meta.env.VITE_PRIMEUI_LICENSE_KEY
 })
