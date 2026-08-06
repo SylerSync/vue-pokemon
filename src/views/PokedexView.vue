@@ -42,46 +42,27 @@ import Splitter from 'primevue/splitter';
 import SplitterPanel from 'primevue/splitterpanel';
 import Button from 'primevue/button';
 import Card from 'primevue/card';
+import { getIndex } from '@/api/pokeapi.js';
+import { getPokemon } from '@/api/pokeapi.js';
 
 const selectedPokemon = ref();
 const pokemon = ref([]);
 const isLoading = ref(true);
 const error = ref(null);
 
-async function fetchData() {
-  try {
-    const response = await fetch('https://pokeapi.co/api/v2/pokemon?limit=100000&offset=0');
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    const jsonData = await response.json();
-    // console.log(jsonData.results);
-    pokemon.value = jsonData.results;
-  } catch (err) {
-    error.value = err.message;
-  } finally {
-    isLoading.value = false;
-  }
-}
-
 async function selectPokemon(pokemon) {
+    isLoading.value = true;
     try {
-    const response = await fetch(`https://pokeapi.co/api/v2/pokemon/${pokemon}`);
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+        selectedPokemon.value = await getPokemon(pokemon);
+    } finally {
+        isLoading.value = false;
     }
-    const jsonData = await response.json();
-    selectedPokemon.value = jsonData;
-    // console.log(JSON.stringify(selectedPokemon.value?.sprites, null, 2));
-  } catch (err) {
-    error.value = err.message;
-  } finally {
-    isLoading.value = false;
-  }
 }
 
 onMounted(() => {
-  fetchData();
+    getIndex().then(results => {
+    pokemon.value = results.results;
+    });
 });
 
 </script>
