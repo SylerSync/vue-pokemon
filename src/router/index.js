@@ -16,6 +16,11 @@ const routes = [
     path: '/dex',
     name: 'Pokedex',
     component: () => import('../views/PokedexView.vue')
+  },
+  {
+    path: "/pokebox",
+    name: "Pokemon Box",
+    component: () => import("@/views/PokeBox.vue")
   }
 ]
 

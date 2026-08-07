@@ -15,6 +15,9 @@ export const usePokemonStore = defineStore("pokemonStore", {
         },
         addWishlistPokemon(pokemon){
             this.caughtPokemon.push(pokemon)
+        },
+        releasePokemon(index){
+            this.caughtPokemon.splice(index, 1)
         }
     }
 })
