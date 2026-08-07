@@ -1,7 +1,8 @@
 <script setup>
-import {watch, ref, computed, onUnmounted} from "vue"
+import {watch, ref, onUnmounted} from "vue"
 import Select from "primevue/select"
 import Card from "primevue/card"
+import Modal from "@/components/Modal.vue"
 
 const regionMusic = {
   kanto: "https://play.pokemonshowdown.com/audio/hgss-kanto-trainer.mp3",
@@ -10,6 +11,7 @@ const regionMusic = {
   sinnoh: "https://play.pokemonshowdown.com/audio/dpp-trainer.mp3",
   unova: "https://play.pokemonshowdown.com/audio/bw-trainer.mp3",
   kalos: "https://play.pokemonshowdown.com/audio/xy-trainer.mp3",
+  alola: "https://play.pokemonshowdown.com/audio/sm-trainer.mp3",
   galar: "https://play.pokemonshowdown.com/audio/sm-trainer.mp3",
   paldea: "https://play.pokemonshowdown.com/audio/sm-trainer.mp3"
 }
@@ -21,6 +23,7 @@ const regions = ref([
     "sinnoh",
     "unova",
     "kalos",
+    "alola",
     "galar",
     "paldea"
 ])
@@ -32,6 +35,20 @@ const selectedRegion = ref("")
 const pokemonList = ref([])
 
 const wildPokemon = ref([])
+
+const isCatchModalOpen = ref(false)
+
+const selectedPokemon = ref(null)
+
+const openCatchModal = (pokemon) => {
+    selectedPokemon.value = pokemon
+    isCatchModalOpen.value = true
+}
+
+const closeCatchModal = () => {
+    selectedPokemon.value = null
+    isCatchModalOpen.value = false
+}
 
 function PlayRegionAudio(region){
     console.log("Attempting to play music for region: " + region.value)
@@ -48,9 +65,6 @@ function PlayRegionAudio(region){
     bgmTrack.loop = true
 
     bgmTrack.play()
-    .then(() => {
-        isAudioPlaying.value = true
-    })
     .catch((err) => {
         console.warn("autoplay prevented or failed: ", err)
     })
@@ -138,32 +152,12 @@ async function getWildPokemonData(){
     console.log(wildPokemon)
 }
 
-const wildPokemon2 = computed(() => {
-    const list = pokemonList.value
-    if (!list || list.length === 0) return [] 
-
-    let wildPokemon = []
-
-    const indexes = []
-    const listLength = list.length  
-    for (let i = 0; i < 6; i++) {
-      const randomIndex = Math.floor(Math.random() * listLength)
-      indexes.push(randomIndex)
-    }
-    for(let index of indexes){
-        wildPokemon.push(pokemonList.value[index])
-    }
-    console.log(wildPokemon)
-
-    return wildPokemon
-})
-
 </script>
 
 <template>
     <Select v-model="selectedRegion" :options="regions" placeholder="Select a region"/>
     <div class="pokemon-grid">
-        <Card  v-for="pokemon in wildPokemon" :key="pokemon.name" class="w-full">
+        <Card  v-for="pokemon in wildPokemon" :key="pokemon.name" class="w-full pokemonCard" @click="openCatchModal(pokemon)">
             <template #title>{{ pokemon.name }}</template>
             <template #header>
                 <div class="sprite-container">
@@ -174,6 +168,21 @@ const wildPokemon2 = computed(() => {
             
         </Card>
     </div>
+
+    <Modal v-if="isCatchModalOpen" @close="closeCatchModal">
+        <div v-if="selectedPokemon" class="catchModal">
+            <h2>{{ selectedPokemon.name }}</h2>
+            <img :src="selectedPokemon.sprite" :alt="selectedPokemon.name">
+            <h3>Types:</h3>
+            <div v-for="type of selectedPokemon.types" :key="type">
+                <p>{{ type }} </p>
+            </div>
+            <p>Weight: {{ selectedPokemon.weight }}</p>
+            <p>Height: {{ selectedPokemon.height }}</p>
+
+            <button>Catch Pokemon</button>
+        </div>
+    </Modal>
 </template>
 
 <style scoped>
@@ -207,6 +216,36 @@ const wildPokemon2 = computed(() => {
 
 .pokemon-title {
   text-transform: capitalize;
+}
+
+.catchModal{
+    background-color: Canvas;
+    color: CanvasText;
+    width:450px;
+    padding:24px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+}
+
+.catchModal Button{
+    background-color: red;
+    width: 50%;
+    border-radius: 5px;
+    border: 2px solid darkred;
+    font-size: medium;
+    cursor: pointer;
+}
+.catchModal Button:hover {
+    background-color: blue;
+    border:2px solid darkblue;
+}
+
+.pokemonCard:hover {
+    cursor: pointer;
+    background-color: Canvas;
 }
 
 
