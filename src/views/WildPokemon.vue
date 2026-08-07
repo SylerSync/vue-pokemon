@@ -1,7 +1,18 @@
 <script setup>
-import {watch, ref, computed} from "vue"
+import {watch, ref, computed, onUnmounted} from "vue"
 import Select from "primevue/select"
 import Card from "primevue/card"
+
+const regionMusic = {
+  kanto: "https://play.pokemonshowdown.com/audio/hgss-kanto-trainer.mp3",
+  johto: "https://play.pokemonshowdown.com/audio/hgss-johto-trainer.mp3",
+  hoenn: "https://play.pokemonshowdown.com/audio/oras-trainer.mp3",
+  sinnoh: "https://play.pokemonshowdown.com/audio/dpp-trainer.mp3",
+  unova: "https://play.pokemonshowdown.com/audio/bw-trainer.mp3",
+  kalos: "https://play.pokemonshowdown.com/audio/xy-trainer.mp3",
+  galar: "https://play.pokemonshowdown.com/audio/sm-trainer.mp3",
+  paldea: "https://play.pokemonshowdown.com/audio/sm-trainer.mp3"
+}
 
 const regions = ref([
     "kanto",
@@ -13,11 +24,45 @@ const regions = ref([
     "galar",
     "paldea"
 ])
+
+let bgmTrack = null
+
 const selectedRegion = ref("")
 
 const pokemonList = ref([])
 
 const wildPokemon = ref([])
+
+function PlayRegionAudio(region){
+    console.log("Attempting to play music for region: " + region.value)
+    if (bgmTrack){
+        bgmTrack.pause()
+        bgmTrack.currentTime = 0
+    }
+
+    const audioUrl = regionMusic[region.value]
+    console.log("Using url: " + audioUrl)
+    if(!audioUrl) return
+
+    bgmTrack = new Audio(audioUrl)
+    bgmTrack.loop = true
+
+    bgmTrack.play()
+    .then(() => {
+        isAudioPlaying.value = true
+    })
+    .catch((err) => {
+        console.warn("autoplay prevented or failed: ", err)
+    })
+}
+
+// clean up the audio when you leave the page.
+onUnmounted(() => {
+  if (bgmTrack) {
+    bgmTrack.pause()
+    bgmTrack = null
+  }
+})
 
 watch(selectedRegion, async (region)=>{
     if(!region || region === "Select a region") return;
@@ -54,6 +99,8 @@ watch(selectedRegion, async (region)=>{
     pokemonList.value = (regionPokemon)
 
     getWildPokemonData();
+
+    PlayRegionAudio(selectedRegion)
 })
 
 async function getWildPokemonData(){
