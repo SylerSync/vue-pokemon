@@ -46,6 +46,9 @@ export const usePokemonStore = defineStore("pokemonStore", {
         },
         getStartersByRegion: (state) => (region) =>{
             return state.starters[region] || []
+        },
+        pokemonIsInWishList: (state) => (pokemonName) => {
+            return state.wishlistPokemon.some(pokemon => pokemon.name === pokemonName);
         }
     },
     actions: {
