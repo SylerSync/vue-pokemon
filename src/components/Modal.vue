@@ -11,12 +11,13 @@
 
 <script setup>
     const props = defineProps(['theme'])
+    const emit = defineEmits(['close'])
 
     const closeModal = () => {
         emit('close')
     }
 </script>
-<style>
+<style scoped>
     .modal{
         width: 400px;
         padding: 20px;

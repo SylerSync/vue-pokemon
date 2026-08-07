@@ -1,8 +1,93 @@
+<script setup>
+import { ref, onMounted, computed, watchEffect } from 'vue';
+import VirtualScroller from 'primevue/virtualscroller';
+import Splitter from 'primevue/splitter';
+import SplitterPanel from 'primevue/splitterpanel';
+import Button from 'primevue/button';
+import Card from 'primevue/card';
+import InputGroup from 'primevue/inputgroup';
+import InputText from 'primevue/inputtext';
+import InputGroupAddon from 'primevue/inputgroupaddon';
+import Search from '@primeicons/vue/search';
+import Select from 'primevue/select';
+import { getIndex } from '@/api/pokeapi.js';
+import { getPokemon } from '@/api/pokeapi.js';
+import { getPokemonByGen } from '@/api/pokeapi.js';
+import { getSpecies } from '@/api/pokeapi.js';
+
+const selectedPokemon = ref();
+const pokemon = ref([]);
+const isLoading = ref(true);
+const text1 = ref(null);
+const selectedRegion = ref(null);
+
+const regions = ref([
+    { region: "Kanto", gen: 1 },
+    { region: "Johto", gen: 2 },
+    { region: "Hoenn", gen: 3 },
+    { region: "Sinnoh", gen: 4 },
+    { region: "Unova", gen: 5 },
+    { region: "Kalos", gen: 6 },
+    { region: "Alola", gen: 7 },
+    { region: "Galar", gen: 8 },
+    { region: "Paldea", gen: 9 }
+])
+
+async function selectPokemon(pokemon) {
+    isLoading.value = true;
+    try {
+        const res1 = await getPokemon(pokemon);
+        const res2 = await getSpecies(pokemon);
+        selectedPokemon.value = { ...res1, ...res2 };
+        console.log(selectedPokemon.value);
+    } finally {
+        isLoading.value = false;
+    }
+}
+
+onMounted(() => {
+    getIndex().then(results => {
+    pokemon.value = results.results;
+    });
+});
+
+const pokemonList = computed(() => {
+    if (text1.value) {
+        return pokemon.value.filter(p => p.name.includes(text1.value));
+    }
+    return pokemon.value;
+});
+
+watchEffect(() => {
+    if (selectedRegion.value) {
+        getPokemonByGen(selectedRegion.value.gen).then(results => {
+            pokemon.value = results.pokemon_species;
+        });
+    } else {
+        getIndex().then(results => {
+            pokemon.value = results.results;
+        });
+    }
+});
+
+</script>
+
 <template>
     <Splitter class="pokedex">
         <SplitterPanel :size="25" :minSize="15" class="list-panel"> 
-            <div class="list-header">Pokedex</div>
-            <VirtualScroller :items="pokemon" :itemSize="44" class="list-scroller">
+            <div class="list-header">
+                <span>Pokedex</span>
+                <div class="space-y-4 max-w-xs mx-auto">
+                    <InputGroup>
+                        <InputGroupAddon>
+                            <Search />
+                        </InputGroupAddon>
+                        <InputText v-model="text1" placeholder="Search" />
+                        <Select v-model="selectedRegion" :options="regions" optionLabel="region" placeholder="Region" class="w-full md:w-56 name" />
+                    </InputGroup>
+                </div>
+            </div>
+            <VirtualScroller :items="pokemonList" :itemSize="44" class="list-scroller">
                 <template v-slot:item="{ item }">
                     <div @click="selectPokemon(item.name)" class="list-row" :class="{selected: selectedPokemon?.name == item.name}">{{ item.name }}</div>
                 </template>
@@ -18,54 +103,20 @@
                 <template #title><span class="name">{{ selectedPokemon.name }}</span></template>
                 <template #subtitle><span v-for="type in selectedPokemon.types" :key="type"> | {{type.type.name}} </span></template>
                 <!-- TODO: Implement Dex Entry -->
-                <!-- <template #content>
+                <template #content>
                     <p class="m-0">
-                        Lorem ipsum dolor sit amet, consectetur adipisicing elit. Inventore sed consequuntur error repudiandae numquam deserunt quisquam repellat libero asperiores earum nam nobis, culpa ratione quam perferendis esse, cupiditate neque
-                        quas!
+                        {{ selectedPokemon.flavor_text_entries.find(entry => entry.language.name === 'en')?.flavor_text.replaceAll("", " ") || 'No dex entry available.' }}
                     </p>
-                </template> -->
-                <!-- <template #footer>
+                </template>
+                <template #footer>
                     <div class="flex gap-3 mt-1">
-                        <Button label="Cancel" severity="secondary" outlined class="w-full" />
-                        <Button label="Save" class="w-full" />
+                        <Button label="Details" class="w-full" />
                     </div>
-                </template> -->
+                </template>
             </Card>
         </SplitterPanel>
     </Splitter>
 </template>
-
-<script setup>
-import { ref, onMounted } from 'vue';
-import VirtualScroller from 'primevue/virtualscroller';
-import Splitter from 'primevue/splitter';
-import SplitterPanel from 'primevue/splitterpanel';
-import Button from 'primevue/button';
-import Card from 'primevue/card';
-import { getIndex } from '@/api/pokeapi.js';
-import { getPokemon } from '@/api/pokeapi.js';
-
-const selectedPokemon = ref();
-const pokemon = ref([]);
-const isLoading = ref(true);
-const error = ref(null);
-
-async function selectPokemon(pokemon) {
-    isLoading.value = true;
-    try {
-        selectedPokemon.value = await getPokemon(pokemon);
-    } finally {
-        isLoading.value = false;
-    }
-}
-
-onMounted(() => {
-    getIndex().then(results => {
-    pokemon.value = results.results;
-    });
-});
-
-</script>
 
 <style scoped>
 .pokedex {
