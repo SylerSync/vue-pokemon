@@ -15,6 +15,7 @@ import { getPokemon } from '@/api/pokeapi.js';
 import { getPokemonByGen } from '@/api/pokeapi.js';
 import { getSpecies } from '@/api/pokeapi.js';
 import Modal from '@/components/Modal.vue';
+import { usePokemonStore } from '@/stores/pokemonStore';
 
 const selectedPokemon = ref();
 const pokemon = ref([]);
@@ -34,11 +35,19 @@ const regions = ref([
     { region: "Galar", gen: 8 },
     { region: "Paldea", gen: 9 }
 ]);
+const pokemonStore = usePokemonStore();
 
 // let bgmTrack = null;
 
 function toggleModal() {
     showModal.value = !showModal.value;
+}
+
+function wishList() {
+    if (selectedPokemon.value) {
+        pokemonStore.addWishlistPokemon(selectedPokemon.value);
+        console.log('Added to wishlist:', selectedPokemon.value);
+    }
 }
 
 async function selectPokemon(pokemon) {
@@ -178,6 +187,7 @@ watchEffect(() => {
                 <template #footer>
                     <div class="flex gap-3 mt-1">
                         <Button label="Details" class="w-full" @click="toggleModal" />
+                        <Button label="Whishlist" class="w-full" @click="wishList" />
                     </div>
                 </template>
             </Card>

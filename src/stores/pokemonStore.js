@@ -41,6 +41,9 @@ export const usePokemonStore = defineStore("pokemonStore", {
 
     }),
     getters:{
+        pokemonIsCaught: (state) => (pokemonName) => {
+            return state.caughtPokemon.some(pokemon => pokemon.name === pokemonName);
+        },
         getStartersByRegion: (state) => (region) =>{
             return state.starters[region] || []
         }
@@ -50,7 +53,7 @@ export const usePokemonStore = defineStore("pokemonStore", {
             this.caughtPokemon.push(pokemon)
         },
         addWishlistPokemon(pokemon){
-            this.caughtPokemon.push(pokemon)
+            this.wishlistPokemon.push(pokemon)
         },
         releasePokemon(index){
             this.caughtPokemon.splice(index, 1)
