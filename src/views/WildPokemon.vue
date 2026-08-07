@@ -134,24 +134,27 @@ async function getWildPokemonData(region){
     }
 
     let pokemonData = []
-
+    let randInt = 0
     //Check if the user needs starter pokemon first
     if(pokemonStore.caughtPokemon.length == 0){
         let starterIDs = pokemonStore.getStartersByRegion(region)
         if(starterIDs){
             for(const pokemon of starterIDs){
+                randInt = Math.floor(Math.random() * 101);
                 const data = await fetch("https://pokeapi.co/api/v2/pokemon/" + pokemon)
                 let dataJson = await data.json();
 
                 let newPokemon = {
                     name : dataJson.name,
                     id : dataJson.id,
-                    sprite : dataJson.sprites.front_default,
+                    sprite : 10 < randInt && randInt < 15 ? dataJson.sprites.front_shiny : dataJson.sprites.front_default,
                     types : dataJson.types.map(t => t.type.name),
                     height : dataJson.height,
                     weight : dataJson.weight
                 }
                 pokemonData.push(newPokemon)
+                console.log(randInt)
+                randInt = 0
             }
         }
         wildPokemon.value = pokemonData
@@ -172,14 +175,18 @@ async function getWildPokemonData(region){
     }
 
     for(let pokemon of pokemonData){
+        randInt = Math.floor(Math.random() * 101);
         const data = await fetch("https://pokeapi.co/api/v2/pokemon/" + pokemon.name)
         let dataJson = await data.json();
 
         pokemon.id = dataJson.id
-        pokemon.sprite = dataJson.sprites.front_default
+        pokemon.sprite = 10 < randInt && randInt < 15 ? dataJson.sprites.front_shiny : dataJson.sprites.front_default
         pokemon.types = dataJson.types.map(t => t.type.name)
         pokemon.height = dataJson.height
         pokemon.weight = dataJson.weight
+        console.log(randInt)
+        console.log(pokemon.sprite)
+        randInt = 0
     }
 
     wildPokemon.value = pokemonData
