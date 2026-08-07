@@ -7,10 +7,10 @@ import Tab from 'primevue/tab';
 <template>
   <Tabs>
         <TabList>
-            <Tab><router-link to="/home">Home</router-link></Tab>
             <Tab><router-link to="/wildPokemon">Wild Pokemon</router-link></Tab>
             <Tab><router-link to="/dex">Pokedex</router-link></Tab>
             <tab><router-link to="/pokebox">PokeBox</router-link></tab>
+            <tab><router-link to="/wishList">WishList</router-link></tab>
         </TabList>
   </Tabs>
   <router-view />
