@@ -120,21 +120,48 @@ watch(selectedRegion, async (region)=>{
 
     pokemonList.value = (regionPokemon)
 
-    getWildPokemonData();
+    getWildPokemonData(region);
 
     PlayRegionAudio(selectedRegion)
 })
 
-async function getWildPokemonData(){
+async function getWildPokemonData(region){
+
     const list = pokemonList.value;
     if(!list || list.length === 0){
         wildPokemon.value = []
         return
     }
 
+    let pokemonData = []
+
+    //Check if the user needs starter pokemon first
+    if(pokemonStore.caughtPokemon.length == 0){
+        let starterIDs = pokemonStore.getStartersByRegion(region)
+        if(starterIDs){
+            for(const pokemon of starterIDs){
+                const data = await fetch("https://pokeapi.co/api/v2/pokemon/" + pokemon)
+                let dataJson = await data.json();
+
+                let newPokemon = {
+                    name : dataJson.name,
+                    id : dataJson.id,
+                    sprite : dataJson.sprites.front_default,
+                    types : dataJson.types.map(t => t.type.name),
+                    height : dataJson.height,
+                    weight : dataJson.weight
+                }
+                pokemonData.push(newPokemon)
+            }
+        }
+        wildPokemon.value = pokemonData
+        return
+    }
+
+    // If player has a starter continue with random choices
     const indexes = []
     const listLength = list.length
-    let pokemonData = []
+    
 
     for (let i = 0; i < 6; i++) {
       const randomIndex = Math.floor(Math.random() * listLength)
