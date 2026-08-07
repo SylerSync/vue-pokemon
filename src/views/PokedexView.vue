@@ -50,6 +50,10 @@ function wishList() {
     }
 }
 
+function checkWishList(name) {
+  return pokemonStore.pokemonIsInWishList(name)
+}
+
 async function selectPokemon(pokemon) {
     isLoading.value = true;
     try {
@@ -69,9 +73,15 @@ onMounted(() => {
 });
 
 const pokemonList = computed(() => {
+    for (let pok of pokemon.value) {
+      pok.wishList = pokemonStore.pokemonIsInWishList(pok.name);
+      pok.caught = pokemonStore.pokemonIsCaught(pok.name);
+    };
+
     if (text1.value) {
-        return pokemon.value.filter(p => p.name.includes(text1.value));
+        return  pokemon.value.filter(p => p.name.includes(text1.value));
     }
+    // console.log(pokemon.value)
     return pokemon.value;
 });
 
@@ -166,7 +176,7 @@ watchEffect(() => {
             </div>
             <VirtualScroller :items="pokemonList" :itemSize="44" class="list-scroller">
                 <template v-slot:item="{ item }">
-                    <div @click="selectPokemon(item.name)" class="list-row" :class="{selected: selectedPokemon?.name == item.name}">{{ item.name }}</div>
+                    <div @click="selectPokemon(item.name)" class="list-row" :class="{selected: selectedPokemon?.name == item.name}"> {{ item.name }} <span v-if="item.wishList">&nbsp	&#10026;</span></div>
                 </template>
             </VirtualScroller>
         </SplitterPanel>
@@ -187,7 +197,7 @@ watchEffect(() => {
                 <template #footer>
                     <div class="flex gap-3 mt-1">
                         <Button label="Details" class="w-full" @click="toggleModal" />
-                        <Button label="Whishlist" class="w-full" @click="wishList" />
+                        <Button v-if="!checkWishList(selectedPokemon.name)" label="Whishlist" class="w-full" @click="wishList" />
                     </div>
                 </template>
             </Card>

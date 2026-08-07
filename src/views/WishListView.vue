@@ -71,11 +71,6 @@ const pokemon = computed(() =>
     }))
 );
 
-onMounted(() => {
-    console.log('Wishlist Pokemon:', pokemonStore.wishlistPokemon);
-    // ProductService.getProductsSmall().then(data => pokemonStore.wishlistPokemon = data);
-});
-
 const getSeverity = (caught) => {
     if (caught) {
         return 'success';
