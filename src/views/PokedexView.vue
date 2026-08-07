@@ -1,8 +1,161 @@
+<script setup>
+import { ref, onMounted, computed, watchEffect } from 'vue';
+import VirtualScroller from 'primevue/virtualscroller';
+import Splitter from 'primevue/splitter';
+import SplitterPanel from 'primevue/splitterpanel';
+import Button from 'primevue/button';
+import Card from 'primevue/card';
+import InputGroup from 'primevue/inputgroup';
+import InputText from 'primevue/inputtext';
+import InputGroupAddon from 'primevue/inputgroupaddon';
+import Search from '@primeicons/vue/search';
+import Select from 'primevue/select';
+import { getIndex } from '@/api/pokeapi.js';
+import { getPokemon } from '@/api/pokeapi.js';
+import { getPokemonByGen } from '@/api/pokeapi.js';
+import { getSpecies } from '@/api/pokeapi.js';
+import Modal from '@/components/Modal.vue';
+
+const selectedPokemon = ref();
+const pokemon = ref([]);
+const isLoading = ref(true);
+const text1 = ref(null);
+const selectedRegion = ref(null);
+const showModal = ref(false);
+const regions = ref([
+    { region: "All", gen: 0 },
+    { region: "Kanto", gen: 1 },
+    { region: "Johto", gen: 2 },
+    { region: "Hoenn", gen: 3 },
+    { region: "Sinnoh", gen: 4 },
+    { region: "Unova", gen: 5 },
+    { region: "Kalos", gen: 6 },
+    { region: "Alola", gen: 7 },
+    { region: "Galar", gen: 8 },
+    { region: "Paldea", gen: 9 }
+]);
+
+// let bgmTrack = null;
+
+function toggleModal() {
+    showModal.value = !showModal.value;
+}
+
+async function selectPokemon(pokemon) {
+    isLoading.value = true;
+    try {
+        const res1 = await getPokemon(pokemon);
+        const res2 = await getSpecies(pokemon);
+        selectedPokemon.value = { ...res1, ...res2 };
+        // console.log(selectedPokemon.value);
+    } finally {
+        isLoading.value = false;
+    }
+}
+
+onMounted(() => {
+    getIndex().then(results => {
+    pokemon.value = results.results;
+    });
+});
+
+const pokemonList = computed(() => {
+    if (text1.value) {
+        return pokemon.value.filter(p => p.name.includes(text1.value));
+    }
+    return pokemon.value;
+});
+
+watchEffect(() => {
+    if (selectedRegion.value) {
+        getPokemonByGen(selectedRegion.value.gen).then(results => {
+            pokemon.value = results.pokemon_species;
+        });
+    } else {
+        getIndex().then(results => {
+            pokemon.value = results.results;
+        });
+    }
+});
+
+// function PlayCry(cryUrl){
+//     console.log("Attempting to play cry for pokemon.")
+//     if (bgmTrack){
+//         bgmTrack.pause()
+//         bgmTrack.currentTime = 0
+//     }
+//     console.log("Using url: " + audioUrl)
+//     if(!audioUrl) return
+
+//     bgmTrack = new Audio(cryUrl)
+//     bgmTrack.loop = true
+
+//     bgmTrack.play()
+//     .catch((err) => {
+//         console.warn("play prevented or failed: ", err)
+//     })
+// }
+
+</script>
+
 <template>
+    <Modal v-if="showModal" @close="toggleModal">
+      <div class="flex justify-center">
+        <Card class="pokemon-card">
+            <template #title>
+              <span class="name">{{ selectedPokemon.name }}</span>
+              <span class="dex-no">#{{ String(selectedPokemon.id).padStart(4, '0') }}</span>
+            </template>
+            <template #subtitle>
+              <div class="types">
+                <span v-for="type in selectedPokemon.types" :key="type" class="type-chip"> | {{type.type.name}} </span>
+              </div>
+            </template>
+            <template #content>
+                  <dl class="measures">
+                      <div>                      
+                        <dt>Height</dt>
+                        <dd>{{ selectedPokemon.height }} m</dd>
+                      </div>
+                      <div>
+                        <dt>Weight</dt>
+                        <dd>{{ selectedPokemon.weight }} kgs</dd>
+                      </div>
+                  </dl>
+                  <section class="block">
+                      <h3>Abilities</h3>
+                      <ul class="abilities">
+                        <li v-for="ability in selectedPokemon.abilities" :key="ability.ability.name">{{ability.ability.name}}</li>
+                      </ul>
+                  </section>
+                  <section class="block">
+                      <h3>Base Stats</h3>
+                      <div v-for="stat in selectedPokemon.stats" :key="stat.stat.name">
+                        <span class="stat-name">{{stat.stat.name}}: </span>
+                        <span class="stat-value">{{stat.base_stat}}</span>
+                        </div>
+                  </section>
+            </template>
+        </Card>
+    </div>
+        <!-- <button label="Cry" class="w-full" @click="PlayCry(selectPokemon.cries.latest)" /> -->
+    </Modal>
+
     <Splitter class="pokedex">
         <SplitterPanel :size="25" :minSize="15" class="list-panel"> 
-            <div class="list-header">Pokedex</div>
-            <VirtualScroller :items="pokemon" :itemSize="44" class="list-scroller">
+            <div class="list-header">
+                <span>Pokedex</span>
+                <div class="space-y-4 max-w-xs mx-auto">
+                    <InputGroup>
+                        <InputGroupAddon>
+                            <Search />
+                        </InputGroupAddon>
+                        <InputText v-model="text1" placeholder="Search" />
+                        <Select v-model="selectedRegion" :options="regions" optionLabel="region" placeholder="Region" class="w-full md:w-56 name" />
+                    </InputGroup>
+                </div>
+            </div>
+            <VirtualScroller :items="pokemonList" :itemSize="44" class="list-scroller">
                 <template v-slot:item="{ item }">
                     <div @click="selectPokemon(item.name)" class="list-row" :class="{selected: selectedPokemon?.name == item.name}">{{ item.name }}</div>
                 </template>
@@ -16,62 +169,46 @@
                     </div>
                 </template>
                 <template #title><span class="name">{{ selectedPokemon.name }}</span></template>
-                <template #subtitle><span v-for="type in selectedPokemon.types" :key="type"> | {{type.type.name}} </span></template>
-                <!-- TODO: Implement Dex Entry -->
-                <!-- <template #content>
+                <template #subtitle><span v-for="type in selectedPokemon.types" :key="type" class="name"> | {{type.type.name}} </span></template>
+                <template #content>
                     <p class="m-0">
-                        Lorem ipsum dolor sit amet, consectetur adipisicing elit. Inventore sed consequuntur error repudiandae numquam deserunt quisquam repellat libero asperiores earum nam nobis, culpa ratione quam perferendis esse, cupiditate neque
-                        quas!
+                        {{ selectedPokemon.flavor_text_entries.find(entry => entry.language.name === 'en')?.flavor_text.replaceAll("", " ") || 'No dex entry available.' }}
                     </p>
-                </template> -->
-                <!-- <template #footer>
+                </template>
+                <template #footer>
                     <div class="flex gap-3 mt-1">
-                        <Button label="Cancel" severity="secondary" outlined class="w-full" />
-                        <Button label="Save" class="w-full" />
+                        <Button label="Details" class="w-full" @click="toggleModal" />
                     </div>
-                </template> -->
+                </template>
             </Card>
         </SplitterPanel>
     </Splitter>
 </template>
-
-<script setup>
-import { ref, onMounted } from 'vue';
-import VirtualScroller from 'primevue/virtualscroller';
-import Splitter from 'primevue/splitter';
-import SplitterPanel from 'primevue/splitterpanel';
-import Button from 'primevue/button';
-import Card from 'primevue/card';
-import { getIndex } from '@/api/pokeapi.js';
-import { getPokemon } from '@/api/pokeapi.js';
-
-const selectedPokemon = ref();
-const pokemon = ref([]);
-const isLoading = ref(true);
-const error = ref(null);
-
-async function selectPokemon(pokemon) {
-    isLoading.value = true;
-    try {
-        selectedPokemon.value = await getPokemon(pokemon);
-    } finally {
-        isLoading.value = false;
-    }
-}
-
-onMounted(() => {
-    getIndex().then(results => {
-    pokemon.value = results.results;
-    });
-});
-
-</script>
 
 <style scoped>
 .pokedex {
   height: 36rem;
   border-radius: var(--p-content-border-radius);
   overflow: hidden;
+}
+
+.pokemon-card {
+  width: 100%;
+  max-width: 24rem;
+}
+
+.head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.dex-no {
+  font-family: ui-monospace, monospace;
+  font-size: 0.8125rem;
+  font-weight: 400;
+  color: var(--p-text-muted-color);
 }
 
 /* ---- list ---- */
@@ -116,6 +253,110 @@ onMounted(() => {
   font-weight: 500;
 }
 
+/* ---- measures ---- */
+.measures {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1px;
+  margin: 0 0 1.5rem;
+  background: var(--p-content-border-color);
+  border: 1px solid var(--p-content-border-color);
+  border-radius: var(--p-content-border-radius);
+  overflow: hidden;
+}
+
+.measures > div {
+  padding: 0.75rem 1rem;
+  background: var(--p-content-background);
+}
+
+.measures dt {
+  margin-bottom: 0.25rem;
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--p-text-muted-color);
+}
+
+.measures dd {
+  margin: 0;
+  font-size: 1.125rem;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---- blocks ---- */
+.block + .block {
+  margin-top: 1.5rem;
+}
+
+.block h3 {
+  margin: 0 0 0.625rem;
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--p-text-muted-color);
+}
+
+.abilities {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.abilities li {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.3125rem 0.625rem;
+  border: 1px solid var(--p-content-border-color);
+  border-radius: var(--p-content-border-radius);
+  font-size: 0.8125rem;
+  text-transform: capitalize;
+}
+
+.abilities li.is-hidden {
+  border-style: dashed;
+  color: var(--p-text-muted-color);
+}
+
+.tag {
+  font-size: 0.625rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  opacity: 0.7;
+}
+
+/* ---- stats ---- */
+.stats {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.stat {
+  display: grid;
+  grid-template-columns: 4.5rem 2.25rem 1fr;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.stat-name {
+  font-size: 0.875rem;
+  color: var(--p-text-muted-color);
+  text-transform: uppercase;
+}
+
+.stat-value {
+  font-size: 0.875rem;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
 /* ---- detail ---- */
 .detail-panel {
   display: flex;
@@ -148,11 +389,6 @@ onMounted(() => {
   text-transform: capitalize;
 }
 
-.dex-no {
-  font-family: ui-monospace, monospace;
-  color: var(--p-text-muted-color);
-}
-
 .types {
   display: flex;
   gap: 0.5rem;
@@ -160,23 +396,15 @@ onMounted(() => {
   text-transform: capitalize;
 }
 
-.stats {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1rem;
-  margin: 0;
-  font-size: 0.875rem;
-}
-
-.stats dt {
-  font-size: 0.75rem;
-  letter-spacing: 0.05em;
+.type-chip {
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  background: var(--p-surface-100);
+  border: 1px solid var(--p-content-border-color);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: var(--p-text-muted-color);
-}
-
-.stats dd {
-  margin: 0;
 }
 
 .actions {

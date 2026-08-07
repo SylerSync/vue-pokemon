@@ -9,3 +9,4 @@ async function get(path) {
 export const getIndex   = () => get('/pokemon?limit=100000')
 export const getPokemon = (name) => get(`/pokemon/${name}`)
 export const getSpecies = (name) => get(`/pokemon-species/${name}`)
+export const getPokemonByGen    = (generation) => get(`/generation/${generation}`)
