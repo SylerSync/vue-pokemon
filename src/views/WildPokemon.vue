@@ -3,6 +3,9 @@ import {watch, ref, onUnmounted} from "vue"
 import Select from "primevue/select"
 import Card from "primevue/card"
 import Modal from "@/components/Modal.vue"
+import { usePokemonStore } from "@/stores/pokemonStore"
+
+const pokemonStore = usePokemonStore()
 
 const regionMusic = {
   kanto: "https://play.pokemonshowdown.com/audio/hgss-kanto-trainer.mp3",
@@ -47,6 +50,13 @@ const openCatchModal = (pokemon) => {
 
 const closeCatchModal = () => {
     selectedPokemon.value = null
+    isCatchModalOpen.value = false
+}
+
+function CatchPokemon(pokemon){
+    pokemonStore.addPokemon(pokemon)
+    console.log(pokemonStore.caughtPokemon)
+    wildPokemon.value = wildPokemon.value.filter(p => p.name !== pokemon.name)
     isCatchModalOpen.value = false
 }
 
@@ -180,7 +190,7 @@ async function getWildPokemonData(){
             <p>Weight: {{ selectedPokemon.weight }}</p>
             <p>Height: {{ selectedPokemon.height }}</p>
 
-            <button>Catch Pokemon</button>
+            <button @click="CatchPokemon(selectedPokemon)">Catch Pokemon</button>
         </div>
     </Modal>
 </template>
