@@ -1,6 +1,7 @@
 import {defineStore} from "pinia"
 
 export const usePokemonStore = defineStore("pokemonStore", {
+    
 
     state: () => ({
         caughtPokemon: [],
@@ -25,10 +26,24 @@ export const usePokemonStore = defineStore("pokemonStore", {
             steel:    '#B8B8D0',
             fairy:    '#EE99AC',
             stellar:  '#40B5A5'
+        },
+        starters: {
+            kanto: [1, 4, 7],
+            johto: [152, 155, 158],
+            hoenn: [252, 255, 258],
+            sinnoh: [387, 390, 393],
+            unova: [495, 498, 501],
+            kalos: [650, 653, 656],
+            alola: [722, 725, 728],
+            galar: [810, 813, 816],
+            paldea: [906, 909, 912]
         }
+
     }),
     getters:{
-        
+        getStartersByRegion: (state) => (region) =>{
+            return state.starters[region] || []
+        }
     },
     actions: {
         addPokemon(pokemon){
