@@ -51,7 +51,9 @@
             <img :src="selectedPokemon.sprite" :alt="selectedPokemon.name">
             <h3>Types:</h3>
             <div v-for="type of selectedPokemon.types" :key="type">
-                <p>{{ type }} </p>
+                <p class="typeTag" :style="{ backgroundColor: pokemonStore.typeColors[type] }">
+                    {{ type }}
+                </p>
             </div>
             <p>Weight: {{ selectedPokemon.weight }}</p>
             <p>Height: {{ selectedPokemon.height }}</p>
@@ -123,5 +125,12 @@
     background-color: Canvas;
 }
 
+.typeTag{
+    border-radius: 5px;
+    padding:5px;
+    margin: 3px;
+    width: 5rem;
+    text-align: center;
+}
 
 </style>
