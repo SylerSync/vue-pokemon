@@ -55,13 +55,11 @@ const closeCatchModal = () => {
 
 function CatchPokemon(pokemon){
     pokemonStore.addPokemon(pokemon)
-    console.log(pokemonStore.caughtPokemon)
     wildPokemon.value = wildPokemon.value.filter(p => p.name !== pokemon.name)
     isCatchModalOpen.value = false
 }
 
 function PlayRegionAudio(region){
-    console.log("Attempting to play music for region: " + region.value)
     if (bgmTrack){
         bgmTrack.pause()
         bgmTrack.currentTime = 0
@@ -158,8 +156,6 @@ async function getWildPokemonData(){
     }
 
     wildPokemon.value = pokemonData
-
-    console.log(wildPokemon)
 }
 
 </script>
