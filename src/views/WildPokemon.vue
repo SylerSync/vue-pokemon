@@ -46,6 +46,7 @@ const selectedPokemon = ref(null)
 const openCatchModal = (pokemon) => {
     selectedPokemon.value = pokemon
     isCatchModalOpen.value = true
+    PlayCry(pokemon.cry)
 }
 
 const closeCatchModal = () => {
@@ -57,6 +58,27 @@ function CatchPokemon(pokemon){
     pokemonStore.addPokemon(pokemon)
     wildPokemon.value = wildPokemon.value.filter(p => p.name !== pokemon.name)
     isCatchModalOpen.value = false
+}
+
+function PlayCry(cry_url){
+    console.log("Playing cry using URL: " + cry_url)
+    if(!cry_url) return
+
+    if(bgmTrack){
+        bgmTrack.volume = 0.3
+    }
+    let cry = new Audio(cry_url)
+    cry.loop = false
+    cry.currentTime = 0;
+    cry.play()
+    .catch((err) => {
+        console.warn("Could not play audio at url: " + cry_url, err)
+    })
+    cry.onended = () => {
+        if(bgmTrack){
+            bgmTrack.volume = 1.0
+        }
+    }
 }
 
 function PlayRegionAudio(region){
@@ -150,7 +172,8 @@ async function getWildPokemonData(region){
                     sprite : 10 < randInt && randInt < 15 ? dataJson.sprites.front_shiny : dataJson.sprites.front_default,
                     types : dataJson.types.map(t => t.type.name),
                     height : dataJson.height,
-                    weight : dataJson.weight
+                    weight : dataJson.weight,
+                    cry: dataJson.cries.latest
                 }
                 pokemonData.push(newPokemon)
                 randInt = 0
@@ -183,6 +206,7 @@ async function getWildPokemonData(region){
         pokemon.types = dataJson.types.map(t => t.type.name)
         pokemon.height = dataJson.height
         pokemon.weight = dataJson.weight
+        pokemon.cry = dataJson.cries.latest
         randInt = 0
     }
 
@@ -297,7 +321,7 @@ async function getWildPokemonData(region){
 
 .pokemonCard:hover {
     cursor: pointer;
-    background-color: Canvas;
+    background-color: SelectedItem;
 }
 
 .typeTag{
