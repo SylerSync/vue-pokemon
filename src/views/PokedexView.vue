@@ -9,6 +9,7 @@ import InputGroup from 'primevue/inputgroup';
 import InputText from 'primevue/inputtext';
 import InputGroupAddon from 'primevue/inputgroupaddon';
 import Search from '@primeicons/vue/search';
+import { Checkbox } from 'primevue';
 import Select from 'primevue/select';
 import { getIndex } from '@/api/pokeapi.js';
 import { getPokemon } from '@/api/pokeapi.js';
@@ -19,6 +20,7 @@ import { usePokemonStore } from '@/stores/pokemonStore';
 
 const selectedPokemon = ref();
 const pokemon = ref([]);
+const allPokemon = ref([]);
 const isLoading = ref(true);
 const text1 = ref(null);
 const selectedRegion = ref(null);
@@ -36,6 +38,8 @@ const regions = ref([
     { region: "Paldea", gen: 9 }
 ]);
 const pokemonStore = usePokemonStore();
+const showWishListed = ref(false);
+const showCaught = ref(false);
 
 // let bgmTrack = null;
 
@@ -78,33 +82,42 @@ async function selectPokemon(pokemon) {
 
 onMounted(() => {
     getIndex().then(results => {
-    pokemon.value = results.results;
+    allPokemon.value = results.results;
     });
 });
 
 const pokemonList = computed(() => {
-    for (let pok of pokemon.value) {
-      pok.wishList = pokemonStore.pokemonIsInWishList(pok.name);
-      pok.caught = pokemonStore.pokemonIsCaught(pok.name);
-    };
+  for (let pok of pokemon.value) {
+    pok.wishList = pokemonStore.pokemonIsInWishList(pok.name);
+    pok.caught = pokemonStore.pokemonIsCaught(pok.name);
+  };
 
-    if (text1.value) {
-        return  pokemon.value.filter(p => p.name.includes(text1.value));
-    }
-    // console.log(pokemon.value)
-    return pokemon.value;
+  let filteredPokemon = [];
+
+  filteredPokemon = pokemon.value
+
+  if (showWishListed.value) {
+    filteredPokemon = filteredPokemon.filter(p => p.wishList)
+  }
+  if (showCaught.value) {
+    filteredPokemon = filteredPokemon.filter(p => p.caught)
+  }
+  if (text1.value) {
+      filteredPokemon = filteredPokemon.filter(p => p.name.includes(text1.value));
+  }
+  
+  // console.log(filteredPokemon)
+  return filteredPokemon;
 });
 
 watchEffect(() => {
     if (selectedRegion.value && selectedRegion.value.gen != 0) {
-        getPokemonByGen(selectedRegion.value.gen).then(results => {
-            pokemon.value = results.pokemon_species;
-        });
-    } else {
-        getIndex().then(results => {
-            pokemon.value = results.results;
-        });
-    }
+      getPokemonByGen(selectedRegion.value.gen).then(results => {
+          pokemon.value = results.pokemon_species;
+      });
+  } else {
+      pokemon.value = allPokemon.value;
+  }
 });
 
 // function PlayCry(cryUrl){
@@ -181,6 +194,12 @@ watchEffect(() => {
                         </InputGroupAddon>
                         <InputText v-model="text1" placeholder="Search" />
                         <Select v-model="selectedRegion" :options="regions" optionLabel="region" placeholder="Region" class="w-full md:w-56 name" />
+                        <InputGroupAddon>
+                            <span class="name">Wish <Checkbox v-model="showWishListed" :binary="true" /></span>
+                        </InputGroupAddon>
+                        <InputGroupAddon>
+                            <span class="name">Caught <Checkbox v-model="showCaught" :binary="true" /></span>
+                        </InputGroupAddon>
                     </InputGroup>
                 </div>
             </div>
