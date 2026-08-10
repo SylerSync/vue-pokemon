@@ -153,7 +153,6 @@ async function getWildPokemonData(region){
                     weight : dataJson.weight
                 }
                 pokemonData.push(newPokemon)
-                console.log(randInt)
                 randInt = 0
             }
         }
@@ -184,8 +183,6 @@ async function getWildPokemonData(region){
         pokemon.types = dataJson.types.map(t => t.type.name)
         pokemon.height = dataJson.height
         pokemon.weight = dataJson.weight
-        console.log(randInt)
-        console.log(pokemon.sprite)
         randInt = 0
     }
 
@@ -198,9 +195,11 @@ async function getWildPokemonData(region){
     <Select v-model="selectedRegion" :options="regions" placeholder="Select a region"/>
     <div class="pokemon-grid">
         <Card  v-for="pokemon in wildPokemon" :key="pokemon.name" class="w-full pokemonCard" @click="openCatchModal(pokemon)">
+            
             <template #title>{{ pokemon.name }}</template>
             <template #header>
                 <div class="sprite-container">
+                    <span class="favPokemon" v-if="pokemonStore.pokemonIsInWishList(pokemon.name)">&#9734;</span>
                     <img class="pokemon-sprite" :src="pokemon.sprite" :alt="pokemon.name"/>
                 </div>
                 
@@ -283,6 +282,17 @@ async function getWildPokemonData(region){
 .catchModal Button:hover {
     background-color: blue;
     border:2px solid darkblue;
+}
+
+.pokemonCard{
+    position: relative;
+}
+
+.favPokemon {
+    position: absolute;
+    top:10px;
+    right:10px;
+    z-index: 10;
 }
 
 .pokemonCard:hover {
