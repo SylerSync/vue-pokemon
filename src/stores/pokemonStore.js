@@ -60,6 +60,10 @@ export const usePokemonStore = defineStore("pokemonStore", {
         },
         releasePokemon(index){
             this.caughtPokemon.splice(index, 1)
+        },
+        // removes from wishlist by name instead of index number
+        removeWishlistPokemon(pokemon){
+            this.wishlistPokemon = this.wishlistPokemon.filter(pok => pok.name !== pokemon)
         }
     }
 })

@@ -44,11 +44,35 @@
                     <Tag :value="getSeverityLabel(data.caught)" :severity="getSeverity(data.caught)" />
                 </template>
             </Column>
+            <Column>
+                <template #body="{ data }">
+                    <button @click="toggleModal(data)">Remove</button>
+                </template>
+            </Column>
             <template #empty>
                 <p class="empty">Nothing on your wish list yet.</p>
             </template>
         </DataTable>
     </section>
+    <Teleport to="body" v-if="showModal">
+        <Modal @close="toggleModal(selectedPokemon)">
+            <div class="confirm">
+              <h2 class="confirm-title">Remove from wish list?</h2>
+              <p class="confirm-body">
+                <span class="subject">{{ selectedPokemon.name }}</span>
+                will be removed from your wish list.
+              </p>
+              <div class="confirm-actions">
+                <button class="btn btn-ghost" @click="toggleModal(selectedPokemon)">
+                  Cancel
+                </button>
+                <button class="btn btn-danger" @click="removeFromWishList(selectedPokemon)">
+                  Remove
+                </button>
+              </div>
+            </div>
+        </Modal>
+    </Teleport>
 </template>
 
 <script setup>
@@ -58,9 +82,12 @@ import ColumnGroup from 'primevue/columngroup';   // optional
 import Row from 'primevue/row';                   // optional
 import Tag from 'primevue/tag';
 import { usePokemonStore } from '@/stores/pokemonStore';
-import { ref, onMounted, computed } from 'vue';
+import { ref, onMounted, computed, watchEffect } from 'vue';
+import Modal from '@/components/Modal.vue';
 
 const pokemonStore = usePokemonStore();
+const showModal = ref(false);
+const selectedPokemon = ref(null);
 
 const pokemon = computed(() =>
     pokemonStore.wishlistPokemon.map(p => ({
@@ -85,6 +112,16 @@ const getSeverityLabel = (caught) => {
         return 'Still Searching';
     }
 };
+
+function removeFromWishList(pokemon){
+    pokemonStore.removeWishlistPokemon(pokemon.name)
+    showModal.value = false;
+}
+
+function toggleModal(pokemon) {
+    selectedPokemon.value = pokemon;
+    showModal.value = !showModal.value;
+}
 </script>
 
 <style scoped>
@@ -208,7 +245,87 @@ const getSeverityLabel = (caught) => {
   color: var(--p-text-muted-color);
 }
 
+.confirm {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  min-width: 18rem;
+  max-width: 26rem;
+  padding: 0.5rem;
+}
+
+.confirm-title {
+  margin: 0;
+  font-size: 1.125rem;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.confirm-body {
+  margin: 0;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--p-text-muted-color);
+}
+
+.subject {
+  text-transform: capitalize;
+  font-weight: 500;
+  color: var(--p-text-color);
+}
+
+.confirm-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.625rem;
+  margin-top: 1rem;
+}
+
+.btn {
+  padding: 0.5rem 1rem;
+  border-radius: var(--p-content-border-radius);
+  border: 1px solid transparent;
+  font: inherit;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.15s, border-color 0.15s;
+}
+
+.btn:focus-visible {
+  outline: var(--p-focus-ring-width, 2px) solid var(--p-focus-ring-color, currentColor);
+  outline-offset: 2px;
+}
+
+.btn-ghost {
+  background: transparent;
+  border-color: var(--p-content-border-color);
+  color: var(--p-text-color);
+}
+
+.btn-ghost:hover {
+  background: var(--p-content-hover-background);
+}
+
+.btn-danger {
+  background: var(--p-red-500);
+  color: #fff;
+}
+
+.btn-danger:hover {
+  background: var(--p-red-600);
+}
+
 @media (prefers-color-scheme: dark) {
   .thumb { background: var(--p-surface-800); }
+}
+
+@media (max-width: 24rem) {
+  .confirm-actions {
+    flex-direction: column-reverse;
+  }
+  .btn {
+    width: 100%;
+  }
 }
 </style>
