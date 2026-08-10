@@ -60,7 +60,17 @@ async function selectPokemon(pokemon) {
         const res1 = await getPokemon(pokemon);
         const res2 = await getSpecies(pokemon);
         selectedPokemon.value = { ...res1, ...res2 };
-        // console.log(selectedPokemon.value);
+    } catch {
+      if(pokemon.includes("-")){
+        let name = pokemon.split('-')[0];
+        try {
+            const res1 = await getPokemon(pokemon);
+            const res2 = await getSpecies(name);
+            selectedPokemon.value = { ...res1, ...res2 };
+        } catch {
+
+        }
+      }
     } finally {
         isLoading.value = false;
     }
@@ -86,7 +96,7 @@ const pokemonList = computed(() => {
 });
 
 watchEffect(() => {
-    if (selectedRegion.value) {
+    if (selectedRegion.value && selectedRegion.value.gen != 0) {
         getPokemonByGen(selectedRegion.value.gen).then(results => {
             pokemon.value = results.pokemon_species;
         });
@@ -176,7 +186,11 @@ watchEffect(() => {
             </div>
             <VirtualScroller :items="pokemonList" :itemSize="44" class="list-scroller">
                 <template v-slot:item="{ item }">
-                    <div @click="selectPokemon(item.name)" class="list-row" :class="{selected: selectedPokemon?.name == item.name}"> {{ item.name }} <span v-if="item.wishList">&nbsp	&#10026;</span></div>
+                    <div @click="selectPokemon(item.name)" class="list-row" :class="{selected: selectedPokemon?.name == item.name}">
+                      <span v-if="item.caught"><img src="../assets/pokeball.png" alt="(Caught)" class="marker">&nbsp;</span>
+                      <span v-if="item.wishList" class="star">&#9734;&nbsp;</span>
+                       <span class="name">{{ item.name }}</span>
+                    </div>
                 </template>
             </VirtualScroller>
         </SplitterPanel>
@@ -271,6 +285,24 @@ watchEffect(() => {
   background: var(--p-highlight-background);
   color: var(--p-highlight-color);
   font-weight: 500;
+}
+
+.marker {
+  flex: none;
+  width: 1em;
+  height: 1em;
+  object-fit: contain;
+}
+
+.star {
+  flex: none;
+  line-height: 1;
+}
+
+.name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 /* ---- measures ---- */
