@@ -4,6 +4,9 @@ import Select from "primevue/select"
 import Card from "primevue/card"
 import Modal from "@/components/Modal.vue"
 import { usePokemonStore } from "@/stores/pokemonStore"
+import { useSettingsStore } from "@/stores/settingsStore"
+
+const settingsStore = useSettingsStore()
 
 const pokemonStore = usePokemonStore()
 
@@ -76,11 +79,12 @@ function CatchPokemon(pokemon) {
 
 }
 
+// Audio Management Section
 function PlayCry(cry_url) {
     console.log("Playing cry using URL: " + cry_url)
-    if (!cry_url) return
+    if (!cry_url || settingsStore.muteAudio) return
 
-    if (bgmTrack) {
+    if (bgmTrack && !settingsStore.muteAudio) {
         bgmTrack.volume = 0.3
     }
     let cry = new Audio(cry_url)
@@ -116,11 +120,24 @@ function PlayRegionAudio(region) {
 
     bgmTrack = new Audio(audioUrl)
     bgmTrack.loop = true
+
+    bgmTrack.muted = Boolean(settingsStore.muteAudio);
+
     bgmTrack.play()
         .catch((err) => {
             console.warn("autoplay prevented or failed: ", err)
         })
 }
+
+watch(
+    () => settingsStore.muteAudio,
+    (isMuted) => {
+        console.log("Mute toggle change detected.")
+        if(bgmTrack){
+            bgmTrack.muted = isMuted;
+        }
+    }
+);
 
 // clean up the audio when you leave the page.
 onUnmounted(() => {
