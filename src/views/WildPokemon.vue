@@ -45,13 +45,19 @@ const wildPokemon = ref([])
 const isCatchModalOpen = ref(false)
 
 const selectedPokemon = ref(null)
+const selectedIndex = ref(null)
 
-const openCatchModal = (pokemon) => {
+const catchMessage = ref("")
+const showFeedback = ref(false)
+const isFinished = ref(false)
+
+const openCatchModal = (pokemon, index) => {
     if (!pokemon) {
         console.warn("Unable to open the modal, failed to find selected Pokemon.")
         return
     }
     selectedPokemon.value = pokemon
+    selectedIndex.value = index
     isCatchModalOpen.value = true
     PlayCry(pokemon.cry)
 }
@@ -59,22 +65,52 @@ const openCatchModal = (pokemon) => {
 const closeCatchModal = () => {
     selectedPokemon.value = null
     isCatchModalOpen.value = false
+    catchMessage.value = ""
+    showFeedback.value = false
+    isFinished.value = false
 }
 
-function CatchPokemon(pokemon) {
-    if (!pokemon) {
+function CatchPokemon() {
+    console.log("Attempting catch!")
+    if (!selectedPokemon.value || selectedIndex.value === null) {
         console.warn("Unable to catch pokemon, pokemon data was not found")
         return
     }
     try {
-        pokemonStore.addPokemon(pokemon)
-        wildPokemon.value = wildPokemon.value.filter(p => p.name !== pokemon.name)
+        let captureRoll = Math.floor(Math.random() * 101);
+        const fleeChance = Math.min(30, 100 - selectedPokemon.value.captureRate);
+        const fleeRoll = Math.floor(Math.random() * 101);
+
+        if(pokemonStore.caughtPokemon.length === 0){
+            captureRoll = 0
+        }
+
+        console.log(`Capture roll: ${captureRoll} Capture Chance: ${selectedPokemon.value.captureRate}`)
+        
+        if(captureRoll <= selectedPokemon.value.captureRate){
+            pokemonStore.addPokemon(selectedPokemon.value)
+            wildPokemon.value.splice(selectedIndex.value, 1)
+            selectedIndex.value = null
+            catchMessage.value = `Gotcha! ${selectedPokemon.value.name} was caught!`
+            showFeedback.value = true
+            isFinished.value = true
+        }
+        else{
+            if(fleeRoll <= fleeChance){
+                wildPokemon.value.splice(selectedIndex.value, 1)
+                catchMessage.value = `Oh no! ${selectedPokemon.value.name} fled!`
+                showFeedback.value = true
+                isFinished.value = true
+            }
+            else{
+                catchMessage.value = `Aww! ${selectedPokemon.value.name} broke free!`
+                showFeedback.value = true
+            }
+        }
+
     }
     catch (err) {
         console.error("Unable to catch pokemon", err)
-    }
-    finally {
-        closeCatchModal()
     }
 
 }
@@ -212,7 +248,7 @@ async function getWildPokemonData(region) {
 
         if (!data.ok) {
           console.error(`An error occurred collecting json data for starter ${pokemonID}`);
-          return null; // Return null on HTTP error
+          return null; 
         }
 
         const dataJson = await data.json();
@@ -224,11 +260,12 @@ async function getWildPokemonData(region) {
           types: dataJson.types.map(t => t.type.name),
           height: dataJson.height,
           weight: dataJson.weight,
-          cry: dataJson.cries?.latest ? dataJson.cries.latest : (dataJson.cries?.legacy || "")
+          cry: dataJson.cries?.latest ? dataJson.cries.latest : (dataJson.cries?.legacy || ""),
+          captureRate: 100
         };
       } catch (err) {
         console.error(`An error occurred loading data for starter: ${pokemonID}`, err);
-        return null; // Return null on network error
+        return null;
       }
     });
 
@@ -251,24 +288,37 @@ async function getWildPokemonData(region) {
 
   const wildPromises = randomTargets.map(async (target) => {
     const randInt = Math.floor(Math.random() * 101);
-    try {
-      const data = await fetch("https://pokeapi.co/api/v2/pokemon/" + target.name);
+    
+    // Use target.name (or target.id/url depending on how pokemonList is structured)
+    const pokemonIdentifier = target.name || target.id;
 
-      if (!data.ok) {
+    try {
+      const [pokemonRes, speciesRes] = await Promise.all([
+        fetch(`https://pokeapi.co/api/v2/pokemon/${pokemonIdentifier}`),
+        fetch(`https://pokeapi.co/api/v2/pokemon-species/${pokemonIdentifier}`)
+      ]);
+
+      if (!pokemonRes.ok) {
         console.error(`An error occurred collecting pokemon data for ${target.name}`);
         return null;
       }
+      if (!speciesRes.ok) {
+        console.error(`An error occurred collecting species data for ${target.name}`);
+        return null;
+      }
 
-      const dataJson = await data.json();
+      const pokemonData = await pokemonRes.json();
+      const speciesData = await speciesRes.json();
 
       return {
-        name: dataJson.name,
-        id: dataJson.id,
-        sprite: 10 < randInt && randInt < 15 ? dataJson.sprites.front_shiny : dataJson.sprites.front_default,
-        types: dataJson.types.map(t => t.type.name),
-        height: dataJson.height,
-        weight: dataJson.weight,
-        cry: dataJson.cries?.latest ? dataJson.cries.latest : (dataJson.cries?.legacy || "")
+        name: pokemonData.name,
+        id: pokemonData.id,
+        sprite: 10 < randInt && randInt < 15 ? pokemonData.sprites.front_shiny : pokemonData.sprites.front_default,
+        types: pokemonData.types.map(t => t.type.name),
+        height: pokemonData.height,
+        weight: pokemonData.weight,
+        cry: pokemonData.cries?.latest ? pokemonData.cries.latest : (pokemonData.cries?.legacy || ""),
+        captureRate: Math.round((speciesData.capture_rate / 255) * 100) 
       };
     } catch (err) {
       console.error(`An error occurred collecting data for ${target.name}`, err);
@@ -280,13 +330,15 @@ async function getWildPokemonData(region) {
   wildPokemon.value = wildResults.filter(Boolean);
 }
 
+
+
 </script>
 
 <template>
     <Select v-model="selectedRegion" :options="regions" placeholder="Select a region" />
     <div class="pokemon-grid">
-        <Card v-for="pokemon in wildPokemon" :key="pokemon.name" class="w-full pokemonCard"
-            @click="openCatchModal(pokemon)">
+        <Card v-for="(pokemon, index) in wildPokemon" :key="index" class="w-full pokemonCard"
+            @click="openCatchModal(pokemon, index)">
 
             <template #title>{{ pokemon.name }}</template>
             <template #header>
@@ -304,6 +356,7 @@ async function getWildPokemonData(region) {
         <div v-if="selectedPokemon" class="catchModal">
             <h2>{{ selectedPokemon.name }}</h2>
             <img :src="selectedPokemon.sprite" :alt="selectedPokemon.name">
+            
             <h3>Types:</h3>
             <div v-for="type of selectedPokemon.types" :key="type">
                 <p class="typeTag" :style="{ backgroundColor: pokemonStore.typeColors[type] }">
@@ -313,7 +366,15 @@ async function getWildPokemonData(region) {
             <p>Weight: {{ selectedPokemon.weight }}</p>
             <p>Height: {{ selectedPokemon.height }}</p>
 
-            <button @click="CatchPokemon(selectedPokemon)">Catch Pokemon</button>
+            <p v-if="catchMessage" class="feedback-text">{{ catchMessage }}</p>
+
+        <!-- Button toggle logic -->
+        <button v-if="isFinished" @click="closeCatchModal">
+            Close
+        </button>
+        <button v-else @click="CatchPokemon()">
+            Catch Pokemon
+        </button>
         </div>
     </Modal>
 </template>
