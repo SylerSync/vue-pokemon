@@ -1,5 +1,6 @@
 <script setup>
 import { watch, ref, onUnmounted } from "vue"
+import {computed} from "vue"
 import Select from "primevue/select"
 import Card from "primevue/card"
 import Modal from "@/components/Modal.vue"
@@ -8,10 +9,17 @@ import { useSettingsStore } from "@/stores/settingsStore"
 import { getMove } from "@/api/pokeapi"
 import Splitter from 'primevue/splitter';
 import SplitterPanel from 'primevue/splitterpanel';
+import { useInventoryStore } from "@/stores/inventoryStore"
 
 const settingsStore = useSettingsStore()
 
 const pokemonStore = usePokemonStore()
+
+const inventoryStore = useInventoryStore()
+
+const selectedPokeball = computed(() => {
+    return inventoryStore.SelectedPokeballData(inventoryStore.selectedPokeball)
+})
 
 const regionMusic = {
     kanto: "https://play.pokemonshowdown.com/audio/hgss-kanto-trainer.mp3",
@@ -86,48 +94,75 @@ function closeDefeatModal() {
     usersSelectedPokemon.value.currentHp = usersSelectedPokemon.value.totalHp
 }
 
+function CatchStarter(){
+    console.log("catching starter")
+    if (!selectedPokemon.value || selectedIndex.value === null) {
+        console.warn("Unable to catch pokemon, pokemon data was not found")
+        return
+    }
+
+    pokemonStore.addPokemon(selectedPokemon.value)
+    wildPokemon.value.splice(selectedIndex.value, 1)
+    selectedIndex.value = null
+    catchMessage.value = `Starter pokemon ${selectedPokemon.value.name} has been chosen.`
+    showFeedback.value = true
+    isFinished.value = true
+}
+
+
 function CatchPokemon() {
     console.log("Attempting catch!")
     if (!selectedPokemon.value || selectedIndex.value === null) {
         console.warn("Unable to catch pokemon, pokemon data was not found")
         return
     }
+    if(pokemonStore.caughtPokemon.length === 0){
+        CatchStarter()
+        return
+    }
     try {
-        // Roll chances for capturing or fleeing
-        let captureRoll = Math.floor(Math.random() * 101);
-        const fleeChance = Math.min(30, 100 - selectedPokemon.value.captureRate);
-        const fleeRoll = Math.floor(Math.random() * 101);
+        if(inventoryStore.UsePokeball(selectedPokeball.value.id)){
+            // Roll chances for capturing or fleeing
+            let captureRoll = Math.floor(Math.random() * 101);
+            const fleeChance = Math.min(30, 100 - selectedPokemon.value.captureRate);
+            const fleeRoll = Math.floor(Math.random() * 101);
 
-        if(pokemonStore.caughtPokemon.length === 0){
-            captureRoll = 0
-        }
+            const rawRate = captureRoll - selectedPokeball.value.catchPower
+            let effectiveCaptureRate = Math.min(100, Math.max(0, rawRate))
 
-        console.log(`Capture roll: ${captureRoll} Capture Chance: ${selectedPokemon.value.captureRate}`)
+            console.log(`Capture roll: ${captureRoll} Effective Roll: ${effectiveCaptureRate} Capture Chance: ${selectedPokemon.value.captureRate}`)
         
         // Capture roll chance hits, pokemon is set and relavent data is set
-        if(captureRoll <= selectedPokemon.value.captureRate){
-            pokemonStore.addPokemon(selectedPokemon.value)
-            wildPokemon.value.splice(selectedIndex.value, 1)
-            selectedIndex.value = null
-            catchMessage.value = `Gotcha! ${selectedPokemon.value.name} was caught!`
-            showFeedback.value = true
-            isFinished.value = true
-        }
-        // If a roll chance fails the pokemon has the chance to flee
-        else{
-            if(fleeRoll <= fleeChance){
+            if(effectiveCaptureRate <= selectedPokemon.value.captureRate){
+                pokemonStore.addPokemon(selectedPokemon.value)
                 wildPokemon.value.splice(selectedIndex.value, 1)
-                catchMessage.value = `Oh no! ${selectedPokemon.value.name} fled!`
+                selectedIndex.value = null
+                console.log(`${Math.trunc(3000/selectedPokemon.value.captureRate)} has been added to your balance`)
+                inventoryStore.AddFunds(Math.trunc(3000/selectedPokemon.value.captureRate))
+                catchMessage.value = `Gotcha! ${selectedPokemon.value.name} was caught!`
                 showFeedback.value = true
                 isFinished.value = true
             }
+            // If a roll chance fails the pokemon has the chance to flee
             else{
-                // if a catch fails and the pokemon doesnt flee, simply show a message and dont alter state.
-                catchMessage.value = `Aww! ${selectedPokemon.value.name} broke free!`
-                showFeedback.value = true
+                if(fleeRoll <= fleeChance){
+                    wildPokemon.value.splice(selectedIndex.value, 1)
+                    catchMessage.value = `Oh no! ${selectedPokemon.value.name} fled!`
+                    selectedIndex.value = null
+                    showFeedback.value = true
+                    isFinished.value = true
+                }
+                else{
+                    // if a catch fails and the pokemon doesnt flee, simply show a message and dont alter state.
+                    catchMessage.value = `Aww! ${selectedPokemon.value.name} broke free!`
+                    showFeedback.value = true
+                }
             }
         }
-
+        else{
+            catchMessage.value = `You don't have any ${selectedPokeball.value.id}, switching to default Pokeball.`
+            showFeedback.value = true
+        }
     }
     catch (err) {
         console.error("Unable to catch pokemon", err)
