@@ -1,5 +1,6 @@
 const BASE = 'https://pokeapi.co/api/v2/'
 
+// makes an api call using the provided path and foutputs the result formatted into json
 async function get(path) {
   const res = await fetch(`${BASE}${path}`)
   if (!res.ok) throw new Error(`${res.status} ${res.statusText}`)
