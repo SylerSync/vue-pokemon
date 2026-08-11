@@ -50,7 +50,7 @@ function toggleModal() {
 function wishList() {
     if (selectedPokemon.value) {
         pokemonStore.addWishlistPokemon(selectedPokemon.value);
-        console.log('Added to wishlist:', selectedPokemon.value);
+        // console.log('Added to wishlist:', selectedPokemon.value);
     }
 }
 
@@ -60,11 +60,14 @@ function checkWishList(name) {
 
 async function selectPokemon(pokemon) {
     isLoading.value = true;
+    // trys to get both the pokemon's species and individual information based off the name
     try {
         const res1 = await getPokemon(pokemon);
         const res2 = await getSpecies(pokemon);
         selectedPokemon.value = { ...res1, ...res2 };
     } catch {
+      // if recalling the information fails try to get information by remove text after the -
+      // This is for fixing the issue where "PokemonName"-"Form" is the provided name which getSpecies returns null for
       if(pokemon.includes("-")){
         let name = pokemon.split('-')[0];
         try {
@@ -87,6 +90,7 @@ onMounted(() => {
 });
 
 const pokemonList = computed(() => {
+  // adds whishList and caught values needed for sorting to the object
   for (let pok of pokemon.value) {
     pok.wishList = pokemonStore.pokemonIsInWishList(pok.name);
     pok.caught = pokemonStore.pokemonIsCaught(pok.name);
@@ -111,6 +115,8 @@ const pokemonList = computed(() => {
 });
 
 watchEffect(() => {
+    //Because region information isn't stored in the pokemon list. When filtered 
+    // by region a new api call is run to grab the list of pokemon from the selected region
     if (selectedRegion.value && selectedRegion.value.gen != 0) {
       getPokemonByGen(selectedRegion.value.gen).then(results => {
           pokemon.value = results.pokemon_species;
@@ -120,6 +126,7 @@ watchEffect(() => {
   }
 });
 
+// TODO: Implement button to play pokemon cry
 // function PlayCry(cryUrl){
 //     console.log("Attempting to play cry for pokemon.")
 //     if (bgmTrack){

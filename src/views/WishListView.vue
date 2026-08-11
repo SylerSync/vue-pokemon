@@ -89,6 +89,8 @@ const pokemonStore = usePokemonStore();
 const showModal = ref(false);
 const selectedPokemon = ref(null);
 
+// ads a caught value to the objects and brings the types up to the top of the
+//  json object so that it can be referenced by primevue's sortable field
 const pokemon = computed(() =>
     pokemonStore.wishlistPokemon.map(p => ({
         ...p,
