@@ -72,11 +72,15 @@ export const useInventoryStore = defineStore("inventoryStore", {
         },
 
         UsePokeball(type) {
+            if(type === "pokeball"){
+                return true
+            }
             const item = this.pokeballs[type];
 
             // Make sure the pokeball type is valid and available
             if (!item || item.count <= 0) {
-                console.warn(`Cannot use pokeball, none in inventory: ${type}`);
+                console.warn(`Cannot use pokeball, none in inventory: ${type}. Switching to Default Pokeball`);
+                this.selectedPokeball = "pokeball"
                 return false;
             }
 
