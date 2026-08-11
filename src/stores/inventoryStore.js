@@ -60,6 +60,16 @@ export const useInventoryStore = defineStore("inventoryStore", {
 
             item.count--;
             return true;
+        },
+        AddFunds(amount){
+            const value = Number(amount)
+
+            if(!isNaN(value) && value > 0){
+                this.funds += value
+                return true
+            }
+            console.warn(`Invalid funds amount: ${value}`)
+            return false
         }
     }
 })
