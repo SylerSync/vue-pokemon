@@ -3,10 +3,33 @@ import Tabs from 'primevue/tabs';
 import TabList from 'primevue/tablist';
 import Tab from 'primevue/tab';
 import Checkbox from "primevue/checkbox";
+import SelectButton from 'primevue/selectbutton';
+import Badge from 'primevue/badge';
+import 'primeicons/primeicons.css';
 import { useSettingsStore } from '@/stores/settingsStore';
+import { useInventoryStore } from './stores/inventoryStore';
+import {computed} from "vue"
+
+
 
 const settingsStore = useSettingsStore()
+const inventoryStore = useInventoryStore()
 
+const pokeballOptions = computed(() => {
+    const standardPokeball = {
+        id: "pokeball",
+        label: "Pokeball",
+        count: '∞'
+    };
+
+    const storeBalls = Object.keys(inventoryStore.pokeballs).map((key) => ({
+        id: key,
+        label: key.charAt(0).toUpperCase() + key.slice(1),
+        count: inventoryStore.pokeballs[key].count
+    }));
+
+    return [standardPokeball, ...storeBalls];
+});
 </script>
 
 <template>
@@ -16,6 +39,25 @@ const settingsStore = useSettingsStore()
             <Tab class="custom-tab" value="/wildPokemon" as="router-link" to="/wildPokemon">Wild Pokemon</Tab>
             <Tab class="custom-tab" value="/pokebox" as="router-link" to="/pokebox">PokeBox</Tab>
             <Tab class="custom-tab" value="/wishList" as="router-link" to="/wishList">WishList</Tab>
+            <Tab class="custom-tab" value="/shop" as="router-link" to="/shop">Shop</Tab>
+            <SelectButton
+            v-model="inventoryStore.selectedPokeball"
+            :options="pokeballOptions"
+            optionLabel="label"
+            optionValue="id"
+            :optionDisabled="(option) => option.couunt <= 0"
+            aria-labelledby="basic"
+            >
+                <template #option="slotProps">
+                    <div class="pokeball-badge-item">
+                        <span class="ball-name">{{ slotProps.option.label }}</span>
+                        <Badge
+                            :value="slotProps.option.count"
+                            :severity="slotProps.option.count > 0 ? 'info' : 'secondary'"
+                        />
+                    </div>
+                </template>
+            </SelectButton>
             <div class="settings-toggle">
                 <Checkbox v-model="settingsStore.muteAudio" :binary="true" inputId="muteAudio" />
                 <label for="muteAudio" class="toggle-label">Mute Audio</label>

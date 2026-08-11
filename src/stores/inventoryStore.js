@@ -5,25 +5,47 @@ export const useInventoryStore = defineStore("inventoryStore", {
         pokeballs : {
             greatball : {
                 count:0,
-                cost:1000
+                cost:1000,
+                catchPower: 15
             },
             ultraball: {
                 count:0,
-                cost:2000
+                cost:2000,
+                catchPower: 35
+
             },
             masterball : {
                 count:0,
-                cost:100000
+                cost:100000,
+                catchPower: 100
             }
         },
         recoveryItems : {
             revive : 0
         },
-        selectedPokeball : "",
-        funds : 0
+        selectedPokeball : "pokeball",
+        funds : 5000
     }),
     getters:{
-
+        SelectedPokeballData: (state) => {
+            return (type) => {
+                let pokeballData = {};
+                if (type && type.toLowerCase() === "pokeball") {
+                    pokeballData = {
+                        id: "pokeball",
+                        count: '∞',
+                        cost: 0,
+                        catchPower: 0
+                    };
+                } else if (type && state.pokeballs[type]) {
+                    pokeballData = {
+                        id: type,
+                        ...state.pokeballs[type]
+                    };
+                }
+                return pokeballData;
+            };
+        }
     },
     actions: {
         BuyPokeball(type, amount = 1) {
