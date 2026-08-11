@@ -83,7 +83,6 @@ const closeCatchModal = () => {
     selectedPokemon.value = null
     isCatchModalOpen.value = false
     isBattleModalOpen.value = false
-    battleStarted.value = false
     catchMessage.value = ""
     showFeedback.value = false
     isFinished.value = false
@@ -180,6 +179,7 @@ function startBattle() {
 }
 
 function endBattle(){
+    battleStarted.value = false
     if(usersSelectedPokemon.value.currentHp > 0) {
         usersSelectedPokemon.value.currentHp = usersSelectedPokemon.value.totalHp
     }
@@ -211,7 +211,7 @@ function battleTurn(move) {
                 usersSelectedPokemon.value.currentHp > 0 ? useMove(usersSelectedPokemon.value, selectedPokemon.value, move) : endBattle()
             }
         }
-        if(selectedPokemon.value.currentHp <= 0 || usersSelectedPokemon.value.currentHp <= 0) {
+        if(battleStarted && selectedPokemon.value.currentHp <= 0 || usersSelectedPokemon.value.currentHp <= 0) {
             endBattle()
         }
     }
