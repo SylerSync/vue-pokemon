@@ -45,7 +45,7 @@ const pokeballOptions = computed(() => {
             :options="pokeballOptions"
             optionLabel="label"
             optionValue="id"
-            :optionDisabled="(option) => option.couunt <= 0"
+            :optionDisabled="(option) => option.count <= 0"
             aria-labelledby="basic"
             >
                 <template #option="slotProps">
