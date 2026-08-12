@@ -379,7 +379,7 @@ function calculateDamage(attacker, defender, move, opts = {}) {
   const base =
     Math.floor(
       Math.floor(
-        (Math.floor((2 * 1) / 5 + 2) * move.power * atk) / def
+        (Math.floor((2 * attacker.level) / 5 + 2) * move.power * atk) / def
       ) / 50
     ) + 2;
 
@@ -629,7 +629,7 @@ async function getWildPokemonData(region) {
             console.log(`An error occured getting moves for ${dataJson.name}`, err)
         }
 
-        const hpCalc = Math.floor(((2 * dataJson.stats.find(s => s.stat.name == "hp")?.base_stat * 1) / 100) + 1 + 10)
+        const hpCalc = Math.floor(((2 * dataJson.stats.find(s => s.stat.name == "hp")?.base_stat * 5) / 100) + 5 + 10)
 
         return {
           name: dataJson.name,
@@ -647,7 +647,8 @@ async function getWildPokemonData(region) {
           stats: dataJson.stats.map(s => ({name: s.stat.name, stat: s.base_stat})),
           moves: randomMoves,
           totalKOs: 0,
-          totalFaints: 0
+          totalFaints: 0,
+          level: 5
         };
       } catch (err) {
         console.error(`An error occurred loading data for starter: ${pokemonID}`, err);
@@ -747,7 +748,8 @@ async function getWildPokemonData(region) {
             console.log(`An error occured getting moves for ${pokemonData.name}`, err)
         }
 
-        const hpCalc = Math.floor(((2 * pokemonData.stats.find(s => s.stat.name == "hp")?.base_stat * 1) / 100) + 1 + 10)
+        const randLevel = Math.floor(Math.random() * 101);
+        const hpCalc = Math.floor(((2 * pokemonData.stats.find(s => s.stat.name == "hp")?.base_stat * randLevel) / 100) + randLevel + 10)
 
       //Create the pokemon data with parts from both the API calls
       return {
@@ -765,7 +767,8 @@ async function getWildPokemonData(region) {
         stats: pokemonData.stats.map(s => ({name: s.stat.name, stat: s.base_stat})),
         moves: randomMoves,
         totalKOs: 0,
-        totalFaints: 0
+        totalFaints: 0,
+        level: randLevel
 
       };
     } catch (err) {
@@ -789,7 +792,7 @@ async function getWildPokemonData(region) {
         <Card v-for="(pokemon, index) in wildPokemon" :key="index" class="w-full pokemonCard"
             @click="openCatchModal(pokemon, index)">
 
-            <template #title>{{ pokemon.name }}</template>
+            <template #title>{{ pokemon.name }} (Level {{ pokemon.level }})</template>
             <template #header>
                 <div class="sprite-container">
                     <span class="favPokemon" v-if="pokemonStore.pokemonIsInWishList(pokemon.name)">&#9734;</span>
@@ -859,7 +862,7 @@ async function getWildPokemonData(region) {
               <template #option="slotProps">
                 <div class="option-row">
                   <img v-if="slotProps.option.sprite" :src="slotProps.option.sprite" alt="" class="option-sprite" />
-                  <span class="option-name">{{ slotProps.option.name }}</span>
+                  <span class="option-name">{{ slotProps.option.name }} Lvl {{ selectedPokemon.level }}</span>
                 </div>
               </template>
             </Select>
@@ -879,7 +882,7 @@ async function getWildPokemonData(region) {
               <div class="combatant-info">
                 <div class="combatant-head">
                   <span class="label">Wild</span>
-                  <span class="combatant-name">{{ selectedPokemon.name }}</span>
+                  <span class="combatant-name">{{ selectedPokemon.name }} Lvl {{ selectedPokemon.level }}</span>
                 </div>
                 <div class="hp">
                   <div class="hp-track">
@@ -907,7 +910,7 @@ async function getWildPokemonData(region) {
               <div class="combatant-info">
                 <div class="combatant-head">
                   <span class="label">Yours</span>
-                  <span class="combatant-name">{{ usersSelectedPokemon.name }}</span>
+                  <span class="combatant-name">{{ usersSelectedPokemon.name }} Lvl {{ usersSelectedPokemon.level }}</span>
                 </div>
                 <div class="hp">
                   <div class="hp-track">
