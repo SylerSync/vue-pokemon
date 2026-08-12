@@ -201,6 +201,7 @@ function handleUseItem(item) {
             </div>
             <p>Weight: {{ selectedPokemon.weight }}</p>
             <p>Height: {{ selectedPokemon.height }}</p>
+            <p>Hp: {{ selectedPokemon.currentHp }}/{{ selectedPokemon.totalHp }}</p>
 
             <button @click="ReleasePokemon()">Release Pokemon</button>
             <button @click="openItemModal()">Use Recovery Item</button>

@@ -148,8 +148,6 @@ function CatchPokemon() {
         if(inventoryStore.UsePokeball(selectedPokeball.value.id)){
             // Roll chances for capturing or fleeing
             let captureRoll = Math.floor(Math.random() * 101);
-            const fleeChance = Math.min(30, 100 - selectedPokemon.value.captureRate);
-            const fleeRoll = Math.floor(Math.random() * 101);
             let damageBonus = 0
             if(battleStarted) {
               console.log(hpPercent(selectedPokemon.value))
@@ -159,6 +157,7 @@ function CatchPokemon() {
             let effectiveCaptureRate = Math.min(100, Math.max(0, rawRate))
 
             console.log(`Capture roll: ${captureRoll} Damage Modifier: -${damageBonus} Effective Roll: ${effectiveCaptureRate} Capture Chance: ${selectedPokemon.value.captureRate}`)
+            battleLog.value.push(`You threw a ${selectedPokeball.value} at ${selectedPokemon.value.name}...`)
         
         // Capture roll chance hits, pokemon is set and relavent data is set
             if(effectiveCaptureRate <= selectedPokemon.value.captureRate){
@@ -173,7 +172,7 @@ function CatchPokemon() {
             }
             // If a roll chance fails the pokemon has the chance to flee
             else{
-                if(fleeRoll <= fleeChance){
+                if(checkPokemonFlees()){
                     catchMessage.value = `Oh no! ${selectedPokemon.value.name} fled!`
                     showFeedback.value = true
                     isFinished.value = true
@@ -182,7 +181,7 @@ function CatchPokemon() {
                 }
                 else{
                     // if a catch fails and the pokemon doesnt flee, simply show a message and dont alter state.
-                    catchMessage.value = `Aww! ${selectedPokemon.value.name} broke free!`
+                    // catchMessage.value = `Aww! ${selectedPokemon.value.name} broke free!`
                     showFeedback.value = true
                 }
             }
@@ -198,6 +197,12 @@ function CatchPokemon() {
 
 }
 
+function checkPokemonFlees() {
+  const fleeChance = Math.min(20, 100 - selectedPokemon.value.captureRate);
+  const fleeRoll = Math.floor(Math.random() * 101);
+  return fleeRoll <= fleeChance
+}
+
 function battlePokemon() {
     isBattleModalOpen.value = true
     isCatchModalOpen.value = false
@@ -211,12 +216,10 @@ function endBattle(){
     battleStarted.value = false
     isBattleModalOpen.value = false
     showDefeat.value = true
-    usersSelectedPokemon.value.currentHp = usersSelectedPokemon.value.totalHp
+    // usersSelectedPokemon.value.currentHp = usersSelectedPokemon.value.totalHp
     if(selectedPokemon.value.currentHp <= 0) {
       battleWin.value = true
       inventoryStore.AddFunds(Math.trunc(3000 - (selectedPokemon.value.captureRate * 10)))
-    } else {
-      battleWin.value = false
     }
     wildPokemon.value.splice(selectedIndex.value, 1)
     battleLog.value = []
@@ -224,59 +227,81 @@ function endBattle(){
 
 async function battleTurn(move) {
     if(battleStarted) {
-        let userSpeed = usersSelectedPokemon.value.stats.find(s => s.name == "speed").stat
-        let wildSpeed = selectedPokemon.value.stats.find(s => s.name == "speed").stat
-        const wildMove = selectedPokemon.value.moves.length
-            ? selectedPokemon.value.moves[Math.floor(Math.random() * selectedPokemon.value.moves.length)]
-            : null;
-        if(userSpeed > wildSpeed) {
-            await useMove(usersSelectedPokemon.value, selectedPokemon.value, move)
-            if (selectedPokemon.value.currentHp <= 0) {
-                endBattle()
-                return
-            }
-            await useMove(selectedPokemon.value, usersSelectedPokemon.value, move)
-            if (usersSelectedPokemon.value.currentHp <= 0) {
-                endBattle()
-                return
-            }
-        } else if (wildSpeed > userSpeed) {
-            await useMove(selectedPokemon.value, usersSelectedPokemon.value, wildMove)
-            if (usersSelectedPokemon.value.currentHp <= 0) {
-                endBattle()
-                return
-            }
-            await useMove(usersSelectedPokemon.value, selectedPokemon.value, move)
-            if (selectedPokemon.value.currentHp <= 0) {
-                endBattle()
-                return
-            }
-        } else {
-            let tieBreaker = Math.floor(Math.random() * 100) + 1
-            if(tieBreaker > 50) {
-                await useMove(usersSelectedPokemon.value, selectedPokemon.value, move)
-                if (selectedPokemon.value.currentHp <= 0) {
-                    endBattle()
-                    return
-                }
-                await useMove(selectedPokemon.value, usersSelectedPokemon.value, move)
-                if (usersSelectedPokemon.value.currentHp <= 0) {
-                    endBattle()
-                    return
-                }
-            } else {
-                await useMove(selectedPokemon.value, usersSelectedPokemon.value, wildMove)
-                if (usersSelectedPokemon.value.currentHp <= 0) {
-                endBattle()
-                return
-                }
-                await useMove(usersSelectedPokemon.value, selectedPokemon.value, move)
-                if (selectedPokemon.value.currentHp <= 0) {
-                    endBattle()
-                    return
-                }
-            }
+      let userSpeed = usersSelectedPokemon.value.stats.find(s => s.name == "speed").stat
+      let wildSpeed = selectedPokemon.value.stats.find(s => s.name == "speed").stat
+      const wildMove = selectedPokemon.value.moves.length
+          ? selectedPokemon.value.moves[Math.floor(Math.random() * selectedPokemon.value.moves.length)]
+          : null;
+      if(move == "Catch"){
+        CatchPokemon()
+        console.log(battleStarted.value)
+        if(!battleStarted.value) {return}
+        console.log("Code continues")
+        await delay(800)
+        battleLog.value.push(`Oh no, ${selectedPokemon.value.name} broke out`)
+        await useMove(selectedPokemon.value, usersSelectedPokemon.value, wildMove)
+        if (usersSelectedPokemon.value.currentHp <= 0) {
+              endBattle()
+              return
         }
+        return
+      }
+      // if(checkPokemonFlees()){
+      //   catchMessage.value = `Oh no! ${selectedPokemon.value.name} fled!`
+      //   showFeedback.value = true
+      //   isFinished.value = true
+      //   battleWin.value = false
+      //   endBattle()
+      //   return
+      // }
+      if(userSpeed > wildSpeed) {
+          await useMove(usersSelectedPokemon.value, selectedPokemon.value, move)
+          if (selectedPokemon.value.currentHp <= 0) {
+              endBattle()
+              return
+          }
+          await useMove(selectedPokemon.value, usersSelectedPokemon.value, wildMove)
+          if (usersSelectedPokemon.value.currentHp <= 0) {
+              endBattle()
+              return
+          }
+      } else if (wildSpeed > userSpeed) {
+          await useMove(selectedPokemon.value, usersSelectedPokemon.value, wildMove)
+          if (usersSelectedPokemon.value.currentHp <= 0) {
+              endBattle()
+              return
+          }
+          await useMove(usersSelectedPokemon.value, selectedPokemon.value, move)
+          if (selectedPokemon.value.currentHp <= 0) {
+              endBattle()
+              return
+          }
+      } else {
+          let tieBreaker = Math.floor(Math.random() * 100) + 1
+          if(tieBreaker > 50) {
+              await useMove(usersSelectedPokemon.value, selectedPokemon.value, move)
+              if (selectedPokemon.value.currentHp <= 0) {
+                  endBattle()
+                  return
+              }
+              await useMove(selectedPokemon.value, usersSelectedPokemon.value, wildMove)
+              if (usersSelectedPokemon.value.currentHp <= 0) {
+                  endBattle()
+                  return
+              }
+          } else {
+              await useMove(selectedPokemon.value, usersSelectedPokemon.value, wildMove)
+              if (usersSelectedPokemon.value.currentHp <= 0) {
+              endBattle()
+              return
+              }
+              await useMove(usersSelectedPokemon.value, selectedPokemon.value, move)
+              if (selectedPokemon.value.currentHp <= 0) {
+                  endBattle()
+                  return
+              }
+          }
+      }
     }
 }
 
@@ -903,7 +928,7 @@ async function getWildPokemonData(region) {
                         </div>
                     </template>
                 </SelectButton>
-                <button @click="CatchPokemon()">
+                <button @click="battleTurn('Catch')">
                     Catch Pokemon
                 </button>
           </div>
@@ -1022,7 +1047,7 @@ async function getWildPokemonData(region) {
 
 /* Styles for battle modal */
 .battle-split {
-  height: 22rem;
+  height: 28rem;
   width: 100%;
   max-width: 40rem;
   margin-inline: auto;
@@ -1069,7 +1094,7 @@ async function getWildPokemonData(region) {
   width: 100%;
   height: 100%;
   padding: 1rem;
-  overflow: hidden;
+  overflow-y: auto;
 }
 
 .combatant {
@@ -1165,7 +1190,7 @@ async function getWildPokemonData(region) {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 0.5rem;
-  margin-top: auto;
+  /* margin-top: auto; */
 }
 
 .move {
