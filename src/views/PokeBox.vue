@@ -96,7 +96,7 @@ const itemInventory = computed(() => {
 
         let effectDescription = '';
         if (item.effect.type === 'revive') {
-            effectDescription = `Revives with ${item.effect.percent}% HP`;
+            effectDescription = `Revives with ${item.effect.percent*100}% HP`;
         } else if (item.effect.type === 'heal') {
             effectDescription = `Heals ${item.effect.amount} HP`;
         }
@@ -199,8 +199,8 @@ function handleUseItem(item) {
                     {{ type }}
                 </p>
             </div>
-            <p>Weight: {{ selectedPokemon.weight }}</p>
-            <p>Height: {{ selectedPokemon.height }}</p>
+            <p>KOs: {{ selectedPokemon.totalKOs }}</p>
+            <p>Faints: {{ selectedPokemon.totalFaints }}</p>
             <p>Hp: {{ selectedPokemon.currentHp }}/{{ selectedPokemon.totalHp }}</p>
 
             <button @click="ReleasePokemon()">Release Pokemon</button>

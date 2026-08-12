@@ -74,6 +74,7 @@ const battleLog = ref([])
 const showDefeat = ref(false)
 const battleWin = ref(false)
 const logEl = ref(null);
+const isResolving = ref(false)
 
 const openCatchModal = (pokemon, index) => {
     if (!pokemon) {
@@ -112,6 +113,14 @@ const closeCatchModal = () => {
 }
 
 const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+const anim = ref(null); // { actor: 'ally' | 'foe', type: 'lunge' | 'hit' | 'faint' }
+
+async function playAnim(actor, type, ms) {
+  anim.value = { actor, type };
+  await delay(ms);
+  anim.value = null;
+}
 
 function closeDefeatModal() {
     showDefeat.value = false
@@ -216,17 +225,25 @@ function endBattle(){
     battleStarted.value = false
     isBattleModalOpen.value = false
     showDefeat.value = true
+    if (usersSelectedPokemon.value.currentHp <= 0) {
+      usersSelectedPokemon.value.currentHp = 0
+      usersSelectedPokemon.value.totalFaints += 1
+      usersSelectedPokemon.value = null
+    }
     // usersSelectedPokemon.value.currentHp = usersSelectedPokemon.value.totalHp
     if(selectedPokemon.value.currentHp <= 0) {
       battleWin.value = true
       inventoryStore.AddFunds(Math.trunc(3000 - (selectedPokemon.value.captureRate * 10)))
+      usersSelectedPokemon.value.totalKOs += 1
     }
     wildPokemon.value.splice(selectedIndex.value, 1)
     battleLog.value = []
+    isResolving.value = false
 }
 
 async function battleTurn(move) {
     if(battleStarted) {
+      isResolving.value = true
       let userSpeed = usersSelectedPokemon.value.stats.find(s => s.name == "speed").stat
       let wildSpeed = selectedPokemon.value.stats.find(s => s.name == "speed").stat
       const wildMove = selectedPokemon.value.moves.length
@@ -244,6 +261,7 @@ async function battleTurn(move) {
               endBattle()
               return
         }
+        isResolving.value = false
         return
       }
       // if(checkPokemonFlees()){
@@ -302,11 +320,16 @@ async function battleTurn(move) {
               }
           }
       }
+      isResolving.value = false
     }
 }
 
 async function useMove(user, target, move) {
+    const actor = user === usersSelectedPokemon.value ? 'ally' : 'foe';
+    const victim = actor === 'ally' ? 'foe' : 'ally';
+
     battleLog.value.push(`${user.name} used ${move.name}`)
+    await playAnim(actor, 'lunge', 300);
     const randInt = Math.floor(Math.random() * 100) + 1
     if(randInt > move.accuracy) {
         battleLog.value.push(`${move.name} missed`)
@@ -327,7 +350,8 @@ async function useMove(user, target, move) {
         } else if (results.effectiveness == .5){
             battleLog.value.push("Not very effective")
         }
-        await delay(800)
+        // await delay(800)
+        await playAnim(victim, 'hit', 400);
         battleLog.value.push(`${user.name} did ${results.damage} damage`)
         target.currentHp -= results.damage
         await delay(800)
@@ -621,7 +645,9 @@ async function getWildPokemonData(region) {
           totalHp: hpCalc,
           currentHp: hpCalc,
           stats: dataJson.stats.map(s => ({name: s.stat.name, stat: s.base_stat})),
-          moves: randomMoves
+          moves: randomMoves,
+          totalKOs: 0,
+          totalFaints: 0
         };
       } catch (err) {
         console.error(`An error occurred loading data for starter: ${pokemonID}`, err);
@@ -737,7 +763,9 @@ async function getWildPokemonData(region) {
         totalHp: hpCalc,
         currentHp: hpCalc,
         stats: pokemonData.stats.map(s => ({name: s.stat.name, stat: s.base_stat})),
-        moves: randomMoves
+        moves: randomMoves,
+        totalKOs: 0,
+        totalFaints: 0
 
       };
     } catch (err) {
@@ -813,6 +841,7 @@ async function getWildPokemonData(region) {
             <Select
               v-model="usersSelectedPokemon"
               :options="pokemonStore.caughtPokemon"
+              :optionDisabled="(option) => (option.currentHp ?? option.totalHp) <= 0"
               optionLabel="name"
               filter
               filterBy="name"
@@ -869,6 +898,7 @@ async function getWildPokemonData(region) {
                 :src="selectedPokemon.sprite"
                 :alt="selectedPokemon.name"
                 class="battle-sprite sprite-foe"
+                :class="anim?.actor === 'foe' ? `anim-${anim.type}` : null"
               />
             </div>
           
@@ -896,6 +926,7 @@ async function getWildPokemonData(region) {
                 :src="usersSelectedPokemon.backSprite ?? usersSelectedPokemon.sprite"
                 :alt="usersSelectedPokemon.name"
                 class="battle-sprite sprite-ally"
+                :class="anim?.actor === 'ally' ? `anim-${anim.type}` : null"
               />
             </div> 
                 <!-- moves -->
@@ -904,6 +935,7 @@ async function getWildPokemonData(region) {
                     v-for="move in usersSelectedPokemon.moves"
                     :key="move.name"
                     class="move"
+                    :disabled="isResolving"
                     @click="battleTurn(move)"
                   >
                     <span class="move-name">{{ move.name }}</span>
@@ -928,7 +960,7 @@ async function getWildPokemonData(region) {
                         </div>
                     </template>
                 </SelectButton>
-                <button @click="battleTurn('Catch')">
+                <button :disabled="isResolving || !inventoryStore.selectedPokeball" @click="battleTurn('Catch')">
                     Catch Pokemon
                 </button>
           </div>
@@ -1254,5 +1286,35 @@ async function getWildPokemonData(region) {
 
 @media (prefers-color-scheme: dark) {
   .hp-track { background: var(--p-surface-700); }
+}
+
+/* attacker lunges toward the opponent */
+.anim-lunge {
+  animation: lunge 300ms ease-in-out;
+}
+.sprite-foe.anim-lunge  { animation-name: lunge-foe; }
+
+@keyframes lunge {
+  50% { transform: translate(20px, -20px); }
+}
+@keyframes lunge-foe {
+  50% { transform: translate(-20px, 20px); }
+}
+
+/* defender flashes and shakes */
+.anim-hit {
+  animation: hit 400ms steps(2, end) 3;
+}
+@keyframes hit {
+  0%, 100% { opacity: 1; transform: translateX(0); }
+  50%      { opacity: 0.2; transform: translateX(-6px); }
+}
+
+/* faint: slide down and fade */
+.anim-faint {
+  animation: faint 700ms ease-in forwards;
+}
+@keyframes faint {
+  to { transform: translateY(40px); opacity: 0; }
 }
 </style>
