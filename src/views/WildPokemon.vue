@@ -1,5 +1,5 @@
 <script setup>
-import { watch, ref, onUnmounted } from "vue"
+import { watch, ref, onUnmounted, nextTick } from "vue"
 import {computed} from "vue"
 import Select from "primevue/select"
 import Card from "primevue/card"
@@ -73,6 +73,7 @@ const usersSelectedPokemon = ref(null)
 const battleLog = ref([])
 const showDefeat = ref(false)
 const battleWin = ref(false)
+const logEl = ref(null);
 
 const openCatchModal = (pokemon, index) => {
     if (!pokemon) {
@@ -110,9 +111,10 @@ const closeCatchModal = () => {
     battleWin.value = false
 }
 
+const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
 function closeDefeatModal() {
     showDefeat.value = false
-    usersSelectedPokemon.value.currentHp = usersSelectedPokemon.value.totalHp
     closeCatchModal()
 }
 
@@ -211,13 +213,16 @@ function endBattle(){
     showDefeat.value = true
     usersSelectedPokemon.value.currentHp = usersSelectedPokemon.value.totalHp
     if(selectedPokemon.value.currentHp <= 0) {
-        inventoryStore.AddFunds(Math.trunc(3000 - (selectedPokemon.value.captureRate * 10)))
+      battleWin.value = true
+      inventoryStore.AddFunds(Math.trunc(3000 - (selectedPokemon.value.captureRate * 10)))
+    } else {
+      battleWin.value = false
     }
     wildPokemon.value.splice(selectedIndex.value, 1)
     battleLog.value = []
 }
 
-function battleTurn(move) {
+async function battleTurn(move) {
     if(battleStarted) {
         let userSpeed = usersSelectedPokemon.value.stats.find(s => s.name == "speed").stat
         let wildSpeed = selectedPokemon.value.stats.find(s => s.name == "speed").stat
@@ -225,23 +230,23 @@ function battleTurn(move) {
             ? selectedPokemon.value.moves[Math.floor(Math.random() * selectedPokemon.value.moves.length)]
             : null;
         if(userSpeed > wildSpeed) {
-            useMove(usersSelectedPokemon.value, selectedPokemon.value, move)
+            await useMove(usersSelectedPokemon.value, selectedPokemon.value, move)
             if (selectedPokemon.value.currentHp <= 0) {
                 endBattle()
                 return
             }
-            useMove(selectedPokemon.value, usersSelectedPokemon.value, move)
+            await useMove(selectedPokemon.value, usersSelectedPokemon.value, move)
             if (usersSelectedPokemon.value.currentHp <= 0) {
                 endBattle()
                 return
             }
         } else if (wildSpeed > userSpeed) {
-            useMove(selectedPokemon.value, usersSelectedPokemon.value, wildMove)
+            await useMove(selectedPokemon.value, usersSelectedPokemon.value, wildMove)
             if (usersSelectedPokemon.value.currentHp <= 0) {
                 endBattle()
                 return
             }
-            useMove(usersSelectedPokemon.value, selectedPokemon.value, move)
+            await useMove(usersSelectedPokemon.value, selectedPokemon.value, move)
             if (selectedPokemon.value.currentHp <= 0) {
                 endBattle()
                 return
@@ -249,23 +254,23 @@ function battleTurn(move) {
         } else {
             let tieBreaker = Math.floor(Math.random() * 100) + 1
             if(tieBreaker > 50) {
-                useMove(usersSelectedPokemon.value, selectedPokemon.value, move)
+                await useMove(usersSelectedPokemon.value, selectedPokemon.value, move)
                 if (selectedPokemon.value.currentHp <= 0) {
                     endBattle()
                     return
                 }
-                useMove(selectedPokemon.value, usersSelectedPokemon.value, move)
+                await useMove(selectedPokemon.value, usersSelectedPokemon.value, move)
                 if (usersSelectedPokemon.value.currentHp <= 0) {
                     endBattle()
                     return
                 }
             } else {
-                useMove(selectedPokemon.value, usersSelectedPokemon.value, wildMove)
+                await useMove(selectedPokemon.value, usersSelectedPokemon.value, wildMove)
                 if (usersSelectedPokemon.value.currentHp <= 0) {
                 endBattle()
                 return
                 }
-                useMove(usersSelectedPokemon.value, selectedPokemon.value, move)
+                await useMove(usersSelectedPokemon.value, selectedPokemon.value, move)
                 if (selectedPokemon.value.currentHp <= 0) {
                     endBattle()
                     return
@@ -275,28 +280,35 @@ function battleTurn(move) {
     }
 }
 
-function useMove(user, target, move) {
+async function useMove(user, target, move) {
     battleLog.value.push(`${user.name} used ${move.name}`)
     const randInt = Math.floor(Math.random() * 100) + 1
     if(randInt > move.accuracy) {
-        return battleLog.value.push(`${move.name} missed`)
+        battleLog.value.push(`${move.name} missed`)
+        await delay(800)
+        return
     }
     if(move.power) {
         const results = calculateDamage(user, target, move)
         if(results.critical) {
             battleLog.value.push("Critical Hit!")
         }
+        if(results.immune) {
+          battleLog.value.push(`It doesn't affect ${target.name}...`);
+          return;
+        }
         if(results.effectiveness == 2){
             battleLog.value.push("Super Effective")
         } else if (results.effectiveness == .5){
             battleLog.value.push("Not very effective")
         }
+        await delay(800)
         battleLog.value.push(`${user.name} did ${results.damage} damage`)
         target.currentHp -= results.damage
+        await delay(800)
     } else {
         battleLog.value.push("This move does nothing bozo.")
     }
-
 }
 
 function calculateDamage(attacker, defender, move, opts = {}) {
@@ -490,6 +502,16 @@ watch(selectedRegion, async (region) => {
   }
 });
 
+watch(
+  () => battleLog.value.length,
+  async () => {
+    await nextTick();
+    if (logEl.value) {
+      logEl.value.scrollTop = logEl.value.scrollHeight;
+    }
+  }
+);
+
 async function getWildPokemonData(region) {
     // This function will use the list of pokemon generated by the watcher in order to choose 6 random pokemon to display
   const list = pokemonList.value;
@@ -519,10 +541,13 @@ async function getWildPokemonData(region) {
         const randomMoves = [];
         try{
             if (dataJson.moves.length > 4){
+              let move = null
                 for (let i = 0; i < 4; i++) {
-                  let randMoveIndex = Math.floor(Math.random() * dataJson.moves.length)
-                  let spiltUrl = dataJson.moves[randMoveIndex].move.url.split("/")
-                  const move = await getMove(spiltUrl.at(-2))
+                  do {
+                    let randMoveIndex = Math.floor(Math.random() * dataJson.moves.length)
+                    let spiltUrl = dataJson.moves[randMoveIndex].move.url.split("/")
+                    move = await getMove(spiltUrl.at(-2))
+                  } while (move.power == null)
                 //   console.log(move)
                   let moveInfo = {
                       name: move.name,
@@ -561,6 +586,7 @@ async function getWildPokemonData(region) {
           name: dataJson.name,
           id: dataJson.id,
           sprite: 10 < randInt && randInt < 15 ? dataJson.sprites.front_shiny : dataJson.sprites.front_default,
+          backSprite: 10 < randInt && randInt < 15 ? dataJson.sprites.back_shiny : dataJson.sprites.back_default,
           types: dataJson.types.map(t => t.type.name),
           height: dataJson.height,
           weight: dataJson.weight,
@@ -632,9 +658,12 @@ async function getWildPokemonData(region) {
         try{
             if (pokemonData.moves.length > 4){
                 for (let i = 0; i < 4; i++) {
-                  let randMoveIndex = Math.floor(Math.random() * pokemonData.moves.length)
-                  let spiltUrl = pokemonData.moves[randMoveIndex].move.url.split("/")
-                  const move = await getMove(spiltUrl.at(-2))
+                  let move = null
+                  do {
+                    let randMoveIndex = Math.floor(Math.random() * pokemonData.moves.length)
+                    let spiltUrl = pokemonData.moves[randMoveIndex].move.url.split("/")
+                    move = await getMove(spiltUrl.at(-2))
+                  } while(move.power == null)
                 //   console.log(move)
                   let moveInfo = {
                       name: move.name,
@@ -791,44 +820,59 @@ async function getWildPokemonData(region) {
 
           <!-- in battle -->
           <div v-else class="arena">
-                <!-- opponent -->
-                <div class="combatant">
-                  <div class="combatant-head">
-                    <span class="label">Wild</span>
-                    <span class="combatant-name">{{ selectedPokemon.name }}</span>
+            <!-- opponent: info left, sprite right -->
+            <div class="combatant combatant-foe">
+              <div class="combatant-info">
+                <div class="combatant-head">
+                  <span class="label">Wild</span>
+                  <span class="combatant-name">{{ selectedPokemon.name }}</span>
+                </div>
+                <div class="hp">
+                  <div class="hp-track">
+                    <div
+                      class="hp-fill"
+                      :class="hpTone(selectedPokemon)"
+                      :style="{ width: hpPercent(selectedPokemon) + '%' }"
+                    />
                   </div>
-                  <div class="hp">
-                    <div class="hp-track">
-                      <div
-                        class="hp-fill"
-                        :class="hpTone(selectedPokemon)"
-                        :style="{ width: hpPercent(selectedPokemon) + '%' }"
-                      />
-                    </div>
-                    <span class="hp-text">
-                      {{ Math.max(0, selectedPokemon.currentHp) }}/{{ selectedPokemon.totalHp }}
-                    </span>
+                  <span class="hp-text">
+                    {{ Math.max(0, selectedPokemon.currentHp) }}/{{ selectedPokemon.totalHp }}
+                  </span>
+                </div>
+              </div>
+              <img
+                :src="selectedPokemon.sprite"
+                :alt="selectedPokemon.name"
+                class="battle-sprite sprite-foe"
+              />
+            </div>
+          
+            <!-- player: sprite left, info right -->
+            <div class="combatant combatant-ally">
+              <div class="combatant-info">
+                <div class="combatant-head">
+                  <span class="label">Yours</span>
+                  <span class="combatant-name">{{ usersSelectedPokemon.name }}</span>
+                </div>
+                <div class="hp">
+                  <div class="hp-track">
+                    <div
+                      class="hp-fill"
+                      :class="hpTone(usersSelectedPokemon)"
+                      :style="{ width: hpPercent(usersSelectedPokemon) + '%' }"
+                    />
                   </div>
-                </div>      
-                <!-- player -->
-                <div class="combatant">
-                  <div class="combatant-head">
-                    <span class="label">Yours</span>
-                    <span class="combatant-name">{{ usersSelectedPokemon.name }}</span>
-                  </div>
-                  <div class="hp">
-                    <div class="hp-track">
-                      <div
-                        class="hp-fill"
-                        :class="hpTone(usersSelectedPokemon)"
-                        :style="{ width: hpPercent(usersSelectedPokemon) + '%' }"
-                      />
-                    </div>
-                    <span class="hp-text">
-                      {{ Math.max(0, usersSelectedPokemon.currentHp) }}/{{ usersSelectedPokemon.totalHp }}
-                    </span>
-                  </div>
-                </div>      
+                  <span class="hp-text">
+                    {{ Math.max(0, usersSelectedPokemon.currentHp) }}/{{ usersSelectedPokemon.totalHp }}
+                  </span>
+                </div>
+              </div>
+              <img
+                :src="usersSelectedPokemon.backSprite ?? usersSelectedPokemon.sprite"
+                :alt="usersSelectedPokemon.name"
+                class="battle-sprite sprite-ally"
+              />
+            </div> 
                 <!-- moves -->
                 <div class="moves">
                   <button
@@ -1021,16 +1065,48 @@ async function getWildPokemonData(region) {
 .arena {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 0.75rem;
   width: 100%;
-  padding: 1.25rem;
+  height: 100%;
+  padding: 1rem;
+  overflow: hidden;
 }
 
 .combatant {
   display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+/* opponent: info left, sprite right */
+.combatant-foe {
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+/* player: sprite left, info right — the diagonal */
+.combatant-ally {
+  flex-direction: row-reverse;
+  justify-content: space-between;
+}
+
+.combatant-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
   flex-direction: column;
   gap: 0.375rem;
 }
+
+.battle-sprite {
+  flex: none;
+  object-fit: contain;
+  image-rendering: pixelated;
+  filter: drop-shadow(0 3px 2px rgb(0 0 0 / 0.25));
+}
+
+.sprite-foe  { width: 4.5rem; height: 4.5rem; }
+.sprite-ally { width: 5.5rem; height: 5.5rem; }
 
 .combatant-head {
   display: flex;
