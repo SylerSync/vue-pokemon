@@ -70,6 +70,7 @@ const battleStarted = ref(false)
 const usersSelectedPokemon = ref(null)
 const battleLog = ref([])
 const showDefeat = ref(false)
+const battleWin = ref(false)
 
 const openCatchModal = (pokemon, index) => {
     if (!pokemon) {
@@ -109,6 +110,7 @@ const closeCatchModal = () => {
 function closeDefeatModal() {
     showDefeat.value = false
     usersSelectedPokemon.value.currentHp = usersSelectedPokemon.value.totalHp
+    closeCatchModal()
 }
 
 function CatchStarter(){
@@ -143,11 +145,15 @@ function CatchPokemon() {
             let captureRoll = Math.floor(Math.random() * 101);
             const fleeChance = Math.min(30, 100 - selectedPokemon.value.captureRate);
             const fleeRoll = Math.floor(Math.random() * 101);
-
-            const rawRate = captureRoll - selectedPokeball.value.catchPower
+            let damageBonus = 0
+            if(battleStarted) {
+              console.log(hpPercent(selectedPokemon.value))
+              damageBonus = hpPercent(selectedPokemon.value) < 20 ? 20 : hpPercent(selectedPokemon.value) < 50 ? 10 : 0
+            }
+            const rawRate = captureRoll - selectedPokeball.value.catchPower - damageBonus
             let effectiveCaptureRate = Math.min(100, Math.max(0, rawRate))
 
-            console.log(`Capture roll: ${captureRoll} Effective Roll: ${effectiveCaptureRate} Capture Chance: ${selectedPokemon.value.captureRate}`)
+            console.log(`Capture roll: ${captureRoll} Damage Modifier: -${damageBonus} Effective Roll: ${effectiveCaptureRate} Capture Chance: ${selectedPokemon.value.captureRate}`)
         
         // Capture roll chance hits, pokemon is set and relavent data is set
             if(effectiveCaptureRate <= selectedPokemon.value.captureRate){
@@ -159,6 +165,8 @@ function CatchPokemon() {
                 catchMessage.value = `Gotcha! ${selectedPokemon.value.name} was caught!`
                 showFeedback.value = true
                 isFinished.value = true
+                battleWin.value = true
+                endBattle()
             }
             // If a roll chance fails the pokemon has the chance to flee
             else{
@@ -168,6 +176,8 @@ function CatchPokemon() {
                     selectedIndex.value = null
                     showFeedback.value = true
                     isFinished.value = true
+                    battleWin.value = false
+                    endBattle()
                 }
                 else{
                     // if a catch fails and the pokemon doesnt flee, simply show a message and dont alter state.
@@ -199,13 +209,13 @@ function startBattle() {
 function endBattle(){
     battleStarted.value = false
     isBattleModalOpen.value = false
+    showDefeat.value = true
     if(usersSelectedPokemon.value.currentHp > 0) {
         usersSelectedPokemon.value.currentHp = usersSelectedPokemon.value.totalHp
         inventoryStore.AddFunds(Math.trunc(3000 - (selectedPokemon.value.captureRate * 10)))
     }
     wildPokemon.value.splice(selectedIndex.value, 1)
     battleLog.value = []
-    closeCatchModal()
 }
 
 function battleTurn(move) {
@@ -858,7 +868,9 @@ async function getWildPokemonData(region) {
 
   <Modal v-if="showDefeat" @close="closeDefeatModal()">
         <div class="catchModal">
-            <p>You lost :(</p>
+            <p v-if="battleWin" class="feedback-text">Congratulations you won!</p>
+            <p v-else class="feedback-text">You lost, better luck next time.</p>
+            <p v-if="catchMessage" class="feedback-text">{{ catchMessage }}</p>
         </div>
     </Modal>
 </template>
