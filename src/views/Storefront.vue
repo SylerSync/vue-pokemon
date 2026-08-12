@@ -60,7 +60,7 @@ function buyRecovery(itemType) {
         </div>
 
         <!-- Table 1: Pokeballs -->
-         <h3>Pokeballs</h3>
+         <h3 class="shopTab">Pokeballs</h3>
         <DataTable :value="shopPokeball" responsiveLayout="scroll" class="p-datatable-sm dataTable">
             <Column field="name" header="Item" style="width: 40%"></Column>
             <Column field="cost" header="Cost" style="width: 20%">
@@ -79,7 +79,7 @@ function buyRecovery(itemType) {
         </DataTable>
 
         <!-- Table 2: Recovery Items -->
-        <h3>Recovery Items</h3>
+        <h3 class="shopTab">Recovery Items</h3>
         <DataTable :value="shopRecovery" responsiveLayout="scroll" class="p-datatable-sm dataTable">
             <Column field="name" header="Item" style="width: 40%"></Column>
             <Column field="cost" header="Cost" style="width: 20%">
@@ -125,7 +125,10 @@ function buyRecovery(itemType) {
 .dataTable {
     border: 5px solid CanvasText;
     border-radius: 5px;
-    margin:10px;
     padding: 5px;
+}
+
+.shopTab {
+    border-bottom: 1px solid CanvasText;
 }
 </style>
