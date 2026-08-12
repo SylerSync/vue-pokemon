@@ -50,8 +50,10 @@ export const useInventoryStore = defineStore("inventoryStore", {
             };
         },
         GetCompleteInventory: (state) => {
-            const completeInventory = {}
-
+            const completeInventory = {
+                "pokeballs" : state.pokeballs,
+                "recoveryItems" : state.recoveryItems
+            }
             return completeInventory
         }
     },
