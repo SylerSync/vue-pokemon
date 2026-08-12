@@ -178,7 +178,7 @@ function handleUseItem(item) {
             <div class="pokemon-grid">
                 <Card v-for="(pokemon, index) in slotProps.items" :key="pokemon.id + '-' + index"
                     class="w-full pokemonCard" @click="openDetailsModal(pokemon, index)">
-                    <template #title>{{ pokemon.name }}</template>
+                    <template #title>{{ pokemon.name }} Lvl {{ pokemon.level }}</template>
                     <template #header>
                         <div class="sprite-container">
                             <img class="pokemon-sprite" :src="pokemon.sprite" :alt="pokemon.name" />
@@ -191,7 +191,7 @@ function handleUseItem(item) {
 
     <Modal v-if="isDetailModalOpen" @close="closeDetailModal">
         <div v-if="selectedPokemon" class="detailModal">
-            <h2>{{ selectedPokemon.name }}</h2>
+            <h2>{{ selectedPokemon.name }} Lvl {{ selectedPokemon.level }}</h2>
             <img :src="selectedPokemon.sprite" :alt="selectedPokemon.name">
             <h3>Types:</h3>
             <div v-for="type of selectedPokemon.types" :key="type">
