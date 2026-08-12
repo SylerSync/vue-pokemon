@@ -21,7 +21,10 @@ export const useInventoryStore = defineStore("inventoryStore", {
             }
         },
         recoveryItems : {
-            revive : 0
+            revive : {
+                count: 0,
+                cost: 300
+            }
         },
         selectedPokeball : "pokeball",
         funds : 5000
@@ -45,9 +48,19 @@ export const useInventoryStore = defineStore("inventoryStore", {
                 }
                 return pokeballData;
             };
+        },
+        GetCompleteInventory: (state) => {
+            const completeInventory = {
+                "pokeballs" : state.pokeballs,
+                "recoveryItems" : state.recoveryItems
+            }
+            return completeInventory
         }
     },
     actions: {
+        /* ================= ================= =================
+            POKEBALL FUNCTIONS
+            ================= ================= ================= */
         BuyPokeball(type, amount = 1) {
             const item = this.pokeballs[type];
 
@@ -87,6 +100,9 @@ export const useInventoryStore = defineStore("inventoryStore", {
             item.count--;
             return true;
         },
+        /* ================= ================= =================
+            FUND FUNCTIONS
+            ================= ================= ================= */
         AddFunds(amount){
             const value = Number(amount)
 
@@ -96,6 +112,39 @@ export const useInventoryStore = defineStore("inventoryStore", {
             }
             console.warn(`Invalid funds amount: ${value}`)
             return false
+        },
+        /* ================= ================= =================
+            RECOVERY FUNCTIONS
+            ================= ================= ================= */
+        UseRecovery(itemType){
+            const item = this.recoveryItems[itemType]
+
+            if(!item || item.count <= 0){
+                console.warn(`Could not find recovery item ${itemType}.`)
+                return false
+            }
+
+            item.count--
+            return true
+            
+        },
+        BuyRecovery(itemType){
+            const item = this.recoveryItems[itemType]
+
+            if(!item){
+                console.warn(`Could not find recovery item ${itemType}.`)
+                return false
+            }
+
+            if(item.cost > this.funds){
+                console.warn(`You do not have enough funds to buy a(n) ${item.id}.`)
+                return false
+            }
+
+            this.funds -= item.cost
+            item.count++
+
+            return true
         }
     }
 })

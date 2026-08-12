@@ -209,8 +209,8 @@ function endBattle(){
     battleStarted.value = false
     isBattleModalOpen.value = false
     showDefeat.value = true
-    if(usersSelectedPokemon.value.currentHp > 0) {
-        usersSelectedPokemon.value.currentHp = usersSelectedPokemon.value.totalHp
+    usersSelectedPokemon.value.currentHp = usersSelectedPokemon.value.totalHp
+    if(selectedPokemon.value.currentHp <= 0) {
         inventoryStore.AddFunds(Math.trunc(3000 - (selectedPokemon.value.captureRate * 10)))
     }
     wildPokemon.value.splice(selectedIndex.value, 1)
