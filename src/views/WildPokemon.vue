@@ -13,6 +13,8 @@ import { useInventoryStore } from "@/stores/inventoryStore"
 import SelectButton from 'primevue/selectbutton';
 import Badge from 'primevue/badge';
 import 'primeicons/primeicons.css';
+import { getPokemon } from "@/api/pokeapi"
+import { getSpecies } from "@/api/pokeapi"
 
 const settingsStore = useSettingsStore()
 
@@ -105,6 +107,7 @@ const closeCatchModal = () => {
     catchMessage.value = ""
     showFeedback.value = false
     isFinished.value = false
+    battleWin.value = false
 }
 
 function closeDefeatModal() {
@@ -158,8 +161,6 @@ function CatchPokemon() {
         // Capture roll chance hits, pokemon is set and relavent data is set
             if(effectiveCaptureRate <= selectedPokemon.value.captureRate){
                 pokemonStore.addPokemon(selectedPokemon.value)
-                wildPokemon.value.splice(selectedIndex.value, 1)
-                selectedIndex.value = null
                 console.log(`${Math.trunc(3000/selectedPokemon.value.captureRate)} has been added to your balance`)
                 inventoryStore.AddFunds(Math.trunc(3000/selectedPokemon.value.captureRate))
                 catchMessage.value = `Gotcha! ${selectedPokemon.value.name} was caught!`
@@ -171,9 +172,7 @@ function CatchPokemon() {
             // If a roll chance fails the pokemon has the chance to flee
             else{
                 if(fleeRoll <= fleeChance){
-                    wildPokemon.value.splice(selectedIndex.value, 1)
                     catchMessage.value = `Oh no! ${selectedPokemon.value.name} fled!`
-                    selectedIndex.value = null
                     showFeedback.value = true
                     isFinished.value = true
                     battleWin.value = false
@@ -522,7 +521,8 @@ async function getWildPokemonData(region) {
             if (dataJson.moves.length > 4){
                 for (let i = 0; i < 4; i++) {
                   let randMoveIndex = Math.floor(Math.random() * dataJson.moves.length)
-                  const move = await getMove(randMoveIndex)
+                  let spiltUrl = dataJson.moves[randMoveIndex].move.url.split("/")
+                  const move = await getMove(spiltUrl.at(-2))
                 //   console.log(move)
                   let moveInfo = {
                       name: move.name,
@@ -552,7 +552,7 @@ async function getWildPokemonData(region) {
                 }
             }
         } catch(err) {
-            console.log(`An error occured getting moves for ${dataJson.name}`)
+            console.log(`An error occured getting moves for ${dataJson.name}`, err)
         }
 
         const hpCalc = Math.floor(((2 * dataJson.stats.find(s => s.stat.name == "hp")?.base_stat * 1) / 100) + 1 + 10)
@@ -599,32 +599,42 @@ async function getWildPokemonData(region) {
   const wildPromises = randomTargets.map(async (target) => {
     const randInt = Math.floor(Math.random() * 101);
 
-    const pokemonIdentifier = target.name || target.id;
+    const pokemonIdentifier = target.name;
+    // const pokemonIdentifier = "deoxys"
     // Both pokemon and pokemon-species calls are required for all the data we need for an individual pokemon
     try {
-      const [pokemonRes, speciesRes] = await Promise.all([
-        fetch(`https://pokeapi.co/api/v2/pokemon/${pokemonIdentifier}`),
-        fetch(`https://pokeapi.co/api/v2/pokemon-species/${pokemonIdentifier}`)
-      ]);
-
-      if (!pokemonRes.ok) {
-        console.error(`An error occurred collecting pokemon data for ${target.name}`);
-        return null;
+      let speciesData = await getSpecies(pokemonIdentifier)
+      let pokemonData = null
+      if(speciesData.varieties.length > 1){
+        for(let form of speciesData.varieties) {
+          // console.log(pokemonIdentifier + "-" + selectedRegion.value)
+          if(form.pokemon.name == (pokemonIdentifier + "-" + selectedRegion.value)) {
+            pokemonData = await getPokemon(form.pokemon.name)
+            // console.log(pokemonData)
+            break
+          }
+        }
+        if(!pokemonData){
+          if (speciesData.varieties[0].is_default) {
+          pokemonData = await getPokemon(speciesData.varieties[0].pokemon.name)
+          }
+          else {
+          let randFormIndex = Math.floor(Math.random() * speciesData.varieties.length)
+          let pokemonId = speciesData.varieties[randFormIndex].pokemon.url.split("/")
+          pokemonData = await getPokemon(pokemonId.at(-2))
+          }
+        }
+      } else {
+        pokemonData = await getPokemon(speciesData.varieties[0].pokemon.name);
       }
-      if (!speciesRes.ok) {
-        console.error(`An error occurred collecting species data for ${target.name}`);
-        return null;
-      }
-
-      const pokemonData = await pokemonRes.json();
-      const speciesData = await speciesRes.json();
 
       const randomMoves = [];
         try{
             if (pokemonData.moves.length > 4){
                 for (let i = 0; i < 4; i++) {
                   let randMoveIndex = Math.floor(Math.random() * pokemonData.moves.length)
-                  const move = await getMove(randMoveIndex)
+                  let spiltUrl = pokemonData.moves[randMoveIndex].move.url.split("/")
+                  const move = await getMove(spiltUrl.at(-2))
                 //   console.log(move)
                   let moveInfo = {
                       name: move.name,
@@ -654,7 +664,7 @@ async function getWildPokemonData(region) {
                 }
             }
         } catch(err) {
-            console.log(`An error occured getting moves for ${pokemonData.name}`)
+            console.log(`An error occured getting moves for ${pokemonData.name}`, err)
         }
 
         const hpCalc = Math.floor(((2 * pokemonData.stats.find(s => s.stat.name == "hp")?.base_stat * 1) / 100) + 1 + 10)
