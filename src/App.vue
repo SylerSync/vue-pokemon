@@ -154,4 +154,5 @@ custom-tab.p-tab-active {
     opacity: 0.4;
     cursor: not-allowed;
 }
+
 </style>
