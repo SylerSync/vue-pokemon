@@ -1,32 +1,52 @@
 <script setup>
-    import {computed} from "vue"
-    import { useInventoryStore } from "@/stores/inventoryStore";
-    import DataTable from "primevue/datatable"
-    import Column from "primevue/column"
-    import Button from "primevue/button"
-    import Tag from "primevue/tag"
+import { computed } from "vue"
+import { useInventoryStore } from "@/stores/inventoryStore";
+import DataTable from "primevue/datatable"
+import Column from "primevue/column"
+import Button from "primevue/button"
+import Tag from "primevue/tag"
 
-    const inventoryStore = useInventoryStore();
+const inventoryStore = useInventoryStore();
 
-    const shopItems = computed(() => {
-        return Object.keys(inventoryStore.pokeballs).map((key) => {
-            const item = inventoryStore.pokeballs[key]
-            return{
-                id: key,
-                name: key.charAt(0).toUpperCase() + key.slice(1),
-                cost : item.cost,
-                count: item.count
-            }
-        })
-    })
-
-    function buyItem(itemType){
-        console.log(`Attempting to purchase pokeball: ${itemType}`)
-        const success = inventoryStore.BuyPokeball(itemType, 1)
-        if(!success){
-            console.warn(  `Not enough funds to buy ${itemType}`)
+const shopPokeball = computed(() => {
+    return Object.keys(inventoryStore.pokeballs).map((key) => {
+        const item = inventoryStore.pokeballs[key]
+        return {
+            id: key,
+            name: key.charAt(0).toUpperCase() + key.slice(1),
+            cost: item.cost,
+            count: item.count
         }
+    })
+})
+
+const shopRecovery = computed(() => {
+    return Object.keys(inventoryStore.recoveryItems).map((key) => {
+        const item = inventoryStore.recoveryItems[key]
+        return {
+            id: key,
+            name: key.charAt(0).toUpperCase() + key.slice(1),
+            cost: item.cost,
+            count: item.count
+        }
+    })
+})
+
+function buyPokeball(itemType) {
+    console.log(`Attempting to purchase pokeball: ${itemType}`)
+    const success = inventoryStore.BuyPokeball(itemType, 1)
+    if (!success) {
+        console.warn(`Not enough funds to buy ${itemType}`)
     }
+}
+
+function buyRecovery(itemType) {
+    console.log(`Attempting to purchase recovery item: ${itemType}`)
+    const success = inventoryStore.BuyRecovery(itemType, 1)
+    if (!success) {
+        console.warn(`Not enough funds to buy ${itemType}`)
+    }
+}
 
 </script>
 <template>
@@ -39,25 +59,40 @@
             </Tag>
         </div>
 
-        <DataTable :value="shopItems" responsiveLayout="scroll" class="p-datatable-sm">
-            <Column field="name" header="Item"></Column>
-            <Column field="cost" header="Cost">
+        <!-- Table 1: Pokeballs -->
+         <h3>Pokeballs</h3>
+        <DataTable :value="shopPokeball" responsiveLayout="scroll" class="p-datatable-sm dataTable">
+            <Column field="name" header="Item" style="width: 40%"></Column>
+            <Column field="cost" header="Cost" style="width: 20%">
                 <template #body="slotProps">
                     ${{ slotProps.data.cost.toLocaleString() }}
                 </template>
             </Column>
-            <Column field="count" header="In Bag"></Column>
-            <Column header="Action">
+            <Column field="count" header="In Bag" style="width: 20%"></Column>
+            <Column header="Action" style="width: 20%">
                 <template #body="slotProps">
-                    <Button
-                        label="Buy"
-                        icon="pi pi-shopping-cart"
-                        severity="primary"
-                        size="small"
-                        class="shop-btn"
+                    <Button label="Buy" icon="pi pi-shopping-cart" severity="primary" size="small" class="shop-btn"
                         :disabled="inventoryStore.funds < slotProps.data.cost"
-                        @click="buyItem(slotProps.data.id)"
-                    />
+                        @click="buyPokeball(slotProps.data.id)" />
+                </template>
+            </Column>
+        </DataTable>
+
+        <!-- Table 2: Recovery Items -->
+        <h3>Recovery Items</h3>
+        <DataTable :value="shopRecovery" responsiveLayout="scroll" class="p-datatable-sm dataTable">
+            <Column field="name" header="Item" style="width: 40%"></Column>
+            <Column field="cost" header="Cost" style="width: 20%">
+                <template #body="slotProps">
+                    ${{ slotProps.data.cost.toLocaleString() }}
+                </template>
+            </Column>
+            <Column field="count" header="In Bag" style="width: 20%"></Column>
+            <Column header="Action" style="width: 20%">
+                <template #body="slotProps">
+                    <Button label="Buy" icon="pi pi-shopping-cart" severity="primary" size="small" class="shop-btn"
+                        :disabled="inventoryStore.funds < slotProps.data.cost"
+                        @click="buyRecovery(slotProps.data.id)" />
                 </template>
             </Column>
         </DataTable>
@@ -83,7 +118,14 @@
     padding: 0.5rem 1rem;
 }
 
-.shop-btn:hover{
+.shop-btn:hover {
     cursor: pointer;
+}
+
+.dataTable {
+    border: 5px solid CanvasText;
+    border-radius: 5px;
+    margin:10px;
+    padding: 5px;
 }
 </style>
