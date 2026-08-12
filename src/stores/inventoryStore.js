@@ -23,7 +23,27 @@ export const useInventoryStore = defineStore("inventoryStore", {
         recoveryItems : {
             revive : {
                 count: 0,
-                cost: 300
+                cost: 300,
+                effect : {
+                    type: "revive",
+                    percent: 0.50
+                }
+            },
+            maxrevive: {
+                count: 0,
+                cost: 1000,
+                effect : {
+                    type: "revive",
+                    percent: 1.00
+                }
+            },
+            potion :{
+                count: 0,
+                cost: 100,
+                effect: {
+                    type: "heal",
+                    amount: 20
+                }
             }
         },
         selectedPokeball : "pokeball",
