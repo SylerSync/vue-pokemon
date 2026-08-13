@@ -1,182 +1,187 @@
 {
   "kanto": {
     "gym_leaders": [
-      { "name": "Brock", "type": "Rock", "team": ["Geodude", "Onix"] },
-      { "name": "Misty", "type": "Water", "team": ["Staryu", "Starmie"] },
-      { "name": "Lt. Surge", "type": "Electric", "team": ["Voltorb", "Pikachu", "Raichu"] },
-      { "name": "Erika", "type": "Grass", "team": ["Victreebel", "Tangela", "Vileplume"] },
-      { "name": "Koga", "type": "Poison", "team": ["Koffing", "Muk", "Koffing", "Weezing"] },
-      { "name": "Sabrina", "type": "Psychic", "team": ["Kadabra", "Mr. Mime", "Venomoth", "Alakazam"] },
-      { "name": "Blaine", "type": "Fire", "team": ["Growlithe", "Ponyta", "Rapidash", "Arcanine"] },
-      { "name": "Giovanni", "type": "Ground", "team": ["Rhyhorn", "Dugtrio", "Nidoqueen", "Nidoking", "Rhydon"] }
+      { "name": "Brock", "type": "Rock", "badge": "Boulder Badge", "roster": [{ "name": "geodude", "level": 12 }, { "name": "onix", "level": 14 }] },
+      { "name": "Misty", "type": "Water", "badge": "Cascade Badge", "roster": [{ "name": "staryu", "level": 18 }, { "name": "starmie", "level": 21 }] },
+      { "name": "Lt. Surge", "type": "Electric", "badge": "Thunder Badge", "roster": [{ "name": "voltorb", "level": 21 }, { "name": "pikachu", "level": 18 }, { "name": "raichu", "level": 24 }] },
+      { "name": "Erika", "type": "Grass", "badge": "Rainbow Badge", "roster": [{ "name": "victreebel", "level": 29 }, { "name": "tangela", "level": 24 }, { "name": "vileplume", "level": 29 }] },
+      { "name": "Koga", "type": "Poison", "badge": "Soul Badge", "roster": [{ "name": "koffing", "level": 37 }, { "name": "muk", "level": 39 }, { "name": "koffing", "level": 37 }, { "name": "weezing", "level": 43 }] },
+      { "name": "Sabrina", "type": "Psychic", "badge": "Marsh Badge", "roster": [{ "name": "kadabra", "level": 38 }, { "name": "mr-mime", "level": 37 }, { "name": "venomoth", "level": 38 }, { "name": "alakazam", "level": 43 }] },
+      { "name": "Blaine", "type": "Fire", "badge": "Volcano Badge", "roster": [{ "name": "growlithe", "level": 42 }, { "name": "ponyta", "level": 40 }, { "name": "rapidash", "level": 42 }, { "name": "arcanine", "level": 47 }] },
+      { "name": "Giovanni", "type": "Ground", "badge": "Earth Badge", "roster": [{ "name": "rhyhorn", "level": 45 }, { "name": "dugtrio", "level": 42 }, { "name": "nidoqueen", "level": 44 }, { "name": "nidoking", "level": 45 }, { "name": "rhydon", "level": 50 }] }
     ],
     "elite_four": [
-      { "name": "Lorelei", "type": "Ice", "team": ["Dewgong", "Cloyster", "Slowbro", "Jynx", "Lapras"] },
-      { "name": "Bruno", "type": "Fighting", "team": ["Onix", "Hitmonchan", "Hitmonlee", "Onix", "Machamp"] },
-      { "name": "Agatha", "type": "Ghost", "team": ["Gengar", "Golbat", "Haunter", "Arbok", "Gengar"] },
-      { "name": "Lance", "type": "Dragon", "team": ["Gyarados", "Dragonair", "Dragonair", "Aerodactyl", "Dragonite"] }
+      { "name": "Lorelei", "type": "Ice", "roster": [{ "name": "dewgong", "level": 54 }, { "name": "cloyster", "level": 53 }, { "name": "slowbro", "level": 54 }, { "name": "jynx", "level": 56 }, { "name": "lapras", "level": 56 }] },
+      { "name": "Bruno", "type": "Fighting", "roster": [{ "name": "onix", "level": 53 }, { "name": "hitmonchan", "level": 55 }, { "name": "hitmonlee", "level": 55 }, { "name": "onix", "level": 56 }, { "name": "machamp", "level": 58 }] },
+      { "name": "Agatha", "type": "Ghost", "roster": [{ "name": "gengar", "level": 56 }, { "name": "golbat", "level": 56 }, { "name": "haunter", "level": 55 }, { "name": "arbok", "level": 58 }, { "name": "gengar", "level": 60 }] },
+      { "name": "Lance", "type": "Dragon", "roster": [{ "name": "gyarados", "level": 58 }, { "name": "dragonair", "level": 56 }, { "name": "dragonair", "level": 56 }, { "name": "aerodactyl", "level": 60 }, { "name": "dragonite", "level": 62 }] }
     ],
-    "champion": {
-      "name": "Blue", "type": "Varied", "team": ["Pidgeot", "Alakazam", "Rhydon", "Exeggutor", "Arcanine", "Blastoise"]
-    }
+    "champion": [
+      { "name": "Blue", "type": "Mixed", "roster": [{ "name": "pidgeot", "level": 61 }, { "name": "alakazam", "level": 59 }, { "name": "rhydon", "level": 61 }, { "name": "exeggutor", "level": 61 }, { "name": "gyarados", "level": 63 }, { "name": "charizard", "level": 65 }] }
+    ]
   },
   "johto": {
     "gym_leaders": [
-      { "name": "Falkner", "type": "Flying", "team": ["Pidgey", "Pidgeotto"] },
-      { "name": "Bugsy", "type": "Bug", "team": ["Scyther", "Metapod", "Kakuna"] },
-      { "name": "Whitney", "type": "Normal", "team": ["Clefairy", "Miltank"] },
-      { "name": "Morty", "type": "Ghost", "team": ["Gastly", "Haunter", "Haunter", "Gengar"] },
-      { "name": "Chuck", "type": "Fighting", "team": ["Primeape", "Poliwrath"] },
-      { "name": "Jasmine", "type": "Steel", "team": ["Magnemite", "Magnemite", "Steelix"] },
-      { "name": "Pryce", "type": "Ice", "team": ["Seel", "Dewgong", "Piloswine"] },
-      { "name": "Clair", "type": "Dragon", "team": ["Dragonair", "Dragonair", "Dragonair", "Kingdra"] }
+      { "name": "Falkner", "type": "Flying", "badge": "Zephyr Badge", "roster": [{ "name": "pidgey", "level": 7 }, { "name": "pidgeotto", "level": 9 }] },
+      { "name": "Bugsy", "type": "Bug", "badge": "Hive Badge", "roster": [{ "name": "scyther", "level": 16 }, { "name": "metapod", "level": 14 }, { "name": "kakuna", "level": 14 }] },
+      { "name": "Whitney", "type": "Normal", "badge": "Plain Badge", "roster": [{ "name": "clefairy", "level": 18 }, { "name": "miltank", "level": 20 }] },
+      { "name": "Morty", "type": "Ghost", "badge": "Fog Badge", "roster": [{ "name": "gastly", "level": 21 }, { "name": "haunter", "level": 21 }, { "name": "gengar", "level": 25 }, { "name": "haunter", "level": 23 }] },
+      { "name": "Chuck", "type": "Fighting", "badge": "Storm Badge", "roster": [{ "name": "primeape", "level": 27 }, { "name": "poliwrath", "level": 30 }] },
+      { "name": "Jasmine", "type": "Steel", "badge": "Mineral Badge", "roster": [{ "name": "magnemite", "level": 30 }, { "name": "magnemite", "level": 30 }, { "name": "steelix", "level": 35 }] },
+      { "name": "Pryce", "type": "Ice", "badge": "Glacier Badge", "roster": [{ "name": "seel", "level": 27 }, { "name": "dewgong", "level": 29 }, { "name": "piloswine", "level": 31 }] },
+      { "name": "Clair", "type": "Dragon", "badge": "Rising Badge", "roster": [{ "name": "dragonair", "level": 37 }, { "name": "dragonair", "level": 37 }, { "name": "dragonair", "level": 37 }, { "name": "kingdra", "level": 40 }] }
     ],
     "elite_four": [
-      { "name": "Will", "type": "Psychic", "team": ["Xatu", "Jynx", "Exeggutor", "Slowbro", "Xatu"] },
-      { "name": "Koga", "type": "Poison", "team": ["Ariados", "Forretress", "Muk", "Venomoth", "Crobat"] },
-      { "name": "Bruno", "type": "Fighting", "team": ["Hitmontop", "Hitmonlee", "Hitmonchan", "Onix", "Machamp"] },
-      { "name": "Karen", "type": "Dark", "team": ["Umbreon", "Vileplume", "Murkrow", "Gengar", "Houndoom"] }
+      { "name": "Will", "type": "Psychic", "roster": [{ "name": "xatu", "level": 40 }, { "name": "jynx", "level": 41 }, { "name": "exeggutor", "level": 41 }, { "name": "slowbro", "level": 41 }, { "name": "xatu", "level": 42 }] },
+      { "name": "Koga", "type": "Poison", "roster": [{ "name": "ariados", "level": 40 }, { "name": "venomoth", "level": 41 }, { "name": "forretress", "level": 43 }, { "name": "muk", "level": 42 }, { "name": "crobat", "level": 44 }] },
+      { "name": "Bruno", "type": "Fighting", "roster": [{ "name": "hitmontop", "level": 42 }, { "name": "hitmonlee", "level": 42 }, { "name": "hitmonchan", "level": 42 }, { "name": "onis", "level": 43 }, { "name": "machamp", "level": 46 }] },
+      { "name": "Karen", "type": "Dark", "roster": [{ "name": "umbreon", "level": 42 }, { "name": "vileplume", "level": 42 }, { "name": "murkrow", "level": 44 }, { "name": "gengar", "level": 45 }, { "name": "houndoom", "level": 47 }] }
     ],
-    "champion": {
-      "name": "Lance", "type": "Dragon", "team": ["Gyarados", "Dragonite", "Dragonite", "Dragonite", "Aerodactyl", "Charizard"]
-    }
+    "champion": [
+      { "name": "Lance", "type": "Dragon", "roster": [{ "name": "gyarados", "level": 44 }, { "name": "dragonite", "level": 47 }, { "name": "dragonite", "level": 47 }, { "name": "aerodactyl", "level": 48 }, { "name": "charizard", "level": 48 }, { "name": "dragonite", "level": 50 }] }
+    ]
   },
   "hoenn": {
     "gym_leaders": [
-      { "name": "Roxanne", "type": "Rock", "team": ["Geodude", "Geodude", "Nosepass"] },
-      { "name": "Brawly", "type": "Fighting", "team": ["Machop", "Makuhita"] },
-      { "name": "Wattson", "type": "Electric", "team": ["Magnemite", "Voltorb", "Magneton"] },
-      { "name": "Flannery", "type": "Fire", "team": ["Slugma", "Slugma", "Camerupt", "Torkoal"] },
-      { "name": "Norman", "type": "Normal", "team": ["Slaking", "Vigoroth", "Slaking"] },
-      { "name": "Winona", "type": "Flying", "team": ["Swellow", "Pelipper", "Skarmory", "Altaria"] },
-      { "name": "Tate & Liza", "type": "Psychic", "team": ["Lunatone", "Solrock"] },
-      { "name": "Wallace", "type": "Water", "team": ["Luvdisc", "Sealeo", "Seaking", "Whiscash", "Milotic"] }
+      { "name": "Roxanne", "type": "Rock", "badge": "Stone Badge", "roster": [{ "name": "geodude", "level": 14 }, { "name": "nosepass", "level": 15 }] },
+      { "name": "Brawly", "type": "Fighting", "badge": "Knuckle Badge", "roster": [{ "name": "machop", "level": 16 }, { "name": "makuhita", "level": 18 }] },
+      { "name": "Wattson", "type": "Electric", "badge": "Dynamo Badge", "roster": [{ "name": "magnemite", "level": 22 }, { "name": "voltorb", "level": 20 }, { "name": "magneton", "level": 24 }] },
+      { "name": "Flannery", "type": "Fire", "badge": "Heat Badge", "roster": [{ "name": "slugma", "level": 26 }, { "name": "numel", "level": 26 }, { "name": "torkoal", "level": 28 }] },
+      { "name": "Norman", "type": "Normal", "badge": "Balance Badge", "roster": [{ "name": "slaking", "level": 28 }, { "name": "vigoroth", "level": 30 }, { "name": "slaking", "level": 31 }] },
+      { "name": "Winona", "type": "Flying", "badge": "Feather Badge", "roster": [{ "name": "swellow", "level": 31 }, { "name": "pelipper", "level": 30 }, { "name": "skarmory", "level": 32 }, { "name": "altaria", "level": 33 }] },
+      { "name": "Tate & Liza", "type": "Psychic", "badge": "Mind Badge", "roster": [{ "name": "lunatone", "level": 42 }, { "name": "solrock", "level": 42 }] },
+      { "name": "Wallace", "type": "Water", "badge": "Rain Badge", "roster": [{ "name": "luvdisc", "level": 40 }, { "name": "whiscash", "level": 42 }, { "name": "sealeo", "level": 40 }, { "name": "milotic", "level": 43 }] }
     ],
     "elite_four": [
-      { "name": "Sidney", "type": "Dark", "team": ["Mightyena", "Shiftry", "Cacturne", "Sharpedo", "Absol"] },
-      { "name": "Phoebe", "type": "Ghost", "team": ["Dusclops", "Banette", "Sableye", "Banette", "Dusclops"] },
-      { "name": "Glacia", "type": "Ice", "team": ["Glalie", "Sealeo", "Sealeo", "Glalie", "Walrein"] },
-      { "name": "Drake", "type": "Dragon", "team": ["Altaria", "Flygon", "Flygon", "Kingdra", "Salamence"] }
+      { "name": "Sidney", "type": "Dark", "roster": [{ "name": "mightyena", "level": 46 }, { "name": "shiftry", "level": 48 }, { "name": "cacturne", "level": 46 }, { "name": "crawdaunt", "level": 48 }, { "name": "absol", "level": 49 }] },
+      { "name": "Phoebe", "type": "Ghost", "roster": [{ "name": "dusclops", "level": 48 }, { "name": "banette", "level": 49 }, { "name": "sableye", "level": 50 }, { "name": "banette", "level": 49 }, { "name": "dusclops", "level": 51 }] },
+      { "name": "Glacia", "type": "Ice", "roster": [{ "name": "glalie", "level": 50 }, { "name": "sealeo", "level": 50 }, { "name": "glalie", "level": 52 }, { "name": "sealeo", "level": 52 }, { "name": "walrein", "level": 53 }] },
+      { "name": "Drake", "type": "Dragon", "roster": [{ "name": "shelgon", "level": 52 }, { "name": "altaria", "level": 54 }, { "name": "flygon", "level": 53 }, { "name": "flygon", "level": 53 }, { "name": "salamence", "level": 55 }] }
     ],
-    "champion": {
-      "name": "Steven Stone", "type": "Steel/Rock", "team": ["Skarmory", "Claydol", "Aggron", "Cradily", "Armaldo", "Metagross"]
-    }
+    "champion": [
+      { "name": "Steven", "type": "Steel", "roster": [{ "name": "skarmory", "level": 57 }, { "name": "claydol", "level": 55 }, { "name": "aggron", "level": 56 }, { "name": "cradily", "level": 56 }, { "name": "armaldo", "level": 56 }, { "name": "metagross", "level": 58 }] }
+    ]
   },
   "sinnoh": {
     "gym_leaders": [
-      { "name": "Roark", "type": "Rock", "team": ["Geodude", "Onix", "Cranidos"] },
-      { "name": "Gardenia", "type": "Grass", "team": ["Cherubi", "Turtwig", "Roserade"] },
-      { "name": "Maylene", "type": "Fighting", "team": ["Meditite", "Machoke", "Lucario"] },
-      { "name": "Crasher Wake", "type": "Water", "team": ["Gyarados", "Quagsire", "Floatzel"] },
-      { "name": "Fantina", "type": "Ghost", "team": ["Duskull", "Haunter", "Mismagius"] },
-      { "name": "Byron", "type": "Steel", "team": ["Bronzor", "Steelix", "Bastiodon"] },
-      { "name": "Candice", "type": "Ice", "team": ["Snover", "Sneasel", "Medicham", "Abomasnow"] },
-      { "name": "Volkner", "type": "Electric", "team": ["Raichu", "Ambipom", "Octillery", "Luxray"] }
+      { "name": "Roark", "type": "Rock", "badge": "Coal Badge", "roster": [{ "name": "geodude", "level": 12 }, { "name": "zubat", "level": 12 }, { "name": "cranidos", "level": 14 }] },
+      { "name": "Gardenia", "type": "Grass", "badge": "Forest Badge", "roster": [{ "name": "cherubi", "level": 19 }, { "name": "turtwig", "level": 19 }, { "name": "roserade", "level": 22 }] },
+      { "name": "Maylene", "type": "Fighting", "badge": "Cobble Badge", "roster": [{ "name": "meditite", "level": 27 }, { "name": "machoke", "level": 27 }, { "name": "lucario", "level": 30 }] },
+      { "name": "Crasher Wake", "type": "Water", "badge": "Fen Badge", "roster": [{ "name": "gyarados", "level": 33 }, { "name": "quagsire", "level": 34 }, { "name": "floatzel", "level": 37 }] },
+      { "name": "Fantina", "type": "Ghost", "badge": "Relic Badge", "roster": [{ "name": "duskull", "level": 24 }, { "name": "haunter", "level": 24 }, { "name": "mismagius", "level": 26 }] },
+      { "name": "Byron", "type": "Steel", "badge": "Mine Badge", "roster": [{ "name": "magneton", "level": 37 }, { "name": "steelix", "level": 38 }, { "name": "bastiodon", "level": 41 }] },
+      { "name": "Candice", "type": "Ice", "badge": "Icicle Badge", "roster": [{ "name": "sneasel", "level": 40 }, { "name": "piloswine", "level": 40 }, { "name": "abomasnow", "level": 42 }, { "name": "froslass", "level": 44 }] },
+      { "name": "Volkner", "type": "Electric", "badge": "Beacon Badge", "roster": [{ "name": "jolteon", "level": 46 }, { "name": "raichu", "level": 46 }, { "name": "luxray", "level": 48 }, { "name": "electivire", "level": 50 }] }
     ],
     "elite_four": [
-      { "name": "Aaron", "type": "Bug", "team": ["Dustox", "Beautifly", "Vespiquen", "Heracross", "Drapion"] },
-      { "name": "Bertha", "type": "Ground", "team": ["Quagsire", "Sudowoodo", "Whiscash", "Graveler", "Hippowdon"] },
-      { "name": "Flint", "type": "Fire", "team": ["Rapidash", "Steelix", "Drifblim", "Lopunny", "Infernape"] },
-      { "name": "Lucian", "type": "Psychic", "team": ["Mr. Mime", "Girafarig", "Medicham", "Alakazam", "Bronzong"] }
+      { "name": "Aaron", "type": "Bug", "roster": [{ "name": "yanmega", "level": 53 }, { "name": "scizor", "level": 53 }, { "name": "vespiquen", "level": 54 }, { "name": "heracross", "level": 54 }, { "name": "drapion", "level": 57 }] },
+      { "name": "Bertha", "type": "Ground", "roster": [{ "name": "whiscash", "level": 55 }, { "name": "gliscor", "level": 53 }, { "name": "hippowdon", "level": 55 }, { "name": "golem", "level": 56 }, { "name": "rhyperior", "level": 59 }] },
+      { "name": "Flint", "type": "Fire", "roster": [{ "name": "houndoom", "level": 52 }, { "name": "flareon", "level": 55 }, { "name": "rapidash", "level": 53 }, { "name": "infernape", "level": 55 }, { "name": "magmortar", "level": 57 }] },
+      { "name": "Lucian", "type": "Psychic", "roster": [{ "name": "mr-mime", "level": 53 }, { "name": "espeon", "level": 55 }, { "name": "bronzong", "level": 54 }, { "name": "alakazam", "level": 56 }, { "name": "gallade", "level": 59 }] }
     ],
-    "champion": {
-      "name": "Cynthia", "type": "Varied", "team": ["Spiritomb", "Roserade", "Gastrodon", "Lucario", "Milotic", "Garchomp"]
-    }
+    "champion": [
+      { "name": "Cynthia", "type": "Mixed", "roster": [{ "name": "spiritomb", "level": 61 }, { "name": "roserade", "level": 60 }, { "name": "gastrodon", "level": 60 }, { "name": "lucario", "level": 63 }, { "name": "milotic", "level": 63 }, { "name": "garchomp", "level": 66 }] }
+    ]
   },
   "unova": {
     "gym_leaders": [
-      { "name": "Cilan / Chili / Cress", "type": "Grass / Fire / Water", "team": ["Pansage / Pansear / Panpour", "Herdier"] },
-      { "name": "Lenora", "type": "Normal", "team": ["Herdier", "Watchog"] },
-      { "name": "Burgh", "type": "Bug", "team": ["Whirlipede", "Dwebble", "Leavanny"] },
-      { "name": "Elesa", "type": "Electric", "team": ["Emolga", "Emolga", "Zebstrika"] },
-      { "name": "Clay", "type": "Ground", "team": ["Krokorok", "Palpitoad", "Excadrill"] },
-      { "name": "Skyla", "type": "Flying", "team": ["Swoobat", "Unfezant", "Swanna"] },
-      { "name": "Brycen", "type": "Ice", "team": ["Vanillish", "Cryogonal", "Beartic"] },
-      { "name": "Drayden / Iris", "type": "Dragon", "team": ["Fraxure", "Druddigon", "Haxorus"] }
+      { "name": "Cilan", "type": "Grass", "badge": "Trio Badge", "roster": [{ "name": "lillipup", "level": 12 }, { "name": "pansage", "level": 14 }] },
+      { "name": "Lenora", "type": "Normal", "badge": "Basic Badge", "roster": [{ "name": "herdier", "level": 18 }, { "name": "watchog", "level": 20 }] },
+      { "name": "Burgh", "type": "Bug", "badge": "Insect Badge", "roster": [{ "name": "whirlipede", "level": 21 }, { "name": "dwebble", "level": 21 }, { "name": "leavanny", "level": 23 }] },
+      { "name": "Elesa", "type": "Electric", "badge": "Bolt Badge", "roster": [{ "name": "emolga", "level": 25 }, { "name": "emolga", "level": 25 }, { "name": "zebstrika", "level": 27 }] },
+      { "name": "Clay", "type": "Ground", "badge": "Quake Badge", "roster": [{ "name": "krokorok", "level": 29 }, { "name": "palpitoad", "level": 29 }, { "name": "excadrill", "level": 31 }] },
+      { "name": "Skyla", "type": "Flying", "badge": "Jet Badge", "roster": [{ "name": "swoobat", "level": 33 }, { "name": "unfezant", "level": 33 }, { "name": "swanna", "level": 35 }] },
+      { "name": "Brycen", "type": "Ice", "badge": "Freeze Badge", "roster": [{ "name": "vanillish", "level": 37 }, { "name": "cryogonal", "level": 37 }, { "name": "beartic", "level": 39 }] },
+      { "name": "Drayden", "type": "Dragon", "badge": "Legend Badge", "roster": [{ "name": "druddigon", "level": 41 }, { "name": "flygon", "level": 41 }, { "name": "haxorus", "level": 43 }] }
     ],
     "elite_four": [
-      { "name": "Shauntal", "type": "Ghost", "team": ["Cofagrigus", "Jellicent", "Golurk", "Chandelure"] },
-      { "name": "Grimsley", "type": "Dark", "team": ["Liepard", "Scrafty", "Krookodile", "Bisharp"] },
-      { "name": "Caitlin", "type": "Psychic", "team": ["Reuniclus", "Musharna", "Sigilyph", "Gothitelle"] },
-      { "name": "Marshal", "type": "Fighting", "team": ["Throh", "Sawk", "Mienshao", "Conkeldurr"] }
+      { "name": "Shauntal", "type": "Ghost", "roster": [{ "name": "cofagrigus", "level": 48 }, { "name": "jellicent", "level": 48 }, { "name": "golurk", "level": 48 }, { "name": "chandelure", "level": 50 }] },
+      { "name": "Grimsley", "type": "Dark", "roster": [{ "name": "liepard", "level": 48 }, { "name": "scrafty", "level": 48 }, { "name": "krookodile", "level": 48 }, { "name": "bisharp", "level": 50 }] },
+      { "name": "Caitlin", "type": "Psychic", "roster": [{ "name": "reuniclus", "level": 48 }, { "name": "musharna", "level": 48 }, { "name": "sigilyph", "level": 48 }, { "name": "gothitelle", "level": 50 }] },
+      { "name": "Marshal", "type": "Fighting", "roster": [{ "name": "throh", "level": 48 }, { "name": "sawk", "level": 48 }, { "name": "mienshao", "level": 48 }, { "name": "conkeldurr", "level": 50 }] }
     ],
-    "champion": {
-      "name": "Alder", "type": "Varied", "team": ["Accelgor", "Bouffalant", "Druddigon", "Escavalier", "Vanilluxe", "Volcarona"]
-    }
+    "champion": [
+      { "name": "Alder", "type": "Mixed", "roster": [{ "name": "accelgor", "level": 75 }, { "name": "bouffalant", "level": 75 }, { "name": "druddigon", "level": 75 }, { "name": "vanilluxe", "level": 75 }, { "name": "escavalier", "level": 75 }, { "name": "volcarona", "level": 77 }] }
+    ]
   },
   "kalos": {
     "gym_leaders": [
-      { "name": "Viola", "type": "Bug", "team": ["Surskit", "Vivillon"] },
-      { "name": "Grant", "type": "Rock", "team": ["Amaura", "Tyrunt"] },
-      { "name": "Korrina", "type": "Fighting", "team": ["Mienfoo", "Machoke", "Hawlucha"] },
-      { "name": "Ramos", "type": "Grass", "team": ["Jumpluff", "Weepinbell", "Gogoat"] },
-      { "name": "Clemont", "type": "Electric", "team": ["Emolga", "Magneton", "Heliolisk"] },
-      { "name": "Valerie", "type": "Fairy", "team": ["Mawile", "Mr. Mime", "Sylveon"] },
-      { "name": "Olympia", "type": "Psychic", "team": ["Sigilyph", "Slowking", "Meowstic"] },
-      { "name": "Wulfric", "type": "Ice", "team": ["Abomasnow", "Cryogonal", "Avalugg"] }
+      { "name": "Viola", "type": "Bug", "badge": "Bug Badge", "roster": [{ "name": "surskit", "level": 10 }, { "name": "vivillon", "level": 12 }] },
+      { "name": "Grant", "type": "Rock", "badge": "Cliff Badge", "roster": [{ "name": "amaura", "level": 25 }, { "name": "tyrunt", "level": 25 }] },
+      { "name": "Korrina", "type": "Fighting", "badge": "Rumble Badge", "roster": [{ "name": "mienfoo", "level": 28 }, { "name": "machoke", "level": 28 }, { "name": "hawlucha", "level": 32 }] },
+      { "name": "Ramos", "type": "Grass", "badge": "Plant Badge", "roster": [{ "name": "jumpluff", "level": 30 }, { "name": "weepinbell", "level": 31 }, { "name": "gogoat", "level": 34 }] },
+      { "name": "Clemont", "type": "Electric", "badge": "Voltage Badge", "roster": [{ "name": "emolga", "level": 35 }, { "name": "magneton", "level": 35 }, { "name": "heliolisk", "level": 37 }] },
+      { "name": "Valerie", "type": "Fairy", "badge": "Fairy Badge", "roster": [{ "name": "mawile", "level": 38 }, { "name": "mr-mime", "level": 39 }, { "name": "sylveon", "level": 42 }] },
+      { "name": "Olympia", "type": "Psychic", "badge": "Psychic Badge", "roster": [{ "name": "sigilyph", "level": 44 }, { "name": "slowking", "level": 45 }, { "name": "meowstic", "level": 48 }] },
+      { "name": "Wulfric", "type": "Ice", "badge": "Iceberg Badge", "roster": [{ "name": "abomasnow", "level": 56 }, { "name": "cryogonal", "level": 55 }, { "name": "avalugg", "level": 59 }] }
     ],
     "elite_four": [
-      { "name": "Malva", "type": "Fire", "team": ["Pyroar", "Torkoal", "Chandelure", "Talonflame"] },
-      { "name": "Siebold", "type": "Water", "team": ["Clawitzer", "Gyarados", "Starmie", "Barbaracle"] },
-      { "name": "Wikstrom", "type": "Steel", "team": ["Klefki", "Probopass", "Scizor", "Aegislash"] },
-      { "name": "Drasna", "type": "Dragon", "team": ["Dragalge", "Druddigon", "Altaria", "Noivern"] }
+      { "name": "Malva", "type": "Fire", "roster": [{ "name": "pyroar", "level": 63 }, { "name": "torkoal", "level": 63 }, { "name": "chandelure", "level": 63 }, { "name": "talonflame", "level": 65 }] },
+      { "name": "Wikstrom", "type": "Steel", "roster": [{ "name": "klefki", "level": 63 }, { "name": "probablepass", "level": 63 }, { "name": "scizor", "level": 63 }, { "name": "aegislash", "level": 65 }] },
+      { "name": "Drasna", "type": "Dragon", "roster": [{ "name": "dragalge", "level": 63 }, { "name": "altaria", "level": 63 }, { "name": "druddigon", "level": 63 }, { "name": "noivern", "level": 65 }] },
+      { "name": "Siebold", "type": "Water", "roster": [{ "name": "clawitzer", "level": 63 }, { "name": "gyarados", "level": 63 }, { "name": "starmie", "level": 63 }, { "name": "barbaracle", "level": 65 }] }
     ],
-    "champion": {
-      "name": "Diantha", "type": "Varied", "team": ["Hawlucha", "Tyrantrum", "Aurorus", "Gourgeist", "Goodra", "Gardevoir"]
-    }
+    "champion": [
+      { "name": "Diantha", "type": "Mixed", "roster": [{ "name": "hawlucha", "level": 64 }, { "name": "tyrantrum", "level": 65 }, { "name": "aurorus", "level": 65 }, { "name": "gourgeist", "level": 65 }, { "name": "goodra", "level": 66 }, { "name": "gardevoir", "level": 68 }] }
+    ]
   },
   "alola": {
-    "trial_captains_and_kahunas": [
-      { "name": "Hala", "type": "Fighting", "team": ["Machop", "Makuhita", "Crabrawler"] },
-      { "name": "Olivia", "type": "Rock", "team": ["Nosepass", "Boldore", "Lycanroc"] },
-      { "name": "Nanu", "type": "Dark", "team": ["Sableye", "Krookodile", "Persian"] },
-      { "name": "Hapu", "type": "Ground", "team": ["Golurk", "Gastrodon", "Flygon", "Mudsdale"] }
+    "gym_leaders": [
+      { "name": "Ilima", "type": "Normal", "badge": "Normalium Z", "roster": [{ "name": "yungoos", "level": 11 }, { "name": "smeargle", "level": 12 }] },
+      { "name": "Lana", "type": "Water", "badge": "Waterium Z", "roster": [{ "name": "chinchou", "level": 19 }, { "name": "shellder", "level": 19 }, { "name": "araquanid", "level": 20 }] },
+      { "name": "Kiawe", "type": "Fire", "badge": "Firium Z", "roster": [{ "name": "fletchinder", "level": 21 }, { "name": "marowak-alola", "level": 22 }, { "name": "salazzle", "level": 22 }] },
+      { "name": "Mallow", "type": "Grass", "badge": "Grassium Z", "roster": [{ "name": "phantump", "level": 23 }, { "name": "shiinotic", "level": 23 }, { "name": "lurantis", "level": 24 }] },
+      { "name": "Nanu", "type": "Dark", "badge": "Darkinium Z", "roster": [{ "name": "sableye", "level": 38 }, { "name": "krookodile", "level": 38 }, { "name": "persian-alola", "level": 39 }] },
+      { "name": "Hapu", "type": "Ground", "badge": "Groundium Z", "roster": [{ "name": "golurk", "level": 47 }, { "name": "gastrodon", "level": 47 }, { "name": "flygon", "level": 47 }, { "name": "mudsdale", "level": 48 }] }
     ],
     "elite_four": [
-      { "name": "Hala", "type": "Fighting", "team": ["Hariyama", "Primeape", "Bewear", "Poliwrath", "Crabominable"] },
-      { "name": "Olivia", "type": "Rock", "team": ["Relicanth", "Carbink", "Golem", "Probopass", "Lycanroc"] },
-      { "name": "Acerola", "type": "Ghost", "team": ["Sableye", "Drifblim", "Dhelmise", "Froslass", "Palossand"] },
-      { "name": "Kahili", "type": "Flying", "team": ["Skarmory", "Mandibuzz", "Oricorio", "Braviary", "Toucannon"] }
+      { "name": "Hala", "type": "Fighting", "roster": [{ "name": "hariyama", "level": 54 }, { "name": "primeape", "level": 54 }, { "name": "bewear", "level": 54 }, { "name": "crabominable", "level": 55 }] },
+      { "name": "Olivia", "type": "Rock", "roster": [{ "name": "armaldo", "level": 54 }, { "name": "cradily", "level": 54 }, { "name": "gigalith", "level": 54 }, { "name": "lycanroc-night", "level": 55 }] },
+      { "name": "Acerola", "type": "Ghost", "roster": [{ "name": "banette", "level": 54 }, { "name": "driftblim", "level": 54 }, { "name": "dhelmise", "level": 54 }, { "name": "palossand", "level": 55 }] },
+      { "name": "Kahili", "type": "Flying", "roster": [{ "name": "skarmory", "level": 54 }, { "name": "hawlucha", "level": 54 }, { "name": "mandibuzz", "level": 54 }, { "name": "toucannon", "level": 55 }] }
     ],
-    "champion": {
-      "name": "Kukui", "type": "Varied", "team": ["Lycanroc", "Ninetales", "Braviary", "Magnezone", "Snorlax", "Incinerator / Decidueye / Primarina"]
-    }
+    "champion": [
+      { "name": "Kukui", "type": "Mixed", "roster": [{ "name": "lycanroc-midday", "level": 57 }, { "name": "ninetales-alola", "level": 56 }, { "name": "braviary", "level": 56 }, { "name": "snorlax", "level": 56 }, { "name": "magnezone", "level": 56 }, { "name": "incineroar", "level": 58 }] }
+    ]
   },
   "galar": {
     "gym_leaders": [
-      { "name": "Milo", "type": "Grass", "team": ["Gossifleur", "Eldegoss"] },
-      { "name": "Nessa", "type": "Water", "team": ["Goldeen", "Arrokuda", "Drednaw"] },
-      { "name": "Kabu", "type": "Fire", "team": ["Ninetales", "Arcanine", "Centiskorch"] },
-      { "name": "Bea / Allister", "type": "Fighting / Ghost", "team": ["Hitmontop / Phantump", "Pangoro / Cursola", "Sirfetch'd / Gengar", "Machamp / Mimikyu"] },
-      { "name": "Opal", "type": "Fairy", "team": ["Weezing", "Mawile", "Togekiss", "Alcremie"] },
-      { "name": "Gordie / Melony", "type": "Rock / Ice", "team": ["Barbaracle / Snom", "Shuckle / Darmanitan", "Stonjourner / Eiscue", "Coalossal / Lapras"] },
-      { "name": "Piers", "type": "Dark", "team": ["Scrafty", "Malamar", "Skuntank", "Obstagoon"] },
-      { "name": "Raihan", "type": "Dragon", "team": ["Gigalith", "Flygon", "Sandaconda", "Duraludon"] }
+      { "name": "Milo", "type": "Grass", "badge": "Grass Badge", "roster": [{ "name": "gossifleur", "level": 19 }, { "name": "eldegoss", "level": 20 }] },
+      { "name": "Nessa", "type": "Water", "badge": "Water Badge", "roster": [{ "name": "goldeen", "level": 22 }, { "name": "arrokuda", "level": 23 }, { "name": "drednaw", "level": 24 }] },
+      { "name": "Kabu", "type": "Fire", "badge": "Fire Badge", "roster": [{ "name": "ninetales", "level": 25 }, { "name": "arcanine", "level": 25 }, { "name": "centiskorch", "level": 27 }] },
+      { "name": "Bea", "type": "Fighting", "badge": "Fighting Badge", "roster": [{ "name": "hitmontop", "level": 34 }, { "name": "pangoro", "level": 34 }, { "name": "sirfetchd", "level": 35 }, { "name": "machamp", "level": 36 }] },
+      { "name": "Opal", "type": "Fairy", "badge": "Fairy Badge", "roster": [{ "name": "weezing-galar", "level": 36 }, { "name": "mawile", "level": 36 }, { "name": "togekiss", "level": 37 }, { "name": "alcremie", "level": 38 }] },
+      { "name": "Gordie", "type": "Rock", "badge": "Rock Badge", "roster": [{ "name": "barbaracle", "level": 40 }, { "name": "shuckle", "level": 40 }, { "name": "stonjourner", "level": 41 }, { "name": "coalossal", "level": 42 }] },
+      { "name": "Piers", "type": "Dark", "badge": "Dark Badge", "roster": [{ "name": "scrafty", "level": 44 }, { "name": "malamar", "level": 45 }, { "name": "skuntank", "level": 45 }, { "name": "obstagoon", "level": 46 }] },
+      { "name": "Raihan", "type": "Dragon", "badge": "Dragon Badge", "roster": [{ "name": "flygon", "level": 47 }, { "name": "gigalith", "level": 46 }, { "name": "sandaconda", "level": 46 }, { "name": "duraludon", "level": 48 }] }
     ],
-    "elite_four": "Galar uses the Champion Cup tournament system in place of a traditional Elite Four.",
-    "champion": {
-      "name": "Leon", "type": "Varied", "team": ["Aegislash", "Dragapult", "Haxorus", "Seismitoad / Mr. Rime / Rhyperior", "Starter Pokémon", "Charizard"]
-    }
+    "elite_four": [
+      { "name": "Marnie", "type": "Dark", "roster": [{ "name": "liepard", "level": 59 }, { "name": "toxicroak", "level": 59 }, { "name": "scrafty", "level": 59 }, { "name": "morpeko", "level": 60 }, { "name": "grimmsnarl", "level": 60 }] },
+      { "name": "Bede", "type": "Fairy", "roster": [{ "name": "mawile", "level": 61 }, { "name": "gardevoir", "level": 61 }, { "name": "galrapidash", "level": 62 }, { "name": "hatterene", "level": 63 }] }
+    ],
+    "champion": [
+      { "name": "Leon", "type": "Mixed", "roster": [{ "name": "aegislash", "level": 68 }, { "name": "dragapult", "level": 68 }, { "name": "haxorus", "level": 69 }, { "name": "seismitoad", "level": 69 }, { "name": "mr-rime", "level": 69 }, { "name": "charizard", "level": 70 }] }
+    ]
   },
   "paldea": {
     "gym_leaders": [
-      { "name": "Katy", "type": "Bug", "team": ["Nymble", "Tarountula", "Teddiursa"] },
-      { "name": "Brassius", "type": "Grass", "team": ["Petilil", "Smoliv", "Sudowoodo"] },
-      { "name": "Iono", "type": "Electric", "team": ["Wattrel", "Bellibolt", "Luxio", "Mismagius"] },
-      { "name": "Kofu", "type": "Water", "team": ["Veluza", "Wugtrio", "Crabominable"] },
-      { "name": "Larry", "type": "Normal", "team": ["Komala", "Dudunsparce", "Staraptor"] },
-      { "name": "Ryme", "type": "Ghost", "team": ["Banette", "Mimikyu", "Houndstone", "Toxtricity"] },
-      { "name": "Tulip", "type": "Psychic", "team": ["Farigiraf", "Gardevoir", "Espathra", "Florges"] },
-      { "name": "Grusha", "type": "Ice", "team": ["Frosmoth", "Beartic", "Cetitan", "Altaria"] }
+      { "name": "Katy", "type": "Bug", "badge": "Bug Badge", "roster": [{ "name": "nymble", "level": 14 }, { "name": "tarountula", "level": 14 }, { "name": "teddiursa", "level": 15 }] },
+      { "name": "Brassius", "type": "Grass", "badge": "Grass Badge", "roster": [{ "name": "petilil", "level": 16 }, { "name": "smoliv", "level": 16 }, { "name": "sudowoodo", "level": 17 }] },
+      { "name": "Iono", "type": "Electric", "badge": "Electric Badge", "roster": [{ "name": "wattrel", "level": 23 }, { "name": "bellibolt", "level": 23 }, { "name": "luxio", "level": 23 }, { "name": "mismagius", "level": 24 }] },
+      { "name": "Kofu", "type": "Water", "badge": "Water Badge", "roster": [{ "name": "veluza", "level": 29 }, { "name": "wugtrio", "level": 29 }, { "name": "crabominable", "level": 30 }] },
+      { "name": "Larry", "type": "Normal", "badge": "Normal Badge", "roster": [{ "name": "komala", "level": 35 }, { "name": "dudunsparce", "level": 35 }, { "name": "staraptor", "level": 36 }] },
+      { "name": "Ryme", "type": "Ghost", "badge": "Ghost Badge", "roster": [{ "name": "banette", "level": 41 }, { "name": "mimikyu", "level": 41 }, { "name": "houndstone", "level": 41 }, { "name": "toxtricity", "level": 42 }] },
+      { "name": "Tulip", "type": "Psychic", "badge": "Psychic Badge", "roster": [{ "name": "farigiraf", "level": 44 }, { "name": "gardevoir", "level": 44 }, { "name": "espathra", "level": 44 }, { "name": "florges", "level": 45 }] },
+      { "name": "Grusha", "type": "Ice", "badge": "Ice Badge", "roster": [{ "name": "frosmoth", "level": 47 }, { "name": "beartic", "level": 47 }, { "name": "cetitan", "level": 47 }, { "name": "altaria", "level": 48 }] }
     ],
     "elite_four": [
-      { "name": "Rika", "type": "Ground", "team": ["Whiscash", "Camerupt", "Donphan", "Dugtrio", "Clodsire"] },
-      { "name": "Poppy", "type": "Steel", "team": ["Copperajah", "Magnezone", "Bronzong", "Corviknight", "Tinkaton"] },
-      { "name": "Larry", "type": "Flying", "team": ["Tropius", "Oricorio", "Altaria", "Staraptor", "Flamigo"] },
-      { "name": "Hassel", "type": "Dragon", "team": ["Noivern", "Haxorus", "Dragalge", "Flapple", "Baxcalibur"] }
+      { "name": "Rika", "type": "Ground", "roster": [{ "name": "whiscash", "level": 57 }, { "name": "camerupt", "level": 57 }, { "name": "donphan", "level": 57 }, { "name": "dugtrio", "level": 57 }, { "name": "clodsire", "level": 58 }] },
+      { "name": "Poppy", "type": "Steel", "roster": [{ "name": "copperajah", "level": 58 }, { "name": "magnezone", "level": 58 }, { "name": "bronzong", "level": 58 }, { "name": "corviknight", "level": 58 }, { "name": "tinkaton", "level": 59 }] },
+      { "name": "Larry", "type": "Flying", "roster": [{ "name": "tropius", "level": 59 }, { "name": "staraptor", "level": 59 }, { "name": "ororicorio", "level": 59 }, { "name": "altaria", "level": 59 }, { "name": "flamigo", "level": 60 }] },
+      { "name": "Hassel", "type": "Dragon", "roster": [{ "name": "noivern", "level": 60 }, { "name": "dragalge", "level": 60 }, { "name": "flapple", "level": 60 }, { "name": "haxorus", "level": 60 }, { "name": "baxcalibur", "level": 61 }] }
     ],
-    "champion": {
-      "name": "Geeta", "type": "Varied", "team": ["Espathra", "Kingambit", "Avalugg", "Veluza", "Gogoat", "Glimmora"]
-    }
+    "champion": [
+      { "name": "Geeta", "type": "Mixed", "roster": [{ "name": "espathra", "level": 61 }, { "name": "gogoat", "level": 61 }, { "name": "veluza", "level": 61 }, { "name": "avalugg", "level": 61 }, { "name": "kingambit", "level": 61 }, { "name": "glimmora", "level": 62 }] }
+    ]
   }
 }
