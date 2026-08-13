@@ -1,30 +1,31 @@
-import {defineStore} from "pinia"
+import { defineStore } from "pinia"
+import tmsData from "@/assets/data/tms.json"
 
 export const useInventoryStore = defineStore("inventoryStore", {
     state: () => ({
-        pokeballs : {
-            greatball : {
-                count:0,
-                cost:1000,
+        pokeballs: {
+            greatball: {
+                count: 0,
+                cost: 1000,
                 catchPower: 15
             },
             ultraball: {
-                count:0,
-                cost:2000,
+                count: 0,
+                cost: 2000,
                 catchPower: 35
 
             },
-            masterball : {
-                count:0,
-                cost:100000,
+            masterball: {
+                count: 0,
+                cost: 100000,
                 catchPower: 100
             }
         },
-        recoveryItems : {
-            revive : {
+        recoveryItems: {
+            revive: {
                 count: 0,
                 cost: 300,
-                effect : {
+                effect: {
                     type: "revive",
                     percent: 0.50
                 }
@@ -32,12 +33,12 @@ export const useInventoryStore = defineStore("inventoryStore", {
             maxrevive: {
                 count: 0,
                 cost: 1000,
-                effect : {
+                effect: {
                     type: "revive",
                     percent: 1.00
                 }
             },
-            potion :{
+            potion: {
                 count: 0,
                 cost: 100,
                 effect: {
@@ -45,35 +46,37 @@ export const useInventoryStore = defineStore("inventoryStore", {
                     amount: 20
                 }
             },
-            super_potion:{
+            super_potion: {
                 count: 0,
                 cost: 400,
-                effect:{
-                    type:"heal",
+                effect: {
+                    type: "heal",
                     amount: 55
                 }
             },
-            hyper_potion:{
+            hyper_potion: {
                 count: 0,
                 cost: 1000,
-                effect:{
-                    type:"heal",
+                effect: {
+                    type: "heal",
                     amount: 150
                 }
             },
-            max_potion:{
+            max_potion: {
                 count: 0,
                 cost: 2000,
-                effect:{
-                    type:"heal",
-                    amount:1000
+                effect: {
+                    type: "heal",
+                    amount: 1000
                 }
             }
         },
-        selectedPokeball : "pokeball",
-        funds : 5000
+        tms: {
+        },
+        selectedPokeball: "pokeball",
+        funds: 5000
     }),
-    getters:{
+    getters: {
         SelectedPokeballData: (state) => {
             return (type) => {
                 let pokeballData = {};
@@ -95,8 +98,9 @@ export const useInventoryStore = defineStore("inventoryStore", {
         },
         GetCompleteInventory: (state) => {
             const completeInventory = {
-                "pokeballs" : state.pokeballs,
-                "recoveryItems" : state.recoveryItems
+                "pokeballs": state.pokeballs,
+                "recoveryItems": state.recoveryItems,
+                "tms": state.tms
             }
             return completeInventory
         }
@@ -129,7 +133,7 @@ export const useInventoryStore = defineStore("inventoryStore", {
         },
 
         UsePokeball(type) {
-            if(type === "pokeball"){
+            if (type === "pokeball") {
                 return true
             }
             const item = this.pokeballs[type];
@@ -147,10 +151,10 @@ export const useInventoryStore = defineStore("inventoryStore", {
         /* ================= ================= =================
             FUND FUNCTIONS
             ================= ================= ================= */
-        AddFunds(amount){
+        AddFunds(amount) {
             const value = Number(amount)
 
-            if(!isNaN(value) && value > 0){
+            if (!isNaN(value) && value > 0) {
                 this.funds += value
                 return true
             }
@@ -160,27 +164,27 @@ export const useInventoryStore = defineStore("inventoryStore", {
         /* ================= ================= =================
             RECOVERY FUNCTIONS
             ================= ================= ================= */
-        UseRecovery(itemType){
+        UseRecovery(itemType) {
             const item = this.recoveryItems[itemType]
 
-            if(!item || item.count <= 0){
+            if (!item || item.count <= 0) {
                 console.warn(`Could not find recovery item ${itemType}.`)
                 return false
             }
 
             item.count--
             return true
-            
+
         },
-        BuyRecovery(itemType){
+        BuyRecovery(itemType) {
             const item = this.recoveryItems[itemType]
 
-            if(!item){
+            if (!item) {
                 console.warn(`Could not find recovery item ${itemType}.`)
                 return false
             }
 
-            if(item.cost > this.funds){
+            if (item.cost > this.funds) {
                 console.warn(`You do not have enough funds to buy a(n) ${item.id}.`)
                 return false
             }
@@ -188,6 +192,44 @@ export const useInventoryStore = defineStore("inventoryStore", {
             this.funds -= item.cost
             item.count++
 
+            return true
+        },
+        BuyTM(tmId) {
+            // 1. Ensure `tms` object exists on state
+            if (!this.tms) {
+                this.tms = {};
+            }
+
+            // 2. Fetch static metadata from tms.json
+            const item = tmsData[tmId]; // Import tmsData from '@/assets/data/tms.json'
+            if (!item) {
+                console.warn(`Could not find TM definition for ${tmId}`);
+                return false;
+            }
+
+            // 3. Check funds
+            if (this.funds < item.cost) {
+                console.warn(`Insufficient funds to buy ${item.code}`);
+                return false;
+            }
+
+            // 4. Complete transaction & safely initialize count
+            this.funds -= item.cost;
+            this.tms[tmId] = (this.tms[tmId] || 0) + 1;
+
+            return true;
+        },
+        UseTM(tmId) {
+            if (!this.tms[tmId] || this.tms[tmId] <= 0) {
+                console.warn(`No ${tmId} remaining in inventory.`)
+                return false
+            }
+
+            this.tms[tmId]--
+
+            if (this.tms[tmId] <= 0) {
+                delete this.tms[tmId]
+            }
             return true
         }
     }
