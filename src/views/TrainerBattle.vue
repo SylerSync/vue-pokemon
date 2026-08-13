@@ -11,9 +11,7 @@ import IconField from 'primevue/iconfield';
 import InputIcon from 'primevue/inputicon';
 import InputText from 'primevue/inputtext';
 import "@/api/pokeapi"
-import { getPokemon } from '@/api/pokeapi';
-import SelectButton from 'primevue/selectbutton';
-import Badge from 'primevue/badge';
+import { fetchTrainerTeam, getPokemon } from '@/api/pokeapi';
 import Splitter from 'primevue/splitter';
 import SplitterPanel from 'primevue/splitterpanel';
 import { useInventoryStore } from '@/stores/inventoryStore';
@@ -31,10 +29,10 @@ const battleLog = ref([])
 const battleStarted = ref(false)
 const anim = ref(null); // { actor: 'ally' | 'foe', type: 'lunge' | 'hit' | 'faint' }
 const isResolving = ref(false)
-const battleSubView = ref("log")
 const isVictory = ref(false)
 const isEndModalOpen = ref(false)
 const payout = ref(0)
+const sidePanel = ref("log") // 'log' | 'team' | 'inventory'
 
 
 const isBattleModalOpen = ref(false)
@@ -72,12 +70,15 @@ function onRegionChange() {
 const trainerOptions = computed(() => {
     if (!selectedRegion.value || !selectedRole.value) return [];
 
-    const rawData = gymData[selectedRegion.value][selectedRole.value];
+    const rawData = gymData[selectedRegion.value]?.[selectedRole.value];
     if (!rawData) return [];
 
-    // Champion is a single object in the JSON
+    // Champion might be a single object OR an array with 1 item
     if (selectedRole.value === 'champion') {
-        return [{ label: `${rawData.name} (${rawData.type})`, value: rawData }];
+        const championObj = Array.isArray(rawData) ? rawData[0] : rawData;
+        if (!championObj) return [];
+
+        return [{ label: `${championObj.name} (${championObj.type})`, value: championObj }];
     }
 
     // Gym Leaders and Elite Four are arrays
@@ -169,35 +170,35 @@ function ToggleSelectedPokemon(pokemon) {
 /// Battle Modal Controls
 /// ---------------------
 
-function isTeamFainted(team) {
-    if (!team || team.length === 0) return true
-
-    return team.every(pokemon => {
-        // Safely reads currentHP or currentHp regardless of casing
-        const hp = pokemon.currentHP ?? pokemon.currentHp ?? 0
-        return hp <= 0
-    })
-}
 
 async function openBattleModal() {
     if (!selectedTrainer.value) {
         console.warn(`A trainer must be selected to battle!`)
         return
     }
-    if (selectedPokemonTeam.value.length < 1) {
-        console.warn(`You must select atleast one pokemon!`)
+
+    // 1. Verify the user has selected at least one Pokemon for their own team
+    if (!selectedPokemonTeam.value || selectedPokemonTeam.value.length < 1) {
+        console.warn(`You must select at least one pokemon!`)
         return
     }
-    opponentPokemonTeam.value = selectedTrainer.value.team.map(pokemon => ({
-        ...pokemon,
-        currentHp: pokemon.totalHp,
-        instanceId: crypto.randomUUID()
-    }));
-    console.log(opponentPokemonTeam.value)
+
+    // 2. Hydrate the opponent's team using the 'roster' array + await
+    opponentPokemonTeam.value = await fetchTrainerTeam(selectedTrainer.value.roster)
+
+    // Verify hydration succeeded
+    if (!opponentPokemonTeam.value || opponentPokemonTeam.value.length < 1) {
+        console.error(`Failed to hydrate opponent team!`)
+        return
+    }
+
+    // 3. Assign active battle fighters
     usersSelectedPokemon.value = selectedPokemonTeam.value[0]
     selectedPokemon.value = opponentPokemonTeam.value[0]
+
+    // 4. Start battle session
     battleStarted.value = true
-    battleLog.value = [`Battle started with ${selectedTrainer.value.name}.`]
+    battleLog.value = [`Battle started with ${selectedTrainer.value.name}!`]
     isBattleModalOpen.value = true
 }
 
@@ -215,6 +216,26 @@ function closeBattleModal() {
 /// ----------------------
 /// Battle Phase Functions
 /// ----------------------
+
+
+const formattedInventory = computed(() => {
+    const items = inventoryStore.recoveryItems;
+    if (!items) return [];
+
+    return Object.entries(items)
+        .filter(([key, data]) => data.count > 0) // Only show items you actually own
+        .map(([key, data]) => {
+            // Clean up the name for display (e.g., 'maxrevive' -> 'Max Revive')
+            let displayName = key === 'maxrevive' ? 'Max Revive' : key.charAt(0).toUpperCase() + key.slice(1);
+
+            return {
+                id: key,            // 'potion', 'revive', etc.
+                name: displayName,
+                count: data.count,
+                effect: data.effect // Passes your { type: "heal", amount: 20 } along!
+            };
+        });
+});
 
 async function battleTurn(move) {
     if (battleStarted.value) {
@@ -393,7 +414,7 @@ function PokemonFainted(trainer) {
             selectedPokemon.value = opponentPokemonTeam.value[randomIndex]
             isResolving.value = false
         }
-        else{
+        else {
             isVictory.value = true
             OpenEndModal()
         }
@@ -404,7 +425,7 @@ function PokemonFainted(trainer) {
                 indexes.push(index)
             }
         }
-        if(indexes.length < 1){
+        if (indexes.length < 1) {
             isVictory = false
             OpenEndModal()
         }
@@ -413,9 +434,9 @@ function PokemonFainted(trainer) {
     indexes = []
 }
 
-function OpenEndModal(){
-    if(isVictory.value){
-        switch (selectedRole.value){
+function OpenEndModal() {
+    if (isVictory.value) {
+        switch (selectedRole.value) {
             case "gym_leaders":
                 console.log("Gym leader defeat detected")
                 payout.value = 10000
@@ -432,18 +453,130 @@ function OpenEndModal(){
         inventoryStore.AddFunds(payout.value)
         isEndModalOpen.value = true
     }
-    else{
+    else {
         console.log("player defeat detected")
         isEndModalOpen.value = true
     }
-    
+
 }
 
-function CloseEndModal(){
+function CloseEndModal() {
     payout.value = 0
     isVictory.value = false
     isEndModalOpen.value = false
-    isBattleModalOpen.value = false
+    closeBattleModal()
+}
+
+async function switchActivePokemon(newPokemon) {
+    if (newPokemon.instanceId === usersSelectedPokemon.value?.instanceId) return;
+    if ((newPokemon.currentHp ?? 0) <= 0) {
+        battleLog.value.push(`${newPokemon.name} is fainted and cannot fight!`);
+        return;
+    }
+
+    isResolving.value = true;
+    battleLog.value.push(`Come back ${usersSelectedPokemon.value.name}! Go ${newPokemon.name}!`);
+    usersSelectedPokemon.value = newPokemon;
+    sidePanel.value = 'log'; // Automatically flip back to log view
+
+    await delay(800);
+
+    // Opponent takes a turn against the newly switched pokemon
+    const wildMove = selectedPokemon.value.moves.length
+        ? selectedPokemon.value.moves[Math.floor(Math.random() * selectedPokemon.value.moves.length)]
+        : null;
+
+    if (wildMove) {
+        await useMove(selectedPokemon.value, usersSelectedPokemon.value, wildMove);
+        if (usersSelectedPokemon.value.currentHp <= 0) {
+            PokemonFainted('player');
+        }
+    }
+
+    isResolving.value = false;
+}
+
+// Add target selection ref in <script setup>
+const selectedTargetPokemon = ref(null);
+
+async function useBattleItem(item) {
+    if (isResolving.value) return;
+
+    // 1. Ensure a target Pokémon has been picked from the dropdown
+    const targetPokemon = selectedTargetPokemon.value;
+    if (!targetPokemon) {
+        battleLog.value.push("Select a Pokémon target from the dropdown first!");
+        return;
+    }
+
+    const currentHp = targetPokemon.currentHp ?? 0;
+    const isFainted = currentHp <= 0;
+    const isFullHp = currentHp >= targetPokemon.totalHp;
+
+    // 2. Validate item effect against target state BEFORE consuming from store
+    if (item.effect.type === 'heal') {
+        if (isFainted) {
+            battleLog.value.push(`${targetPokemon.name} is fainted! Use a Revive instead.`);
+            return;
+        }
+        if (isFullHp) {
+            battleLog.value.push(`${targetPokemon.name} is already at full HP!`);
+            return;
+        }
+    } else if (item.effect.type === 'revive') {
+        if (!isFainted) {
+            battleLog.value.push(`${targetPokemon.name} is not fainted!`);
+            return;
+        }
+    }
+
+    // 3. Consume item via Pinia store using return boolean validation
+    const itemUsed = inventoryStore.UseRecovery(item.id);
+    if (!itemUsed) {
+        battleLog.value.push(`Failed to use ${item.name}. None remaining!`);
+        return;
+    }
+
+    isResolving.value = true;
+
+    // 4. Apply exact recovery math directly
+    if (item.effect.type === 'heal') {
+        const healAmount = item.effect.amount;
+        const previousHp = targetPokemon.currentHp;
+
+        targetPokemon.currentHp = Math.min(
+            targetPokemon.totalHp,
+            targetPokemon.currentHp + healAmount
+        );
+
+        const actualHealed = targetPokemon.currentHp - previousHp;
+        battleLog.value.push(`Used ${item.name}! Restored ${actualHealed} HP to ${targetPokemon.name}.`);
+    }
+    else if (item.effect.type === 'revive') {
+        const revivedHp = Math.floor(targetPokemon.totalHp * item.effect.percent);
+        targetPokemon.currentHp = revivedHp;
+        battleLog.value.push(`Used ${item.name}! Revived ${targetPokemon.name} with ${revivedHp} HP.`);
+    }
+
+    // Reset dropdown selection
+    selectedTargetPokemon.value = null;
+    sidePanel.value = 'log'; // Flip back to log view
+
+    await delay(800);
+
+    // 5. Opponent turn after item usage
+    const wildMove = selectedPokemon.value?.moves?.length
+        ? selectedPokemon.value.moves[Math.floor(Math.random() * selectedPokemon.value.moves.length)]
+        : null;
+
+    if (wildMove) {
+        await useMove(selectedPokemon.value, usersSelectedPokemon.value, wildMove);
+        if (usersSelectedPokemon.value.currentHp <= 0) {
+            PokemonFainted('player');
+        }
+    }
+
+    isResolving.value = false;
 }
 
 </script>
@@ -549,7 +682,7 @@ function CloseEndModal(){
                                     <img v-if="slotProps.option.sprite" :src="slotProps.option.sprite" alt=""
                                         class="option-sprite" />
                                     <span class="option-name">{{ slotProps.option.name }} Lvl {{ slotProps.option.level
-                                    }}</span>
+                                        }}</span>
                                 </div>
                             </template>
                         </Select>
@@ -566,7 +699,7 @@ function CloseEndModal(){
                                 <div class="combatant-head">
                                     <span class="label">Wild</span>
                                     <span class="combatant-name">{{ selectedPokemon.name }} Lvl {{ selectedPokemon.level
-                                    }}</span>
+                                        }}</span>
                                 </div>
                                 <div class="hp">
                                     <div class="hp-track">
@@ -614,27 +747,107 @@ function CloseEndModal(){
                                 <span class="move-power">{{ move.power ?? '—' }}</span>
                             </button>
                         </div>
-                        <!-- MID-BATTLE ACTIONS (POKÉMON & INVENTORY) -->
-                        <div class="battle-actions-row">
-                            <!-- POKÉMON BUTTON: Opens Party Switch View -->
-                            <button class="action-btn pkmn-btn" :disabled="isResolving"
-                                @click="battleSubView = 'party'">
-                                <i class="mr-1"></i> POKÉMON
-                            </button>
 
-                            <!-- INVENTORY BUTTON: Opens Bag / Items View -->
-                            <button class="action-btn bag-btn" :disabled="isResolving" @click="battleSubView = 'bag'">
-                                <i class="mr-1"></i> INVENTORY
-                            </button>
-                        </div>
                     </div>
                 </SplitterPanel>
 
                 <!-- log -->
-                <SplitterPanel :minSize="20" class="log-panel">
-                    <div class="log-head">Log</div>
-                    <div ref="logEl" class="log-body">
-                        <p v-for="(entry, i) in battleLog" :key="i" class="log-line">{{ entry }}</p>
+                <SplitterPanel :minSize="20" class="side-panel">
+                    <!-- TOP NAVIGATION TAB BUTTONS -->
+                    <div class="panel-tabs">
+                        <button class="tab-btn" :class="{ active: sidePanel === 'log' }" @click="sidePanel = 'log'">
+                            LOG
+                        </button>
+                        <button class="tab-btn" :class="{ active: sidePanel === 'team' }" @click="sidePanel = 'team'">
+                            TEAM
+                        </button>
+                        <button class="tab-btn" :class="{ active: sidePanel === 'inventory' }"
+                            @click="sidePanel = 'inventory'">
+                            ITEMS
+                        </button>
+                    </div>
+
+                    <!-- DYNAMIC BODY CONTENT -->
+                    <div class="panel-content">
+
+                        <!-- 1. BATTLE LOG VIEW -->
+                        <div v-if="sidePanel === 'log'" ref="logEl" class="log-body">
+                            <p v-for="(entry, i) in battleLog" :key="i" class="log-line">{{ entry }}</p>
+                        </div>
+
+                        <!-- 2. POKÉMON TEAM SELECTOR VIEW -->
+                        <div v-else-if="sidePanel === 'team'" class="team-body">
+                            <div v-for="pokemon in selectedPokemonTeam" :key="pokemon.instanceId" class="team-card"
+                                :class="{
+                                    'fainted': (pokemon.currentHp ?? 0) <= 0,
+                                    'active': pokemon.instanceId === usersSelectedPokemon?.instanceId
+                                }" @click="switchActivePokemon(pokemon)">
+                                <img :src="pokemon.sprite" :alt="pokemon.name" class="team-sprite" />
+                                <div class="team-info">
+                                    <span class="team-name">{{ pokemon.name }}</span>
+                                    <span class="team-hp">{{ Math.max(0, pokemon.currentHp) }} / {{ pokemon.totalHp }}
+                                        HP</span>
+                                </div>
+                                <span v-if="pokemon.instanceId === usersSelectedPokemon?.instanceId"
+                                    class="active-tag">ACTIVE</span>
+                            </div>
+                        </div>
+
+                        <!-- 3. INVENTORY / ITEMS VIEW -->
+                        <div v-else-if="sidePanel === 'inventory'" class="inventory-body">
+
+                            <!-- Target Selection Picker with HP Gauges -->
+                            <div class="target-picker-container">
+                                <label class="target-label">Target Pokémon</label>
+                                <Select v-model="selectedTargetPokemon" :options="selectedPokemonTeam"
+                                    optionLabel="name" placeholder="Select Target" class="w-full target-select">
+                                    <!-- Selected Value Display -->
+                                    <template #value="slotProps">
+                                        <div v-if="slotProps.value" class="target-option">
+                                            <span class="target-name">{{ slotProps.value.name }}</span>
+                                            <span class="target-hp-text">
+                                                {{ Math.max(0, slotProps.value.currentHp) }}/{{ slotProps.value.totalHp
+                                                }}
+                                            </span>
+                                        </div>
+                                        <span v-else class="placeholder">{{ slotProps.placeholder }}</span>
+                                    </template>
+
+                                    <!-- Dropdown Options with Live HP Meters -->
+                                    <template #option="slotProps">
+                                        <div class="target-option-dropdown">
+                                            <div class="target-details">
+                                                <div class="target-head">
+                                                    <span class="target-name">{{ slotProps.option.name }}</span>
+                                                    <span class="target-hp-text">
+                                                        {{ Math.max(0, slotProps.option.currentHp) }}/{{
+                                                        slotProps.option.totalHp }} HP
+                                                    </span>
+                                                </div>
+                                                <div class="hp-track">
+                                                    <div class="hp-fill" :class="hpTone(slotProps.option)"
+                                                        :style="{ width: hpPercent(slotProps.option) + '%' }" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </template>
+                                </Select>
+                            </div>
+
+                            <!-- Items List -->
+                            <div v-for="item in formattedInventory" :key="item.id" class="item-card">
+                                <div class="item-info">
+                                    <span class="item-name">{{ item.name }}</span>
+                                    <span class="item-count">x{{ item.count }}</span>
+                                </div>
+                                <Button label="Use" size="small"
+                                    :disabled="!selectedTargetPokemon || item.count <= 0 || isResolving"
+                                    @click="useBattleItem(item)" />
+                            </div>
+
+                            <p v-if="!formattedInventory.length" class="empty-msg">No recovery items in inventory.</p>
+                        </div>
+
                     </div>
                 </SplitterPanel>
             </Splitter>
@@ -642,17 +855,22 @@ function CloseEndModal(){
     </Modal>
 
     <Modal v-if="isEndModalOpen" @close="CloseEndModal">
-        <template class="endModal">
-            <div v-if="isVictory">
+        <div class="endModal">
+            <!-- VICTORY SCREEN -->
+            <div v-if="isVictory" class="end-content">
                 <h3>Victory!</h3>
-                <p>{{ payout }}</p>
+                <p class="payout-text">Reward: ${{ payout }}</p>
             </div>
-            <div v-if="!isVictory">
-                <h3>You lose</h3>
-                <p>Better luck next time</p>
+
+            <!-- DEFEAT SCREEN -->
+            <div v-else class="end-content">
+                <h3>You Lose</h3>
+                <p>Better luck next time!</p>
             </div>
-            <Button @click="CloseEndModal">Okay</Button>
-        </template>
+
+            <!-- ACTION BUTTON -->
+            <Button label="Okay" @click="CloseEndModal" />
+        </div>
     </Modal>
 
 </template>
@@ -1045,6 +1263,125 @@ function CloseEndModal(){
 
 .action-btn:hover:not(:disabled) {
     background: var(--p-content-hover-background);
+}
+
+.side-panel {
+    display: flex;
+    flex-direction: column;
+    border-inline-start: 1px solid var(--p-content-border-color);
+    height: 100%;
+}
+
+/* Tab Header */
+.panel-tabs {
+    display: flex;
+    border-bottom: 1px solid var(--p-content-border-color);
+    background: var(--p-surface-50);
+}
+
+.tab-btn {
+    flex: 1;
+    padding: 0.5rem 0.25rem;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    border: none;
+    border-bottom: 2px solid transparent;
+    background: transparent;
+    color: var(--p-text-muted-color);
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.tab-btn:hover {
+    color: var(--p-primary-color);
+}
+
+.tab-btn.active {
+    color: var(--p-primary-color);
+    border-bottom-color: var(--p-primary-color);
+    background: var(--p-content-background);
+}
+
+/* Panel Body Base */
+.panel-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0.75rem;
+}
+
+/* Team View Styles */
+.team-body,
+.inventory-body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.team-card,
+.item-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.5rem;
+    border: 1px solid var(--p-content-border-color);
+    border-radius: var(--p-content-border-radius);
+    background: var(--p-content-background);
+    cursor: pointer;
+}
+
+.team-card:hover:not(.fainted) {
+    background: var(--p-content-hover-background);
+}
+
+.team-card.active {
+    border-color: var(--p-primary-color);
+}
+
+.team-card.fainted {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.team-sprite {
+    width: 2.25rem;
+    height: 2.25rem;
+    object-fit: contain;
+    image-rendering: pixelated;
+}
+
+.team-info,
+.item-info {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    margin-left: 0.5rem;
+}
+
+.team-name,
+.item-name {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: capitalize;
+}
+
+.team-hp,
+.item-count {
+    font-size: 0.6875rem;
+    color: var(--p-text-muted-color);
+}
+
+.active-tag {
+    font-size: 0.625rem;
+    font-weight: 700;
+    color: var(--p-primary-color);
+}
+
+.empty-msg {
+    font-size: 0.75rem;
+    color: var(--p-text-muted-color);
+    text-align: center;
+    margin-top: 1rem;
 }
 
 @keyframes faint {
