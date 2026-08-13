@@ -166,7 +166,7 @@ function CatchPokemon() {
             let effectiveCaptureRate = Math.min(100, Math.max(0, rawRate))
 
             console.log(`Capture roll: ${captureRoll} Damage Modifier: -${damageBonus} Effective Roll: ${effectiveCaptureRate} Capture Chance: ${selectedPokemon.value.captureRate}`)
-            battleLog.value.push(`You threw a ${selectedPokeball.value} at ${selectedPokemon.value.name}...`)
+            battleLog.value.push(`You threw a ${selectedPokeball.value.id} at ${selectedPokemon.value.name}...`)
         
         // Capture roll chance hits, pokemon is set and relavent data is set
             if(effectiveCaptureRate <= selectedPokemon.value.captureRate){
@@ -251,9 +251,7 @@ async function battleTurn(move) {
           : null;
       if(move == "Catch"){
         CatchPokemon()
-        console.log(battleStarted.value)
         if(!battleStarted.value) {return}
-        console.log("Code continues")
         await delay(800)
         battleLog.value.push(`Oh no, ${selectedPokemon.value.name} broke out`)
         await useMove(selectedPokemon.value, usersSelectedPokemon.value, wildMove)
@@ -644,7 +642,7 @@ async function getWildPokemonData(region) {
           captureRate: 100,
           totalHp: hpCalc,
           currentHp: hpCalc,
-          stats: dataJson.stats.map(s => ({name: s.stat.name, stat: s.base_stat})),
+          stats: dataJson.stats.map(s => ({name: s.stat.name, base_stat: s.base_stat, stat: ((2 * s.base_stat * 5)/100) + 5})),
           moves: randomMoves,
           totalKOs: 0,
           totalFaints: 0,
@@ -764,12 +762,12 @@ async function getWildPokemonData(region) {
         captureRate: Math.round((speciesData.capture_rate / 255) * 100),
         totalHp: hpCalc,
         currentHp: hpCalc,
-        stats: pokemonData.stats.map(s => ({name: s.stat.name, stat: s.base_stat})),
+        stats: pokemonData.stats.map(s => ({name: s.stat.name, base_stat: s.base_stat, stat: ((2 * s.base_stat * randLevel)/100) + 5})),
         moves: randomMoves,
         totalKOs: 0,
         totalFaints: 0,
         level: randLevel
-
+        
       };
     } catch (err) {
       console.error(`An error occurred collecting data for ${target.name}`, err);
@@ -862,7 +860,7 @@ async function getWildPokemonData(region) {
               <template #option="slotProps">
                 <div class="option-row">
                   <img v-if="slotProps.option.sprite" :src="slotProps.option.sprite" alt="" class="option-sprite" />
-                  <span class="option-name">{{ slotProps.option.name }} Lvl {{ selectedPokemon.level }}</span>
+                  <span class="option-name">{{ slotProps.option.name }} Lvl {{ slotProps.option.level }}</span>
                 </div>
               </template>
             </Select>
