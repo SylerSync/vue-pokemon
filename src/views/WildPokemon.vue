@@ -142,7 +142,7 @@ function CatchStarter(){
     isFinished.value = true
 }
 
-function CatchPokemon() {
+async function CatchPokemon() {
     console.log(selectedPokemon.value)
     console.log("Attempting catch!")
     if (!selectedPokemon.value || selectedIndex.value === null) {
@@ -170,6 +170,8 @@ function CatchPokemon() {
         
         // Capture roll chance hits, pokemon is set and relavent data is set
             if(effectiveCaptureRate <= selectedPokemon.value.captureRate){
+                await delay(800)
+                battleLog.value.push(`Congradulations, you caught ${selectedPokemon.value.name}`)
                 pokemonStore.addPokemon(selectedPokemon.value)
                 console.log(`${Math.trunc(3000/selectedPokemon.value.captureRate)} has been added to your balance`)
                 inventoryStore.AddFunds(Math.trunc(3000/selectedPokemon.value.captureRate))
@@ -177,15 +179,19 @@ function CatchPokemon() {
                 showFeedback.value = true
                 isFinished.value = true
                 battleWin.value = true
+                await delay(800)
                 endBattle()
             }
             // If a roll chance fails the pokemon has the chance to flee
             else{
                 if(checkPokemonFlees()){
+                    await delay(800)
+                    battleLog.value.push(`${selectedPokemon.value.name} fled`)
                     catchMessage.value = `Oh no! ${selectedPokemon.value.name} fled!`
                     showFeedback.value = true
                     isFinished.value = true
                     battleWin.value = false
+                    await delay(800)
                     endBattle()
                 }
                 else{
@@ -250,7 +256,7 @@ async function battleTurn(move) {
           ? selectedPokemon.value.moves[Math.floor(Math.random() * selectedPokemon.value.moves.length)]
           : null;
       if(move == "Catch"){
-        CatchPokemon()
+        await CatchPokemon()
         if(!battleStarted.value) {return}
         await delay(800)
         battleLog.value.push(`Oh no, ${selectedPokemon.value.name} broke out`)
@@ -361,7 +367,7 @@ async function useMove(user, target, move) {
 function calculateDamage(attacker, defender, move, opts = {}) {
   const {
     critical = Math.random() < 1 / 24,
-    randomFactor = (Math.floor(Math.random() * 16) + 85) / 100,
+    randomFactor = Math.max(.85, Math.random()),
     weatherMod = 1,
     otherMod = 1,
   } = opts;
@@ -832,7 +838,7 @@ async function getWildPokemonData(region) {
         </div>
     </Modal>
 
-    <Modal v-if="isBattleModalOpen" @close="endBattle()">
+  <Modal v-if="isBattleModalOpen" @close="endBattle()">
     <div class="battle">
       <Splitter :sizes="[70, 30]" class="battle-split">
         <SplitterPanel :minSize="45" class="battle-stage">
