@@ -187,60 +187,8 @@ async function BuildOpponentTeam() {
     }
 }
 
-// Computed active fighters (default to first non-fainted Pokemon)
-const activeOpponentPokemon = computed(() => {
-    return opponentPokemonTeam.value?.find(p => p.currentHP > 0) || opponentPokemonTeam.value?.[0]
-})
 
-const activePlayerPokemon = computed(() => {
-    return selectedPokemonTeam.value?.find(p => (p.currentHp ?? p.totalHp) > 0) || selectedPokemonTeam.value?.[0]
-})
 
-// Helper: Calculate HP percentage safely across different property casings
-function getHpPercent(pokemon) {
-    if (!pokemon) return 0
-    const current = pokemon.currentHP ?? pokemon.currentHp ?? 0
-    const total = pokemon.totalHP ?? pokemon.totalHp ?? 1
-    return Math.max(0, Math.min(100, Math.round((current / total) * 100)))
-}
-
-// Helper: Dynamic HP Bar Color
-function getHpColorClass(pokemon) {
-    const percent = getHpPercent(pokemon)
-    if (percent > 50) return 'hp-green'
-    if (percent > 20) return 'hp-yellow'
-    return 'hp-red'
-}
-
-const battleSubView = ref('arena')
-
-function selectPokemonToSwitch(pokemon) {
-    if ((pokemon.currentHp ?? pokemon.totalHp) <= 0) {
-        battleMessage.value = `${pokemon.name} has no energy left to fight!`
-        return
-    }
-
-    // Set as active combatant (e.g., move to index 0 or set active ID)
-    activePlayerPokemonId.value = pokemon.instanceId
-    battleMessage.value = `Go! ${pokemon.name}!`
-
-    // Return to the arena view
-    battleSubView.value = 'arena'
-}
-
-function HandleRun() {
-    battleMessage.value = "You can't run from a trainer battle."
-}
-
-const dialogSubView = ref('menu')
-
-function selectMove(move) {
-    // 1. Show move execution message
-    battleMessage.value = `${activePlayerPokemon.value?.name} used ${move.name.toUpperCase()}!`
-
-    // 2. Return to the main menu view
-    dialogSubView.value = 'menu'
-}
 
 </script>
 <template>
@@ -289,6 +237,7 @@ function selectMove(move) {
                             <template #grid="slotProps">
                                 <div class="pokemon-grid">
                                     <Card v-for="(pokemon, index) in (slotProps.items || filteredPokemon)"
+                                        v-if="pokemon.currentHp > 0"
                                         :key="pokemon.id ? pokemon.id : index" class="w-full pokemonCard"
                                         @click="ToggleSelectedPokemon(pokemon)"
                                         :class="{ 'is-selected': selectedPokemonTeam.some(p => p.instanceId === pokemon.instanceId) }">
@@ -315,102 +264,154 @@ function selectMove(move) {
         </div>
     </div>
 
+    
     <Modal v-if="isBattleModalOpen">
-        <div class="battle-screen">
-            <!-- TOP BAR: TRAINER BANNER -->
-            <div class="battle-header">
-                <span class="vs-badge">VS</span>
-                <h3 class="trainer-title">Battle vs. {{ selectedTrainer?.name }}</h3>
-            </div>
+    <div class="battle">
+      <Splitter :sizes="[70, 30]" class="battle-split">
+        <SplitterPanel :minSize="45" class="battle-stage">
 
-            <!-- MAIN ARENA SCREEN -->
-            <div class="battle-arena">
-                <!-- OPPONENT FIELD (Top Right) -->
-                <div class="field-side opponent-side">
-                    <div class="status-box opponent-status">
-                        <div class="info-row">
-                            <span class="pokemon-name">{{ activeOpponentPokemon?.name }}</span>
-                            <div class="party-balls">
-                                <span v-for="(poke, i) in opponentPokemonTeam" :key="'opp-ball-' + i"
-                                    class="ball"></span>
-                            </div>
-                        </div>
-                        <div class="hp-wrapper">
-                            <span class="hp-label">HP</span>
-                            <div class="hp-bar-bg">
-                                <div class="hp-bar-fill hp-green" style="width: 100%;"></div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="sprite-platform opponent-platform">
-                        <img :src="activeOpponentPokemon?.sprite" :alt="activeOpponentPokemon?.name"
-                            class="battle-sprite opponent-sprite" />
-                    </div>
+          <!-- pre-battle -->
+          <div v-if="!battleStarted" class="setup">
+            <h2 class="setup-title">Choose your fighter</h2>
+            <Select
+              v-model="usersSelectedPokemon"
+              :options="pokemonStore.caughtPokemon"
+              :optionDisabled="(option) => (option.currentHp ?? option.totalHp) <= 0"
+              optionLabel="name"
+              filter
+              filterBy="name"
+              showClear
+              placeholder="Select a Pokémon"
+              class="setup-select"
+            >
+              <template #value="slotProps">
+                <div v-if="slotProps.value" class="option-row">
+                  <img v-if="slotProps.value.sprite" :src="slotProps.value.sprite" alt="" class="option-sprite" />
+                  <span class="option-name">{{ slotProps.value.name }}</span>
                 </div>
-
-                <!-- PLAYER FIELD (Bottom Left) -->
-                <div class="field-side player-side">
-                    <div class="sprite-platform player-platform">
-                        <img :src="activePlayerPokemon?.sprite" :alt="activePlayerPokemon?.name"
-                            class="battle-sprite player-sprite" />
-                    </div>
-                    <div class="status-box player-status">
-                        <div class="info-row">
-                            <span class="pokemon-name">{{ activePlayerPokemon?.name }}</span>
-                            <div class="party-balls">
-                                <span v-for="(poke, i) in selectedPokemonTeam" :key="'player-ball-' + i"
-                                    class="ball"></span>
-                            </div>
-                        </div>
-                        <div class="hp-wrapper">
-                            <span class="hp-label">HP</span>
-                            <div class="hp-bar-bg">
-                                <div class="hp-bar-fill hp-green" style="width: 100%;"></div>
-                            </div>
-                        </div>
-                        <div class="hp-text">
-                            {{ activePlayerPokemon?.currentHp || activePlayerPokemon?.totalHp || 0 }} / {{
-                            activePlayerPokemon?.totalHp || 0 }}
-                        </div>
-                    </div>
+                <span v-else class="placeholder">{{ slotProps.placeholder }}</span>
+              </template>
+              <template #option="slotProps">
+                <div class="option-row">
+                  <img v-if="slotProps.option.sprite" :src="slotProps.option.sprite" alt="" class="option-sprite" />
+                  <span class="option-name">{{ slotProps.option.name }} Lvl {{ slotProps.option.level }}</span>
                 </div>
+              </template>
+            </Select>
+            <button
+              class="btn btn-primary"
+              :disabled="!usersSelectedPokemon"
+              @click="startBattle()"
+            >
+              Start Battle
+            </button>
+          </div>
+
+          <!-- in battle -->
+          <div v-else class="arena">
+            <!-- opponent: info left, sprite right -->
+            <div class="combatant combatant-foe">
+              <div class="combatant-info">
+                <div class="combatant-head">
+                  <span class="label">Wild</span>
+                  <span class="combatant-name">{{ selectedPokemon.name }} Lvl {{ selectedPokemon.level }}</span>
+                </div>
+                <div class="hp">
+                  <div class="hp-track">
+                    <div
+                      class="hp-fill"
+                      :class="hpTone(selectedPokemon)"
+                      :style="{ width: hpPercent(selectedPokemon) + '%' }"
+                    />
+                  </div>
+                  <span class="hp-text">
+                    {{ Math.max(0, selectedPokemon.currentHp) }}/{{ selectedPokemon.totalHp }}
+                  </span>
+                </div>
+              </div>
+              <img
+                :src="selectedPokemon.sprite"
+                :alt="selectedPokemon.name"
+                class="battle-sprite sprite-foe"
+                :class="anim?.actor === 'foe' ? `anim-${anim.type}` : null"
+              />
             </div>
+          
+            <!-- player: sprite left, info right -->
+            <div class="combatant combatant-ally">
+              <div class="combatant-info">
+                <div class="combatant-head">
+                  <span class="label">Yours</span>
+                  <span class="combatant-name">{{ usersSelectedPokemon.name }} Lvl {{ usersSelectedPokemon.level }}</span>
+                </div>
+                <div class="hp">
+                  <div class="hp-track">
+                    <div
+                      class="hp-fill"
+                      :class="hpTone(usersSelectedPokemon)"
+                      :style="{ width: hpPercent(usersSelectedPokemon) + '%' }"
+                    />
+                  </div>
+                  <span class="hp-text">
+                    {{ Math.max(0, usersSelectedPokemon.currentHp) }}/{{ usersSelectedPokemon.totalHp }}
+                  </span>
+                </div>
+              </div>
+              <img
+                :src="usersSelectedPokemon.backSprite ?? usersSelectedPokemon.sprite"
+                :alt="usersSelectedPokemon.name"
+                class="battle-sprite sprite-ally"
+                :class="anim?.actor === 'ally' ? `anim-${anim.type}` : null"
+              />
+            </div> 
+                <!-- moves -->
+                <div class="moves">
+                  <button
+                    v-for="move in usersSelectedPokemon.moves"
+                    :key="move.name"
+                    class="move"
+                    :disabled="isResolving"
+                    @click="battleTurn(move)"
+                  >
+                    <span class="move-name">{{ move.name }}</span>
+                    <span class="move-power">{{ move.power ?? '—' }}</span>
+                  </button>
+                </div>
+                <SelectButton
+                v-model="inventoryStore.selectedPokeball"
+                :options="pokeballOptions"
+                optionLabel="label"
+                optionValue="id"
+                :optionDisabled="(option) => option.count <= 0"
+                aria-labelledby="basic"
+                >
+                    <template #option="slotProps">
+                        <div class="pokeball-badge-item">
+                            <span class="ball-name">{{ slotProps.option.label }}</span>
+                            <Badge
+                                :value="slotProps.option.count"
+                                :severity="slotProps.option.count > 0 ? 'info' : 'secondary'"
+                            />
+                        </div>
+                    </template>
+                </SelectButton>
+                <button :disabled="isResolving || !inventoryStore.selectedPokeball" @click="battleTurn('Catch')">
+                    Catch Pokemon
+                </button>
+          </div>
+        </SplitterPanel>
 
-            <!-- ARENA BOTTOM MENU -->
-            <div class="battle-menu">
+        <!-- log -->
+        <SplitterPanel :minSize="20" class="log-panel">
+          <div class="log-head">Log</div>
+          <div ref="logEl" class="log-body">
+            <p v-for="(entry, i) in battleLog" :key="i" class="log-line">{{ entry }}</p>
+          </div>
+        </SplitterPanel>
+      </Splitter>
+    </div>
+  </Modal>
 
-                <!-- VIEW 1: MAIN BATTLE MENU (Default) -->
-                <template v-if="dialogSubView === 'menu'">
-                    <div class="dialog-box">
-                        <p v-if="battleMessage">{{ battleMessage }}</p>
-                        <p v-else>What will <strong>{{ activePlayerPokemon?.name }}</strong> do?</p>
-                    </div>
-                    <div class="action-grid">
-                        <!-- Clicking FIGHT switches to the moves view -->
-                        <button class="menu-btn fight-btn" @click="battleSubView = 'moves'">FIGHT</button>
-                        <button class="menu-btn pkmn-btn">POKÉMON</button>
-                        <button class="menu-btn bag-btn">BAG</button>
-                        <button class="menu-btn run-btn" @click="handleRun">RUN</button>
-                    </div>
-                </template>
-
-                <!-- VIEW 2: MOVE SELECTOR GRID -->
-                <template v-else-if="dialogSubView === 'moves'">
-                    <div class="moves-grid">
-                        <!-- Loop through the active player Pokemon's moves -->
-                        <button v-for="(move, index) in activePlayerPokemon?.moves?.slice(0, 4)" :key="index"
-                            class="move-btn" @click="selectMove(move)">
-                            {{ move.name }}
-                        </button>
-                    </div>
-
-                    <!-- Back button to return to main actions -->
-                    <button class="menu-btn back-btn" @click="battleSubView = 'menu'">CANCEL</button>
-                </template>
-
-            </div>
-        </div>
-    </Modal>
 </template>
 
 <style scoped>
