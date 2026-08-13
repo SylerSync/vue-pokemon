@@ -12,6 +12,7 @@ import Select from 'primevue/select'
 import IconField from 'primevue/iconfield'
 import InputIcon from 'primevue/inputicon'
 import { useInventoryStore } from "@/stores/inventoryStore";
+import tmData from '@/assets/data/tms.json';
 
 const pokemonStore = usePokemonStore()
 const inventoryStore = useInventoryStore()
@@ -20,6 +21,111 @@ const searchQuery = ref('')
 const sortKey = ref(null)
 const sortOrder = ref(null)
 const sortField = ref(null)
+const isTmModalOpen = ref(false)
+const isReplaceModalOpen = ref(false);
+const pendingNewMove = ref(null);
+const pendingTmId = ref(null);
+
+function openReplaceMoveModal(newMove, tmId) {
+    pendingNewMove.value = newMove;
+    pendingTmId.value = tmId;
+    isReplaceModalOpen.value = true;
+}
+
+function closeReplaceMoveModal() {
+    isReplaceModalOpen.value = false;
+    pendingNewMove.value = null;
+    pendingTmId.value = null;
+}
+
+function confirmReplaceMove(indexToReplace) {
+    const target = selectedPokemon.value;
+    if (!target || !pendingNewMove.value || pendingTmId.value === null) return;
+
+    // Use TM from store
+    if (inventoryStore.UseTM(pendingTmId.value)) {
+        // Overwrite selected move slot
+        target.moves[indexToReplace] = pendingNewMove.value;
+
+        closeReplaceMoveModal();
+        closeTmModal();
+    }
+}
+
+const openTmModal = () => {
+    isTmModalOpen.value = true;
+};
+
+const closeTmModal = () => {
+    isTmModalOpen.value = false;
+};
+
+const tmInventory = computed(() => {
+    return Object.entries(inventoryStore.tms || {})
+        .filter(([_, count]) => count > 0)
+        .map(([id, count]) => {
+            const tm = tmData[id];
+            return {
+                id,
+                code: tm?.code || id.toUpperCase(),
+                moveName: tm?.moveName || 'Unknown Move',
+                move: tm?.move,
+                type: tm?.type || 'normal',
+                count
+            };
+        });
+});
+
+async function handleUseTM(tmItem) {
+    const target = selectedPokemon.value;
+    if (!target) return;
+
+    // 1. Check if Pokémon ALREADY knows this move
+    const alreadyKnows = target.moves.some(m => m.name.toLowerCase() === tmItem.moveName.toLowerCase());
+    if (alreadyKnows) {
+        console.warn(`${target.name} already knows ${tmItem.moveName}!`);
+        return;
+    }
+
+    try {
+        // 2. Fetch Pokémon species data to check if it CAN learn this TM
+        const pResp = await fetch(`https://pokeapi.co/api/v2/pokemon/${target.name.toLowerCase()}`);
+        const pData = await pResp.json();
+
+        const canLearn = pData.moves.some(m => m.move.name.toLowerCase() === tmItem.move.toLowerCase());
+        if (!canLearn) {
+            console.warn(`${target.name} cannot learn ${tmItem.moveName}!`);
+            alert(`${target.name} is not compatible with ${tmItem.code} (${tmItem.moveName}).`);
+            return;
+        }
+
+        // 3. Fetch move details
+        const mResp = await fetch(`https://pokeapi.co/api/v2/move/${tmItem.move}`);
+        const mData = await mResp.json();
+
+        const newMove = {
+            name: tmItem.moveName,
+            type: tmItem.type,
+            class: mData.damage_class?.name || 'status',
+            power: mData.power || 0,
+            accuracy: mData.accuracy || 100
+        };
+
+        // 4. Handle Moveset Capacity (Max 4 Moves)
+        if (target.moves.length < 4) {
+            if (inventoryStore.UseTM(tmItem.id)) {
+                target.moves.push(newMove);
+                closeTmModal();
+            }
+        } else {
+            // Trigger Move Replacement Modal!
+            openReplaceMoveModal(newMove, tmItem.id);
+        }
+
+    } catch (err) {
+        console.error("Error verifying TM learning compatibility:", err);
+    }
+}
 
 const sortOptions = ref([
     { label: 'Name (A-Z)', value: 'name' },
@@ -202,7 +308,7 @@ function hpTone(p) {
         </template>
     </DataView>
 
-    <!-- POKEMON DETAIL MODAL -->
+    <!-- POKÉMON DETAIL MODAL -->
     <Modal v-if="isDetailModalOpen" @close="closeDetailModal">
         <div v-if="selectedPokemon" class="detailModal">
             <!-- HEADER: Sprite + Name + Level + Types -->
@@ -265,12 +371,15 @@ function hpTone(p) {
                 </div>
             </div>
 
-            <!-- ACTION BUTTONS -->
+            <!-- ACTION BUTTONS: 2 Top (Heal + TM), 1 Bottom (Release) -->
             <div class="modal-actions">
-                <Button label="Heal / Recover" icon="pi pi-heart-fill" severity="success" class="action-btn"
-                    @click="openItemModal" />
-                <Button label="Release Pokémon" icon="pi pi-trash" severity="danger" variant="outlined"
-                    class="action-btn" @click="ReleasePokemon" />
+                <div class="top-actions">
+                    <Button label="Heal / Recover" icon="pi pi-heart-fill" severity="success" class="action-btn"
+                        @click="openItemModal" />
+                    <Button label="Use TM" icon="pi pi-bolt" severity="info" class="action-btn" @click="openTmModal" />
+                </div>
+                <Button label="Release Pokémon" icon="pi pi-trash" severity="danger" variant="outlined" class="full-btn"
+                    @click="ReleasePokemon" />
             </div>
         </div>
     </Modal>
@@ -278,18 +387,70 @@ function hpTone(p) {
     <!-- RECOVERY ITEM SELECTION MODAL -->
     <Modal v-if="isItemModalOpen" @close="closeItemModal">
         <div class="itemModal-container">
-            <h3 class="section-title mb-2">Select Item to Use</h3>
+            <h3 class="section-title mb-2">Select Recovery Item</h3>
             <DataTable :value="itemInventory" responsiveLayout="scroll" class="p-datatable-sm itemMenu">
                 <Column field="name" header="Item" style="width: 30%"></Column>
                 <Column field="effectDescription" header="Effect" style="width: 35%"></Column>
                 <Column field="count" header="In Bag" style="width: 15%"></Column>
                 <Column header="Action" style="width: 20%">
                     <template #body="slotProps">
-                        <Button label="Use" severity="primary" size="small"
-                            :disabled="slotProps.data.count <= 0" @click="handleUseItem(slotProps.data)" />
+                        <Button label="Use" severity="primary" size="small" :disabled="slotProps.data.count <= 0"
+                            @click="handleUseItem(slotProps.data)" />
                     </template>
                 </Column>
             </DataTable>
+        </div>
+    </Modal>
+
+    <!-- TM SELECTION MODAL -->
+    <Modal v-if="isTmModalOpen" @close="closeTmModal">
+        <div class="itemModal-container">
+            <h3 class="section-title mb-2">Select TM to Teach</h3>
+            <DataTable :value="tmInventory" responsiveLayout="scroll" paginator :rows="5"
+                class="p-datatable-sm itemMenu">
+                <Column field="code" header="TM" style="width: 20%"></Column>
+                <Column field="moveName" header="Move" style="width: 35%">
+                    <template #body="slotProps">
+                        <span class="tm-type-pill"
+                            :style="{ backgroundColor: pokemonStore.typeColors[slotProps.data.type] || '#777' }">
+                            {{ slotProps.data.moveName }}
+                        </span>
+                    </template>
+                </Column>
+                <Column field="count" header="In Bag" style="width: 20%"></Column>
+                <Column header="Action" style="width: 25%">
+                    <template #body="slotProps">
+                        <Button label="Teach" severity="info" size="small" :disabled="slotProps.data.count <= 0"
+                            @click="handleUseTM(slotProps.data)" />
+                    </template>
+                </Column>
+            </DataTable>
+        </div>
+    </Modal>
+
+    <!-- REPLACE MOVE SELECTION MODAL -->
+    <Modal v-if="isReplaceModalOpen" @close="closeReplaceMoveModal">
+        <div class="itemModal-container" v-if="pendingNewMove">
+            <h3 class="section-title mb-2">
+                Select a move for {{ selectedPokemon.name }} to forget for {{ pendingNewMove.name }}:
+            </h3>
+
+            <div class="replace-grid">
+                <div v-for="(move, index) in selectedPokemon.moves" :key="move.name" class="move-card replace-card"
+                    @click="confirmReplaceMove(index)">
+                    <div class="move-main">
+                        <span class="move-name">{{ move.name }}</span>
+                        <span class="move-type" :style="{ color: pokemonStore.typeColors[move.type] || 'inherit' }">
+                            {{ move.type }}
+                        </span>
+                    </div>
+                    <div class="move-stats">
+                        <span class="move-class-badge" :class="move.class">{{ move.class }}</span>
+                        <span class="move-power">PWR: {{ move.power || '—' }}</span>
+                    </div>
+                    <Button label="Forget This Move" severity="danger" size="small" class="mt-2 w-full" />
+                </div>
+            </div>
         </div>
     </Modal>
 </template>
@@ -349,7 +510,7 @@ function hpTone(p) {
     width: 100%;
     max-width: 28rem;
     box-sizing: border-box;
-    text-align: left; /* Restores normal text flow */
+    text-align: left;
     background-color: Canvas;
     border: 3px solid CanvasText;
     border-radius: 5px;
@@ -553,18 +714,29 @@ function hpTone(p) {
     padding: 1rem;
 }
 
-/* Modal Action Buttons */
+/* Modal Action Buttons (Stacked Layout) */
 .modal-actions {
     display: flex;
-    gap: 0.75rem;
+    flex-direction: column;
+    gap: 0.5rem;
     margin-top: 0.5rem;
+}
+
+.top-actions {
+    display: flex;
+    gap: 0.5rem;
+    width: 100%;
 }
 
 .action-btn {
     flex: 1;
 }
 
-/* Item Menu Styling */
+.full-btn {
+    width: 100%;
+}
+
+/* Item Menu & TM Styling */
 .itemModal-container {
     padding: 1rem;
 }
@@ -573,5 +745,32 @@ function hpTone(p) {
     border-radius: var(--p-content-border-radius);
     overflow: hidden;
     border: 1px solid var(--p-content-border-color);
+}
+
+.tm-type-pill {
+    display: inline-block;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #ffffff;
+    padding: 0.2rem 0.5rem;
+    border-radius: 6px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+}
+
+.replace-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+    margin-top: 0.75rem;
+}
+
+.replace-card {
+    cursor: pointer;
+    transition: transform 0.15s ease, border-color 0.15s ease;
+}
+
+.replace-card:hover {
+    transform: translateY(-2px);
+    border-color: #ef4444;
 }
 </style>
