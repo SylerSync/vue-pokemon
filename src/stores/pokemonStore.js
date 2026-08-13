@@ -1,10 +1,51 @@
 import { defineStore } from "pinia"
 
+const testGodPokemon = {
+    id: 150,
+    name: "mewtwo-god",
+    level: 100,
+    totalHp: 999,
+    currentHp: 999,
+    types: ["psychic"],
+    sprite: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/150.png",
+    backSprite: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/150.png",
+    cry: "https://raw.githubusercontent.com/PokeAPI/cries/main/cries/pokemon/latest/150.ogg",
+    instanceId: "test-god-mewtwo-uuid",
+    stats: [
+        { name: "hp", stat: 999 },
+        { name: "attack", stat: 999 },
+        { name: "defense", stat: 999 },
+        { name: "special-attack", stat: 999 },
+        { name: "special-defense", stat: 999 },
+        { name: "speed", stat: 999 } // Ensures you always go first
+    ],
+    moves: [
+        {
+            name: "psystrike-god",
+            type: "psychic",
+            class: "special",
+            power: 300,
+            accuracy: 100,
+            pp: 99
+        },
+        {
+            name: "hyper-beam-god",
+            type: "normal",
+            class: "special",
+            power: 300,
+            accuracy: 100,
+            pp: 99
+        }
+    ]
+}
+
 export const usePokemonStore = defineStore("pokemonStore", {
 
 
     state: () => ({
-        caughtPokemon: [],
+        caughtPokemon: [
+            { ...testGodPokemon, instanceId: crypto.randomUUID() },
+        ],
         wishlistPokemon: [],
         typeColors: {
             normal: '#A8A878',
