@@ -96,7 +96,7 @@ const itemInventory = computed(() => {
 
         let effectDescription = '';
         if (item.effect.type === 'revive') {
-            effectDescription = `Revives with ${item.effect.percent}% HP`;
+            effectDescription = `Revives with ${item.effect.percent*100}% HP`;
         } else if (item.effect.type === 'heal') {
             effectDescription = `Heals ${item.effect.amount} HP`;
         }
@@ -178,7 +178,7 @@ function handleUseItem(item) {
             <div class="pokemon-grid">
                 <Card v-for="(pokemon, index) in slotProps.items" :key="pokemon.id + '-' + index"
                     class="w-full pokemonCard" @click="openDetailsModal(pokemon, index)">
-                    <template #title>{{ pokemon.name }}</template>
+                    <template #title>{{ pokemon.name }} Lvl {{ pokemon.level }}</template>
                     <template #header>
                         <div class="sprite-container">
                             <img class="pokemon-sprite" :src="pokemon.sprite" :alt="pokemon.name" />
@@ -191,7 +191,7 @@ function handleUseItem(item) {
 
     <Modal v-if="isDetailModalOpen" @close="closeDetailModal">
         <div v-if="selectedPokemon" class="detailModal">
-            <h2>{{ selectedPokemon.name }}</h2>
+            <h2>{{ selectedPokemon.name }} Lvl {{ selectedPokemon.level }}</h2>
             <img :src="selectedPokemon.sprite" :alt="selectedPokemon.name">
             <h3>Types:</h3>
             <div v-for="type of selectedPokemon.types" :key="type">
@@ -199,8 +199,9 @@ function handleUseItem(item) {
                     {{ type }}
                 </p>
             </div>
-            <p>Weight: {{ selectedPokemon.weight }}</p>
-            <p>Height: {{ selectedPokemon.height }}</p>
+            <p>KOs: {{ selectedPokemon.totalKOs }}</p>
+            <p>Faints: {{ selectedPokemon.totalFaints }}</p>
+            <p>Hp: {{ selectedPokemon.currentHp }}/{{ selectedPokemon.totalHp }}</p>
 
             <button @click="ReleasePokemon()">Release Pokemon</button>
             <button @click="openItemModal()">Use Recovery Item</button>
