@@ -44,6 +44,30 @@ export const useInventoryStore = defineStore("inventoryStore", {
                     type: "heal",
                     amount: 20
                 }
+            },
+            super_potion:{
+                count: 0,
+                cost: 400,
+                effect:{
+                    type:"heal",
+                    amount: 55
+                }
+            },
+            hyper_potion:{
+                count: 0,
+                cost: 1000,
+                effect:{
+                    type:"heal",
+                    amount: 150
+                }
+            },
+            max_potion:{
+                count: 0,
+                cost: 2000,
+                effect:{
+                    type:"heal",
+                    amount:1000
+                }
             }
         },
         selectedPokeball : "pokeball",
