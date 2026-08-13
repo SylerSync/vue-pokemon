@@ -16,8 +16,10 @@ import SelectButton from 'primevue/selectbutton';
 import Badge from 'primevue/badge';
 import Splitter from 'primevue/splitter';
 import SplitterPanel from 'primevue/splitterpanel';
+import { useInventoryStore } from '@/stores/inventoryStore';
 
 const pokemonStore = usePokemonStore()
+const inventoryStore = useInventoryStore()
 const selectedRegion = ref(null)
 const selectedRole = ref(null)
 const selectedTrainer = ref(null)
@@ -30,6 +32,10 @@ const battleStarted = ref(false)
 const anim = ref(null); // { actor: 'ally' | 'foe', type: 'lunge' | 'hit' | 'faint' }
 const isResolving = ref(false)
 const battleSubView = ref("log")
+const isVictory = ref(false)
+const isEndModalOpen = ref(false)
+const payout = ref(0)
+
 
 const isBattleModalOpen = ref(false)
 
@@ -388,7 +394,8 @@ function PokemonFainted(trainer) {
             isResolving.value = false
         }
         else{
-            closeBattleModal()
+            isVictory.value = true
+            OpenEndModal()
         }
     }
     if (trainer === "player") {
@@ -398,11 +405,45 @@ function PokemonFainted(trainer) {
             }
         }
         if(indexes.length < 1){
-            closeBattleModal()
+            isVictory = false
+            OpenEndModal()
         }
     }
 
     indexes = []
+}
+
+function OpenEndModal(){
+    if(isVictory.value){
+        switch (selectedRole.value){
+            case "gym_leaders":
+                console.log("Gym leader defeat detected")
+                payout.value = 10000
+                break;
+            case "elite_four":
+                console.log("elite four defeat detected")
+                payout.value = 20000
+                break;
+            case "champion":
+                console.log("Champion defeat detected")
+                payout.value = 30000
+                break;
+        }
+        inventoryStore.AddFunds(payout.value)
+        isEndModalOpen.value = true
+    }
+    else{
+        console.log("player defeat detected")
+        isEndModalOpen.value = true
+    }
+    
+}
+
+function CloseEndModal(){
+    payout.value = 0
+    isVictory.value = false
+    isEndModalOpen.value = false
+    isBattleModalOpen.value = false
 }
 
 </script>
@@ -598,6 +639,20 @@ function PokemonFainted(trainer) {
                 </SplitterPanel>
             </Splitter>
         </div>
+    </Modal>
+
+    <Modal v-if="isEndModalOpen" @close="CloseEndModal">
+        <template class="endModal">
+            <div v-if="isVictory">
+                <h3>Victory!</h3>
+                <p>{{ payout }}</p>
+            </div>
+            <div v-if="!isVictory">
+                <h3>You lose</h3>
+                <p>Better luck next time</p>
+            </div>
+            <Button @click="CloseEndModal">Okay</Button>
+        </template>
     </Modal>
 
 </template>
