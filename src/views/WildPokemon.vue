@@ -754,6 +754,7 @@ async function getWildPokemonData(region) {
         name: pokemonData.name,
         id: pokemonData.id,
         sprite: 10 < randInt && randInt < 15 ? pokemonData.sprites.front_shiny : pokemonData.sprites.front_default,
+        backSprite: 10 < randInt && randInt < 15 ? pokemonData.sprites.back_shiny : pokemonData.sprites.back_default,
         types: pokemonData.types.map(t => t.type.name),
         height: pokemonData.height,
         weight: pokemonData.weight,
