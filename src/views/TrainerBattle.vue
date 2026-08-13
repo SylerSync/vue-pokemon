@@ -12,6 +12,10 @@ import InputIcon from 'primevue/inputicon';
 import InputText from 'primevue/inputtext';
 import "@/api/pokeapi"
 import { getPokemon } from '@/api/pokeapi';
+import SelectButton from 'primevue/selectbutton';
+import Badge from 'primevue/badge';
+import Splitter from 'primevue/splitter';
+import SplitterPanel from 'primevue/splitterpanel';
 
 const pokemonStore = usePokemonStore()
 const selectedRegion = ref(null)
@@ -19,6 +23,13 @@ const selectedRole = ref(null)
 const selectedTrainer = ref(null)
 const selectedPokemonTeam = ref([])
 const opponentPokemonTeam = ref([])
+const selectedPokemon = ref(null)
+const usersSelectedPokemon = ref(null)
+const battleLog = ref([])
+const battleStarted = ref(false)
+const anim = ref(null); // { actor: 'ally' | 'foe', type: 'lunge' | 'hit' | 'faint' }
+const isResolving = ref(false)
+const battleSubView = ref("log")
 
 const isBattleModalOpen = ref(false)
 
@@ -152,43 +163,247 @@ function ToggleSelectedPokemon(pokemon) {
 /// Battle Modal Controls
 /// ---------------------
 
+function isTeamFainted(team) {
+    if (!team || team.length === 0) return true
+
+    return team.every(pokemon => {
+        // Safely reads currentHP or currentHp regardless of casing
+        const hp = pokemon.currentHP ?? pokemon.currentHp ?? 0
+        return hp <= 0
+    })
+}
+
 async function openBattleModal() {
-    opponentPokemonTeam.value = await BuildOpponentTeam()
-    isBattleModalOpen.value = true
+    if (!selectedTrainer.value) {
+        console.warn(`A trainer must be selected to battle!`)
+        return
+    }
+    if (selectedPokemonTeam.value.length < 1) {
+        console.warn(`You must select atleast one pokemon!`)
+        return
+    }
+    opponentPokemonTeam.value = selectedTrainer.value.team.map(pokemon => ({
+        ...pokemon,
+        currentHp: pokemon.totalHp,
+        instanceId: crypto.randomUUID()
+    }));
     console.log(opponentPokemonTeam.value)
+    usersSelectedPokemon.value = selectedPokemonTeam.value[0]
+    selectedPokemon.value = opponentPokemonTeam.value[0]
+    battleStarted.value = true
+    battleLog.value = [`Battle started with ${selectedTrainer.value.name}.`]
+    isBattleModalOpen.value = true
 }
 
 function closeBattleModal() {
-    isBattleModalOpen.value = false
     opponentPokemonTeam.value = null
     battleMessage.value = defaultMessage.value
+    usersSelectedPokemon.value = null
+    selectedPokemon.value = null
+    battleLog.value = []
+    battleStarted.value = false
+    isBattleModalOpen.value = false
+    isResolving.value = false
 }
 
-async function BuildOpponentTeam() {
-    const opponent = selectedTrainer.value
-    try {
-        const promises = opponent.team.map(async (name) => {
-            const formattedName = name.toLowerCase().trim().replace(/[\s\.]+/g, '-').replace(/[^a-z0-9-]/g, '');
-            const raw = await getPokemon(formattedName);
-            return {
-                name: raw.name,
-                sprite: raw.sprites.front_default,
-                types: raw.types.map(t => t.type.name),
-                totalHP: raw.stats.find(s => s.stat.name === 'hp')?.base_stat || 0,
-                currentHP: raw.stats.find(s => s.stat.name === 'hp')?.base_stat || 0,
-                instanceId: crypto.randomUUID()
+/// ----------------------
+/// Battle Phase Functions
+/// ----------------------
+
+async function battleTurn(move) {
+    if (battleStarted.value) {
+        isResolving.value = true
+        let userSpeed = usersSelectedPokemon.value.stats.find(s => s.name == "speed").stat
+        let wildSpeed = selectedPokemon.value.stats.find(s => s.name == "speed").stat
+        const wildMove = selectedPokemon.value.moves.length
+            ? selectedPokemon.value.moves[Math.floor(Math.random() * selectedPokemon.value.moves.length)]
+            : null;
+        if (userSpeed > wildSpeed) {
+            await useMove(usersSelectedPokemon.value, selectedPokemon.value, move)
+            if (selectedPokemon.value.currentHp <= 0) {
+                PokemonFainted("opponent")
+                return
             }
-        })
-
-        return await Promise.all(promises)
-    }
-    catch (error) {
-        console.error(`Failed to load pokemon team: ${error}`)
+            await useMove(selectedPokemon.value, usersSelectedPokemon.value, wildMove)
+            if (usersSelectedPokemon.value.currentHp <= 0) {
+                PokemonFainted("player")
+                return
+            }
+        } else if (wildSpeed > userSpeed) {
+            await useMove(selectedPokemon.value, usersSelectedPokemon.value, wildMove)
+            if (usersSelectedPokemon.value.currentHp <= 0) {
+                PokemonFainted("player")
+                return
+            }
+            await useMove(usersSelectedPokemon.value, selectedPokemon.value, move)
+            if (selectedPokemon.value.currentHp <= 0) {
+                PokemonFainted("opponent")
+                return
+            }
+        } else {
+            let tieBreaker = Math.floor(Math.random() * 100) + 1
+            if (tieBreaker > 50) {
+                await useMove(usersSelectedPokemon.value, selectedPokemon.value, move)
+                if (selectedPokemon.value.currentHp <= 0) {
+                    PokemonFainted("opponent")
+                    return
+                }
+                await useMove(selectedPokemon.value, usersSelectedPokemon.value, wildMove)
+                if (usersSelectedPokemon.value.currentHp <= 0) {
+                    PokemonFainted("player")
+                    return
+                }
+            } else {
+                await useMove(selectedPokemon.value, usersSelectedPokemon.value, wildMove)
+                if (usersSelectedPokemon.value.currentHp <= 0) {
+                    PokemonFainted("player")
+                    return
+                }
+                await useMove(usersSelectedPokemon.value, selectedPokemon.value, move)
+                if (selectedPokemon.value.currentHp <= 0) {
+                    PokemonFainted("opponent")
+                    return
+                }
+            }
+        }
+        isResolving.value = false
     }
 }
 
+async function useMove(user, target, move) {
+    const actor = user === usersSelectedPokemon.value ? 'ally' : 'foe';
+    const victim = actor === 'ally' ? 'foe' : 'ally';
 
+    battleLog.value.push(`${user.name} used ${move.name}`)
+    await playAnim(actor, 'lunge', 300);
+    const randInt = Math.floor(Math.random() * 100) + 1
+    if (randInt > move.accuracy) {
+        battleLog.value.push(`${move.name} missed`)
+        await delay(800)
+        return
+    }
+    if (move.power) {
+        const results = calculateDamage(user, target, move)
+        if (results.critical) {
+            battleLog.value.push("Critical Hit!")
+        }
+        if (results.immune) {
+            battleLog.value.push(`It doesn't affect ${target.name}...`);
+            return;
+        }
+        if (results.effectiveness == 2) {
+            battleLog.value.push("Super Effective")
+        } else if (results.effectiveness == .5) {
+            battleLog.value.push("Not very effective")
+        }
+        // await delay(800)
+        await playAnim(victim, 'hit', 400);
+        battleLog.value.push(`${user.name} did ${results.damage} damage`)
+        target.currentHp -= results.damage
+        await delay(800)
+    } else {
+        battleLog.value.push("This move does nothing bozo.")
+    }
+}
 
+function calculateDamage(attacker, defender, move, opts = {}) {
+    const {
+        critical = Math.random() < 1 / 24,
+        randomFactor = Math.max(.85, Math.random()),
+        weatherMod = 1,
+        otherMod = 1,
+    } = opts;
+
+    if (move.class === 'status' || !move.power) {
+        return { damage: 0, effectiveness: 1, critical: false, immune: false };
+    }
+
+    const physical = move.class === 'physical';
+    const atk = physical ? attacker.stats.find(s => s.name == "attack").stat : attacker.stats.find(s => s.name == "special-attack").stat;
+    const def = physical ? defender.stats.find(s => s.name == "defense").stat : defender.stats.find(s => s.name == "special-defense").stat;
+
+    const base =
+        Math.floor(
+            Math.floor(
+                (Math.floor((2 * attacker.level) / 5 + 2) * move.power * atk) / def
+            ) / 50
+        ) + 2;
+
+    const stab = attacker.types.includes(move.type) ? 1.5 : 1;
+    const effectiveness = typeEffectiveness(move.type, defender.types);
+    const critMod = critical ? 1.5 : 1;
+
+    if (effectiveness === 0) {
+        return { damage: 0, effectiveness: 0, critical: false, immune: true };
+    }
+
+    const damage = Math.max(
+        1,
+        Math.floor(
+            base * weatherMod * critMod * randomFactor * stab * effectiveness * otherMod
+        )
+    );
+
+    return { damage, effectiveness, critical, immune: false };
+}
+
+function typeEffectiveness(moveType, defenderTypes) {
+    return defenderTypes.reduce(
+        (mult, t) => mult * (pokemonStore.typeChart[moveType]?.[t] ?? 1),
+        1
+    );
+}
+
+function hpPercent(p) {
+    return Math.max(0, Math.min(100, (p.currentHp / p.totalHp) * 100));
+}
+
+function hpTone(p) {
+    const pct = hpPercent(p);
+    return pct > 50 ? 'ok' : pct > 20 ? 'warn' : 'crit';
+}
+
+async function playAnim(actor, type, ms) {
+    anim.value = { actor, type };
+    await delay(ms);
+    anim.value = null;
+}
+
+function delay(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+function PokemonFainted(trainer) {
+    console.log("A pokemon fainted!")
+    let indexes = []
+    if (trainer === "opponent") {
+        for (const [index, pokemon] of opponentPokemonTeam.value.entries()) {
+            if (pokemon.currentHp > 0) {
+                indexes.push(index)
+            }
+        }
+        if (indexes.length > 0) {
+            const randomIndex = indexes[Math.floor(Math.random() * indexes.length)]
+            selectedPokemon.value = opponentPokemonTeam.value[randomIndex]
+            isResolving.value = false
+        }
+        else{
+            closeBattleModal()
+        }
+    }
+    if (trainer === "player") {
+        for (const [index, pokemon] of selectedPokemonTeam.value.entries()) {
+            if (pokemon.currentHp > 0) {
+                indexes.push(index)
+            }
+        }
+        if(indexes.length < 1){
+            closeBattleModal()
+        }
+    }
+
+    indexes = []
+}
 
 </script>
 <template>
@@ -236,18 +451,22 @@ async function BuildOpponentTeam() {
 
                             <template #grid="slotProps">
                                 <div class="pokemon-grid">
-                                    <Card v-for="(pokemon, index) in (slotProps.items || filteredPokemon)"
-                                        v-if="pokemon.currentHp > 0"
-                                        :key="pokemon.id ? pokemon.id : index" class="w-full pokemonCard"
-                                        @click="ToggleSelectedPokemon(pokemon)"
-                                        :class="{ 'is-selected': selectedPokemonTeam.some(p => p.instanceId === pokemon.instanceId) }">
-                                        <template #title>{{ pokemon.name }}</template>
-                                        <template #header>
-                                            <div class="sprite-container">
-                                                <img class="pokemon-sprite" :src="pokemon.sprite" :alt="pokemon.name" />
-                                            </div>
-                                        </template>
-                                    </Card>
+                                    <template v-for="(pokemon, index) in (slotProps.items || filteredPokemon)"
+                                        :key="pokemon.instanceId || pokemon.id || index">
+                                        <Card v-if="pokemon && (pokemon.currentHp ?? pokemon.currentHP ?? 0) > 0"
+                                            class="w-full pokemonCard" @click="ToggleSelectedPokemon(pokemon)"
+                                            :class="{ 'is-selected': selectedPokemonTeam.some(p => p.instanceId === pokemon.instanceId) }">
+
+                                            <template #title>{{ pokemon.name }}</template>
+                                            <template #header>
+                                                <div class="sprite-container">
+                                                    <img class="pokemon-sprite" :src="pokemon.sprite"
+                                                        :alt="pokemon.name" />
+                                                </div>
+                                            </template>
+                                        </Card>
+                                    </template>
+
                                 </div>
                             </template>
                         </DataView>
@@ -264,153 +483,122 @@ async function BuildOpponentTeam() {
         </div>
     </div>
 
-    
+
     <Modal v-if="isBattleModalOpen">
-    <div class="battle">
-      <Splitter :sizes="[70, 30]" class="battle-split">
-        <SplitterPanel :minSize="45" class="battle-stage">
+        <div class="battle">
+            <Splitter :sizes="[70, 30]" class="battle-split">
+                <SplitterPanel :minSize="45" class="battle-stage">
 
-          <!-- pre-battle -->
-          <div v-if="!battleStarted" class="setup">
-            <h2 class="setup-title">Choose your fighter</h2>
-            <Select
-              v-model="usersSelectedPokemon"
-              :options="pokemonStore.caughtPokemon"
-              :optionDisabled="(option) => (option.currentHp ?? option.totalHp) <= 0"
-              optionLabel="name"
-              filter
-              filterBy="name"
-              showClear
-              placeholder="Select a Pokémon"
-              class="setup-select"
-            >
-              <template #value="slotProps">
-                <div v-if="slotProps.value" class="option-row">
-                  <img v-if="slotProps.value.sprite" :src="slotProps.value.sprite" alt="" class="option-sprite" />
-                  <span class="option-name">{{ slotProps.value.name }}</span>
-                </div>
-                <span v-else class="placeholder">{{ slotProps.placeholder }}</span>
-              </template>
-              <template #option="slotProps">
-                <div class="option-row">
-                  <img v-if="slotProps.option.sprite" :src="slotProps.option.sprite" alt="" class="option-sprite" />
-                  <span class="option-name">{{ slotProps.option.name }} Lvl {{ slotProps.option.level }}</span>
-                </div>
-              </template>
-            </Select>
-            <button
-              class="btn btn-primary"
-              :disabled="!usersSelectedPokemon"
-              @click="startBattle()"
-            >
-              Start Battle
-            </button>
-          </div>
+                    <!-- pre-battle -->
+                    <div v-if="!battleStarted" class="setup">
+                        <h2 class="setup-title">Choose your fighter</h2>
+                        <Select v-model="usersSelectedPokemon" :options="pokemonStore.caughtPokemon"
+                            :optionDisabled="(option) => (option.currentHp ?? option.totalHp) <= 0" optionLabel="name"
+                            filter filterBy="name" showClear placeholder="Select a Pokémon" class="setup-select">
+                            <template #value="slotProps">
+                                <div v-if="slotProps.value" class="option-row">
+                                    <img v-if="slotProps.value.sprite" :src="slotProps.value.sprite" alt=""
+                                        class="option-sprite" />
+                                    <span class="option-name">{{ slotProps.value.name }}</span>
+                                </div>
+                                <span v-else class="placeholder">{{ slotProps.placeholder }}</span>
+                            </template>
+                            <template #option="slotProps">
+                                <div class="option-row">
+                                    <img v-if="slotProps.option.sprite" :src="slotProps.option.sprite" alt=""
+                                        class="option-sprite" />
+                                    <span class="option-name">{{ slotProps.option.name }} Lvl {{ slotProps.option.level
+                                    }}</span>
+                                </div>
+                            </template>
+                        </Select>
+                        <button class="btn btn-primary" :disabled="!usersSelectedPokemon" @click="">
+                            Start Battle
+                        </button>
+                    </div>
 
-          <!-- in battle -->
-          <div v-else class="arena">
-            <!-- opponent: info left, sprite right -->
-            <div class="combatant combatant-foe">
-              <div class="combatant-info">
-                <div class="combatant-head">
-                  <span class="label">Wild</span>
-                  <span class="combatant-name">{{ selectedPokemon.name }} Lvl {{ selectedPokemon.level }}</span>
-                </div>
-                <div class="hp">
-                  <div class="hp-track">
-                    <div
-                      class="hp-fill"
-                      :class="hpTone(selectedPokemon)"
-                      :style="{ width: hpPercent(selectedPokemon) + '%' }"
-                    />
-                  </div>
-                  <span class="hp-text">
-                    {{ Math.max(0, selectedPokemon.currentHp) }}/{{ selectedPokemon.totalHp }}
-                  </span>
-                </div>
-              </div>
-              <img
-                :src="selectedPokemon.sprite"
-                :alt="selectedPokemon.name"
-                class="battle-sprite sprite-foe"
-                :class="anim?.actor === 'foe' ? `anim-${anim.type}` : null"
-              />
-            </div>
-          
-            <!-- player: sprite left, info right -->
-            <div class="combatant combatant-ally">
-              <div class="combatant-info">
-                <div class="combatant-head">
-                  <span class="label">Yours</span>
-                  <span class="combatant-name">{{ usersSelectedPokemon.name }} Lvl {{ usersSelectedPokemon.level }}</span>
-                </div>
-                <div class="hp">
-                  <div class="hp-track">
-                    <div
-                      class="hp-fill"
-                      :class="hpTone(usersSelectedPokemon)"
-                      :style="{ width: hpPercent(usersSelectedPokemon) + '%' }"
-                    />
-                  </div>
-                  <span class="hp-text">
-                    {{ Math.max(0, usersSelectedPokemon.currentHp) }}/{{ usersSelectedPokemon.totalHp }}
-                  </span>
-                </div>
-              </div>
-              <img
-                :src="usersSelectedPokemon.backSprite ?? usersSelectedPokemon.sprite"
-                :alt="usersSelectedPokemon.name"
-                class="battle-sprite sprite-ally"
-                :class="anim?.actor === 'ally' ? `anim-${anim.type}` : null"
-              />
-            </div> 
-                <!-- moves -->
-                <div class="moves">
-                  <button
-                    v-for="move in usersSelectedPokemon.moves"
-                    :key="move.name"
-                    class="move"
-                    :disabled="isResolving"
-                    @click="battleTurn(move)"
-                  >
-                    <span class="move-name">{{ move.name }}</span>
-                    <span class="move-power">{{ move.power ?? '—' }}</span>
-                  </button>
-                </div>
-                <SelectButton
-                v-model="inventoryStore.selectedPokeball"
-                :options="pokeballOptions"
-                optionLabel="label"
-                optionValue="id"
-                :optionDisabled="(option) => option.count <= 0"
-                aria-labelledby="basic"
-                >
-                    <template #option="slotProps">
-                        <div class="pokeball-badge-item">
-                            <span class="ball-name">{{ slotProps.option.label }}</span>
-                            <Badge
-                                :value="slotProps.option.count"
-                                :severity="slotProps.option.count > 0 ? 'info' : 'secondary'"
-                            />
+                    <!-- in battle -->
+                    <div v-else class="arena">
+                        <!-- opponent: info left, sprite right -->
+                        <div class="combatant combatant-foe">
+                            <div class="combatant-info">
+                                <div class="combatant-head">
+                                    <span class="label">Wild</span>
+                                    <span class="combatant-name">{{ selectedPokemon.name }} Lvl {{ selectedPokemon.level
+                                    }}</span>
+                                </div>
+                                <div class="hp">
+                                    <div class="hp-track">
+                                        <div class="hp-fill" :class="hpTone(selectedPokemon)"
+                                            :style="{ width: hpPercent(selectedPokemon) + '%' }" />
+                                    </div>
+                                    <span class="hp-text">
+                                        {{ Math.max(0, selectedPokemon.currentHp) }}/{{ selectedPokemon.totalHp }}
+                                    </span>
+                                </div>
+                            </div>
+                            <img :src="selectedPokemon.sprite" :alt="selectedPokemon.name"
+                                class="battle-sprite sprite-foe"
+                                :class="anim?.actor === 'foe' ? `anim-${anim.type}` : null" />
                         </div>
-                    </template>
-                </SelectButton>
-                <button :disabled="isResolving || !inventoryStore.selectedPokeball" @click="battleTurn('Catch')">
-                    Catch Pokemon
-                </button>
-          </div>
-        </SplitterPanel>
 
-        <!-- log -->
-        <SplitterPanel :minSize="20" class="log-panel">
-          <div class="log-head">Log</div>
-          <div ref="logEl" class="log-body">
-            <p v-for="(entry, i) in battleLog" :key="i" class="log-line">{{ entry }}</p>
-          </div>
-        </SplitterPanel>
-      </Splitter>
-    </div>
-  </Modal>
+                        <!-- player: sprite left, info right -->
+                        <div class="combatant combatant-ally">
+                            <div class="combatant-info">
+                                <div class="combatant-head">
+                                    <span class="label">Yours</span>
+                                    <span class="combatant-name">{{ usersSelectedPokemon.name }} Lvl {{
+                                        usersSelectedPokemon.level }}</span>
+                                </div>
+                                <div class="hp">
+                                    <div class="hp-track">
+                                        <div class="hp-fill" :class="hpTone(usersSelectedPokemon)"
+                                            :style="{ width: hpPercent(usersSelectedPokemon) + '%' }" />
+                                    </div>
+                                    <span class="hp-text">
+                                        {{ Math.max(0, usersSelectedPokemon.currentHp) }}/{{
+                                            usersSelectedPokemon.totalHp }}
+                                    </span>
+                                </div>
+                            </div>
+                            <img :src="usersSelectedPokemon.backSprite ?? usersSelectedPokemon.sprite"
+                                :alt="usersSelectedPokemon.name" class="battle-sprite sprite-ally"
+                                :class="anim?.actor === 'ally' ? `anim-${anim.type}` : null" />
+                        </div>
+                        <!-- moves -->
+                        <div class="moves">
+                            <button v-for="move in usersSelectedPokemon.moves" :key="move.name" class="move"
+                                :disabled="isResolving" @click="battleTurn(move)">
+                                <span class="move-name">{{ move.name }}</span>
+                                <span class="move-power">{{ move.power ?? '—' }}</span>
+                            </button>
+                        </div>
+                        <!-- MID-BATTLE ACTIONS (POKÉMON & INVENTORY) -->
+                        <div class="battle-actions-row">
+                            <!-- POKÉMON BUTTON: Opens Party Switch View -->
+                            <button class="action-btn pkmn-btn" :disabled="isResolving"
+                                @click="battleSubView = 'party'">
+                                <i class="mr-1"></i> POKÉMON
+                            </button>
+
+                            <!-- INVENTORY BUTTON: Opens Bag / Items View -->
+                            <button class="action-btn bag-btn" :disabled="isResolving" @click="battleSubView = 'bag'">
+                                <i class="mr-1"></i> INVENTORY
+                            </button>
+                        </div>
+                    </div>
+                </SplitterPanel>
+
+                <!-- log -->
+                <SplitterPanel :minSize="20" class="log-panel">
+                    <div class="log-head">Log</div>
+                    <div ref="logEl" class="log-body">
+                        <p v-for="(entry, i) in battleLog" :key="i" class="log-line">{{ entry }}</p>
+                    </div>
+                </SplitterPanel>
+            </Splitter>
+        </div>
+    </Modal>
 
 </template>
 
@@ -485,281 +673,329 @@ async function BuildOpponentTeam() {
     border: 2px solid CanvasText;
 }
 
-/* Battle Container */
-.battle-screen {
+/* Styles for battle modal */
+.battle-split {
+    height: 28rem;
     width: 100%;
-    max-width: 600px;
-    background: linear-gradient(to bottom, #d8f8d8 0%, #f8f8f8 100%);
-    border: 4px solid #282828;
-    border-radius: 12px;
+    max-width: 40rem;
+    margin-inline: auto;
+    border: 1px solid var(--p-content-border-color);
+    border-radius: var(--p-content-border-radius);
     overflow: hidden;
-    font-family: 'Courier New', Courier, monospace;
-    color: #282828;
 }
 
-.battle-header {
-    background-color: #ef4444;
-    color: white;
-    padding: 8px 16px;
+/* ---- setup ---- */
+.battle-stage {
     display: flex;
-    align-items: center;
-    gap: 12px;
 }
 
-.vs-badge {
-    background-color: #f59e0b;
-    color: #000;
-    font-weight: 900;
-    padding: 2px 8px;
-    border-radius: 4px;
-}
-
-.trainer-title {
-    margin: 0;
-    font-size: 1.1rem;
-    text-transform: capitalize;
-}
-
-/* Battle Field Layout */
-.battle-arena {
+.setup {
     display: flex;
     flex-direction: column;
-    padding: 16px;
-    gap: 16px;
-    min-height: 280px;
-    justify-content: space-between;
+    gap: 0.875rem;
+    margin: auto;
+    padding: 1.5rem;
+    width: 100%;
+    max-width: 16rem;
 }
 
-.field-side {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+.setup-title {
+    margin: 0;
+    font-size: 0.6875rem;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--p-text-muted-color);
+    text-align: center;
+}
+
+.setup-select {
     width: 100%;
 }
 
-.opponent-side {
-    flex-direction: row;
-}
-
-.player-side {
-    flex-direction: row-reverse;
-}
-
-/* Status / Health Cards */
-.status-box {
-    background: #f8f8d8;
-    border: 3px solid #484848;
-    border-radius: 8px;
-    padding: 8px 12px;
-    width: 200px;
-    box-shadow: 3px 3px 0px #888888;
-}
-
-.info-row {
+.option-row {
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    margin-bottom: 4px;
+    gap: 0.5rem;
 }
 
-.pokemon-name {
-    font-weight: bold;
+.option-sprite {
+    width: 1.5rem;
+    height: 1.5rem;
+    object-fit: contain;
+}
+
+.option-name {
     text-transform: capitalize;
-    font-size: 0.95rem;
 }
 
-.party-balls {
+.placeholder {
+    color: var(--p-text-muted-color);
+}
+
+/* ---- arena ---- */
+.arena {
     display: flex;
-    gap: 3px;
-}
-
-.ball {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background-color: #ef4444;
-    border: 1px solid #000;
-}
-
-.ball.fainted {
-    background-color: #9ca3af;
-}
-
-/* HP Bar Styling */
-.hp-wrapper {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-}
-
-.hp-label {
-    font-weight: bold;
-    font-size: 0.75rem;
-    color: #d97706;
-}
-
-.hp-bar-bg {
-    flex-grow: 1;
-    height: 10px;
-    background-color: #4b5563;
-    border-radius: 5px;
-    border: 1px solid #000;
-    overflow: hidden;
-}
-
-.hp-bar-fill {
+    flex-direction: column;
+    gap: 0.75rem;
+    width: 100%;
     height: 100%;
-    transition: width 0.4s ease-in-out, background-color 0.4s ease;
+    padding: 1rem;
+    overflow-y: auto;
 }
 
-.hp-green {
-    background-color: #22c55e;
-}
-
-.hp-yellow {
-    background-color: #eab308;
-}
-
-.hp-red {
-    background-color: #ef4444;
-}
-
-.hp-text {
-    text-align: right;
-    font-size: 0.75rem;
-    margin-top: 2px;
-    font-weight: bold;
-}
-
-/* Platforms & Sprites */
-.sprite-platform {
-    width: 120px;
-    height: 40px;
-    background: #b8e0b8;
-    border-radius: 50%;
+.combatant {
     display: flex;
     align-items: center;
-    justify-content: center;
-    position: relative;
-    border: 2px solid #88b088;
+    gap: 1rem;
+}
+
+/* opponent: info left, sprite right */
+.combatant-foe {
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+/* player: sprite left, info right — the diagonal */
+.combatant-ally {
+    flex-direction: row-reverse;
+    justify-content: space-between;
+}
+
+.combatant-info {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.375rem;
 }
 
 .battle-sprite {
-    width: 96px;
-    height: 96px;
-    position: absolute;
-    bottom: 5px;
+    flex: none;
+    object-fit: contain;
     image-rendering: pixelated;
+    filter: drop-shadow(0 3px 2px rgb(0 0 0 / 0.25));
 }
 
-.opponent-sprite {
-    filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.2));
+.sprite-foe {
+    width: 4.5rem;
+    height: 4.5rem;
 }
 
-.player-sprite {
-    transform: scale(1.1);
+.sprite-ally {
+    width: 5.5rem;
+    height: 5.5rem;
 }
 
-/* Bottom Command Panel */
-.battle-menu {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    background-color: #282828;
-    padding: 8px;
-    gap: 8px;
-    border-top: 4px solid #484848;
+.combatant-head {
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
 }
 
-.dialog-box {
-    background: #ffffff;
-    border: 3px solid #686868;
-    border-radius: 6px;
-    padding: 12px;
+.label {
+    font-size: 0.625rem;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--p-text-muted-color);
+}
+
+.combatant-name {
+    font-weight: 600;
+    text-transform: capitalize;
+}
+
+.hp {
     display: flex;
     align-items: center;
+    gap: 0.625rem;
 }
 
-.dialog-box p {
-    margin: 0;
-    font-size: 0.9rem;
+.hp-track {
+    flex: 1;
+    height: 8px;
+    border-radius: 4px;
+    background: var(--p-surface-200);
+    overflow: hidden;
 }
 
-.action-grid {
+.hp-fill {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.45s ease-out, background-color 0.3s;
+}
+
+.hp-fill.ok {
+    background: #22c55e;
+}
+
+.hp-fill.warn {
+    background: #eab308;
+}
+
+.hp-fill.crit {
+    background: #ef4444;
+}
+
+.hp-text {
+    flex: none;
+    min-width: 4.5rem;
+    text-align: right;
+    font-size: 0.75rem;
+    font-variant-numeric: tabular-nums;
+    color: var(--p-text-muted-color);
+}
+
+/* ---- moves ---- */
+.moves {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 6px;
+    gap: 0.5rem;
+    /* margin-top: auto; */
 }
 
-.menu-btn {
-    border: 2px solid #000;
-    border-radius: 6px;
-    font-weight: bold;
-    font-size: 0.85rem;
+.move {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid var(--p-content-border-color);
+    border-radius: var(--p-content-border-radius);
+    background: var(--p-content-background);
+    font: inherit;
+    font-size: 0.8125rem;
     cursor: pointer;
-    padding: 8px;
-    transition: transform 0.1s, filter 0.1s;
+    transition: background-color 0.15s, border-color 0.15s;
 }
 
-.menu-btn:hover {
-    filter: brightness(1.1);
-    transform: translateY(-1px);
+.move:hover:not(:disabled) {
+    background: var(--p-content-hover-background);
+    border-color: var(--p-primary-color);
 }
 
-.fight-btn {
-    background-color: #ef4444;
-    color: white;
+.move:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
 }
 
-.pkmn-btn {
-    background-color: #22c55e;
-    color: white;
+.move-name {
+    text-transform: capitalize;
 }
 
-.bag-btn {
-    background-color: #eab308;
-    color: white;
+.move-power {
+    font-variant-numeric: tabular-nums;
+    color: var(--p-text-muted-color);
 }
 
-.run-btn {
-    background-color: #6b7280;
-    color: white;
+/* ---- log ---- */
+.log-panel {
+    display: flex;
+    flex-direction: column;
+    border-inline-start: 1px solid var(--p-content-border-color);
 }
 
-.moves-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 6px;
-  flex-grow: 1;
+.log-head {
+    flex: none;
+    padding: 0.625rem 0.875rem;
+    border-bottom: 1px solid var(--p-content-border-color);
+    font-size: 0.625rem;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--p-text-muted-color);
 }
 
-.move-btn {
-  background-color: #ffffff;
-  border: 2px solid #282828;
-  border-radius: 6px;
-  font-family: inherit;
-  font-weight: bold;
-  font-size: 0.85rem;
-  text-transform: uppercase;
-  padding: 10px;
-  cursor: pointer;
-  transition: transform 0.1s, background-color 0.1s;
+.log-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0.75rem 0.875rem;
 }
 
-.move-btn:hover {
-  background-color: #f3f4f6;
-  transform: translateY(-1px);
+.log-line {
+    margin: 0 0 0.5rem;
+    font-size: 0.75rem;
+    line-height: 1.45;
 }
 
-.back-btn {
-  background-color: #4b5563;
-  color: white;
-  grid-column: span 2;
+@media (prefers-color-scheme: dark) {
+    .hp-track {
+        background: var(--p-surface-700);
+    }
 }
 
-/* Stack vertically on smaller screens */
-@media (max-width: 992px) {
-    .top-row {
-        grid-template-columns: 1fr;
+/* attacker lunges toward the opponent */
+.anim-lunge {
+    animation: lunge 300ms ease-in-out;
+}
+
+.sprite-foe.anim-lunge {
+    animation-name: lunge-foe;
+}
+
+@keyframes lunge {
+    50% {
+        transform: translate(20px, -20px);
+    }
+}
+
+@keyframes lunge-foe {
+    50% {
+        transform: translate(-20px, 20px);
+    }
+}
+
+/* defender flashes and shakes */
+.anim-hit {
+    animation: hit 400ms steps(2, end) 3;
+}
+
+@keyframes hit {
+
+    0%,
+    100% {
+        opacity: 1;
+        transform: translateX(0);
+    }
+
+    50% {
+        opacity: 0.2;
+        transform: translateX(-6px);
+    }
+}
+
+/* faint: slide down and fade */
+.anim-faint {
+    animation: faint 700ms ease-in forwards;
+}
+
+.battle-actions-row {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+}
+
+.action-btn {
+    flex: 1;
+    padding: 0.5rem;
+    font-weight: 600;
+    font-size: 0.75rem;
+    border: 1px solid var(--p-content-border-color);
+    border-radius: var(--p-content-border-radius);
+    background: var(--p-content-background);
+    cursor: pointer;
+    transition: background-color 0.15s;
+}
+
+.action-btn:hover:not(:disabled) {
+    background: var(--p-content-hover-background);
+}
+
+@keyframes faint {
+    to {
+        transform: translateY(40px);
+        opacity: 0;
     }
 }
 </style>

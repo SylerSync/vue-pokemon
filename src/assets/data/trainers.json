@@ -1,182 +1,2721 @@
 {
   "kanto": {
     "gym_leaders": [
-      { "name": "Brock", "type": "Rock", "team": ["Geodude", "Onix"] },
-      { "name": "Misty", "type": "Water", "team": ["Staryu", "Starmie"] },
-      { "name": "Lt. Surge", "type": "Electric", "team": ["Voltorb", "Pikachu", "Raichu"] },
-      { "name": "Erika", "type": "Grass", "team": ["Victreebel", "Tangela", "Vileplume"] },
-      { "name": "Koga", "type": "Poison", "team": ["Koffing", "Muk", "Koffing", "Weezing"] },
-      { "name": "Sabrina", "type": "Psychic", "team": ["Kadabra", "Mr. Mime", "Venomoth", "Alakazam"] },
-      { "name": "Blaine", "type": "Fire", "team": ["Growlithe", "Ponyta", "Rapidash", "Arcanine"] },
-      { "name": "Giovanni", "type": "Ground", "team": ["Rhyhorn", "Dugtrio", "Nidoqueen", "Nidoking", "Rhydon"] }
+      {
+        "name": "Brock",
+        "type": "Rock",
+        "badge": "Boulder Badge",
+        "team": [
+          {
+            "id": 74,
+            "name": "geodude",
+            "level": 12,
+            "totalHp": 31,
+            "currentHp": 31,
+            "types": ["rock", "ground"],
+            "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/74.png",
+            "backSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/74.png",
+            "cry": "https://raw.githubusercontent.com/PokeAPI/cries/main/cries/pokemon/latest/74.ogg",
+            "stats": [
+              { "name": "hp", "base_stat": 40, "stat": 31 },
+              { "name": "attack", "base_stat": 80, "stat": 24 },
+              { "name": "defense", "base_stat": 100, "stat": 29 },
+              { "name": "special-attack", "base_stat": 30, "stat": 12 },
+              { "name": "special-defense", "base_stat": 30, "stat": 12 },
+              { "name": "speed", "base_stat": 20, "stat": 9 }
+            ],
+            "moves": [
+              { "name": "tackle", "type": "normal", "class": "physical", "power": 40, "accuracy": 100, "pp": 35 },
+              { "name": "defense-curl", "type": "normal", "class": "status", "power": null, "accuracy": null, "pp": 40 },
+              { "name": "rock-throw", "type": "rock", "class": "physical", "power": 50, "accuracy": 90, "pp": 15 }
+            ]
+          },
+          {
+            "id": 95,
+            "name": "onix",
+            "level": 14,
+            "totalHp": 35,
+            "currentHp": 35,
+            "types": ["rock", "ground"],
+            "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/95.png",
+            "backSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/95.png",
+            "cry": "https://raw.githubusercontent.com/PokeAPI/cries/main/cries/pokemon/latest/95.ogg",
+            "stats": [
+              { "name": "hp", "base_stat": 35, "stat": 35 },
+              { "name": "attack", "base_stat": 45, "stat": 18 },
+              { "name": "defense", "base_stat": 160, "stat": 51 },
+              { "name": "special-attack", "base_stat": 30, "stat": 13 },
+              { "name": "special-defense", "base_stat": 45, "stat": 18 },
+              { "name": "speed", "base_stat": 70, "stat": 26 }
+            ],
+            "moves": [
+              { "name": "tackle", "type": "normal", "class": "physical", "power": 40, "accuracy": 100, "pp": 35 },
+              { "name": "screech", "type": "normal", "class": "status", "power": null, "accuracy": 85, "pp": 40 },
+              { "name": "bind", "type": "normal", "class": "physical", "power": 15, "accuracy": 85, "pp": 20 },
+              { "name": "rock-throw", "type": "rock", "class": "physical", "power": 50, "accuracy": 90, "pp": 15 }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "Misty",
+        "type": "Water",
+        "badge": "Cascade Badge",
+        "team": [
+          {
+            "id": 120,
+            "name": "staryu",
+            "level": 18,
+            "totalHp": 42,
+            "currentHp": 42,
+            "types": ["water"],
+            "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/120.png",
+            "backSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/120.png",
+            "cry": "https://raw.githubusercontent.com/PokeAPI/cries/main/cries/pokemon/latest/120.ogg",
+            "stats": [
+              { "name": "hp", "base_stat": 30, "stat": 42 },
+              { "name": "attack", "base_stat": 45, "stat": 24 },
+              { "name": "defense", "base_stat": 55, "stat": 28 },
+              { "name": "special-attack", "base_stat": 70, "stat": 34 },
+              { "name": "special-defense", "base_stat": 55, "stat": 28 },
+              { "name": "speed", "base_stat": 85, "stat": 40 }
+            ],
+            "moves": [
+              { "name": "tackle", "type": "normal", "class": "physical", "power": 40, "accuracy": 100, "pp": 35 },
+              { "name": "harden", "type": "normal", "class": "status", "power": null, "accuracy": null, "pp": 30 },
+              { "name": "water-gun", "type": "water", "class": "special", "power": 40, "accuracy": 100, "pp": 25 },
+              { "name": "bubble-beam", "type": "water", "class": "special", "power": 65, "accuracy": 100, "pp": 20 }
+            ]
+          },
+          {
+            "id": 121,
+            "name": "starmie",
+            "level": 21,
+            "totalHp": 57,
+            "currentHp": 57,
+            "types": ["water", "psychic"],
+            "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/121.png",
+            "backSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/121.png",
+            "cry": "https://raw.githubusercontent.com/PokeAPI/cries/main/cries/pokemon/latest/121.ogg",
+            "stats": [
+              { "name": "hp", "base_stat": 60, "stat": 57 },
+              { "name": "attack", "base_stat": 75, "stat": 38 },
+              { "name": "defense", "base_stat": 85, "stat": 43 },
+              { "name": "special-attack", "base_stat": 100, "stat": 51 },
+              { "name": "special-defense", "base_stat": 85, "stat": 43 },
+              { "name": "speed", "base_stat": 115, "stat": 58 }
+            ],
+            "moves": [
+              { "name": "tackle", "type": "normal", "class": "physical", "power": 40, "accuracy": 100, "pp": 35 },
+              { "name": "water-gun", "type": "water", "class": "special", "power": 40, "accuracy": 100, "pp": 25 },
+              { "name": "swift", "type": "normal", "class": "special", "power": 60, "accuracy": null, "pp": 20 },
+              { "name": "bubble-beam", "type": "water", "class": "special", "power": 65, "accuracy": 100, "pp": 20 }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "Lt. Surge",
+        "type": "Electric",
+        "badge": "Thunder Badge",
+        "team": [
+          {
+            "id": 100,
+            "name": "voltorb",
+            "level": 21,
+            "totalHp": 51,
+            "currentHp": 51,
+            "types": ["electric"],
+            "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/100.png",
+            "backSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/100.png",
+            "cry": "https://raw.githubusercontent.com/PokeAPI/cries/main/cries/pokemon/latest/100.ogg",
+            "stats": [
+              { "name": "hp", "base_stat": 40, "stat": 51 },
+              { "name": "attack", "base_stat": 30, "stat": 21 },
+              { "name": "defense", "base_stat": 50, "stat": 30 },
+              { "name": "special-attack", "base_stat": 55, "stat": 32 },
+              { "name": "special-defense", "base_stat": 55, "stat": 32 },
+              { "name": "speed", "base_stat": 100, "stat": 53 }
+            ],
+            "moves": [
+              { "name": "tackle", "type": "normal", "class": "physical", "power": 40, "accuracy": 100, "pp": 35 },
+              { "name": "screech", "type": "normal", "class": "status", "power": null, "accuracy": 85, "pp": 40 },
+              { "name": "sonic-boom", "type": "normal", "class": "special", "power": null, "accuracy": 90, "pp": 20 }
+            ]
+          },
+          {
+            "id": 25,
+            "name": "pikachu",
+            "level": 18,
+            "totalHp": 45,
+            "currentHp": 45,
+            "types": ["electric"],
+            "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/25.png",
+            "backSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/25.png",
+            "cry": "https://raw.githubusercontent.com/PokeAPI/cries/main/cries/pokemon/latest/25.ogg",
+            "stats": [
+              { "name": "hp", "base_stat": 35, "stat": 45 },
+              { "name": "attack", "base_stat": 55, "stat": 28 },
+              { "name": "defense", "base_stat": 40, "stat": 22 },
+              { "name": "special-attack", "base_stat": 50, "stat": 26 },
+              { "name": "special-defense", "base_stat": 50, "stat": 26 },
+              { "name": "speed", "base_stat": 90, "stat": 42 }
+            ],
+            "moves": [
+              { "name": "thunder-shock", "type": "electric", "class": "special", "power": 40, "accuracy": 100, "pp": 30 },
+              { "name": "growl", "type": "normal", "class": "status", "power": null, "accuracy": 100, "pp": 40 },
+              { "name": "quick-attack", "type": "normal", "class": "physical", "power": 40, "accuracy": 100, "pp": 30 },
+              { "name": "thunder-wave", "type": "electric", "class": "status", "power": null, "accuracy": 90, "pp": 20 }
+            ]
+          },
+          {
+            "id": 26,
+            "name": "raichu",
+            "level": 24,
+            "totalHp": 68,
+            "currentHp": 68,
+            "types": ["electric"],
+            "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/26.png",
+            "backSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/26.png",
+            "cry": "https://raw.githubusercontent.com/PokeAPI/cries/main/cries/pokemon/latest/26.ogg",
+            "stats": [
+              { "name": "hp", "base_stat": 60, "stat": 68 },
+              { "name": "attack", "base_stat": 90, "stat": 52 },
+              { "name": "defense", "base_stat": 55, "stat": 35 },
+              { "name": "special-attack", "base_stat": 90, "stat": 52 },
+              { "name": "special-defense", "base_stat": 80, "stat": 47 },
+              { "name": "speed", "base_stat": 110, "stat": 62 }
+            ],
+            "moves": [
+              { "name": "thunder-bolt", "type": "electric", "class": "special", "power": 90, "accuracy": 100, "pp": 15 },
+              { "name": "thunder-punch", "type": "electric", "class": "physical", "power": 75, "accuracy": 100, "pp": 15 },
+              { "name": "quick-attack", "type": "normal", "class": "physical", "power": 40, "accuracy": 100, "pp": 30 },
+              { "name": "thunder-wave", "type": "electric", "class": "status", "power": null, "accuracy": 90, "pp": 20 }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "Erika",
+        "type": "Grass",
+        "badge": "Rainbow Badge",
+        "team": [
+          {
+            "id": 71,
+            "name": "victreebel",
+            "level": 29,
+            "totalHp": 92,
+            "currentHp": 92,
+            "types": ["grass", "poison"],
+            "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/71.png",
+            "backSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/71.png",
+            "cry": "https://raw.githubusercontent.com/PokeAPI/cries/main/cries/pokemon/latest/71.ogg",
+            "stats": [
+              { "name": "hp", "base_stat": 80, "stat": 92 },
+              { "name": "attack", "base_stat": 105, "stat": 72 },
+              { "name": "defense", "base_stat": 65, "stat": 46 },
+              { "name": "special-attack", "base_stat": 100, "stat": 69 },
+              { "name": "special-defense", "base_stat": 70, "stat": 49 },
+              { "name": "speed", "base_stat": 70, "stat": 49 }
+            ],
+            "moves": [
+              { "name": "razor-leaf", "type": "grass", "class": "physical", "power": 55, "accuracy": 95, "pp": 25 },
+              { "name": "acid", "type": "poison", "class": "special", "power": 40, "accuracy": 100, "pp": 30 },
+              { "name": "sleep-powder", "type": "grass", "class": "status", "power": null, "accuracy": 75, "pp": 15 },
+              { "name": "wrap", "type": "normal", "class": "physical", "power": 15, "accuracy": 90, "pp": 20 }
+            ]
+          },
+          {
+            "id": 114,
+            "name": "tangela",
+            "level": 24,
+            "totalHp": 71,
+            "currentHp": 71,
+            "types": ["grass"],
+            "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/114.png",
+            "backSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/114.png",
+            "cry": "https://raw.githubusercontent.com/PokeAPI/cries/main/cries/pokemon/latest/114.ogg",
+            "stats": [
+              { "name": "hp", "base_stat": 65, "stat": 71 },
+              { "name": "attack", "base_stat": 55, "stat": 35 },
+              { "name": "defense", "base_stat": 115, "stat": 65 },
+              { "name": "special-attack", "base_stat": 100, "stat": 57 },
+              { "name": "special-defense", "base_stat": 40, "stat": 28 },
+              { "name": "speed", "base_stat": 60, "stat": 37 }
+            ],
+            "moves": [
+              { "name": "vine-whip", "type": "grass", "class": "physical", "power": 45, "accuracy": 100, "pp": 25 },
+              { "name": "bind", "type": "normal", "class": "physical", "power": 15, "accuracy": 85, "pp": 20 },
+              { "name": "poison-powder", "type": "poison", "class": "status", "power": null, "accuracy": 75, "pp": 35 }
+            ]
+          },
+          {
+            "id": 45,
+            "name": "vileplume",
+            "level": 29,
+            "totalHp": 89,
+            "currentHp": 89,
+            "types": ["grass", "poison"],
+            "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/45.png",
+            "backSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/45.png",
+            "cry": "https://raw.githubusercontent.com/PokeAPI/cries/main/cries/pokemon/latest/45.ogg",
+            "stats": [
+              { "name": "hp", "base_stat": 75, "stat": 89 },
+              { "name": "attack", "base_stat": 80, "stat": 56 },
+              { "name": "defense", "base_stat": 85, "stat": 59 },
+              { "name": "special-attack", "base_stat": 110, "stat": 75 },
+              { "name": "special-defense", "base_stat": 90, "stat": 62 },
+              { "name": "speed", "base_stat": 50, "stat": 37 }
+            ],
+            "moves": [
+              { "name": "petal-dance", "type": "grass", "class": "special", "power": 120, "accuracy": 100, "pp": 10 },
+              { "name": "mega-drain", "type": "grass", "class": "special", "power": 40, "accuracy": 100, "pp": 15 },
+              { "name": "sleep-powder", "type": "grass", "class": "status", "power": null, "accuracy": 75, "pp": 15 }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "Koga",
+        "type": "Poison",
+        "badge": "Soul Badge",
+        "team": [
+          {
+            "id": 109,
+            "name": "koffing",
+            "level": 37,
+            "totalHp": 89,
+            "currentHp": 89,
+            "types": ["poison"],
+            "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/109.png",
+            "backSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/109.png",
+            "cry": "https://raw.githubusercontent.com/PokeAPI/cries/main/cries/pokemon/latest/109.ogg",
+            "stats": [
+              { "name": "hp", "base_stat": 40, "stat": 89 },
+              { "name": "attack", "base_stat": 65, "stat": 58 },
+              { "name": "defense", "base_stat": 95, "stat": 82 },
+              { "name": "special-attack", "base_stat": 60, "stat": 54 },
+              { "name": "special-defense", "base_stat": 45, "stat": 42 },
+              { "name": "speed", "base_stat": 35, "stat": 34 }
+            ],
+            "moves": [
+              { "name": "sludge", "type": "poison", "class": "special", "power": 65, "accuracy": 100, "pp": 20 },
+              { "name": "smog", "type": "poison", "class": "special", "power": 30, "accuracy": 70, "pp": 20 },
+              { "name": "toxic", "type": "poison", "class": "status", "power": null, "accuracy": 90, "pp": 10 }
+            ]
+          },
+          {
+            "id": 89,
+            "name": "muk",
+            "level": 39,
+            "totalHp": 139,
+            "currentHp": 139,
+            "types": ["poison"],
+            "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/89.png",
+            "backSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/89.png",
+            "cry": "https://raw.githubusercontent.com/PokeAPI/cries/main/cries/pokemon/latest/89.ogg",
+            "stats": [
+              { "name": "hp", "base_stat": 105, "stat": 139 },
+              { "name": "attack", "base_stat": 105, "stat": 95 },
+              { "name": "defense", "base_stat": 75, "stat": 69 },
+              { "name": "special-attack", "base_stat": 65, "stat": 61 },
+              { "name": "special-defense", "base_stat": 100, "stat": 91 },
+              { "name": "speed", "base_stat": 50, "stat": 49 }
+            ],
+            "moves": [
+              { "name": "sludge", "type": "poison", "class": "special", "power": 65, "accuracy": 100, "pp": 20 },
+              { "name": "minimize", "type": "normal", "class": "status", "power": null, "accuracy": null, "pp": 10 },
+              { "name": "screech", "type": "normal", "class": "status", "power": null, "accuracy": 85, "pp": 40 },
+              { "name": "toxic", "type": "poison", "class": "status", "power": null, "accuracy": 90, "pp": 10 }
+            ]
+          },
+          {
+            "id": 110,
+            "name": "weezing",
+            "level": 43,
+            "totalHp": 118,
+            "currentHp": 118,
+            "types": ["poison"],
+            "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/110.png",
+            "backSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/110.png",
+            "cry": "https://raw.githubusercontent.com/PokeAPI/cries/main/cries/pokemon/latest/110.ogg",
+            "stats": [
+              { "name": "hp", "base_stat": 65, "stat": 118 },
+              { "name": "attack", "base_stat": 90, "stat": 91 },
+              { "name": "defense", "base_stat": 120, "stat": 119 },
+              { "name": "special-attack", "base_stat": 85, "stat": 86 },
+              { "name": "special-defense", "base_stat": 70, "stat": 72 },
+              { "name": "speed", "base_stat": 60, "stat": 62 }
+            ],
+            "moves": [
+              { "name": "sludge", "type": "poison", "class": "special", "power": 65, "accuracy": 100, "pp": 20 },
+              { "name": "tackle", "type": "normal", "class": "physical", "power": 40, "accuracy": 100, "pp": 35 },
+              { "name": "toxic", "type": "poison", "class": "status", "power": null, "accuracy": 90, "pp": 10 },
+              { "name": "explosion", "type": "normal", "class": "physical", "power": 250, "accuracy": 100, "pp": 5 }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "Sabrina",
+        "type": "Psychic",
+        "badge": "Marsh Badge",
+        "team": [
+          {
+            "id": 64,
+            "name": "kadabra",
+            "level": 38,
+            "totalHp": 91,
+            "currentHp": 91,
+            "types": ["psychic"],
+            "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/64.png",
+            "backSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/64.png",
+            "cry": "https://raw.githubusercontent.com/PokeAPI/cries/main/cries/pokemon/latest/64.ogg",
+            "stats": [
+              { "name": "hp", "base_stat": 40, "stat": 91 },
+              { "name": "attack", "base_stat": 35, "stat": 36 },
+              { "name": "defense", "base_stat": 30, "stat": 32 },
+              { "name": "special-attack", "base_stat": 120, "stat": 106 },
+              { "name": "special-defense", "base_stat": 70, "stat": 63 },
+              { "name": "speed", "base_stat": 105, "stat": 93 }
+            ],
+            "moves": [
+              { "name": "psybeam", "type": "psychic", "class": "special", "power": 65, "accuracy": 100, "pp": 20 },
+              { "name": "recover", "type": "psychic", "class": "status", "power": null, "accuracy": null, "pp": 10 },
+              { "name": "psychic", "type": "psychic", "class": "special", "power": 90, "accuracy": 100, "pp": 10 },
+              { "name": "reflect", "type": "psychic", "class": "status", "power": null, "accuracy": null, "pp": 20 }
+            ]
+          },
+          {
+            "id": 122,
+            "name": "mr-mime",
+            "level": 37,
+            "totalHp": 89,
+            "currentHp": 89,
+            "types": ["psychic", "fairy"],
+            "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/122.png",
+            "backSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/122.png",
+            "cry": "https://raw.githubusercontent.com/PokeAPI/cries/main/cries/pokemon/latest/122.ogg",
+            "stats": [
+              { "name": "hp", "base_stat": 40, "stat": 89 },
+              { "name": "attack", "base_stat": 45, "stat": 42 },
+              { "name": "defense", "base_stat": 65, "stat": 58 },
+              { "name": "special-attack", "base_stat": 100, "stat": 86 },
+              { "name": "special-defense", "base_stat": 120, "stat": 102 },
+              { "name": "speed", "base_stat": 90, "stat": 78 }
+            ],
+            "moves": [
+              { "name": "confusion", "type": "psychic", "class": "special", "power": 50, "accuracy": 100, "pp": 25 },
+              { "name": "barrier", "type": "psychic", "class": "status", "power": null, "accuracy": null, "pp": 20 },
+              { "name": "light-screen", "type": "psychic", "class": "status", "power": null, "accuracy": null, "pp": 30 },
+              { "name": "doubleslap", "type": "normal", "class": "physical", "power": 15, "accuracy": 85, "pp": 10 }
+            ]
+          },
+          {
+            "id": 49,
+            "name": "venomoth",
+            "level": 38,
+            "totalHp": 115,
+            "currentHp": 115,
+            "types": ["bug", "poison"],
+            "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/49.png",
+            "backSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/49.png",
+            "cry": "https://raw.githubusercontent.com/PokeAPI/cries/main/cries/pokemon/latest/49.ogg",
+            "stats": [
+              { "name": "hp", "base_stat": 70, "stat": 115 },
+              { "name": "attack", "base_stat": 65, "stat": 61 },
+              { "name": "defense", "base_stat": 60, "stat": 57 },
+              { "name": "special-attack", "base_stat": 90, "stat": 82 },
+              { "name": "special-defense", "base_stat": 75, "stat": 69 },
+              { "name": "speed", "base_stat": 90, "stat": 82 }
+            ],
+            "moves": [
+              { "name": "psybeam", "type": "psychic", "class": "special", "power": 65, "accuracy": 100, "pp": 20 },
+              { "name": "poison-powder", "type": "poison", "class": "status", "power": null, "accuracy": 75, "pp": 35 },
+              { "name": "leech-life", "type": "bug", "class": "physical", "power": 80, "accuracy": 100, "pp": 10 },
+              { "name": "stun-spore", "type": "grass", "class": "status", "power": null, "accuracy": 75, "pp": 30 }
+            ]
+          },
+          {
+            "id": 65,
+            "name": "alakazam",
+            "level": 43,
+            "totalHp": 109,
+            "currentHp": 109,
+            "types": ["psychic"],
+            "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/65.png",
+            "backSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/65.png",
+            "cry": "https://raw.githubusercontent.com/PokeAPI/cries/main/cries/pokemon/latest/65.ogg",
+            "stats": [
+              { "name": "hp", "base_stat": 55, "stat": 109 },
+              { "name": "attack", "base_stat": 50, "stat": 53 },
+              { "name": "defense", "base_stat": 45, "stat": 49 },
+              { "name": "special-attack", "base_stat": 135, "stat": 134 },
+              { "name": "special-defense", "base_stat": 95, "stat": 96 },
+              { "name": "speed", "base_stat": 120, "stat": 121 }
+            ],
+            "moves": [
+              { "name": "psychic", "type": "psychic", "class": "special", "power": 90, "accuracy": 100, "pp": 10 },
+              { "name": "recover", "type": "psychic", "class": "status", "power": null, "accuracy": null, "pp": 10 },
+              { "name": "psybeam", "type": "psychic", "class": "special", "power": 65, "accuracy": 100, "pp": 20 },
+              { "name": "reflect", "type": "psychic", "class": "status", "power": null, "accuracy": null, "pp": 20 }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "Blaine",
+        "type": "Fire",
+        "badge": "Volcano Badge",
+        "team": [
+          {
+            "id": 58,
+            "name": "growlithe",
+            "level": 42,
+            "totalHp": 114,
+            "currentHp": 114,
+            "types": ["fire"],
+            "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/58.png",
+            "backSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/58.png",
+            "cry": "https://raw.githubusercontent.com/PokeAPI/cries/main/cries/pokemon/latest/58.ogg",
+            "stats": [
+              { "name": "hp", "base_stat": 55, "stat": 114 },
+              { "name": "attack", "base_stat": 70, "stat": 72 },
+              { "name": "defense", "base_stat": 45, "stat": 48 },
+              { "name": "special-attack", "base_stat": 70, "stat": 72 },
+              { "name": "special-defense", "base_stat": 50, "stat": 52 },
+              { "name": "speed", "base_stat": 60, "stat": 62 }
+            ],
+            "moves": [
+              { "name": "flamethrower", "type": "fire", "class": "special", "power": 90, "accuracy": 100, "pp": 15 },
+              { "name": "take-down", "type": "normal", "class": "physical", "power": 90, "accuracy": 85, "pp": 20 },
+              { "name": "agility", "type": "psychic", "class": "status", "power": null, "accuracy": null, "pp": 30 },
+              { "name": "roar", "type": "normal", "class": "status", "power": null, "accuracy": null, "pp": 20 }
+            ]
+          },
+          {
+            "id": 77,
+            "name": "ponyta",
+            "level": 40,
+            "totalHp": 105,
+            "currentHp": 105,
+            "types": ["fire"],
+            "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/77.png",
+            "backSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/77.png",
+            "cry": "https://raw.githubusercontent.com/PokeAPI/cries/main/cries/pokemon/latest/77.ogg",
+            "stats": [
+              { "name": "hp", "base_stat": 50, "stat": 105 },
+              { "name": "attack", "base_stat": 85, "stat": 81 },
+              { "name": "defense", "base_stat": 55, "stat": 54 },
+              { "name": "special-attack", "base_stat": 65, "stat": 62 },
+              { "name": "special-defense", "base_stat": 65, "stat": 62 },
+              { "name": "speed", "base_stat": 90, "stat": 85 }
+            ],
+            "moves": [
+              { "name": "fire-spin", "type": "fire", "class": "special", "power": 35, "accuracy": 85, "pp": 15 },
+              { "name": "stomp", "type": "normal", "class": "physical", "power": 65, "accuracy": 100, "pp": 20 },
+              { "name": "tail-whip", "type": "normal", "class": "status", "power": null, "accuracy": 100, "pp": 30 },
+              { "name": "growl", "type": "normal", "class": "status", "power": null, "accuracy": 100, "pp": 40 }
+            ]
+          },
+          {
+            "id": 78,
+            "name": "rapidash",
+            "level": 42,
+            "totalHp": 122,
+            "currentHp": 122,
+            "types": ["fire"],
+            "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/78.png",
+            "backSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/78.png",
+            "cry": "https://raw.githubusercontent.com/PokeAPI/cries/main/cries/pokemon/latest/78.ogg",
+            "stats": [
+              { "name": "hp", "base_stat": 65, "stat": 122 },
+              { "name": "attack", "base_stat": 100, "stat": 102 },
+              { "name": "defense", "base_stat": 70, "stat": 73 },
+              { "name": "special-attack", "base_stat": 80, "stat": 82 },
+              { "name": "special-defense", "base_stat": 80, "stat": 82 },
+              { "name": "speed", "base_stat": 105, "stat": 106 }
+            ],
+            "moves": [
+              { "name": "fire-blast", "type": "fire", "class": "special", "power": 110, "accuracy": 85, "pp": 5 },
+              { "name": "stomp", "type": "normal", "class": "physical", "power": 65, "accuracy": 100, "pp": 20 },
+              { "name": "fire-spin", "type": "fire", "class": "special", "power": 35, "accuracy": 85, "pp": 15 },
+              { "name": "fury-attack", "type": "normal", "class": "physical", "power": 15, "accuracy": 85, "pp": 20 }
+            ]
+          },
+          {
+            "id": 59,
+            "name": "arcanine",
+            "level": 47,
+            "totalHp": 151,
+            "currentHp": 151,
+            "types": ["fire"],
+            "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/59.png",
+            "backSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/59.png",
+            "cry": "https://raw.githubusercontent.com/PokeAPI/cries/main/cries/pokemon/latest/59.ogg",
+            "stats": [
+              { "name": "hp", "base_stat": 90, "stat": 151 },
+              { "name": "attack", "base_stat": 110, "stat": 124 },
+              { "name": "defense", "base_stat": 80, "stat": 91 },
+              { "name": "special-attack", "base_stat": 100, "stat": 113 },
+              { "name": "special-defense", "base_stat": 80, "stat": 91 },
+              { "name": "speed", "base_stat": 95, "stat": 108 }
+            ],
+            "moves": [
+              { "name": "fire-blast", "type": "fire", "class": "special", "power": 110, "accuracy": 85, "pp": 5 },
+              { "name": "flamethrower", "type": "fire", "class": "special", "power": 90, "accuracy": 100, "pp": 15 },
+              { "name": "extremespeed", "type": "normal", "class": "physical", "power": 80, "accuracy": 100, "pp": 5 },
+              { "name": "roar", "type": "normal", "class": "status", "power": null, "accuracy": null, "pp": 20 }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "Giovanni",
+        "type": "Ground",
+        "badge": "Earth Badge",
+        "team": [
+          {
+            "id": 111,
+            "name": "rhyhorn",
+            "level": 45,
+            "totalHp": 139,
+            "currentHp": 139,
+            "types": ["ground", "rock"],
+            "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/111.png",
+            "backSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/111.png",
+            "cry": "https://raw.githubusercontent.com/PokeAPI/cries/main/cries/pokemon/latest/111.ogg",
+            "stats": [
+              { "name": "hp", "base_stat": 80, "stat": 139 },
+              { "name": "attack", "base_stat": 85, "stat": 96 },
+              { "name": "defense", "base_stat": 95, "stat": 106 },
+              { "name": "special-attack", "base_stat": 30, "stat": 38 },
+              { "name": "special-defense", "base_stat": 30, "stat": 38 },
+              { "name": "speed", "base_stat": 25, "stat": 33 }
+            ],
+            "moves": [
+              { "name": "stomp", "type": "normal", "class": "physical", "power": 65, "accuracy": 100, "pp": 20 },
+              { "name": "tail-whip", "type": "normal", "class": "status", "power": null, "accuracy": 100, "pp": 30 },
+              { "name": "fury-attack", "type": "normal", "class": "physical", "power": 15, "accuracy": 85, "pp": 20 },
+              { "name": "horn-drill", "type": "normal", "class": "physical", "power": null, "accuracy": 30, "pp": 5 }
+            ]
+          },
+          {
+            "id": 51,
+            "name": "dugtrio",
+            "level": 42,
+            "totalHp": 97,
+            "currentHp": 97,
+            "types": ["ground"],
+            "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/51.png",
+            "backSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/51.png",
+            "cry": "https://raw.githubusercontent.com/PokeAPI/cries/main/cries/pokemon/latest/51.ogg",
+            "stats": [
+              { "name": "hp", "base_stat": 35, "stat": 97 },
+              { "name": "attack", "base_stat": 100, "stat": 102 },
+              { "name": "defense", "base_stat": 50, "stat": 52 },
+              { "name": "special-attack", "base_stat": 50, "stat": 52 },
+              { "name": "special-defense", "base_stat": 70, "stat": 72 },
+              { "name": "speed", "base_stat": 120, "stat": 122 }
+            ],
+            "moves": [
+              { "name": "earthquake", "type": "ground", "class": "physical", "power": 100, "accuracy": 100, "pp": 10 },
+              { "name": "slash", "type": "normal", "class": "physical", "power": 70, "accuracy": 100, "pp": 20 },
+              { "name": "sand-attack", "type": "ground", "class": "status", "power": null, "accuracy": 100, "pp": 15 },
+              { "name": "growl", "type": "normal", "class": "status", "power": null, "accuracy": 100, "pp": 40 }
+            ]
+          },
+          {
+            "id": 31,
+            "name": "nidoqueen",
+            "level": 44,
+            "totalHp": 141,
+            "currentHp": 141,
+            "types": ["poison", "ground"],
+            "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/31.png",
+            "backSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/31.png",
+            "cry": "https://raw.githubusercontent.com/PokeAPI/cries/main/cries/pokemon/latest/31.ogg",
+            "stats": [
+              { "name": "hp", "base_stat": 90, "stat": 141 },
+              { "name": "attack", "base_stat": 92, "stat": 99 },
+              { "name": "defense", "base_stat": 87, "stat": 94 },
+              { "name": "special-attack", "base_stat": 75, "stat": 82 },
+              { "name": "special-defense", "base_stat": 85, "stat": 92 },
+              { "name": "speed", "base_stat": 76, "stat": 83 }
+            ],
+            "moves": [
+              { "name": "earthquake", "type": "ground", "class": "physical", "power": 100, "accuracy": 100, "pp": 10 },
+              { "name": "poison-sting", "type": "poison", "class": "physical", "power": 15, "accuracy": 100, "pp": 35 },
+              { "name": "body-slam", "type": "normal", "class": "physical", "power": 85, "accuracy": 100, "pp": 15 },
+              { "name": "superpower", "type": "fighting", "class": "physical", "power": 120, "accuracy": 100, "pp": 5 }
+            ]
+          },
+          {
+            "id": 34,
+            "name": "nidoking",
+            "level": 45,
+            "totalHp": 140,
+            "currentHp": 140,
+            "types": ["poison", "ground"],
+            "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/34.png",
+            "backSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/34.png",
+            "cry": "https://raw.githubusercontent.com/PokeAPI/cries/main/cries/pokemon/latest/34.ogg",
+            "stats": [
+              { "name": "hp", "base_stat": 81, "stat": 140 },
+              { "name": "attack", "base_stat": 102, "stat": 111 },
+              { "name": "defense", "base_stat": 77, "stat": 86 },
+              { "name": "special-attack", "base_stat": 85, "stat": 94 },
+              { "name": "special-defense", "base_stat": 75, "stat": 84 },
+              { "name": "speed", "base_stat": 85, "stat": 94 }
+            ],
+            "moves": [
+              { "name": "earthquake", "type": "ground", "class": "physical", "power": 100, "accuracy": 100, "pp": 10 },
+              { "name": "thrash", "type": "normal", "class": "physical", "power": 120, "accuracy": 100, "pp": 10 },
+              { "name": "poison-jab", "type": "poison", "class": "physical", "power": 80, "accuracy": 100, "pp": 20 },
+              { "name": "megahorn", "type": "bug", "class": "physical", "power": 120, "accuracy": 85, "pp": 10 }
+            ]
+          },
+          {
+            "id": 112,
+            "name": "rhydon",
+            "level": 50,
+            "totalHp": 180,
+            "currentHp": 180,
+            "types": ["ground", "rock"],
+            "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/112.png",
+            "backSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/112.png",
+            "cry": "https://raw.githubusercontent.com/PokeAPI/cries/main/cries/pokemon/latest/112.ogg",
+            "stats": [
+              { "name": "hp", "base_stat": 105, "stat": 180 },
+              { "name": "attack", "base_stat": 130, "stat": 151 },
+              { "name": "defense", "base_stat": 120, "stat": 141 },
+              { "name": "special-attack", "base_stat": 45, "stat": 56 },
+              { "name": "special-defense", "base_stat": 45, "stat": 56 },
+              { "name": "speed", "base_stat": 40, "stat": 51 }
+            ],
+            "moves": [
+              { "name": "earthquake", "type": "ground", "class": "physical", "power": 100, "accuracy": 100, "pp": 10 },
+              { "name": "rock-slide", "type": "rock", "class": "physical", "power": 75, "accuracy": 90, "pp": 10 },
+              { "name": "horn-drill", "type": "normal", "class": "physical", "power": null, "accuracy": 30, "pp": 5 },
+              { "name": "scary-face", "type": "normal", "class": "status", "power": null, "accuracy": 100, "pp": 10 }
+            ]
+          }
+        ]
+      }
     ],
     "elite_four": [
-      { "name": "Lorelei", "type": "Ice", "team": ["Dewgong", "Cloyster", "Slowbro", "Jynx", "Lapras"] },
-      { "name": "Bruno", "type": "Fighting", "team": ["Onix", "Hitmonchan", "Hitmonlee", "Onix", "Machamp"] },
-      { "name": "Agatha", "type": "Ghost", "team": ["Gengar", "Golbat", "Haunter", "Arbok", "Gengar"] },
-      { "name": "Lance", "type": "Dragon", "team": ["Gyarados", "Dragonair", "Dragonair", "Aerodactyl", "Dragonite"] }
+      {
+        "name": "Lorelei",
+        "type": "Ice",
+        "team": [
+          {
+            "id": 87,
+            "name": "dewgong",
+            "level": 54,
+            "totalHp": 183,
+            "currentHp": 183,
+            "types": ["water", "ice"],
+            "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/87.png",
+            "backSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/87.png",
+            "cry": "https://raw.githubusercontent.com/PokeAPI/cries/main/cries/pokemon/latest/87.ogg",
+            "stats": [
+              { "name": "hp", "base_stat": 90, "stat": 183 },
+              { "name": "attack", "base_stat": 70, "stat": 99 },
+              { "name": "defense", "base_stat": 80, "stat": 110 },
+              { "name": "special-attack", "base_stat": 70, "stat": 99 },
+              { "name": "special-defense", "base_stat": 95, "stat": 126 },
+              { "name": "speed", "base_stat": 70, "stat": 99 }
+            ],
+            "moves": [
+              { "name": "ice-beam", "type": "ice", "class": "special", "power": 90, "accuracy": 100, "pp": 10 },
+              { "name": "surf", "type": "water", "class": "special", "power": 90, "accuracy": 100, "pp": 15 },
+              { "name": "aurora-beam", "type": "ice", "class": "special", "power": 65, "accuracy": 100, "pp": 20 },
+              { "name": "rest", "type": "psychic", "class": "status", "power": null, "accuracy": null, "pp": 10 }
+            ]
+          },
+          {
+            "id": 91,
+            "name": "cloyster",
+            "level": 53,
+            "totalHp": 137,
+            "currentHp": 137,
+            "types": ["water", "ice"],
+            "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/91.png",
+            "backSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/91.png",
+            "cry": "https://raw.githubusercontent.com/PokeAPI/cries/main/cries/pokemon/latest/91.ogg",
+            "stats": [
+              { "name": "hp", "base_stat": 50, "stat": 137 },
+              { "name": "attack", "base_stat": 95, "stat": 124 },
+              { "name": "defense", "base_stat": 180, "stat": 214 },
+              { "name": "special-attack", "base_stat": 85, "stat": 113 },
+              { "name": "special-defense", "base_stat": 45, "stat": 69 },
+              { "name": "speed", "base_stat": 70, "stat": 97 }
+            ],
+            "moves": [
+              { "name": "icicle-spear", "type": "ice", "class": "physical", "power": 25, "accuracy": 100, "pp": 30 },
+              { "name": "spike-cannon", "type": "normal", "class": "physical", "power": 20, "accuracy": 100, "pp": 15 },
+              { "name": "supersonic", "type": "normal", "class": "status", "power": null, "accuracy": 55, "pp": 20 },
+              { "name": "protect", "type": "normal", "class": "status", "power": null, "accuracy": null, "pp": 10 }
+            ]
+          },
+          {
+            "id": 80,
+            "name": "slowbro",
+            "level": 54,
+            "totalHp": 188,
+            "currentHp": 188,
+            "types": ["water", "psychic"],
+            "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/80.png",
+            "backSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/80.png",
+            "cry": "https://raw.githubusercontent.com/PokeAPI/cries/main/cries/pokemon/latest/80.ogg",
+            "stats": [
+              { "name": "hp", "base_stat": 95, "stat": 188 },
+              { "name": "attack", "base_stat": 75, "stat": 104 },
+              { "name": "defense", "base_stat": 110, "stat": 142 },
+              { "name": "special-attack", "base_stat": 100, "stat": 131 },
+              { "name": "special-defense", "base_stat": 80, "stat": 110 },
+              { "name": "speed", "base_stat": 30, "stat": 56 }
+            ],
+            "moves": [
+              { "name": "psychic", "type": "psychic", "class": "special", "power": 90, "accuracy": 100, "pp": 10 },
+              { "name": "water-pulse", "type": "water", "class": "special", "power": 60, "accuracy": 100, "pp": 20 },
+              { "name": "yawn", "type": "normal", "class": "status", "power": null, "accuracy": null, "pp": 10 },
+              { "name": "amnesia", "type": "psychic", "class": "status", "power": null, "accuracy": null, "pp": 20 }
+            ]
+          },
+          {
+            "id": 124,
+            "name": "jynx",
+            "level": 56,
+            "totalHp": 156,
+            "currentHp": 156,
+            "types": ["ice", "psychic"],
+            "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/124.png",
+            "backSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/124.png",
+            "cry": "https://raw.githubusercontent.com/PokeAPI/cries/main/cries/pokemon/latest/124.ogg",
+            "stats": [
+              { "name": "hp", "base_stat": 65, "stat": 156 },
+              { "name": "attack", "base_stat": 50, "stat": 80 },
+              { "name": "defense", "base_stat": 35, "stat": 63 },
+              { "name": "special-attack", "base_stat": 115, "stat": 152 },
+              { "name": "special-defense", "base_stat": 95, "stat": 130 },
+              { "name": "speed", "base_stat": 95, "stat": 130 }
+            ],
+            "moves": [
+              { "name": "ice-punch", "type": "ice", "class": "physical", "power": 75, "accuracy": 100, "pp": 15 },
+              { "name": "lovely-kiss", "type": "normal", "class": "status", "power": null, "accuracy": 75, "pp": 10 },
+              { "name": "psychic", "type": "psychic", "class": "special", "power": 90, "accuracy": 100, "pp": 10 },
+              { "name": "thrash", "type": "normal", "class": "physical", "power": 120, "accuracy": 100, "pp": 10 }
+            ]
+          },
+          {
+            "id": 131,
+            "name": "lapras",
+            "level": 56,
+            "totalHp": 224,
+            "currentHp": 224,
+            "types": ["water", "ice"],
+            "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/131.png",
+            "backSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/131.png",
+            "cry": "https://raw.githubusercontent.com/PokeAPI/cries/main/cries/pokemon/latest/131.ogg",
+            "stats": [
+              { "name": "hp", "base_stat": 130, "stat": 224 },
+              { "name": "attack", "base_stat": 85, "stat": 119 },
+              { "name": "defense", "base_stat": 80, "stat": 114 },
+              { "name": "special-attack", "base_stat": 85, "stat": 119 },
+              { "name": "special-defense", "base_stat": 95, "stat": 130 },
+              { "name": "speed", "base_stat": 60, "stat": 91 }
+            ],
+            "moves": [
+              { "name": "blizzard", "type": "ice", "class": "special", "power": 110, "accuracy": 70, "pp": 5 },
+              { "name": "surf", "type": "water", "class": "special", "power": 90, "accuracy": 100, "pp": 15 },
+              { "name": "body-slam", "type": "normal", "class": "physical", "power": 85, "accuracy": 100, "pp": 15 },
+              { "name": "confuse-ray", "type": "ghost", "class": "status", "power": null, "accuracy": 100, "pp": 10 }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "Bruno",
+        "type": "Fighting",
+        "team": [
+          {
+            "id": 95,
+            "name": "onix",
+            "level": 53,
+            "totalHp": 121,
+            "currentHp": 121,
+            "types": ["rock", "ground"],
+            "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/95.png",
+            "backSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/95.png",
+            "cry": "https://raw.githubusercontent.com/PokeAPI/cries/main/cries/pokemon/latest/95.ogg",
+            "stats": [
+              { "name": "hp", "base_stat": 35, "stat": 121 },
+              { "name": "attack", "base_stat": 45, "stat": 71 },
+              { "name": "defense", "base_stat": 160, "stat": 192 },
+              { "name": "special-attack", "base_stat": 30, "stat": 54 },
+              { "name": "special-defense", "base_stat": 45, "stat": 71 },
+              { "name": "speed", "base_stat": 70, "stat": 97 }
+            ],
+            "moves": [
+              { "name": "rock-tomb", "type": "rock", "class": "physical", "power": 60, "accuracy": 95, "pp": 15 },
+              { "name": "earthquake", "type": "ground", "class": "physical", "power": 100, "accuracy": 100, "pp": 10 },
+              { "name": "iron-tail", "type": "steel", "class": "physical", "power": 100, "accuracy": 75, "pp": 15 },
+              { "name": "roar", "type": "normal", "class": "status", "power": null, "accuracy": null, "pp": 20 }
+            ]
+          },
+          {
+            "id": 107,
+            "name": "hitmonchan",
+            "level": 55,
+            "totalHp": 142,
+            "currentHp": 142,
+            "types": ["fighting"],
+            "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/107.png",
+            "backSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/107.png",
+            "cry": "https://raw.githubusercontent.com/PokeAPI/cries/main/cries/pokemon/latest/107.ogg",
+            "stats": [
+              { "name": "hp", "base_stat": 50, "stat": 142 },
+              { "name": "attack", "base_stat": 105, "stat": 139 },
+              { "name": "defense", "base_stat": 79, "stat": 111 },
+              { "name": "special-attack", "base_stat": 35, "stat": 62 },
+              { "name": "special-defense", "base_stat": 110, "stat": 145 },
+              { "name": "speed", "base_stat": 76, "stat": 107 }
+            ],
+            "moves": [
+              { "name": "fire-punch", "type": "fire", "class": "physical", "power": 75, "accuracy": 100, "pp": 15 },
+              { "name": "ice-punch", "type": "ice", "class": "physical", "power": 75, "accuracy": 100, "pp": 15 },
+              { "name": "thunder-punch", "type": "electric", "class": "physical", "power": 75, "accuracy": 100, "pp": 15 },
+              { "name": "sky-upper-cut", "type": "fighting", "class": "physical", "power": 85, "accuracy": 90, "pp": 15 }
+            ]
+          },
+          {
+            "id": 106,
+            "name": "hitmonlee",
+            "level": 55,
+            "totalHp": 142,
+            "currentHp": 142,
+            "types": ["fighting"],
+            "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/106.png",
+            "backSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/106.png",
+            "cry": "https://raw.githubusercontent.com/PokeAPI/cries/main/cries/pokemon/latest/106.ogg",
+            "stats": [
+              { "name": "hp", "base_stat": 50, "stat": 142 },
+              { "name": "attack", "base_stat": 120, "stat": 156 },
+              { "name": "defense", "base_stat": 53, "stat": 82 },
+              { "name": "special-attack", "base_stat": 35, "stat": 62 },
+              { "name": "special-defense", "base_stat": 110, "stat": 145 },
+              { "name": "speed", "base_stat": 87, "stat": 120 }
+            ],
+            "moves": [
+              { "name": "mega-kick", "type": "normal", "class": "physical", "power": 120, "accuracy": 75, "pp": 5 },
+              { "name": "jump-kick", "type": "fighting", "class": "physical", "power": 100, "accuracy": 95, "pp": 10 },
+              { "name": "brick-break", "type": "fighting", "class": "physical", "power": 75, "accuracy": 100, "pp": 15 },
+              { "name": "swagger", "type": "normal", "class": "status", "power": null, "accuracy": 85, "pp": 15 }
+            ]
+          },
+          {
+            "id": 68,
+            "name": "machamp",
+            "level": 58,
+            "totalHp": 184,
+            "currentHp": 184,
+            "types": ["fighting"],
+            "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/68.png",
+            "backSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/68.png",
+            "cry": "https://raw.githubusercontent.com/PokeAPI/cries/main/cries/pokemon/latest/68.ogg",
+            "stats": [
+              { "name": "hp", "base_stat": 90, "stat": 184 },
+              { "name": "attack", "base_stat": 130, "stat": 176 },
+              { "name": "defense", "base_stat": 80, "stat": 118 },
+              { "name": "special-attack", "base_stat": 65, "stat": 100 },
+              { "name": "special-defense", "base_stat": 85, "stat": 124 },
+              { "name": "speed", "base_stat": 55, "stat": 89 }
+            ],
+            "moves": [
+              { "name": "cross-chop", "type": "fighting", "class": "physical", "power": 100, "accuracy": 80, "pp": 5 },
+              { "name": "rock-slide", "type": "rock", "class": "physical", "power": 75, "accuracy": 90, "pp": 10 },
+              { "name": "scary-face", "type": "normal", "class": "status", "power": null, "accuracy": 100, "pp": 10 },
+              { "name": "revenge", "type": "fighting", "class": "physical", "power": 60, "accuracy": 100, "pp": 10 }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "Agatha",
+        "type": "Ghost",
+        "team": [
+          {
+            "id": 94,
+            "name": "gengar",
+            "level": 56,
+            "totalHp": 150,
+            "currentHp": 150,
+            "types": ["ghost", "poison"],
+            "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/94.png",
+            "backSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/94.png",
+            "cry": "https://raw.githubusercontent.com/PokeAPI/cries/main/cries/pokemon/latest/94.ogg",
+            "stats": [
+              { "name": "hp", "base_stat": 60, "stat": 150 },
+              { "name": "attack", "base_stat": 65, "stat": 97 },
+              { "name": "defense", "base_stat": 60, "stat": 91 },
+              { "name": "special-attack", "base_stat": 130, "stat": 169 },
+              { "name": "special-defense", "base_stat": 75, "stat": 108 },
+              { "name": "speed", "base_stat": 110, "stat": 147 }
+            ],
+            "moves": [
+              { "name": "shadow-ball", "type": "ghost", "class": "special", "power": 80, "accuracy": 100, "pp": 15 },
+              { "name": "sludge-bomb", "type": "poison", "class": "special", "power": 90, "accuracy": 100, "pp": 10 },
+              { "name": "hypnosis", "type": "psychic", "class": "status", "power": null, "accuracy": 60, "pp": 20 },
+              { "name": "dream-eater", "type": "psychic", "class": "special", "power": 100, "accuracy": 100, "pp": 15 }
+            ]
+          },
+          {
+            "id": 42,
+            "name": "golbat",
+            "level": 56,
+            "totalHp": 167,
+            "currentHp": 167,
+            "types": ["poison", "flying"],
+            "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/42.png",
+            "backSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/42.png",
+            "cry": "https://raw.githubusercontent.com/PokeAPI/cries/main/cries/pokemon/latest/42.ogg",
+            "stats": [
+              { "name": "hp", "base_stat": 75, "stat": 167 },
+              { "name": "attack", "base_stat": 80, "stat": 114 },
+              { "name": "defense", "base_stat": 70, "stat": 103 },
+              { "name": "special-attack", "base_stat": 65, "stat": 97 },
+              { "name": "special-defense", "base_stat": 75, "stat": 108 },
+              { "name": "speed", "base_stat": 90, "stat": 125 }
+            ],
+            "moves": [
+              { "name": "air-cutter", "type": "flying", "class": "special", "power": 60, "accuracy": 95, "pp": 25 },
+              { "name": "poison-fang", "type": "poison", "class": "physical", "power": 50, "accuracy": 100, "pp": 15 },
+              { "name": "confuse-ray", "type": "ghost", "class": "status", "power": null, "accuracy": 100, "pp": 10 },
+              { "name": "bite", "type": "dark", "class": "physical", "power": 60, "accuracy": 100, "pp": 25 }
+            ]
+          },
+          {
+            "id": 93,
+            "name": "haunter",
+            "level": 55,
+            "totalHp": 137,
+            "currentHp": 137,
+            "types": ["ghost", "poison"],
+            "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/93.png",
+            "backSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/93.png",
+            "cry": "https://raw.githubusercontent.com/PokeAPI/cries/main/cries/pokemon/latest/93.ogg",
+            "stats": [
+              { "name": "hp", "base_stat": 45, "stat": 137 },
+              { "name": "attack", "base_stat": 50, "stat": 79 },
+              { "name": "defense", "base_stat": 45, "stat": 73 },
+              { "name": "special-attack", "base_stat": 115, "stat": 149 },
+              { "name": "special-defense", "base_stat": 55, "stat": 84 },
+              { "name": "speed", "base_stat": 95, "stat": 128 }
+            ],
+            "moves": [
+              { "name": "shadow-punch", "type": "ghost", "class": "physical", "power": 60, "accuracy": null, "pp": 20 },
+              { "name": "curse", "type": "ghost", "class": "status", "power": null, "accuracy": null, "pp": 10 },
+              { "name": "hypnosis", "type": "psychic", "class": "status", "power": null, "accuracy": 60, "pp": 20 },
+              { "name": "dream-eater", "type": "psychic", "class": "special", "power": 100, "accuracy": 100, "pp": 15 }
+            ]
+          },
+          {
+            "id": 24,
+            "name": "arbok",
+            "level": 58,
+            "totalHp": 156,
+            "currentHp": 156,
+            "types": ["poison"],
+            "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/24.png",
+            "backSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/24.png",
+            "cry": "https://raw.githubusercontent.com/PokeAPI/cries/main/cries/pokemon/latest/24.ogg",
+            "stats": [
+              { "name": "hp", "base_stat": 60, "stat": 156 },
+              { "name": "attack", "base_stat": 95, "stat": 135 },
+              { "name": "defense", "base_stat": 69, "stat": 105 },
+              { "name": "special-attack", "base_stat": 65, "stat": 100 },
+              { "name": "special-defense", "base_stat": 79, "stat": 117 },
+              { "name": "speed", "base_stat": 80, "stat": 118 }
+            ],
+            "moves": [
+              { "name": "sludge-bomb", "type": "poison", "class": "special", "power": 90, "accuracy": 100, "pp": 10 },
+              { "name": "bite", "type": "dark", "class": "physical", "power": 60, "accuracy": 100, "pp": 25 },
+              { "name": "screech", "type": "normal", "class": "status", "power": null, "accuracy": 85, "pp": 40 },
+              { "name": "glare", "type": "normal", "class": "status", "power": null, "accuracy": 100, "pp": 30 }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "Lance",
+        "type": "Dragon",
+        "team": [
+          {
+            "id": 130,
+            "name": "gyarados",
+            "level": 58,
+            "totalHp": 196,
+            "currentHp": 196,
+            "types": ["water", "flying"],
+            "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/130.png",
+            "backSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/130.png",
+            "cry": "https://raw.githubusercontent.com/PokeAPI/cries/main/cries/pokemon/latest/130.ogg",
+            "stats": [
+              { "name": "hp", "base_stat": 95, "stat": 196 },
+              { "name": "attack", "base_stat": 125, "stat": 170 },
+              { "name": "defense", "base_stat": 79, "stat": 117 },
+              { "name": "special-attack", "base_stat": 60, "stat": 95 },
+              { "name": "special-defense", "base_stat": 100, "stat": 141 },
+              { "name": "speed", "base_stat": 81, "stat": 119 }
+            ],
+            "moves": [
+              { "name": "dragon-rage", "type": "dragon", "class": "special", "power": null, "accuracy": 100, "pp": 10 },
+              { "name": "twister", "type": "dragon", "class": "special", "power": 40, "accuracy": 100, "pp": 20 },
+              { "name": "hyper-beam", "type": "normal", "class": "special", "power": 150, "accuracy": 90, "pp": 5 },
+              { "name": "bite", "type": "dark", "class": "physical", "power": 60, "accuracy": 100, "pp": 25 }
+            ]
+          },
+          {
+            "id": 148,
+            "name": "dragonair",
+            "level": 56,
+            "totalHp": 152,
+            "currentHp": 152,
+            "types": ["dragon"],
+            "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/148.png",
+            "backSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/148.png",
+            "cry": "https://raw.githubusercontent.com/PokeAPI/cries/main/cries/pokemon/latest/148.ogg",
+            "stats": [
+              { "name": "hp", "base_stat": 61, "stat": 152 },
+              { "name": "attack", "base_stat": 84, "stat": 118 },
+              { "name": "defense", "base_stat": 65, "stat": 97 },
+              { "name": "special-attack", "base_stat": 70, "stat": 103 },
+              { "name": "special-defense", "base_stat": 70, "stat": 103 },
+              { "name": "speed", "base_stat": 70, "stat": 103 }
+            ],
+            "moves": [
+              { "name": "outrage", "type": "dragon", "class": "physical", "power": 120, "accuracy": 100, "pp": 10 },
+              { "name": "dragon-rage", "type": "dragon", "class": "special", "power": null, "accuracy": 100, "pp": 10 },
+              { "name": "safeguard", "type": "normal", "class": "status", "power": null, "accuracy": null, "pp": 25 },
+              { "name": "hyper-beam", "type": "normal", "class": "special", "power": 150, "accuracy": 90, "pp": 5 }
+            ]
+          },
+          {
+            "id": 142,
+            "name": "aerodactyl",
+            "level": 60,
+            "totalHp": 185,
+            "currentHp": 185,
+            "types": ["rock", "flying"],
+            "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/142.png",
+            "backSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/142.png",
+            "cry": "https://raw.githubusercontent.com/PokeAPI/cries/main/cries/pokemon/latest/142.ogg",
+            "stats": [
+              { "name": "hp", "base_stat": 80, "stat": 185 },
+              { "name": "attack", "base_stat": 105, "stat": 152 },
+              { "name": "defense", "base_stat": 65, "stat": 104 },
+              { "name": "special-attack", "base_stat": 60, "stat": 98 },
+              { "name": "special-defense", "base_stat": 75, "stat": 116 },
+              { "name": "speed", "base_stat": 130, "stat": 182 }
+            ],
+            "moves": [
+              { "name": "rock-slide", "type": "rock", "class": "physical", "power": 75, "accuracy": 90, "pp": 10 },
+              { "name": "wing-attack", "type": "flying", "class": "physical", "power": 60, "accuracy": 100, "pp": 35 },
+              { "name": "scary-face", "type": "normal", "class": "status", "power": null, "accuracy": 100, "pp": 10 },
+              { "name": "hyper-beam", "type": "normal", "class": "special", "power": 150, "accuracy": 90, "pp": 5 }
+            ]
+          },
+          {
+            "id": 149,
+            "name": "dragonite",
+            "level": 62,
+            "totalHp": 204,
+            "currentHp": 204,
+            "types": ["dragon", "flying"],
+            "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/149.png",
+            "backSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/149.png",
+            "cry": "https://raw.githubusercontent.com/PokeAPI/cries/main/cries/pokemon/latest/149.ogg",
+            "stats": [
+              { "name": "hp", "base_stat": 91, "stat": 204 },
+              { "name": "attack", "base_stat": 134, "stat": 193 },
+              { "name": "defense", "base_stat": 95, "stat": 145 },
+              { "name": "special-attack", "base_stat": 100, "stat": 151 },
+              { "name": "special-defense", "base_stat": 100, "stat": 151 },
+              { "name": "speed", "base_stat": 80, "stat": 126 }
+            ],
+            "moves": [
+              { "name": "outrage", "type": "dragon", "class": "physical", "power": 120, "accuracy": 100, "pp": 10 },
+              { "name": "fire-blast", "type": "fire", "class": "special", "power": 110, "accuracy": 85, "pp": 5 },
+              { "name": "safeguard", "type": "normal", "class": "status", "power": null, "accuracy": null, "pp": 25 },
+              { "name": "hyper-beam", "type": "normal", "class": "special", "power": 150, "accuracy": 90, "pp": 5 }
+            ]
+          }
+        ]
+      }
     ],
     "champion": {
-      "name": "Blue", "type": "Varied", "team": ["Pidgeot", "Alakazam", "Rhydon", "Exeggutor", "Arcanine", "Blastoise"]
+      "name": "Blue",
+      "type": "Varied",
+      "team": [
+        {
+          "id": 18,
+          "name": "pidgeot",
+          "level": 61,
+          "totalHp": 191,
+          "currentHp": 191,
+          "types": ["normal", "flying"],
+          "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/18.png",
+          "backSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/18.png",
+          "cry": "https://raw.githubusercontent.com/PokeAPI/cries/main/cries/pokemon/latest/18.ogg",
+          "stats": [
+            { "name": "hp", "base_stat": 83, "stat": 191 },
+            { "name": "attack", "base_stat": 80, "stat": 124 },
+            { "name": "defense", "base_stat": 75, "stat": 118 },
+            { "name": "special-attack", "base_stat": 70, "stat": 112 },
+            { "name": "special-defense", "base_stat": 70, "stat": 112 },
+            { "name": "speed", "base_stat": 101, "stat": 149 }
+          ],
+          "moves": [
+            { "name": "aerial-ace", "type": "flying", "class": "physical", "power": 60, "accuracy": null, "pp": 20 },
+            { "name": "feather-dance", "type": "flying", "class": "status", "power": null, "accuracy": 100, "pp": 15 },
+            { "name": "sand-attack", "type": "ground", "class": "status", "power": null, "accuracy": 100, "pp": 15 },
+            { "name": "whirlwind", "type": "normal", "class": "status", "power": null, "accuracy": null, "pp": 20 }
+          ]
+        },
+        {
+          "id": 65,
+          "name": "alakazam",
+          "level": 59,
+          "totalHp": 146,
+          "currentHp": 146,
+          "types": ["psychic"],
+          "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/65.png",
+          "backSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/65.png",
+          "cry": "https://raw.githubusercontent.com/PokeAPI/cries/main/cries/pokemon/latest/65.ogg",
+          "stats": [
+            { "name": "hp", "base_stat": 55, "stat": 146 },
+            { "name": "attack", "base_stat": 50, "stat": 73 },
+            { "name": "defense", "base_stat": 45, "stat": 67 },
+            { "name": "special-attack", "base_stat": 135, "stat": 182 },
+            { "name": "special-defense", "base_stat": 95, "stat": 132 },
+            { "name": "speed", "base_stat": 120, "stat": 164 }
+          ],
+          "moves": [
+            { "name": "psychic", "type": "psychic", "class": "special", "power": 90, "accuracy": 100, "pp": 10 },
+            { "name": "shadow-ball", "type": "ghost", "class": "special", "power": 80, "accuracy": 100, "pp": 15 },
+            { "name": "reflect", "type": "psychic", "class": "status", "power": null, "accuracy": null, "pp": 20 },
+            { "name": "future-sight", "type": "psychic", "class": "special", "power": 120, "accuracy": 100, "pp": 10 }
+          ]
+        },
+        {
+          "id": 112,
+          "name": "rhydon",
+          "level": 61,
+          "totalHp": 218,
+          "currentHp": 218,
+          "types": ["ground", "rock"],
+          "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/112.png",
+          "backSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/112.png",
+          "cry": "https://raw.githubusercontent.com/PokeAPI/cries/main/cries/pokemon/latest/112.ogg",
+          "stats": [
+            { "name": "hp", "base_stat": 105, "stat": 218 },
+            { "name": "attack", "base_stat": 130, "stat": 184 },
+            { "name": "defense", "base_stat": 120, "stat": 172 },
+            { "name": "special-attack", "base_stat": 45, "stat": 70 },
+            { "name": "special-defense", "base_stat": 45, "stat": 70 },
+            { "name": "speed", "base_stat": 40, "stat": 64 }
+          ],
+          "moves": [
+            { "name": "earthquake", "type": "ground", "class": "physical", "power": 100, "accuracy": 100, "pp": 10 },
+            { "name": "rock-tomb", "type": "rock", "class": "physical", "power": 60, "accuracy": 95, "pp": 15 },
+            { "name": "scary-face", "type": "normal", "class": "status", "power": null, "accuracy": 100, "pp": 10 },
+            { "name": "horn-drill", "type": "normal", "class": "physical", "power": null, "accuracy": 30, "pp": 5 }
+          ]
+        },
+        {
+          "id": 103,
+          "name": "exeggutor",
+          "level": 59,
+          "totalHp": 199,
+          "currentHp": 199,
+          "types": ["grass", "psychic"],
+          "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/103.png",
+          "backSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/103.png",
+          "cry": "https://raw.githubusercontent.com/PokeAPI/cries/main/cries/pokemon/latest/103.ogg",
+          "stats": [
+            { "name": "hp", "base_stat": 95, "stat": 199 },
+            { "name": "attack", "base_stat": 95, "stat": 132 },
+            { "name": "defense", "base_stat": 85, "stat": 120 },
+            { "name": "special-attack", "base_stat": 125, "stat": 169 },
+            { "name": "special-defense", "base_stat": 75, "stat": 108 },
+            { "name": "speed", "base_stat": 55, "stat": 84 }
+          ],
+          "moves": [
+            { "name": "giga-drain", "type": "grass", "class": "special", "power": 75, "accuracy": 100, "pp": 10 },
+            { "name": "psychic", "type": "psychic", "class": "special", "power": 90, "accuracy": 100, "pp": 10 },
+            { "name": "hypnosis", "type": "psychic", "class": "status", "power": null, "accuracy": 60, "pp": 20 },
+            { "name": "egg-bomb", "type": "normal", "class": "physical", "power": 100, "accuracy": 75, "pp": 10 }
+          ]
+        },
+        {
+          "id": 59,
+          "name": "arcanine",
+          "level": 61,
+          "totalHp": 198,
+          "currentHp": 198,
+          "types": ["fire"],
+          "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/59.png",
+          "backSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/59.png",
+          "cry": "https://raw.githubusercontent.com/PokeAPI/cries/main/cries/pokemon/latest/59.ogg",
+          "stats": [
+            { "name": "hp", "base_stat": 90, "stat": 198 },
+            { "name": "attack", "base_stat": 110, "stat": 160 },
+            { "name": "defense", "base_stat": 80, "stat": 120 },
+            { "name": "special-attack", "base_stat": 100, "stat": 148 },
+            { "name": "special-defense", "base_stat": 80, "stat": 120 },
+            { "name": "speed", "base_stat": 95, "stat": 141 }
+          ],
+          "moves": [
+            { "name": "extreme-speed", "type": "normal", "class": "physical", "power": 80, "accuracy": 100, "pp": 5 },
+            { "name": "flamethrower", "type": "fire", "class": "special", "power": 90, "accuracy": 100, "pp": 15 },
+            { "name": "bite", "type": "dark", "class": "physical", "power": 60, "accuracy": 100, "pp": 25 },
+            { "name": "roar", "type": "normal", "class": "status", "power": null, "accuracy": null, "pp": 20 }
+          ]
+        },
+        {
+          "id": 9,
+          "name": "blastoise",
+          "level": 65,
+          "totalHp": 208,
+          "currentHp": 208,
+          "types": ["water"],
+          "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/9.png",
+          "backSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/9.png",
+          "cry": "https://raw.githubusercontent.com/PokeAPI/cries/main/cries/pokemon/latest/9.ogg",
+          "stats": [
+            { "name": "hp", "base_stat": 79, "stat": 208 },
+            { "name": "attack", "base_stat": 83, "stat": 139 },
+            { "name": "defense", "base_stat": 100, "stat": 162 },
+            { "name": "special-attack", "base_stat": 85, "stat": 141 },
+            { "name": "special-defense", "base_stat": 105, "stat": 169 },
+            { "name": "speed", "base_stat": 78, "stat": 131 }
+          ],
+          "moves": [
+            { "name": "hydro-pump", "type": "water", "class": "special", "power": 110, "accuracy": 80, "pp": 5 },
+            { "name": "rain-dance", "type": "water", "class": "status", "power": null, "accuracy": null, "pp": 5 },
+            { "name": "skull-bash", "type": "normal", "class": "physical", "power": 130, "accuracy": 100, "pp": 10 },
+            { "name": "bite", "type": "dark", "class": "physical", "power": 60, "accuracy": 100, "pp": 25 }
+          ]
+        }
+      ]
     }
   },
   "johto": {
     "gym_leaders": [
-      { "name": "Falkner", "type": "Flying", "team": ["Pidgey", "Pidgeotto"] },
-      { "name": "Bugsy", "type": "Bug", "team": ["Scyther", "Metapod", "Kakuna"] },
-      { "name": "Whitney", "type": "Normal", "team": ["Clefairy", "Miltank"] },
-      { "name": "Morty", "type": "Ghost", "team": ["Gastly", "Haunter", "Haunter", "Gengar"] },
-      { "name": "Chuck", "type": "Fighting", "team": ["Primeape", "Poliwrath"] },
-      { "name": "Jasmine", "type": "Steel", "team": ["Magnemite", "Magnemite", "Steelix"] },
-      { "name": "Pryce", "type": "Ice", "team": ["Seel", "Dewgong", "Piloswine"] },
-      { "name": "Clair", "type": "Dragon", "team": ["Dragonair", "Dragonair", "Dragonair", "Kingdra"] }
+      {
+        "name": "Falkner",
+        "type": "Flying",
+        "badge": "Zephyr Badge",
+        "team": [
+          {
+            "id": 16,
+            "name": "pidgey",
+            "level": 7,
+            "totalHp": 21,
+            "currentHp": 21,
+            "types": ["normal", "flying"],
+            "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/16.png",
+            "backSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/16.png",
+            "cry": "https://raw.githubusercontent.com/PokeAPI/cries/main/cries/pokemon/latest/16.ogg",
+            "stats": [
+              { "name": "hp", "base_stat": 40, "stat": 21 },
+              { "name": "attack", "base_stat": 45, "stat": 12 },
+              { "name": "defense", "base_stat": 40, "stat": 11 },
+              { "name": "special-attack", "base_stat": 35, "stat": 10 },
+              { "name": "special-defense", "base_stat": 35, "stat": 10 },
+              { "name": "speed", "base_stat": 56, "stat": 14 }
+            ],
+            "moves": [
+              { "name": "tackle", "type": "normal", "class": "physical", "power": 40, "accuracy": 100, "pp": 35 },
+              { "name": "mud-slap", "type": "ground", "class": "special", "power": 20, "accuracy": 100, "pp": 10 }
+            ]
+          },
+          {
+            "id": 17,
+            "name": "pidgeotto",
+            "level": 9,
+            "totalHp": 29,
+            "currentHp": 29,
+            "types": ["normal", "flying"],
+            "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/17.png",
+            "backSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/17.png",
+            "cry": "https://raw.githubusercontent.com/PokeAPI/cries/main/cries/pokemon/latest/17.ogg",
+            "stats": [
+              { "name": "hp", "base_stat": 63, "stat": 29 },
+              { "name": "attack", "base_stat": 60, "stat": 17 },
+              { "name": "defense", "base_stat": 55, "stat": 16 },
+              { "name": "special-attack", "base_stat": 50, "stat": 15 },
+              { "name": "special-defense", "base_stat": 50, "stat": 15 },
+              { "name": "speed", "base_stat": 71, "stat": 19 }
+            ],
+            "moves": [
+              { "name": "gust", "type": "flying", "class": "special", "power": 40, "accuracy": 100, "pp": 35 },
+              { "name": "quick-attack", "type": "normal", "class": "physical", "power": 40, "accuracy": 100, "pp": 30 },
+              { "name": "mud-slap", "type": "ground", "class": "special", "power": 20, "accuracy": 100, "pp": 10 }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "Bugsy",
+        "type": "Bug",
+        "badge": "Hive Badge",
+        "team": [
+          {
+            "id": 11,
+            "name": "metapod",
+            "level": 14,
+            "totalHp": 38,
+            "currentHp": 38,
+            "types": ["bug"],
+            "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/11.png",
+            "backSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/11.png",
+            "cry": "https://raw.githubusercontent.com/PokeAPI/cries/main/cries/pokemon/latest/11.ogg",
+            "stats": [
+              { "name": "hp", "base_stat": 50, "stat": 38 },
+              { "name": "attack", "base_stat": 20, "stat": 11 },
+              { "name": "defense", "base_stat": 55, "stat": 21 },
+              { "name": "special-attack", "base_stat": 25, "stat": 12 },
+              { "name": "special-defense", "base_stat": 25, "stat": 12 },
+              { "name": "speed", "base_stat": 30, "stat": 14 }
+            ],
+            "moves": [
+              { "name": "harden", "type": "normal", "class": "status", "power": null, "accuracy": null, "pp": 30 }
+            ]
+          },
+          {
+            "id": 14,
+            "name": "kakuna",
+            "level": 14,
+            "totalHp": 36,
+            "currentHp": 36,
+            "types": ["bug", "poison"],
+            "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/14.png",
+            "backSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/14.png",
+            "cry": "https://raw.githubusercontent.com/PokeAPI/cries/main/cries/pokemon/latest/14.ogg",
+            "stats": [
+              { "name": "hp", "base_stat": 45, "stat": 36 },
+              { "name": "attack", "base_stat": 25, "stat": 12 },
+              { "name": "defense", "base_stat": 50, "stat": 19 },
+              { "name": "special-attack", "base_stat": 25, "stat": 12 },
+              { "name": "special-defense", "base_stat": 25, "stat": 12 },
+              { "name": "speed", "base_stat": 35, "stat": 15 }
+            ],
+            "moves": [
+              { "name": "harden", "type": "normal", "class": "status", "power": null, "accuracy": null, "pp": 30 }
+            ]
+          },
+          {
+            "id": 123,
+            "name": "scyther",
+            "level": 16,
+            "totalHp": 51,
+            "currentHp": 51,
+            "types": ["bug", "flying"],
+            "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/123.png",
+            "backSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/123.png",
+            "cry": "https://raw.githubusercontent.com/PokeAPI/cries/main/cries/pokemon/latest/123.ogg",
+            "stats": [
+              { "name": "hp", "base_stat": 70, "stat": 51 },
+              { "name": "attack", "base_stat": 110, "stat": 44 },
+              { "name": "defense", "base_stat": 80, "stat": 34 },
+              { "name": "special-attack", "base_stat": 55, "stat": 25 },
+              { "name": "special-defense", "base_stat": 80, "stat": 34 },
+              { "name": "speed", "base_stat": 105, "stat": 42 }
+            ],
+            "moves": [
+              { "name": "fury-cutter", "type": "bug", "class": "physical", "power": 40, "accuracy": 95, "pp": 20 },
+              { "name": "quick-attack", "type": "normal", "class": "physical", "power": 40, "accuracy": 100, "pp": 30 },
+              { "name": "leer", "type": "normal", "class": "status", "power": null, "accuracy": 100, "pp": 30 }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "Whitney",
+        "type": "Normal",
+        "badge": "Plain Badge",
+        "team": [
+          {
+            "id": 35,
+            "name": "clefairy",
+            "level": 18,
+            "totalHp": 58,
+            "currentHp": 58,
+            "types": ["fairy"],
+            "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/35.png",
+            "backSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/35.png",
+            "cry": "https://raw.githubusercontent.com/PokeAPI/cries/main/cries/pokemon/latest/35.ogg",
+            "stats": [
+              { "name": "hp", "base_stat": 70, "stat": 58 },
+              { "name": "attack", "base_stat": 45, "stat": 24 },
+              { "name": "defense", "base_stat": 48, "stat": 25 },
+              { "name": "special-attack", "base_stat": 60, "stat": 30 },
+              { "name": "special-defense", "base_stat": 65, "stat": 32 },
+              { "name": "speed", "base_stat": 35, "stat": 20 }
+            ],
+            "moves": [
+              { "name": "metronome", "type": "normal", "class": "status", "power": null, "accuracy": null, "pp": 10 },
+              { "name": "encore", "type": "normal", "class": "status", "power": null, "accuracy": 100, "pp": 5 },
+              { "name": "mimic", "type": "normal", "class": "status", "power": null, "accuracy": null, "pp": 10 },
+              { "name": "doubleslap", "type": "normal", "class": "physical", "power": 15, "accuracy": 85, "pp": 10 }
+            ]
+          },
+          {
+            "id": 241,
+            "name": "miltank",
+            "level": 20,
+            "totalHp": 71,
+            "currentHp": 71,
+            "types": ["normal"],
+            "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/241.png",
+            "backSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/241.png",
+            "cry": "https://raw.githubusercontent.com/PokeAPI/cries/main/cries/pokemon/latest/241.ogg",
+            "stats": [
+              { "name": "hp", "base_stat": 95, "stat": 71 },
+              { "name": "attack", "base_stat": 80, "stat": 41 },
+              { "name": "defense", "base_stat": 105, "stat": 51 },
+              { "name": "special-attack", "base_stat": 40, "stat": 23 },
+              { "name": "special-defense", "base_stat": 70, "stat": 36 },
+              { "name": "speed", "base_stat": 100, "stat": 49 }
+            ],
+            "moves": [
+              { "name": "rollout", "type": "rock", "class": "physical", "power": 30, "accuracy": 90, "pp": 20 },
+              { "name": "attract", "type": "normal", "class": "status", "power": null, "accuracy": 100, "pp": 15 },
+              { "name": "stomp", "type": "normal", "class": "physical", "power": 65, "accuracy": 100, "pp": 20 },
+              { "name": "milk-drink", "type": "normal", "class": "status", "power": null, "accuracy": null, "pp": 10 }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "Morty",
+        "type": "Ghost",
+        "badge": "Fog Badge",
+        "team": [
+          {
+            "id": 92,
+            "name": "gastly",
+            "level": 21,
+            "totalHp": 48,
+            "currentHp": 48,
+            "types": ["ghost", "poison"],
+            "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/92.png",
+            "backSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/92.png",
+            "cry": "https://raw.githubusercontent.com/PokeAPI/cries/main/cries/pokemon/latest/92.ogg",
+            "stats": [
+              { "name": "hp", "base_stat": 30, "stat": 48 },
+              { "name": "attack", "base_stat": 35, "stat": 22 },
+              { "name": "defense", "base_stat": 30, "stat": 19 },
+              { "name": "special-attack", "base_stat": 100, "stat": 53 },
+              { "name": "special-defense", "base_stat": 35, "stat": 22 },
+              { "name": "speed", "base_stat": 80, "stat": 43 }
+            ],
+            "moves": [
+              { "name": "lick", "type": "ghost", "class": "physical", "power": 30, "accuracy": 100, "pp": 30 },
+              { "name": "spite", "type": "ghost", "class": "status", "power": null, "accuracy": 100, "pp": 10 },
+              { "name": "curse", "type": "ghost", "class": "status", "power": null, "accuracy": null, "pp": 10 },
+              { "name": "mean-look", "type": "normal", "class": "status", "power": null, "accuracy": null, "pp": 5 }
+            ]
+          },
+          {
+            "id": 93,
+            "name": "haunter",
+            "level": 23,
+            "totalHp": 57,
+            "currentHp": 57,
+            "types": ["ghost", "poison"],
+            "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/93.png",
+            "backSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/93.png",
+            "cry": "https://raw.githubusercontent.com/PokeAPI/cries/main/cries/pokemon/latest/93.ogg",
+            "stats": [
+              { "name": "hp", "base_stat": 45, "stat": 57 },
+              { "name": "attack", "base_stat": 50, "stat": 31 },
+              { "name": "defense", "base_stat": 45, "stat": 28 },
+              { "name": "special-attack", "base_stat": 115, "stat": 66 },
+              { "name": "special-defense", "base_stat": 55, "stat": 34 },
+              { "name": "speed", "base_stat": 95, "stat": 56 }
+            ],
+            "moves": [
+              { "name": "hypnosis", "type": "psychic", "class": "status", "power": null, "accuracy": 60, "pp": 20 },
+              { "name": "dream-eater", "type": "psychic", "class": "special", "power": 100, "accuracy": 100, "pp": 15 },
+              { "name": "curse", "type": "ghost", "class": "status", "power": null, "accuracy": null, "pp": 10 },
+              { "name": "night-shade", "type": "ghost", "class": "special", "power": null, "accuracy": 100, "pp": 15 }
+            ]
+          },
+          {
+            "id": 94,
+            "name": "gengar",
+            "level": 25,
+            "totalHp": 72,
+            "currentHp": 72,
+            "types": ["ghost", "poison"],
+            "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/94.png",
+            "backSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/94.png",
+            "cry": "https://raw.githubusercontent.com/PokeAPI/cries/main/cries/pokemon/latest/94.ogg",
+            "stats": [
+              { "name": "hp", "base_stat": 60, "stat": 72 },
+              { "name": "attack", "base_stat": 65, "stat": 42 },
+              { "name": "defense", "base_stat": 60, "stat": 39 },
+              { "name": "special-attack", "base_stat": 130, "stat": 78 },
+              { "name": "special-defense", "base_stat": 75, "stat": 47 },
+              { "name": "speed", "base_stat": 110, "stat": 67 }
+            ],
+            "moves": [
+              { "name": "shadow-ball", "type": "ghost", "class": "special", "power": 80, "accuracy": 100, "pp": 15 },
+              { "name": "hypnosis", "type": "psychic", "class": "status", "power": null, "accuracy": 60, "pp": 20 },
+              { "name": "mean-look", "type": "normal", "class": "status", "power": null, "accuracy": null, "pp": 5 },
+              { "name": "dream-eater", "type": "psychic", "class": "special", "power": 100, "accuracy": 100, "pp": 15 }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "Chuck",
+        "type": "Fighting",
+        "badge": "Storm Badge",
+        "team": [
+          {
+            "id": 57,
+            "name": "primeape",
+            "level": 27,
+            "totalHp": 81,
+            "currentHp": 81,
+            "types": ["fighting"],
+            "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/57.png",
+            "backSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/57.png",
+            "cry": "https://raw.githubusercontent.com/PokeAPI/cries/main/cries/pokemon/latest/57.ogg",
+            "stats": [
+              { "name": "hp", "base_stat": 65, "stat": 81 },
+              { "name": "attack", "base_stat": 105, "stat": 68 },
+              { "name": "defense", "base_stat": 60, "stat": 42 },
+              { "name": "special-attack", "base_stat": 60, "stat": 42 },
+              { "name": "special-defense", "base_stat": 70, "stat": 48 },
+              { "name": "speed", "base_stat": 95, "stat": 62 }
+            ],
+            "moves": [
+              { "name": "karate-chop", "type": "fighting", "class": "physical", "power": 52, "accuracy": 100, "pp": 25 },
+              { "name": "rage", "type": "normal", "class": "physical", "power": 20, "accuracy": 100, "pp": 20 },
+              { "name": "fury-swipes", "type": "normal", "class": "physical", "power": 18, "accuracy": 80, "pp": 15 },
+              { "name": "focus-energy", "type": "normal", "class": "status", "power": null, "accuracy": null, "pp": 30 }
+            ]
+          },
+          {
+            "id": 62,
+            "name": "poliwrath",
+            "level": 30,
+            "totalHp": 100,
+            "currentHp": 100,
+            "types": ["water", "fighting"],
+            "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/62.png",
+            "backSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/62.png",
+            "cry": "https://raw.githubusercontent.com/PokeAPI/cries/main/cries/pokemon/latest/62.ogg",
+            "stats": [
+              { "name": "hp", "base_stat": 90, "stat": 100 },
+              { "name": "attack", "base_stat": 95, "stat": 69 },
+              { "name": "defense", "base_stat": 95, "stat": 69 },
+              { "name": "special-attack", "base_stat": 70, "stat": 54 },
+              { "name": "special-defense", "base_stat": 90, "stat": 66 },
+              { "name": "speed", "base_stat": 70, "stat": 54 }
+            ],
+            "moves": [
+              { "name": "dynamic-punch", "type": "fighting", "class": "physical", "power": 100, "accuracy": 50, "pp": 5 },
+              { "name": "mind-reader", "type": "normal", "class": "status", "power": null, "accuracy": null, "pp": 5 },
+              { "name": "surf", "type": "water", "class": "special", "power": 90, "accuracy": 100, "pp": 15 },
+              { "name": "body-slam", "type": "normal", "class": "physical", "power": 85, "accuracy": 100, "pp": 15 }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "Jasmine",
+        "type": "Steel",
+        "badge": "Mineral Badge",
+        "team": [
+          {
+            "id": 81,
+            "name": "magnemite",
+            "level": 30,
+            "totalHp": 67,
+            "currentHp": 67,
+            "types": ["electric", "steel"],
+            "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/81.png",
+            "backSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/81.png",
+            "cry": "https://raw.githubusercontent.com/PokeAPI/cries/main/cries/pokemon/latest/81.ogg",
+            "stats": [
+              { "name": "hp", "base_stat": 25, "stat": 67 },
+              { "name": "attack", "base_stat": 35, "stat": 31 },
+              { "name": "defense", "base_stat": 70, "stat": 54 },
+              { "name": "special-attack", "base_stat": 95, "stat": 69 },
+              { "name": "special-defense", "base_stat": 55, "stat": 45 },
+              { "name": "speed", "base_stat": 45, "stat": 39 }
+            ],
+            "moves": [
+              { "name": "thunder-bolt", "type": "electric", "class": "special", "power": 90, "accuracy": 100, "pp": 15 },
+              { "name": "supersonic", "type": "normal", "class": "status", "power": null, "accuracy": 55, "pp": 20 },
+              { "name": "sonic-boom", "type": "normal", "class": "special", "power": null, "accuracy": 90, "pp": 20 }
+            ]
+          },
+          {
+            "id": 208,
+            "name": "steelix",
+            "level": 35,
+            "totalHp": 107,
+            "currentHp": 107,
+            "types": ["steel", "ground"],
+            "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/208.png",
+            "backSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/208.png",
+            "cry": "https://raw.githubusercontent.com/PokeAPI/cries/main/cries/pokemon/latest/208.ogg",
+            "stats": [
+              { "name": "hp", "base_stat": 75, "stat": 107 },
+              { "name": "attack", "base_stat": 85, "stat": 73 },
+              { "name": "defense", "base_stat": 200, "stat": 154 },
+              { "name": "special-attack", "base_stat": 55, "stat": 52 },
+              { "name": "special-defense", "base_stat": 65, "stat": 59 },
+              { "name": "speed", "base_stat": 30, "stat": 35 }
+            ],
+            "moves": [
+              { "name": "iron-tail", "type": "steel", "class": "physical", "power": 100, "accuracy": 75, "pp": 15 },
+              { "name": "rock-throw", "type": "rock", "class": "physical", "power": 50, "accuracy": 90, "pp": 15 },
+              { "name": "screech", "type": "normal", "class": "status", "power": null, "accuracy": 85, "pp": 40 },
+              { "name": "sandstorm", "type": "rock", "class": "status", "power": null, "accuracy": null, "pp": 10 }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "Pryce",
+        "type": "Ice",
+        "badge": "Glacier Badge",
+        "team": [
+          {
+            "id": 86,
+            "name": "seel",
+            "level": 27,
+            "totalHp": 81,
+            "currentHp": 81,
+            "types": ["water"],
+            "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/86.png",
+            "backSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/86.png",
+            "cry": "https://raw.githubusercontent.com/PokeAPI/cries/main/cries/pokemon/latest/86.ogg",
+            "stats": [
+              { "name": "hp", "base_stat": 65, "stat": 81 },
+              { "name": "attack", "base_stat": 45, "stat": 35 },
+              { "name": "defense", "base_stat": 55, "stat": 41 },
+              { "name": "special-attack", "base_stat": 45, "stat": 35 },
+              { "name": "special-defense", "base_stat": 70, "stat": 51 },
+              { "name": "speed", "base_stat": 45, "stat": 35 }
+            ],
+            "moves": [
+              { "name": "headbutt", "type": "normal", "class": "physical", "power": 70, "accuracy": 100, "pp": 15 },
+              { "name": "icy-wind", "type": "ice", "class": "special", "power": 55, "accuracy": 95, "pp": 15 },
+              { "name": "aurora-beam", "type": "ice", "class": "special", "power": 65, "accuracy": 100, "pp": 20 },
+              { "name": "rest", "type": "psychic", "class": "status", "power": null, "accuracy": null, "pp": 10 }
+            ]
+          },
+          {
+            "id": 87,
+            "name": "dewgong",
+            "level": 29,
+            "totalHp": 97,
+            "currentHp": 97,
+            "types": ["water", "ice"],
+            "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/87.png",
+            "backSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/87.png",
+            "cry": "https://raw.githubusercontent.com/PokeAPI/cries/main/cries/pokemon/latest/87.ogg",
+            "stats": [
+              { "name": "hp", "base_stat": 90, "stat": 97 },
+              { "name": "attack", "base_stat": 70, "stat": 54 },
+              { "name": "defense", "base_stat": 80, "stat": 60 },
+              { "name": "special-attack", "base_stat": 70, "stat": 54 },
+              { "name": "special-defense", "base_stat": 95, "stat": 69 },
+              { "name": "speed", "base_stat": 70, "stat": 54 }
+            ],
+            "moves": [
+              { "name": "aurora-beam", "type": "ice", "class": "special", "power": 65, "accuracy": 100, "pp": 20 },
+              { "name": "take-down", "type": "normal", "class": "physical", "power": 90, "accuracy": 85, "pp": 20 },
+              { "name": "icy-wind", "type": "ice", "class": "special", "power": 55, "accuracy": 95, "pp": 15 },
+              { "name": "rest", "type": "psychic", "class": "status", "power": null, "accuracy": null, "pp": 10 }
+            ]
+          },
+          {
+            "id": 221,
+            "name": "piloswine",
+            "level": 31,
+            "totalHp": 113,
+            "currentHp": 113,
+            "types": ["ice", "ground"],
+            "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/221.png",
+            "backSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/221.png",
+            "cry": "https://raw.githubusercontent.com/PokeAPI/cries/main/cries/pokemon/latest/221.ogg",
+            "stats": [
+              { "name": "hp", "base_stat": 100, "stat": 113 },
+              { "name": "attack", "base_stat": 100, "stat": 76 },
+              { "name": "defense", "base_stat": 80, "stat": 62 },
+              { "name": "special-attack", "base_stat": 60, "stat": 49 },
+              { "name": "special-defense", "base_stat": 60, "stat": 49 },
+              { "name": "speed", "base_stat": 50, "stat": 43 }
+            ],
+            "moves": [
+              { "name": "icy-wind", "type": "ice", "class": "special", "power": 55, "accuracy": 95, "pp": 15 },
+              { "name": "blizzard", "type": "ice", "class": "special", "power": 110, "accuracy": 70, "pp": 5 },
+              { "name": "fury-attack", "type": "normal", "class": "physical", "power": 15, "accuracy": 85, "pp": 20 },
+              { "name": "mist", "type": "ice", "class": "status", "power": null, "accuracy": null, "pp": 30 }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "Clair",
+        "type": "Dragon",
+        "badge": "Rising Badge",
+        "team": [
+          {
+            "id": 148,
+            "name": "dragonair",
+            "level": 37,
+            "totalHp": 104,
+            "currentHp": 104,
+            "types": ["dragon"],
+            "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/148.png",
+            "backSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/148.png",
+            "cry": "https://raw.githubusercontent.com/PokeAPI/cries/main/cries/pokemon/latest/148.ogg",
+            "stats": [
+              { "name": "hp", "base_stat": 61, "stat": 104 },
+              { "name": "attack", "base_stat": 84, "stat": 79 },
+              { "name": "defense", "base_stat": 65, "stat": 65 },
+              { "name": "special-attack", "base_stat": 70, "stat": 69 },
+              { "name": "special-defense", "base_stat": 70, "stat": 69 },
+              { "name": "speed", "base_stat": 70, "stat": 69 }
+            ],
+            "moves": [
+              { "name": "dragon-breath", "type": "dragon", "class": "special", "power": 60, "accuracy": 100, "pp": 20 },
+              { "name": "slam", "type": "normal", "class": "physical", "power": 80, "accuracy": 75, "pp": 20 },
+              { "name": "thunder-wave", "type": "electric", "class": "status", "power": null, "accuracy": 90, "pp": 20 }
+            ]
+          },
+          {
+            "id": 230,
+            "name": "kingdra",
+            "level": 40,
+            "totalHp": 125,
+            "currentHp": 125,
+            "types": ["water", "dragon"],
+            "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/230.png",
+            "backSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/230.png",
+            "cry": "https://raw.githubusercontent.com/PokeAPI/cries/main/cries/pokemon/latest/230.ogg",
+            "stats": [
+              { "name": "hp", "base_stat": 75, "stat": 125 },
+              { "name": "attack", "base_stat": 95, "stat": 92 },
+              { "name": "defense", "base_stat": 95, "stat": 92 },
+              { "name": "special-attack", "base_stat": 95, "stat": 92 },
+              { "name": "special-defense", "base_stat": 95, "stat": 92 },
+              { "name": "speed", "base_stat": 85, "stat": 84 }
+            ],
+            "moves": [
+              { "name": "dragon-breath", "type": "dragon", "class": "special", "power": 60, "accuracy": 100, "pp": 20 },
+              { "name": "hydro-pump", "type": "water", "class": "special", "power": 110, "accuracy": 80, "pp": 5 },
+              { "name": "hyper-beam", "type": "normal", "class": "special", "power": 150, "accuracy": 90, "pp": 5 },
+              { "name": "smokescreen", "type": "normal", "class": "status", "power": null, "accuracy": 100, "pp": 20 }
+            ]
+          }
+        ]
+      }
     ],
     "elite_four": [
-      { "name": "Will", "type": "Psychic", "team": ["Xatu", "Jynx", "Exeggutor", "Slowbro", "Xatu"] },
-      { "name": "Koga", "type": "Poison", "team": ["Ariados", "Forretress", "Muk", "Venomoth", "Crobat"] },
-      { "name": "Bruno", "type": "Fighting", "team": ["Hitmontop", "Hitmonlee", "Hitmonchan", "Onix", "Machamp"] },
-      { "name": "Karen", "type": "Dark", "team": ["Umbreon", "Vileplume", "Murkrow", "Gengar", "Houndoom"] }
+      {
+        "name": "Will",
+        "type": "Psychic",
+        "team": [
+          {
+            "id": 178,
+            "name": "xatu",
+            "level": 40,
+            "totalHp": 117,
+            "currentHp": 117,
+            "types": ["psychic", "flying"],
+            "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/178.png",
+            "backSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/178.png",
+            "cry": "https://raw.githubusercontent.com/PokeAPI/cries/main/cries/pokemon/latest/178.ogg",
+            "stats": [
+              { "name": "hp", "base_stat": 65, "stat": 117 },
+              { "name": "attack", "base_stat": 75, "stat": 76 },
+              { "name": "defense", "base_stat": 70, "stat": 72 },
+              { "name": "special-attack", "base_stat": 95, "stat": 92 },
+              { "name": "special-defense", "base_stat": 70, "stat": 72 },
+              { "name": "speed", "base_stat": 95, "stat": 92 }
+            ],
+            "moves": [
+              { "name": "psychic", "type": "psychic", "class": "special", "power": 90, "accuracy": 100, "pp": 10 },
+              { "name": "confuse-ray", "type": "ghost", "class": "status", "power": null, "accuracy": 100, "pp": 10 },
+              { "name": "night-shade", "type": "ghost", "class": "special", "power": null, "accuracy": 100, "pp": 15 },
+              { "name": "quick-attack", "type": "normal", "class": "physical", "power": 40, "accuracy": 100, "pp": 30 }
+            ]
+          },
+          {
+            "id": 124,
+            "name": "jynx",
+            "level": 41,
+            "totalHp": 118,
+            "currentHp": 118,
+            "types": ["ice", "psychic"],
+            "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/124.png",
+            "backSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/124.png",
+            "cry": "https://raw.githubusercontent.com/PokeAPI/cries/main/cries/pokemon/latest/124.ogg",
+            "stats": [
+              { "name": "hp", "base_stat": 65, "stat": 118 },
+              { "name": "attack", "base_stat": 50, "stat": 57 },
+              { "name": "defense", "base_stat": 35, "stat": 45 },
+              { "name": "special-attack", "base_stat": 115, "stat": 111 },
+              { "name": "special-defense", "base_stat": 95, "stat": 95 },
+              { "name": "speed", "base_stat": 95, "stat": 95 }
+            ],
+            "moves": [
+              { "name": "ice-punch", "type": "ice", "class": "physical", "power": 75, "accuracy": 100, "pp": 15 },
+              { "name": "psychic", "type": "psychic", "class": "special", "power": 90, "accuracy": 100, "pp": 10 },
+              { "name": "lovely-kiss", "type": "normal", "class": "status", "power": null, "accuracy": 75, "pp": 10 },
+              { "name": "doubleslap", "type": "normal", "class": "physical", "power": 15, "accuracy": 85, "pp": 10 }
+            ]
+          },
+          {
+            "id": 103,
+            "name": "exeggutor",
+            "level": 41,
+            "totalHp": 142,
+            "currentHp": 142,
+            "types": ["grass", "psychic"],
+            "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/103.png",
+            "backSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/103.png",
+            "cry": "https://raw.githubusercontent.com/PokeAPI/cries/main/cries/pokemon/latest/103.ogg",
+            "stats": [
+              { "name": "hp", "base_stat": 95, "stat": 142 },
+              { "name": "attack", "base_stat": 95, "stat": 95 },
+              { "name": "defense", "base_stat": 85, "stat": 86 },
+              { "name": "special-attack", "base_stat": 125, "stat": 120 },
+              { "name": "special-defense", "base_stat": 75, "stat": 78 },
+              { "name": "speed", "base_stat": 55, "stat": 61 }
+            ],
+            "moves": [
+              { "name": "psychic", "type": "psychic", "class": "special", "power": 90, "accuracy": 100, "pp": 10 },
+              { "name": "egg-bomb", "type": "normal", "class": "physical", "power": 100, "accuracy": 75, "pp": 10 },
+              { "name": "reflect", "type": "psychic", "class": "status", "power": null, "accuracy": null, "pp": 20 },
+              { "name": "hypnosis", "type": "psychic", "class": "status", "power": null, "accuracy": 60, "pp": 20 }
+            ]
+          },
+          {
+            "id": 80,
+            "name": "slowbro",
+            "level": 41,
+            "totalHp": 142,
+            "currentHp": 142,
+            "types": ["water", "psychic"],
+            "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/80.png",
+            "backSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/80.png",
+            "cry": "https://raw.githubusercontent.com/PokeAPI/cries/main/cries/pokemon/latest/80.ogg",
+            "stats": [
+              { "name": "hp", "base_stat": 95, "stat": 142 },
+              { "name": "attack", "base_stat": 75, "stat": 78 },
+              { "name": "defense", "base_stat": 110, "stat": 107 },
+              { "name": "special-attack", "base_stat": 100, "stat": 99 },
+              { "name": "special-defense", "base_stat": 80, "stat": 82 },
+              { "name": "speed", "base_stat": 30, "stat": 41 }
+            ],
+            "moves": [
+              { "name": "psychic", "type": "psychic", "class": "special", "power": 90, "accuracy": 100, "pp": 10 },
+              { "name": "surf", "type": "water", "class": "special", "power": 90, "accuracy": 100, "pp": 15 },
+              { "name": "amnesia", "type": "psychic", "class": "status", "power": null, "accuracy": null, "pp": 20 },
+              { "name": "curse", "type": "ghost", "class": "status", "power": null, "accuracy": null, "pp": 10 }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "Karen",
+        "type": "Dark",
+        "team": [
+          {
+            "id": 197,
+            "name": "umbreon",
+            "level": 42,
+            "totalHp": 147,
+            "currentHp": 147,
+            "types": ["dark"],
+            "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/197.png",
+            "backSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/197.png",
+            "cry": "https://raw.githubusercontent.com/PokeAPI/cries/main/cries/pokemon/latest/197.ogg",
+            "stats": [
+              { "name": "hp", "base_stat": 95, "stat": 147 },
+              { "name": "attack", "base_stat": 65, "stat": 71 },
+              { "name": "defense", "base_stat": 110, "stat": 113 },
+              { "name": "special-attack", "base_stat": 60, "stat": 67 },
+              { "name": "special-defense", "base_stat": 130, "stat": 130 },
+              { "name": "speed", "base_stat": 65, "stat": 71 }
+            ],
+            "moves": [
+              { "name": "faint-attack", "type": "dark", "class": "physical", "power": 60, "accuracy": null, "pp": 20 },
+              { "name": "confuse-ray", "type": "ghost", "class": "status", "power": null, "accuracy": 100, "pp": 10 },
+              { "name": "sand-attack", "type": "ground", "class": "status", "power": null, "accuracy": 100, "pp": 15 },
+              { "name": "mean-look", "type": "normal", "class": "status", "power": null, "accuracy": null, "pp": 5 }
+            ]
+          },
+          {
+            "id": 229,
+            "name": "houndoom",
+            "level": 47,
+            "totalHp": 145,
+            "currentHp": 145,
+            "types": ["dark", "fire"],
+            "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/229.png",
+            "backSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/229.png",
+            "cry": "https://raw.githubusercontent.com/PokeAPI/cries/main/cries/pokemon/latest/229.ogg",
+            "stats": [
+              { "name": "hp", "base_stat": 75, "stat": 145 },
+              { "name": "attack", "base_stat": 90, "stat": 103 },
+              { "name": "defense", "base_stat": 50, "stat": 65 },
+              { "name": "special-attack", "base_stat": 110, "stat": 122 },
+              { "name": "special-defense", "base_stat": 80, "stat": 94 },
+              { "name": "speed", "base_stat": 95, "stat": 108 }
+            ],
+            "moves": [
+              { "name": "crunch", "type": "dark", "class": "physical", "power": 80, "accuracy": 100, "pp": 15 },
+              { "name": "flamethrower", "type": "fire", "class": "special", "power": 90, "accuracy": 100, "pp": 15 },
+              { "name": "sunny-day", "type": "fire", "class": "status", "power": null, "accuracy": null, "pp": 5 },
+              { "name": "bite", "type": "dark", "class": "physical", "power": 60, "accuracy": 100, "pp": 25 }
+            ]
+          }
+        ]
+      }
     ],
     "champion": {
-      "name": "Lance", "type": "Dragon", "team": ["Gyarados", "Dragonite", "Dragonite", "Dragonite", "Aerodactyl", "Charizard"]
+      "name": "Lance",
+      "type": "Dragon",
+      "team": [
+        {
+          "id": 130,
+          "name": "gyarados",
+          "level": 44,
+          "totalHp": 151,
+          "currentHp": 151,
+          "types": ["water", "flying"],
+          "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/130.png",
+          "backSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/130.png",
+          "cry": "https://raw.githubusercontent.com/PokeAPI/cries/main/cries/pokemon/latest/130.ogg",
+          "stats": [
+            { "name": "hp", "base_stat": 95, "stat": 151 },
+            { "name": "attack", "base_stat": 125, "stat": 128 },
+            { "name": "defense", "base_stat": 79, "stat": 88 },
+            { "name": "special-attack", "base_stat": 60, "stat": 71 },
+            { "name": "special-defense", "base_stat": 100, "stat": 106 },
+            { "name": "speed", "base_stat": 81, "stat": 89 }
+          ],
+          "moves": [
+            { "name": "dragon-rage", "type": "dragon", "class": "special", "power": null, "accuracy": 100, "pp": 10 },
+            { "name": "hyper-beam", "type": "normal", "class": "special", "power": 150, "accuracy": 90, "pp": 5 },
+            { "name": "twister", "type": "dragon", "class": "special", "power": 40, "accuracy": 100, "pp": 20 },
+            { "name": "rain-dance", "type": "water", "class": "status", "power": null, "accuracy": null, "pp": 5 }
+          ]
+        },
+        {
+          "id": 149,
+          "name": "dragonite",
+          "level": 50,
+          "totalHp": 166,
+          "currentHp": 166,
+          "types": ["dragon", "flying"],
+          "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/149.png",
+          "backSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/149.png",
+          "cry": "https://raw.githubusercontent.com/PokeAPI/cries/main/cries/pokemon/latest/149.ogg",
+          "stats": [
+            { "name": "hp", "base_stat": 91, "stat": 166 },
+            { "name": "attack", "base_stat": 134, "stat": 155 },
+            { "name": "defense", "base_stat": 95, "stat": 116 },
+            { "name": "special-attack", "base_stat": 100, "stat": 121 },
+            { "name": "special-defense", "base_stat": 100, "stat": 121 },
+            { "name": "speed", "base_stat": 80, "stat": 101 }
+          ],
+          "moves": [
+            { "name": "outrage", "type": "dragon", "class": "physical", "power": 120, "accuracy": 100, "pp": 10 },
+            { "name": "fire-blast", "type": "fire", "class": "special", "power": 110, "accuracy": 85, "pp": 5 },
+            { "name": "hyper-beam", "type": "normal", "class": "special", "power": 150, "accuracy": 90, "pp": 5 },
+            { "name": "safeguard", "type": "normal", "class": "status", "power": null, "accuracy": null, "pp": 25 }
+          ]
+        },
+        {
+          "id": 149,
+          "name": "dragonite",
+          "level": 50,
+          "totalHp": 166,
+          "currentHp": 166,
+          "types": ["dragon", "flying"],
+          "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/149.png",
+          "backSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/149.png",
+          "cry": "https://raw.githubusercontent.com/PokeAPI/cries/main/cries/pokemon/latest/149.ogg",
+          "stats": [
+            { "name": "hp", "base_stat": 91, "stat": 166 },
+            { "name": "attack", "base_stat": 134, "stat": 155 },
+            { "name": "defense", "base_stat": 95, "stat": 116 },
+            { "name": "special-attack", "base_stat": 100, "stat": 121 },
+            { "name": "special-defense", "base_stat": 100, "stat": 121 },
+            { "name": "speed", "base_stat": 80, "stat": 101 }
+          ],
+          "moves": [
+            { "name": "outrage", "type": "dragon", "class": "physical", "power": 120, "accuracy": 100, "pp": 10 },
+            { "name": "fire-blast", "type": "fire", "class": "special", "power": 110, "accuracy": 85, "pp": 5 },
+            { "name": "hyper-beam", "type": "normal", "class": "special", "power": 150, "accuracy": 90, "pp": 5 },
+            { "name": "safeguard", "type": "normal", "class": "status", "power": null, "accuracy": null, "pp": 25 }
+          ]
+        },
+        {
+          "id": 149,
+          "name": "dragonite",
+          "level": 50,
+          "totalHp": 166,
+          "currentHp": 166,
+          "types": ["dragon", "flying"],
+          "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/149.png",
+          "backSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/149.png",
+          "cry": "https://raw.githubusercontent.com/PokeAPI/cries/main/cries/pokemon/latest/149.ogg",
+          "stats": [
+            { "name": "hp", "base_stat": 91, "stat": 166 },
+            { "name": "attack", "base_stat": 134, "stat": 155 },
+            { "name": "defense", "base_stat": 95, "stat": 116 },
+            { "name": "special-attack", "base_stat": 100, "stat": 121 },
+            { "name": "special-defense", "base_stat": 100, "stat": 121 },
+            { "name": "speed", "base_stat": 80, "stat": 101 }
+          ],
+          "moves": [
+            { "name": "outrage", "type": "dragon", "class": "physical", "power": 120, "accuracy": 100, "pp": 10 },
+            { "name": "fire-blast", "type": "fire", "class": "special", "power": 110, "accuracy": 85, "pp": 5 },
+            { "name": "hyper-beam", "type": "normal", "class": "special", "power": 150, "accuracy": 90, "pp": 5 },
+            { "name": "safeguard", "type": "normal", "class": "status", "power": null, "accuracy": null, "pp": 25 }
+          ]
+        },
+        {
+          "id": 6,
+          "name": "charizard",
+          "level": 48,
+          "totalHp": 147,
+          "currentHp": 147,
+          "types": ["fire", "flying"],
+          "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/6.png",
+          "backSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/6.png",
+          "cry": "https://raw.githubusercontent.com/PokeAPI/cries/main/cries/pokemon/latest/6.ogg",
+          "stats": [
+            { "name": "hp", "base_stat": 78, "stat": 147 },
+            { "name": "attack", "base_stat": 84, "stat": 98 },
+            { "name": "defense", "base_stat": 78, "stat": 92 },
+            { "name": "special-attack", "base_stat": 109, "stat": 122 },
+            { "name": "special-defense", "base_stat": 85, "stat": 98 },
+            { "name": "speed", "base_stat": 100, "stat": 113 }
+          ],
+          "moves": [
+            { "name": "air-slash", "type": "flying", "class": "special", "power": 75, "accuracy": 95, "pp": 15 },
+            { "name": "fire-fang", "type": "fire", "class": "physical", "power": 65, "accuracy": 95, "pp": 15 },
+            { "name": "dragon-claw", "type": "dragon", "class": "physical", "power": 80, "accuracy": 100, "pp": 15 },
+            { "name": "shadow-claw", "type": "ghost", "class": "physical", "power": 70, "accuracy": 100, "pp": 15 }
+          ]
+        }
+      ]
     }
   },
   "hoenn": {
     "gym_leaders": [
-      { "name": "Roxanne", "type": "Rock", "team": ["Geodude", "Geodude", "Nosepass"] },
-      { "name": "Brawly", "type": "Fighting", "team": ["Machop", "Makuhita"] },
-      { "name": "Wattson", "type": "Electric", "team": ["Magnemite", "Voltorb", "Magneton"] },
-      { "name": "Flannery", "type": "Fire", "team": ["Slugma", "Slugma", "Camerupt", "Torkoal"] },
-      { "name": "Norman", "type": "Normal", "team": ["Slaking", "Vigoroth", "Slaking"] },
-      { "name": "Winona", "type": "Flying", "team": ["Swellow", "Pelipper", "Skarmory", "Altaria"] },
-      { "name": "Tate & Liza", "type": "Psychic", "team": ["Lunatone", "Solrock"] },
-      { "name": "Wallace", "type": "Water", "team": ["Luvdisc", "Sealeo", "Seaking", "Whiscash", "Milotic"] }
+      {
+        "name": "Roxanne",
+        "type": "Rock",
+        "badge": "Stone Badge",
+        "team": [
+          {
+            "id": 74,
+            "name": "geodude",
+            "level": 14,
+            "totalHp": 35,
+            "currentHp": 35,
+            "types": ["rock", "ground"],
+            "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/74.png",
+            "backSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/74.png",
+            "cry": "https://raw.githubusercontent.com/PokeAPI/cries/main/cries/pokemon/latest/74.ogg",
+            "stats": [
+              { "name": "hp", "base_stat": 40, "stat": 35 },
+              { "name": "attack", "base_stat": 80, "stat": 28 },
+              { "name": "defense", "base_stat": 100, "stat": 33 },
+              { "name": "special-attack", "base_stat": 30, "stat": 14 },
+              { "name": "special-defense", "base_stat": 30, "stat": 14 },
+              { "name": "speed", "base_stat": 20, "stat": 11 }
+            ],
+            "moves": [
+              { "name": "tackle", "type": "normal", "class": "physical", "power": 40, "accuracy": 100, "pp": 35 },
+              { "name": "rock-tomb", "type": "rock", "class": "physical", "power": 60, "accuracy": 95, "pp": 15 },
+              { "name": "defense-curl", "type": "normal", "class": "status", "power": null, "accuracy": null, "pp": 40 }
+            ]
+          },
+          {
+            "id": 299,
+            "name": "nosepass",
+            "level": 15,
+            "totalHp": 37,
+            "currentHp": 37,
+            "types": ["rock"],
+            "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/299.png",
+            "backSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/299.png",
+            "cry": "https://raw.githubusercontent.com/PokeAPI/cries/main/cries/pokemon/latest/299.ogg",
+            "stats": [
+              { "name": "hp", "base_stat": 30, "stat": 37 },
+              { "name": "attack", "base_stat": 45, "stat": 19 },
+              { "name": "defense", "base_stat": 135, "stat": 48 },
+              { "name": "special-attack", "base_stat": 45, "stat": 19 },
+              { "name": "special-defense", "base_stat": 90, "stat": 33 },
+              { "name": "speed", "base_stat": 30, "stat": 15 }
+            ],
+            "moves": [
+              { "name": "rock-tomb", "type": "rock", "class": "physical", "power": 60, "accuracy": 95, "pp": 15 },
+              { "name": "tackle", "type": "normal", "class": "physical", "power": 40, "accuracy": 100, "pp": 35 },
+              { "name": "harden", "type": "normal", "class": "status", "power": null, "accuracy": null, "pp": 30 }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "Norman",
+        "type": "Normal",
+        "badge": "Balance Badge",
+        "team": [
+          {
+            "id": 289,
+            "name": "slaking",
+            "level": 31,
+            "totalHp": 142,
+            "currentHp": 142,
+            "types": ["normal"],
+            "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/289.png",
+            "backSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/289.png",
+            "cry": "https://raw.githubusercontent.com/PokeAPI/cries/main/cries/pokemon/latest/289.ogg",
+            "stats": [
+              { "name": "hp", "base_stat": 150, "stat": 142 },
+              { "name": "attack", "base_stat": 160, "stat": 113 },
+              { "name": "defense", "base_stat": 100, "stat": 75 },
+              { "name": "special-attack", "base_stat": 95, "stat": 71 },
+              { "name": "special-defense", "base_stat": 65, "stat": 52 },
+              { "name": "speed", "base_stat": 100, "stat": 75 }
+            ],
+            "moves": [
+              { "name": "facade", "type": "normal", "class": "physical", "power": 70, "accuracy": 100, "pp": 20 },
+              { "name": "yawn", "type": "normal", "class": "status", "power": null, "accuracy": null, "pp": 10 },
+              { "name": "counter", "type": "fighting", "class": "physical", "power": null, "accuracy": 100, "pp": 20 },
+              { "name": "feint-attack", "type": "dark", "class": "physical", "power": 60, "accuracy": null, "pp": 20 }
+            ]
+          }
+        ]
+      }
     ],
     "elite_four": [
-      { "name": "Sidney", "type": "Dark", "team": ["Mightyena", "Shiftry", "Cacturne", "Sharpedo", "Absol"] },
-      { "name": "Phoebe", "type": "Ghost", "team": ["Dusclops", "Banette", "Sableye", "Banette", "Dusclops"] },
-      { "name": "Glacia", "type": "Ice", "team": ["Glalie", "Sealeo", "Sealeo", "Glalie", "Walrein"] },
-      { "name": "Drake", "type": "Dragon", "team": ["Altaria", "Flygon", "Flygon", "Kingdra", "Salamence"] }
+      {
+        "name": "Drake",
+        "type": "Dragon",
+        "team": [
+          {
+            "id": 373,
+            "name": "salamence",
+            "level": 55,
+            "totalHp": 186,
+            "currentHp": 186,
+            "types": ["dragon", "flying"],
+            "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/373.png",
+            "backSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/373.png",
+            "cry": "https://raw.githubusercontent.com/PokeAPI/cries/main/cries/pokemon/latest/373.ogg",
+            "stats": [
+              { "name": "hp", "base_stat": 95, "stat": 186 },
+              { "name": "attack", "base_stat": 135, "stat": 169 },
+              { "name": "defense", "base_stat": 80, "stat": 110 },
+              { "name": "special-attack", "base_stat": 110, "stat": 142 },
+              { "name": "special-defense", "base_stat": 80, "stat": 110 },
+              { "name": "speed", "base_stat": 100, "stat": 131 }
+            ],
+            "moves": [
+              { "name": "dragon-claw", "type": "dragon", "class": "physical", "power": 80, "accuracy": 100, "pp": 15 },
+              { "name": "flamethrower", "type": "fire", "class": "special", "power": 90, "accuracy": 100, "pp": 15 },
+              { "name": "rock-slide", "type": "rock", "class": "physical", "power": 75, "accuracy": 90, "pp": 10 },
+              { "name": "crunch", "type": "dark", "class": "physical", "power": 80, "accuracy": 100, "pp": 15 }
+            ]
+          }
+        ]
+      }
     ],
     "champion": {
-      "name": "Steven Stone", "type": "Steel/Rock", "team": ["Skarmory", "Claydol", "Aggron", "Cradily", "Armaldo", "Metagross"]
+      "name": "Steven Stone",
+      "type": "Steel/Rock",
+      "team": [
+        {
+          "id": 376,
+          "name": "metagross",
+          "level": 58,
+          "totalHp": 178,
+          "currentHp": 178,
+          "types": ["steel", "psychic"],
+          "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/376.png",
+          "backSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/376.png",
+          "cry": "https://raw.githubusercontent.com/PokeAPI/cries/main/cries/pokemon/latest/376.ogg",
+          "stats": [
+            { "name": "hp", "base_stat": 80, "stat": 178 },
+            { "name": "attack", "base_stat": 135, "stat": 174 },
+            { "name": "defense", "base_stat": 130, "stat": 168 },
+            { "name": "special-attack", "base_stat": 95, "stat": 127 },
+            { "name": "special-defense", "base_stat": 90, "stat": 121 },
+            { "name": "speed", "base_stat": 70, "stat": 97 }
+          ],
+          "moves": [
+            { "name": "meteor-mash", "type": "steel", "class": "physical", "power": 90, "accuracy": 90, "pp": 10 },
+            { "name": "psychic", "type": "psychic", "class": "special", "power": 90, "accuracy": 100, "pp": 10 },
+            { "name": "earthquake", "type": "ground", "class": "physical", "power": 100, "accuracy": 100, "pp": 10 },
+            { "name": "hyper-beam", "type": "normal", "class": "special", "power": 150, "accuracy": 90, "pp": 5 }
+          ]
+        }
+      ]
     }
   },
   "sinnoh": {
     "gym_leaders": [
-      { "name": "Roark", "type": "Rock", "team": ["Geodude", "Onix", "Cranidos"] },
-      { "name": "Gardenia", "type": "Grass", "team": ["Cherubi", "Turtwig", "Roserade"] },
-      { "name": "Maylene", "type": "Fighting", "team": ["Meditite", "Machoke", "Lucario"] },
-      { "name": "Crasher Wake", "type": "Water", "team": ["Gyarados", "Quagsire", "Floatzel"] },
-      { "name": "Fantina", "type": "Ghost", "team": ["Duskull", "Haunter", "Mismagius"] },
-      { "name": "Byron", "type": "Steel", "team": ["Bronzor", "Steelix", "Bastiodon"] },
-      { "name": "Candice", "type": "Ice", "team": ["Snover", "Sneasel", "Medicham", "Abomasnow"] },
-      { "name": "Volkner", "type": "Electric", "team": ["Raichu", "Ambipom", "Octillery", "Luxray"] }
+      {
+        "name": "Roark",
+        "type": "Rock",
+        "badge": "Coal Badge",
+        "team": [
+          {
+            "id": 408,
+            "name": "cranidos",
+            "level": 14,
+            "totalHp": 48,
+            "currentHp": 48,
+            "types": ["rock"],
+            "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/408.png",
+            "backSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/408.png",
+            "cry": "https://raw.githubusercontent.com/PokeAPI/cries/main/cries/pokemon/latest/408.ogg",
+            "stats": [
+              { "name": "hp", "base_stat": 67, "stat": 48 },
+              { "name": "attack", "base_stat": 125, "stat": 42 },
+              { "name": "defense", "base_stat": 40, "stat": 17 },
+              { "name": "special-attack", "base_stat": 30, "stat": 14 },
+              { "name": "special-defense", "base_stat": 30, "stat": 14 },
+              { "name": "speed", "base_stat": 58, "stat": 22 }
+            ],
+            "moves": [
+              { "name": "headbutt", "type": "normal", "class": "physical", "power": 70, "accuracy": 100, "pp": 15 },
+              { "name": "rock-tomb", "type": "rock", "class": "physical", "power": 60, "accuracy": 95, "pp": 15 },
+              { "name": "leer", "type": "normal", "class": "status", "power": null, "accuracy": 100, "pp": 30 }
+            ]
+          }
+        ]
+      }
     ],
-    "elite_four": [
-      { "name": "Aaron", "type": "Bug", "team": ["Dustox", "Beautifly", "Vespiquen", "Heracross", "Drapion"] },
-      { "name": "Bertha", "type": "Ground", "team": ["Quagsire", "Sudowoodo", "Whiscash", "Graveler", "Hippowdon"] },
-      { "name": "Flint", "type": "Fire", "team": ["Rapidash", "Steelix", "Drifblim", "Lopunny", "Infernape"] },
-      { "name": "Lucian", "type": "Psychic", "team": ["Mr. Mime", "Girafarig", "Medicham", "Alakazam", "Bronzong"] }
-    ],
+    "elite_four": [],
     "champion": {
-      "name": "Cynthia", "type": "Varied", "team": ["Spiritomb", "Roserade", "Gastrodon", "Lucario", "Milotic", "Garchomp"]
+      "name": "Cynthia",
+      "type": "Varied",
+      "team": [
+        {
+          "id": 445,
+          "name": "garchomp",
+          "level": 66,
+          "totalHp": 242,
+          "currentHp": 242,
+          "types": ["dragon", "ground"],
+          "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/445.png",
+          "backSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/445.png",
+          "cry": "https://raw.githubusercontent.com/PokeAPI/cries/main/cries/pokemon/latest/445.ogg",
+          "stats": [
+            { "name": "hp", "base_stat": 108, "stat": 242 },
+            { "name": "attack", "base_stat": 130, "stat": 198 },
+            { "name": "defense", "base_stat": 95, "stat": 151 },
+            { "name": "special-attack", "base_stat": 80, "stat": 131 },
+            { "name": "special-defense", "base_stat": 85, "stat": 138 },
+            { "name": "speed", "base_stat": 102, "stat": 161 }
+          ],
+          "moves": [
+            { "name": "dragon-rush", "type": "dragon", "class": "physical", "power": 100, "accuracy": 75, "pp": 10 },
+            { "name": "earthquake", "type": "ground", "class": "physical", "power": 100, "accuracy": 100, "pp": 10 },
+            { "name": "brick-break", "type": "fighting", "class": "physical", "power": 75, "accuracy": 100, "pp": 15 },
+            { "name": "giga-impact", "type": "normal", "class": "physical", "power": 150, "accuracy": 90, "pp": 5 }
+          ]
+        }
+      ]
     }
   },
   "unova": {
     "gym_leaders": [
-      { "name": "Cilan / Chili / Cress", "type": "Grass / Fire / Water", "team": ["Pansage / Pansear / Panpour", "Herdier"] },
-      { "name": "Lenora", "type": "Normal", "team": ["Herdier", "Watchog"] },
-      { "name": "Burgh", "type": "Bug", "team": ["Whirlipede", "Dwebble", "Leavanny"] },
-      { "name": "Elesa", "type": "Electric", "team": ["Emolga", "Emolga", "Zebstrika"] },
-      { "name": "Clay", "type": "Ground", "team": ["Krokorok", "Palpitoad", "Excadrill"] },
-      { "name": "Skyla", "type": "Flying", "team": ["Swoobat", "Unfezant", "Swanna"] },
-      { "name": "Brycen", "type": "Ice", "team": ["Vanillish", "Cryogonal", "Beartic"] },
-      { "name": "Drayden / Iris", "type": "Dragon", "team": ["Fraxure", "Druddigon", "Haxorus"] }
+      {
+        "name": "Elesa",
+        "type": "Electric",
+        "badge": "Bolt Badge",
+        "team": [
+          {
+            "id": 587,
+            "name": "emolga",
+            "level": 27,
+            "totalHp": 76,
+            "currentHp": 76,
+            "types": ["electric", "flying"],
+            "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/587.png",
+            "backSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/587.png",
+            "cry": "https://raw.githubusercontent.com/PokeAPI/cries/main/cries/pokemon/latest/587.ogg",
+            "stats": [
+              { "name": "hp", "base_stat": 55, "stat": 76 },
+              { "name": "attack", "base_stat": 75, "stat": 51 },
+              { "name": "defense", "base_stat": 60, "stat": 42 },
+              { "name": "special-attack", "base_stat": 75, "stat": 51 },
+              { "name": "special-defense", "base_stat": 60, "stat": 42 },
+              { "name": "speed", "base_stat": 103, "stat": 68 }
+            ],
+            "moves": [
+              { "name": "volt-switch", "type": "electric", "class": "special", "power": 70, "accuracy": 100, "pp": 20 },
+              { "name": "quick-attack", "type": "normal", "class": "physical", "power": 40, "accuracy": 100, "pp": 30 },
+              { "name": "aerial-ace", "type": "flying", "class": "physical", "power": 60, "accuracy": null, "pp": 20 }
+            ]
+          }
+        ]
+      }
     ],
-    "elite_four": [
-      { "name": "Shauntal", "type": "Ghost", "team": ["Cofagrigus", "Jellicent", "Golurk", "Chandelure"] },
-      { "name": "Grimsley", "type": "Dark", "team": ["Liepard", "Scrafty", "Krookodile", "Bisharp"] },
-      { "name": "Caitlin", "type": "Psychic", "team": ["Reuniclus", "Musharna", "Sigilyph", "Gothitelle"] },
-      { "name": "Marshal", "type": "Fighting", "team": ["Throh", "Sawk", "Mienshao", "Conkeldurr"] }
-    ],
+    "elite_four": [],
     "champion": {
-      "name": "Alder", "type": "Varied", "team": ["Accelgor", "Bouffalant", "Druddigon", "Escavalier", "Vanilluxe", "Volcarona"]
+      "name": "Alder",
+      "type": "Varied",
+      "team": [
+        {
+          "id": 637,
+          "name": "volcarona",
+          "level": 77,
+          "totalHp": 243,
+          "currentHp": 243,
+          "types": ["bug", "fire"],
+          "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/637.png",
+          "backSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/637.png",
+          "cry": "https://raw.githubusercontent.com/PokeAPI/cries/main/cries/pokemon/latest/637.ogg",
+          "stats": [
+            { "name": "hp", "base_stat": 85, "stat": 243 },
+            { "name": "attack", "base_stat": 60, "stat": 122 },
+            { "name": "defense", "base_stat": 65, "stat": 130 },
+            { "name": "special-attack", "base_stat": 135, "stat": 238 },
+            { "name": "special-defense", "base_stat": 105, "stat": 189 },
+            { "name": "speed", "base_stat": 100, "stat": 181 }
+          ],
+          "moves": [
+            { "name": "bug-buzz", "type": "bug", "class": "special", "power": 90, "accuracy": 100, "pp": 10 },
+            { "name": "heat-wave", "type": "fire", "class": "special", "power": 95, "accuracy": 90, "pp": 10 },
+            { "name": "quiver-dance", "type": "bug", "class": "status", "power": null, "accuracy": null, "pp": 20 },
+            { "name": "hyper-beam", "type": "normal", "class": "special", "power": 150, "accuracy": 90, "pp": 5 }
+          ]
+        }
+      ]
     }
   },
   "kalos": {
     "gym_leaders": [
-      { "name": "Viola", "type": "Bug", "team": ["Surskit", "Vivillon"] },
-      { "name": "Grant", "type": "Rock", "team": ["Amaura", "Tyrunt"] },
-      { "name": "Korrina", "type": "Fighting", "team": ["Mienfoo", "Machoke", "Hawlucha"] },
-      { "name": "Ramos", "type": "Grass", "team": ["Jumpluff", "Weepinbell", "Gogoat"] },
-      { "name": "Clemont", "type": "Electric", "team": ["Emolga", "Magneton", "Heliolisk"] },
-      { "name": "Valerie", "type": "Fairy", "team": ["Mawile", "Mr. Mime", "Sylveon"] },
-      { "name": "Olympia", "type": "Psychic", "team": ["Sigilyph", "Slowking", "Meowstic"] },
-      { "name": "Wulfric", "type": "Ice", "team": ["Abomasnow", "Cryogonal", "Avalugg"] }
+      {
+        "name": "Korrina",
+        "type": "Fighting",
+        "badge": "Rumble Badge",
+        "team": [
+          {
+            "id": 701,
+            "name": "hawlucha",
+            "level": 32,
+            "totalHp": 99,
+            "currentHp": 99,
+            "types": ["fighting", "flying"],
+            "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/701.png",
+            "backSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/701.png",
+            "cry": "https://raw.githubusercontent.com/PokeAPI/cries/main/cries/pokemon/latest/701.ogg",
+            "stats": [
+              { "name": "hp", "base_stat": 78, "stat": 99 },
+              { "name": "attack", "base_stat": 92, "stat": 72 },
+              { "name": "defense", "base_stat": 75, "stat": 59 },
+              { "name": "special-attack", "base_stat": 74, "stat": 58 },
+              { "name": "special-defense", "base_stat": 63, "stat": 50 },
+              { "name": "speed", "base_stat": 118, "stat": 91 }
+            ],
+            "moves": [
+              { "name": "flying-press", "type": "fighting", "class": "physical", "power": 100, "accuracy": 95, "pp": 10 },
+              { "name": "high-jump-kick", "type": "fighting", "class": "physical", "power": 130, "accuracy": 90, "pp": 10 },
+              { "name": "hone-claws", "type": "dark", "class": "status", "power": null, "accuracy": null, "pp": 15 }
+            ]
+          }
+        ]
+      }
     ],
-    "elite_four": [
-      { "name": "Malva", "type": "Fire", "team": ["Pyroar", "Torkoal", "Chandelure", "Talonflame"] },
-      { "name": "Siebold", "type": "Water", "team": ["Clawitzer", "Gyarados", "Starmie", "Barbaracle"] },
-      { "name": "Wikstrom", "type": "Steel", "team": ["Klefki", "Probopass", "Scizor", "Aegislash"] },
-      { "name": "Drasna", "type": "Dragon", "team": ["Dragalge", "Druddigon", "Altaria", "Noivern"] }
-    ],
+    "elite_four": [],
     "champion": {
-      "name": "Diantha", "type": "Varied", "team": ["Hawlucha", "Tyrantrum", "Aurorus", "Gourgeist", "Goodra", "Gardevoir"]
+      "name": "Diantha",
+      "type": "Varied",
+      "team": [
+        {
+          "id": 282,
+          "name": "gardevoir",
+          "level": 68,
+          "totalHp": 192,
+          "currentHp": 192,
+          "types": ["psychic", "fairy"],
+          "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/282.png",
+          "backSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/282.png",
+          "cry": "https://raw.githubusercontent.com/PokeAPI/cries/main/cries/pokemon/latest/282.ogg",
+          "stats": [
+            { "name": "hp", "base_stat": 68, "stat": 192 },
+            { "name": "attack", "base_stat": 65, "stat": 108 },
+            { "name": "defense", "base_stat": 65, "stat": 108 },
+            { "name": "special-attack", "base_stat": 125, "stat": 197 },
+            { "name": "special-defense", "base_stat": 115, "stat": 183 },
+            { "name": "speed", "base_stat": 80, "stat": 130 }
+          ],
+          "moves": [
+            { "name": "moonblast", "type": "fairy", "class": "special", "power": 95, "accuracy": 100, "pp": 15 },
+            { "name": "psychic", "type": "psychic", "class": "special", "power": 90, "accuracy": 100, "pp": 10 },
+            { "name": "shadow-ball", "type": "ghost", "class": "special", "power": 80, "accuracy": 100, "pp": 15 },
+            { "name": "thunderbolt", "type": "electric", "class": "special", "power": 90, "accuracy": 100, "pp": 15 }
+          ]
+        }
+      ]
     }
   },
   "alola": {
     "trial_captains_and_kahunas": [
-      { "name": "Hala", "type": "Fighting", "team": ["Machop", "Makuhita", "Crabrawler"] },
-      { "name": "Olivia", "type": "Rock", "team": ["Nosepass", "Boldore", "Lycanroc"] },
-      { "name": "Nanu", "type": "Dark", "team": ["Sableye", "Krookodile", "Persian"] },
-      { "name": "Hapu", "type": "Ground", "team": ["Golurk", "Gastrodon", "Flygon", "Mudsdale"] }
+      {
+        "name": "Hala",
+        "type": "Fighting",
+        "team": [
+          {
+            "id": 739,
+            "name": "crabrawler",
+            "level": 15,
+            "totalHp": 48,
+            "currentHp": 48,
+            "types": ["fighting"],
+            "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/739.png",
+            "backSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/739.png",
+            "cry": "https://raw.githubusercontent.com/PokeAPI/cries/main/cries/pokemon/latest/739.ogg",
+            "stats": [
+              { "name": "hp", "base_stat": 47, "stat": 48 },
+              { "name": "attack", "base_stat": 82, "stat": 33 },
+              { "name": "defense", "base_stat": 57, "stat": 24 },
+              { "name": "special-attack", "base_stat": 42, "stat": 19 },
+              { "name": "special-defense", "base_stat": 47, "stat": 21 },
+              { "name": "speed", "base_stat": 43, "stat": 20 }
+            ],
+            "moves": [
+              { "name": "power-up-punch", "type": "fighting", "class": "physical", "power": 40, "accuracy": 100, "pp": 20 },
+              { "name": "pursuit", "type": "dark", "class": "physical", "power": 40, "accuracy": 100, "pp": 20 },
+              { "name": "leer", "type": "normal", "class": "status", "power": null, "accuracy": 100, "pp": 30 }
+            ]
+          }
+        ]
+      }
     ],
-    "elite_four": [
-      { "name": "Hala", "type": "Fighting", "team": ["Hariyama", "Primeape", "Bewear", "Poliwrath", "Crabominable"] },
-      { "name": "Olivia", "type": "Rock", "team": ["Relicanth", "Carbink", "Golem", "Probopass", "Lycanroc"] },
-      { "name": "Acerola", "type": "Ghost", "team": ["Sableye", "Drifblim", "Dhelmise", "Froslass", "Palossand"] },
-      { "name": "Kahili", "type": "Flying", "team": ["Skarmory", "Mandibuzz", "Oricorio", "Braviary", "Toucannon"] }
-    ],
+    "elite_four": [],
     "champion": {
-      "name": "Kukui", "type": "Varied", "team": ["Lycanroc", "Ninetales", "Braviary", "Magnezone", "Snorlax", "Incinerator / Decidueye / Primarina"]
+      "name": "Kukui",
+      "type": "Varied",
+      "team": [
+        {
+          "id": 745,
+          "name": "lycanroc",
+          "level": 57,
+          "totalHp": 171,
+          "currentHp": 171,
+          "types": ["rock"],
+          "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/745.png",
+          "backSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/745.png",
+          "cry": "https://raw.githubusercontent.com/PokeAPI/cries/main/cries/pokemon/latest/745.ogg",
+          "stats": [
+            { "name": "hp", "base_stat": 75, "stat": 171 },
+            { "name": "attack", "base_stat": 115, "stat": 150 },
+            { "name": "defense", "base_stat": 65, "stat": 92 },
+            { "name": "special-attack", "base_stat": 55, "stat": 80 },
+            { "name": "special-defense", "base_stat": 65, "stat": 92 },
+            { "name": "speed", "base_stat": 112, "stat": 147 }
+          ],
+          "moves": [
+            { "name": "accelerock", "type": "rock", "class": "physical", "power": 40, "accuracy": 100, "pp": 20 },
+            { "name": "stone-edge", "type": "rock", "class": "physical", "power": 100, "accuracy": 80, "pp": 5 },
+            { "name": "crunch", "type": "dark", "class": "physical", "power": 80, "accuracy": 100, "pp": 15 },
+            { "name": "stealth-rock", "type": "rock", "class": "status", "power": null, "accuracy": null, "pp": 20 }
+          ]
+        }
+      ]
     }
   },
   "galar": {
     "gym_leaders": [
-      { "name": "Milo", "type": "Grass", "team": ["Gossifleur", "Eldegoss"] },
-      { "name": "Nessa", "type": "Water", "team": ["Goldeen", "Arrokuda", "Drednaw"] },
-      { "name": "Kabu", "type": "Fire", "team": ["Ninetales", "Arcanine", "Centiskorch"] },
-      { "name": "Bea / Allister", "type": "Fighting / Ghost", "team": ["Hitmontop / Phantump", "Pangoro / Cursola", "Sirfetch'd / Gengar", "Machamp / Mimikyu"] },
-      { "name": "Opal", "type": "Fairy", "team": ["Weezing", "Mawile", "Togekiss", "Alcremie"] },
-      { "name": "Gordie / Melony", "type": "Rock / Ice", "team": ["Barbaracle / Snom", "Shuckle / Darmanitan", "Stonjourner / Eiscue", "Coalossal / Lapras"] },
-      { "name": "Piers", "type": "Dark", "team": ["Scrafty", "Malamar", "Skuntank", "Obstagoon"] },
-      { "name": "Raihan", "type": "Dragon", "team": ["Gigalith", "Flygon", "Sandaconda", "Duraludon"] }
+      {
+        "name": "Raihan",
+        "type": "Dragon",
+        "badge": "Dragon Badge",
+        "team": [
+          {
+            "id": 884,
+            "name": "duraludon",
+            "level": 48,
+            "totalHp": 142,
+            "currentHp": 142,
+            "types": ["steel", "dragon"],
+            "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/884.png",
+            "backSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/884.png",
+            "cry": "https://raw.githubusercontent.com/PokeAPI/cries/main/cries/pokemon/latest/884.ogg",
+            "stats": [
+              { "name": "hp", "base_stat": 70, "stat": 142 },
+              { "name": "attack", "base_stat": 95, "stat": 108 },
+              { "name": "defense", "base_stat": 115, "stat": 129 },
+              { "name": "special-attack", "base_stat": 120, "stat": 134 },
+              { "name": "special-defense", "base_stat": 50, "stat": 62 },
+              { "name": "speed", "base_stat": 85, "stat": 97 }
+            ],
+            "moves": [
+              { "name": "dragon-claw", "type": "dragon", "class": "physical", "power": 80, "accuracy": 100, "pp": 15 },
+              { "name": "flash-cannon", "type": "steel", "class": "special", "power": 80, "accuracy": 100, "pp": 10 },
+              { "name": "rock-slide", "type": "rock", "class": "physical", "power": 75, "accuracy": 90, "pp": 10 },
+              { "name": "breaking-swipe", "type": "dragon", "class": "physical", "power": 60, "accuracy": 100, "pp": 15 }
+            ]
+          }
+        ]
+      }
     ],
     "elite_four": "Galar uses the Champion Cup tournament system in place of a traditional Elite Four.",
     "champion": {
-      "name": "Leon", "type": "Varied", "team": ["Aegislash", "Dragapult", "Haxorus", "Seismitoad / Mr. Rime / Rhyperior", "Starter Pokémon", "Charizard"]
+      "name": "Leon",
+      "type": "Varied",
+      "team": [
+        {
+          "id": 6,
+          "name": "charizard",
+          "level": 65,
+          "totalHp": 204,
+          "currentHp": 204,
+          "types": ["fire", "flying"],
+          "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/6.png",
+          "backSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/6.png",
+          "cry": "https://raw.githubusercontent.com/PokeAPI/cries/main/cries/pokemon/latest/6.ogg",
+          "stats": [
+            { "name": "hp", "base_stat": 78, "stat": 204 },
+            { "name": "attack", "base_stat": 84, "stat": 131 },
+            { "name": "defense", "base_stat": 78, "stat": 122 },
+            { "name": "special-attack", "base_stat": 109, "stat": 169 },
+            { "name": "special-defense", "base_stat": 85, "stat": 132 },
+            { "name": "speed", "base_stat": 100, "stat": 156 }
+          ],
+          "moves": [
+            { "name": "fire-blast", "type": "fire", "class": "special", "power": 110, "accuracy": 85, "pp": 5 },
+            { "name": "air-slash", "type": "flying", "class": "special", "power": 75, "accuracy": 95, "pp": 15 },
+            { "name": "solar-beam", "type": "grass", "class": "special", "power": 120, "accuracy": 100, "pp": 10 },
+            { "name": "ancient-power", "type": "rock", "class": "special", "power": 60, "accuracy": 100, "pp": 5 }
+          ]
+        }
+      ]
     }
   },
   "paldea": {
     "gym_leaders": [
-      { "name": "Katy", "type": "Bug", "team": ["Nymble", "Tarountula", "Teddiursa"] },
-      { "name": "Brassius", "type": "Grass", "team": ["Petilil", "Smoliv", "Sudowoodo"] },
-      { "name": "Iono", "type": "Electric", "team": ["Wattrel", "Bellibolt", "Luxio", "Mismagius"] },
-      { "name": "Kofu", "type": "Water", "team": ["Veluza", "Wugtrio", "Crabominable"] },
-      { "name": "Larry", "type": "Normal", "team": ["Komala", "Dudunsparce", "Staraptor"] },
-      { "name": "Ryme", "type": "Ghost", "team": ["Banette", "Mimikyu", "Houndstone", "Toxtricity"] },
-      { "name": "Tulip", "type": "Psychic", "team": ["Farigiraf", "Gardevoir", "Espathra", "Florges"] },
-      { "name": "Grusha", "type": "Ice", "team": ["Frosmoth", "Beartic", "Cetitan", "Altaria"] }
+      {
+        "name": "Iono",
+        "type": "Electric",
+        "badge": "Levincia Gym Badge",
+        "team": [
+          {
+            "id": 939,
+            "name": "bellibolt",
+            "level": 24,
+            "totalHp": 97,
+            "currentHp": 97,
+            "types": ["electric"],
+            "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/939.png",
+            "backSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/939.png",
+            "cry": "https://raw.githubusercontent.com/PokeAPI/cries/main/cries/pokemon/latest/939.ogg",
+            "stats": [
+              { "name": "hp", "base_stat": 109, "stat": 97 },
+              { "name": "attack", "base_stat": 64, "stat": 41 },
+              { "name": "defense", "base_stat": 91, "stat": 57 },
+              { "name": "special-attack", "base_stat": 103, "stat": 64 },
+              { "name": "special-defense", "base_stat": 83, "stat": 52 },
+              { "name": "speed", "base_stat": 45, "stat": 30 }
+            ],
+            "moves": [
+              { "name": "spark", "type": "electric", "class": "physical", "power": 65, "accuracy": 100, "pp": 20 },
+              { "name": "water-gun", "type": "water", "class": "special", "power": 40, "accuracy": 100, "pp": 25 },
+              { "name": "mud-shot", "type": "ground", "class": "special", "power": 55, "accuracy": 95, "pp": 15 }
+            ]
+          }
+        ]
+      }
     ],
     "elite_four": [
-      { "name": "Rika", "type": "Ground", "team": ["Whiscash", "Camerupt", "Donphan", "Dugtrio", "Clodsire"] },
-      { "name": "Poppy", "type": "Steel", "team": ["Copperajah", "Magnezone", "Bronzong", "Corviknight", "Tinkaton"] },
-      { "name": "Larry", "type": "Flying", "team": ["Tropius", "Oricorio", "Altaria", "Staraptor", "Flamigo"] },
-      { "name": "Hassel", "type": "Dragon", "team": ["Noivern", "Haxorus", "Dragalge", "Flapple", "Baxcalibur"] }
+      {
+        "name": "Rika",
+        "type": "Ground",
+        "team": [
+          {
+            "id": 980,
+            "name": "clodsire",
+            "level": 58,
+            "totalHp": 222,
+            "currentHp": 222,
+            "types": ["poison", "ground"],
+            "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/980.png",
+            "backSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/980.png",
+            "cry": "https://raw.githubusercontent.com/PokeAPI/cries/main/cries/pokemon/latest/980.ogg",
+            "stats": [
+              { "name": "hp", "base_stat": 130, "stat": 222 },
+              { "name": "attack", "base_stat": 75, "stat": 108 },
+              { "name": "defense", "base_stat": 60, "stat": 88 },
+              { "name": "special-attack", "base_stat": 45, "stat": 67 },
+              { "name": "special-defense", "base_stat": 100, "stat": 141 },
+              { "name": "speed", "base_stat": 20, "stat": 32 }
+            ],
+            "moves": [
+              { "name": "earthquake", "type": "ground", "class": "physical", "power": 100, "accuracy": 100, "pp": 10 },
+              { "name": "toxic", "type": "poison", "class": "status", "power": null, "accuracy": 90, "pp": 10 },
+              { "name": "sludge-bomb", "type": "poison", "class": "special", "power": 90, "accuracy": 100, "pp": 10 },
+              { "name": "yawn", "type": "normal", "class": "status", "power": null, "accuracy": null, "pp": 10 }
+            ]
+          }
+        ]
+      }
     ],
     "champion": {
-      "name": "Geeta", "type": "Varied", "team": ["Espathra", "Kingambit", "Avalugg", "Veluza", "Gogoat", "Glimmora"]
+      "name": "Geeta",
+      "type": "Varied",
+      "team": [
+        {
+          "id": 970,
+          "name": "glimmora",
+          "level": 62,
+          "totalHp": 195,
+          "currentHp": 195,
+          "types": ["rock", "poison"],
+          "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/970.png",
+          "backSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/970.png",
+          "cry": "https://raw.githubusercontent.com/PokeAPI/cries/main/cries/pokemon/latest/970.ogg",
+          "stats": [
+            { "name": "hp", "base_stat": 83, "stat": 195 },
+            { "name": "attack", "base_stat": 55, "stat": 87 },
+            { "name": "defense", "base_stat": 90, "stat": 138 },
+            { "name": "special-attack", "base_stat": 130, "stat": 193 },
+            { "name": "special-defense", "base_stat": 81, "stat": 125 },
+            { "name": "speed", "base_stat": 86, "stat": 132 }
+          ],
+          "moves": [
+            { "name": "mortal-spin", "type": "poison", "class": "physical", "power": 30, "accuracy": 100, "pp": 15 },
+            { "name": "sludge-wave", "type": "poison", "class": "special", "power": 95, "accuracy": 100, "pp": 10 },
+            { "name": "power-gem", "type": "rock", "class": "special", "power": 80, "accuracy": 100, "pp": 20 },
+            { "name": "earth-power", "type": "ground", "class": "special", "power": 90, "accuracy": 100, "pp": 10 }
+          ]
+        }
+      ]
     }
   }
 }
