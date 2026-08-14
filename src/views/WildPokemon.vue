@@ -17,6 +17,9 @@ import { getPokemon } from "@/api/pokeapi"
 import { getSpecies } from "@/api/pokeapi"
 import { getEvoChain } from "@/api/pokeapi"
 import PokemonBattle from "@/components/PokemonBattle.vue"
+import { getPokemonData } from "@/assets/helpers/pokemonHelper"
+import { getPokemonWithLevelData } from "@/assets/helpers/pokemonHelper"
+import { getMoveData } from "@/assets/helpers/pokemonHelper"
 
 const settingsStore = useSettingsStore()
 
@@ -72,12 +75,9 @@ const isFinished = ref(false)
 
 const isBattleModalOpen = ref(false)
 const battleStarted = ref(false)
-const usersSelectedPokemon = ref(null)
 const battleLog = ref([])
 const showDefeat = ref(false)
 const battleWin = ref(false)
-const logEl = ref(null);
-const isResolving = ref(false)
 
 const openCatchModal = (pokemon, index) => {
   if (!pokemon) {
@@ -90,22 +90,6 @@ const openCatchModal = (pokemon, index) => {
   PlayCry(pokemon.cry)
 }
 
-const pokeballOptions = computed(() => {
-  const standardPokeball = {
-    id: "pokeball",
-    label: "Pokeball",
-    count: '∞'
-  };
-
-  const storeBalls = Object.keys(inventoryStore.pokeballs).map((key) => ({
-    id: key,
-    label: key.charAt(0).toUpperCase() + key.slice(1),
-    count: inventoryStore.pokeballs[key].count
-  }));
-
-  return [standardPokeball, ...storeBalls];
-});
-
 const closeCatchModal = () => {
   selectedPokemon.value = null
   isCatchModalOpen.value = false
@@ -116,14 +100,6 @@ const closeCatchModal = () => {
 }
 
 const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
-
-const anim = ref(null); // { actor: 'ally' | 'foe', type: 'lunge' | 'hit' | 'faint' }
-
-async function playAnim(actor, type, ms) {
-  anim.value = { actor, type };
-  await delay(ms);
-  anim.value = null;
-}
 
 function closeDefeatModal() {
   showDefeat.value = false
@@ -235,7 +211,6 @@ async function CatchPokemon() {
 
 }
 
-
 function battlePokemon() {
   isBattleModalOpen.value = true
   isCatchModalOpen.value = false
@@ -304,7 +279,6 @@ watch(
     }
   }
 );
-
 
 onUnmounted(() => {
   // clean up the audio when you leave the page.
@@ -454,7 +428,6 @@ async function getWildPokemonData(region) {
 
     // Collect pokemon data for the starters and set the wildPokemon value to the returned list
     const starterPromises = starterIDs.map(async (pokemonID) => {
-      const randInt = Math.floor(Math.random() * 101);
       try {
         const data = await fetch("https://pokeapi.co/api/v2/pokemon/" + pokemonID);
         let speciesData = await getSpecies(pokemonID)
@@ -464,77 +437,7 @@ async function getWildPokemonData(region) {
         }
 
         const dataJson = await data.json();
-        const randomMoves = [];
-
-        const chainUrl = speciesData?.evolution_chain?.url;
-        const chainId = chainUrl ? chainUrl.match(/\/(\d+)\/?$/)?.[1] : null;
-
-        try {
-          const movePool = dataJson.moves.filter(m => m.version_group_details[0].move_learn_method.name === "level-up" && m.version_group_details[0].level_learned_at <= 5)
-          console.log(movePool)
-          if (movePool.length > 4) {
-            let move = null
-            for (let i = 0; i < 4; i++) {
-              let randMoveIndex = Math.floor(Math.random() * movePool.length)
-              let spiltUrl = movePool[randMoveIndex].move.url.split("/")
-              move = await getMove(spiltUrl.at(-2))
-              //   console.log(move)
-              let moveInfo = {
-                name: move.name,
-                accuracy: move.accuracy,
-                type: move.type.name,
-                class: move.damage_class.name,
-                power: move.power,
-                pp: move.pp,
-                stat_changes: move.stat_changes.map(s => ({ stat: s.stat.name, change: s.change }))
-              }
-              randomMoves.push(moveInfo)
-            }
-          } else {
-            for (let move of movePool) {
-              const moveResp = await fetch(move.move.url)
-              const moveData = await moveResp.json()
-              let moveInfo = {
-                name: moveData.name,
-                accuracy: moveData.accuracy,
-                type: moveData.type.name,
-                class: moveData.damage_class.name,
-                power: moveData.power,
-                pp: moveData.pp,
-                stat_changes: moveData.stat_changes.map(s => ({ stat: s.stat.name, change: s.change }))
-              }
-              randomMoves.push(moveInfo)
-            }
-          }
-        } catch (err) {
-          console.log(`An error occured getting moves for ${dataJson.name}`, err)
-        }
-        let evoDetails = []
-        const hpCalc = Math.floor(((2 * dataJson.stats.find(s => s.stat.name == "hp")?.base_stat * 5) / 100) + 5 + 10)
-        if (chainId) {
-          evoDetails = await getEvolutionRequirements(chainId, speciesData.name)
-        }
-
-        return {
-          name: dataJson.name,
-          id: dataJson.id,
-          sprite: 10 < randInt && randInt < 15 ? dataJson.sprites.front_shiny : dataJson.sprites.front_default,
-          backSprite: 10 < randInt && randInt < 15 ? dataJson.sprites.back_shiny : dataJson.sprites.back_default,
-          types: dataJson.types.map(t => t.type.name),
-          height: dataJson.height,
-          weight: dataJson.weight,
-          cry: dataJson.cries?.latest ? dataJson.cries.latest : (dataJson.cries?.legacy || ""),
-          //Since these are starters the capture rate is manually set to 100% so you cant fail to aquire a starter.
-          captureRate: 100,
-          totalHp: hpCalc,
-          currentHp: hpCalc,
-          stats: dataJson.stats.map(s => ({ name: s.stat.name, base_stat: s.base_stat, stat: ((2 * s.base_stat * 5) / 100) + 5 })),
-          moves: randomMoves,
-          totalKOs: 0,
-          totalFaints: 0,
-          level: 5,
-          evoDetails: evoDetails
-        };
+        return await getPokemonWithLevelData(dataJson.name, selectedRegion.value, 5)
       } catch (err) {
         console.error(`An error occurred loading data for starter: ${pokemonID}`, err);
         return null;
@@ -564,149 +467,12 @@ async function getWildPokemonData(region) {
 
     const pokemonIdentifier = target.name;
     // const pokemonIdentifier = "deoxys"
-    // Both pokemon and pokemon-species calls are required for all the data we need for an individual pokemon
-    try {
-      let speciesData = await getSpecies(pokemonIdentifier)
-      let pokemonData = null
-      if (speciesData.varieties.length > 1) {
-        for (let form of speciesData.varieties) {
-          // console.log(pokemonIdentifier + "-" + selectedRegion.value)
-          if (form.pokemon.name == (pokemonIdentifier + "-" + selectedRegion.value)) {
-            pokemonData = await getPokemon(form.pokemon.name)
-            // console.log(pokemonData)
-            break
-          }
-        }
-        if (!pokemonData) {
-          if (speciesData.varieties[0].is_default) {
-            pokemonData = await getPokemon(speciesData.varieties[0].pokemon.name)
-          }
-          else {
-            let randFormIndex = Math.floor(Math.random() * speciesData.varieties.length)
-            let pokemonId = speciesData.varieties[randFormIndex].pokemon.url.split("/")
-            pokemonData = await getPokemon(pokemonId.at(-2))
-          }
-        }
-      } else {
-        pokemonData = await getPokemon(speciesData.varieties[0].pokemon.name);
-      }
-
-      let levelRange = await calculateMaxAndMinLevels(speciesData, pokemonData.name)
-      // console.log(`${pokemonData.name} - Min: ${levelRange.min} Max: ${levelRange.max}`)
-
-      const randLevel = Math.floor(Math.random() * (levelRange.max - levelRange.min + 1)) + levelRange.min;
-      const randomMoves = [];
-      try {
-        const movePool = pokemonData.moves.filter(m => m.version_group_details[0].move_learn_method.name === "level-up" && m.version_group_details[0].level_learned_at <= randLevel)
-        if (movePool.length > 4) {
-          // console.log(pokemonData.name)
-          // console.log(movePool)
-          for (let i = 0; i < 4; i++) {
-            let move = null
-            let randMoveIndex = Math.floor(Math.random() * movePool.length)
-            let spiltUrl = movePool[randMoveIndex].move.url.split("/")
-            move = await getMove(spiltUrl.at(-2))
-            // console.log(move)
-            if (move.power != null) {
-              let moveInfo = {
-                name: move.name,
-                accuracy: move.accuracy,
-                type: move.type.name,
-                class: move.damage_class.name,
-                power: move.power,
-                pp: move.pp,
-                stat_changes: move.stat_changes.map(s => ({ stat: s.stat.name, change: s.change }))
-              }
-              randomMoves.push(moveInfo)
-            } else {
-              i--
-            }
-          }
-        } else {
-          for (let move of movePool) {
-            const moveResp = await fetch(move.move.url)
-            const moveData = await moveResp.json()
-            let moveInfo = {
-              name: moveData.name,
-              accuracy: moveData.accuracy,
-              type: moveData.type.name,
-              class: moveData.damage_class.name,
-              power: moveData.power,
-              pp: moveData.pp,
-              stat_changes: moveData.stat_changes.map(s => ({ stat: s.stat.name, change: s.change }))
-            }
-            randomMoves.push(moveInfo)
-          }
-        }
-      } catch (err) {
-        console.log(`An error occured getting moves for ${pokemonData.name}`, err)
-      }
-      const hpCalc = Math.floor(((2 * pokemonData.stats.find(s => s.stat.name == "hp")?.base_stat * randLevel) / 100) + randLevel + 10)
-
-      //Create the pokemon data with parts from both the API calls
-      return {
-        name: pokemonData.name,
-        id: pokemonData.id,
-        sprite: 10 < randInt && randInt < 15 ? pokemonData.sprites.front_shiny : pokemonData.sprites.front_default,
-        backSprite: 10 < randInt && randInt < 15 ? pokemonData.sprites.back_shiny : pokemonData.sprites.back_default,
-        types: pokemonData.types.map(t => t.type.name),
-        height: pokemonData.height,
-        weight: pokemonData.weight,
-        cry: pokemonData.cries?.latest ? pokemonData.cries.latest : (pokemonData.cries?.legacy || ""),
-        // Pokemon uses a scale of 0-255 for capture rate. this is being converted to a percentage of 100
-        captureRate: Math.round((speciesData.capture_rate / 255) * 100),
-        totalHp: hpCalc,
-        currentHp: hpCalc,
-        stats: pokemonData.stats.map(s => ({ name: s.stat.name, base_stat: s.base_stat, stat: ((2 * s.base_stat * randLevel) / 100) + 5 })),
-        moves: randomMoves,
-        totalKOs: 0,
-        totalFaints: 0,
-        level: randLevel,
-        canEvolve: false,
-        evoLevel: null,
-        requiredEvoItem: null
-
-      };
-    } catch (err) {
-      console.error(`An error occurred collecting data for ${target.name}`, err);
-      return null;
-    }
+    return await getPokemonData(pokemonIdentifier, selectedRegion)
   });
 
   const wildResults = await Promise.all(wildPromises);
   console.log(wildResults)
   wildPokemon.value = wildResults.filter(Boolean);
-}
-
-async function calculateMaxAndMinLevels(pokemonSpecies, name) {
-  let max = 100;
-  let min = pokemonSpecies.is_legendary ? 85 : pokemonSpecies.is_mythical ? 75 : 1
-
-  function walk(node, parentDetails) {
-    if (node.species.name === name) {
-      // min: the level it evolved at (if it has a pre-evolution)
-      const lvl = parentDetails?.find(d => d.min_level)?.min_level;
-      if (lvl) min = lvl;
-      // max: the lowest level any of its evolutions require
-      const nextLevels = node.evolves_to
-        .flatMap(e => e.evolution_details)
-        .map(d => d.min_level)
-        .filter(Boolean);
-      if (nextLevels.length) max = Math.min(...nextLevels) - 1;
-      return true;
-    }
-    return node.evolves_to.some(e => walk(e, e.evolution_details));
-  }
-
-  try {
-    let url = pokemonSpecies.evolution_chain.url.split("/")
-    const evoChain = await getEvoChain(url.at(-2))
-    walk(evoChain.chain, null);
-    return { min, max };
-  } catch (err) {
-    console.error(`There was an issue getting the min and max levels for ${name}.`, err);
-    return { min, max };
-  }
 }
 
 </script>
