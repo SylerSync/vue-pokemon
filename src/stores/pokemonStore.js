@@ -1,5 +1,6 @@
 import { defineStore } from "pinia"
 
+
 const testGodPokemon = {
     id: 150,
     name: "mewtwo-god",
@@ -35,7 +36,35 @@ const testGodPokemon = {
             power: 300,
             accuracy: 100,
             pp: 99
-        }
+        },
+        {
+            name: "pass-turn",
+            type: "normal",
+            class: "special",
+            power: 0,
+            accuracy: 100,
+            pp: 99
+        },
+        {
+            name: 'status-test',
+            type: 'electric',
+            power: null,
+            accuracy: 100,
+            priority: 0,
+            damageClass: 'status',
+            targetsSelf: false,        // target is 'selected-pokemon'
+            statChanges: [],
+            statChance: 0,
+            ailment: 'burn',
+            ailmentChance: 0,          // ⚠️ see below
+            drain: 0,
+            healing: 0,
+            flinchChance: 0,
+            critRate: 0,
+            trap: false,
+            minTurns: 0,               // null in API
+            maxTurns: 0,               // null in API
+        },
     ]
 }
 

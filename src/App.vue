@@ -38,6 +38,8 @@ const pokeballOptions = computed(() => {
 
     return [standardPokeball, ...storeBalls];
 });
+
+
 </script>
 
 <template>
