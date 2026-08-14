@@ -8,201 +8,214 @@ import { getMove } from "@/api/pokeapi"
 // If no form the base form will be suplied
 // Note: for regional forms the region's name is the form
 export async function getPokemonData(pokemon, specialForm) {
-    const randInt = Math.floor(Math.random() * 101);
-    try {
-      let speciesData = await getSpecies(pokemon)
-      let pokemonData = null
-      if(speciesData.varieties.length > 1){
-        for(let form of speciesData.varieties) {
-          console.log(form.pokemon.name)
-          console.log(pokemon + "-" + specialForm)
-          if(form.pokemon.name == (pokemon + "-" + specialForm)) {
-            pokemonData = await getPokemon(form.pokemon.name)
-            break
-          }
+  const randInt = Math.floor(Math.random() * 101);
+  try {
+    let speciesData = await getSpecies(pokemon)
+    let pokemonData = null
+    if (speciesData.varieties.length > 1) {
+      for (let form of speciesData.varieties) {
+        console.log(form.pokemon.name)
+        console.log(pokemon + "-" + specialForm)
+        if (form.pokemon.name == (pokemon + "-" + specialForm)) {
+          pokemonData = await getPokemon(form.pokemon.name)
+          break
         }
-        if(!pokemonData){
-          if (speciesData.varieties[0].is_default) {
+      }
+      if (!pokemonData) {
+        if (speciesData.varieties[0].is_default) {
           pokemonData = await getPokemon(speciesData.varieties[0].pokemon.name)
-          }
-          else {
+        }
+        else {
           let randFormIndex = Math.floor(Math.random() * speciesData.varieties.length)
           let pokemonId = speciesData.varieties[randFormIndex].pokemon.url.split("/")
           pokemonData = await getPokemon(pokemonId.at(-2))
-          }
+        }
+      }
+    } else {
+      pokemonData = await getPokemon(speciesData.varieties[0].pokemon.name);
+    }
+
+    let levelRange = await calculateMaxAndMinLevels(speciesData, pokemonData.name)
+    // console.log(`${pokemonData.name} - Min: ${levelRange.min} Max: ${levelRange.max}`)
+
+    const randLevel = Math.floor(Math.random() * (levelRange.max - levelRange.min + 1)) + levelRange.min;
+    const randomMoves = [];
+    try {
+      const movePool = pokemonData.moves.filter(m => m.version_group_details[0].move_learn_method.name === "level-up" && m.version_group_details[0].level_learned_at <= randLevel)
+      if (movePool.length > 4) {
+        // console.log(pokemonData.name)
+        // console.log(movePool)
+        let selectedMoves = []
+        for (let i = 0; i < 4; i++) {
+          let move = null
+          let randMoveIndex = getRandomWithExclusions(0, movePool.length - 1, selectedMoves)
+          selectedMoves.push(randMoveIndex)
+          let spiltUrl = movePool[randMoveIndex].move.url.split("/")
+          move = await getMove(spiltUrl.at(-2))
+          let moveInfo = await getMoveData(move)
+          randomMoves.push(moveInfo)
         }
       } else {
-        pokemonData = await getPokemon(speciesData.varieties[0].pokemon.name);
-      }
-
-      let levelRange = await calculateMaxAndMinLevels(speciesData, pokemonData.name)
-      // console.log(`${pokemonData.name} - Min: ${levelRange.min} Max: ${levelRange.max}`)
-
-      const randLevel = Math.floor(Math.random() * (levelRange.max - levelRange.min + 1)) + levelRange.min;
-      const randomMoves = [];
-      try{
-        const movePool = pokemonData.moves.filter(m => m.version_group_details[0].move_learn_method.name === "level-up" && m.version_group_details[0].level_learned_at <= randLevel)
-        if (movePool.length > 4){
-          // console.log(pokemonData.name)
-          // console.log(movePool)
-          let selectedMoves = []
-            for (let i = 0; i < 4; i++) {
-                let move = null
-                let randMoveIndex = getRandomWithExclusions(0, movePool.length-1, selectedMoves)
-                selectedMoves.push(randMoveIndex)
-                let spiltUrl = movePool[randMoveIndex].move.url.split("/")
-                move = await getMove(spiltUrl.at(-2))
-                // move = await getMove(147)
-                let moveInfo = await getMoveData(move)
-                randomMoves.push(moveInfo)
-            }
-        } else {
-            for (let move of movePool) {
-                const moveResp = await fetch(move.move.url)
-                const moveData = await moveResp.json()
-                let moveInfo = await getMoveData(moveData)
-                randomMoves.push(moveInfo)
-            }
+        for (let move of movePool) {
+          const moveResp = await fetch(move.move.url)
+          const moveData = await moveResp.json()
+          let moveInfo = await getMoveData(moveData)
+          randomMoves.push(moveInfo)
         }
-      } catch(err) {
-          console.log(`An error occured getting moves for ${pokemonData.name}`, err)
       }
-      const hpCalc = Math.floor(((2 * pokemonData.stats.find(s => s.stat.name == "hp")?.base_stat * randLevel) / 100) + randLevel + 10)
-
-      //Create the pokemon data with parts from both the API calls
-      return {
-        name: pokemonData.name,
-        id: pokemonData.id,
-        sprite: 10 < randInt && randInt < 15 ? pokemonData.sprites.front_shiny : pokemonData.sprites.front_default,
-        backSprite: 10 < randInt && randInt < 15 ? pokemonData.sprites.back_shiny : pokemonData.sprites.back_default,
-        types: pokemonData.types.map(t => t.type.name),
-        height: pokemonData.height,
-        weight: pokemonData.weight,
-        cry: pokemonData.cries?.latest ? pokemonData.cries.latest : (pokemonData.cries?.legacy || ""),
-        // Pokemon uses a scale of 0-255 for capture rate. this is being converted to a percentage of 100
-        captureRate: Math.round((speciesData.capture_rate / 255) * 100),
-        totalHp: hpCalc,
-        currentHp: hpCalc,
-        stats: pokemonData.stats.map(s => ({name: s.stat.name, base_stat: s.base_stat, stat: ((2 * s.base_stat * randLevel)/100) + 5})),
-        moves: randomMoves,
-        totalKOs: 0,
-        totalFaints: 0,
-        level: randLevel
-        
-      };
     } catch (err) {
-      console.error(`An error occurred collecting data for ${pokemon}`, err);
-      return null;
+      console.log(`An error occured getting moves for ${pokemonData.name}`, err)
     }
+    const hpCalc = Math.floor(((2 * pokemonData.stats.find(s => s.stat.name == "hp")?.base_stat * randLevel) / 100) + randLevel + 10)
+
+    let url = speciesData.evolution_chain.url
+    const match = url?.match(/\/(\d+)\/?$/);
+    const chainId = match ? match[1] : null;
+    const evoDetails = await getEvolutionRequirements(chainId, speciesData.name)
+    
+
+    //Create the pokemon data with parts from both the API calls
+    return {
+      name: pokemonData.name,
+      id: pokemonData.id,
+      sprite: 10 < randInt && randInt < 15 ? pokemonData.sprites.front_shiny : pokemonData.sprites.front_default,
+      backSprite: 10 < randInt && randInt < 15 ? pokemonData.sprites.back_shiny : pokemonData.sprites.back_default,
+      types: pokemonData.types.map(t => t.type.name),
+      height: pokemonData.height,
+      weight: pokemonData.weight,
+      cry: pokemonData.cries?.latest ? pokemonData.cries.latest : (pokemonData.cries?.legacy || ""),
+      // Pokemon uses a scale of 0-255 for capture rate. this is being converted to a percentage of 100
+      captureRate: Math.round((speciesData.capture_rate / 255) * 100),
+      totalHp: hpCalc,
+      currentHp: hpCalc,
+      stats: pokemonData.stats.map(s => ({ name: s.stat.name, base_stat: s.base_stat, stat: ((2 * s.base_stat * randLevel) / 100) + 5 })),
+      moves: randomMoves,
+      totalKOs: 0,
+      totalFaints: 0,
+      level: randLevel,
+      evoDetails: evoDetails
+
+    };
+  } catch (err) {
+    console.error(`An error occurred collecting data for ${pokemon}`, err);
+    return null;
+  }
 }
 
 export async function getPokemonWithLevelData(pokemon, specialForm, level) {
-    const randInt = Math.floor(Math.random() * 101);
-    try {
-      let speciesData = await getSpecies(pokemon)
-      let pokemonData = null
-      if(speciesData.varieties.length > 1){
-        for(let form of speciesData.varieties) {
-          if(form.pokemon.name == (pokemon + "-" + specialForm)) {
-            pokemonData = await getPokemon(form.pokemon.name)
-            break
-          }
+  const randInt = Math.floor(Math.random() * 101);
+  try {
+    let speciesData = await getSpecies(pokemon)
+    let pokemonData = null
+    if (speciesData.varieties.length > 1) {
+      for (let form of speciesData.varieties) {
+        if (form.pokemon.name == (pokemon + "-" + specialForm)) {
+          pokemonData = await getPokemon(form.pokemon.name)
+          break
         }
-        if(!pokemonData){
-          if (speciesData.varieties[0].is_default) {
+      }
+      if (!pokemonData) {
+        if (speciesData.varieties[0].is_default) {
           pokemonData = await getPokemon(speciesData.varieties[0].pokemon.name)
-          }
-          else {
+        }
+        else {
           let randFormIndex = Math.floor(Math.random() * speciesData.varieties.length)
           let pokemonId = speciesData.varieties[randFormIndex].pokemon.url.split("/")
           pokemonData = await getPokemon(pokemonId.at(-2))
-          }
+        }
+      }
+    } else {
+      pokemonData = await getPokemon(speciesData.varieties[0].pokemon.name);
+    }
+
+    let levelRange = await calculateMaxAndMinLevels(speciesData, pokemonData.name)
+    const randomMoves = [];
+    try {
+      const movePool = pokemonData.moves.filter(m => m.version_group_details[0].move_learn_method.name === "level-up" && m.version_group_details[0].level_learned_at <= level)
+      if (movePool.length > 4) {
+        // console.log(pokemonData.name)
+        // console.log(movePool)
+        let selectedMoves = []
+        for (let i = 0; i < 4; i++) {
+          let move = null
+          let randMoveIndex = getRandomWithExclusions(0, movePool.length - 1, selectedMoves)
+          selectedMoves.push(randMoveIndex)
+          let spiltUrl = movePool[randMoveIndex].move.url.split("/")
+          move = await getMove(spiltUrl.at(-2))
+          let moveInfo = await getMoveData(move)
+          randomMoves.push(moveInfo)
         }
       } else {
-        pokemonData = await getPokemon(speciesData.varieties[0].pokemon.name);
-      }
-
-      let levelRange = await calculateMaxAndMinLevels(speciesData, pokemonData.name)
-      const randomMoves = [];
-      try{
-        const movePool = pokemonData.moves.filter(m => m.version_group_details[0].move_learn_method.name === "level-up" && m.version_group_details[0].level_learned_at <= level)
-        if (movePool.length > 4){
-          // console.log(pokemonData.name)
-          // console.log(movePool)
-          let selectedMoves = []
-            for (let i = 0; i < 4; i++) {
-                let move = null
-                let randMoveIndex = getRandomWithExclusions(0, movePool.length-1, selectedMoves)
-                selectedMoves.push(randMoveIndex)
-                let spiltUrl = movePool[randMoveIndex].move.url.split("/")
-                move = await getMove(spiltUrl.at(-2))
-                let moveInfo = await getMoveData(move)
-                randomMoves.push(moveInfo)
-            }
-        } else {
-            for (let move of movePool) {
-                const moveResp = await fetch(move.move.url)
-                const moveData = await moveResp.json()
-                let moveInfo = await getMoveData(moveData)
-                randomMoves.push(moveInfo)
-            }
+        for (let move of movePool) {
+          const moveResp = await fetch(move.move.url)
+          const moveData = await moveResp.json()
+          let moveInfo = await getMoveData(moveData)
+          randomMoves.push(moveInfo)
         }
-      } catch(err) {
-          console.log(`An error occured getting moves for ${pokemon}`, err)
       }
-      const hpCalc = Math.floor(((2 * pokemonData.stats.find(s => s.stat.name == "hp")?.base_stat * level) / 100) + level + 10)
-
-      //Create the pokemon data with parts from both the API calls
-      return {
-        name: pokemonData.name,
-        id: pokemonData.id,
-        sprite: 10 < randInt && randInt < 15 ? pokemonData.sprites.front_shiny : pokemonData.sprites.front_default,
-        backSprite: 10 < randInt && randInt < 15 ? pokemonData.sprites.back_shiny : pokemonData.sprites.back_default,
-        types: pokemonData.types.map(t => t.type.name),
-        height: pokemonData.height,
-        weight: pokemonData.weight,
-        cry: pokemonData.cries?.latest ? pokemonData.cries.latest : (pokemonData.cries?.legacy || ""),
-        // Pokemon uses a scale of 0-255 for capture rate. this is being converted to a percentage of 100
-        captureRate: Math.round((speciesData.capture_rate / 255) * 100),
-        totalHp: hpCalc,
-        currentHp: hpCalc,
-        stats: pokemonData.stats.map(s => ({name: s.stat.name, base_stat: s.base_stat, stat: ((2 * s.base_stat * level)/100) + 5})),
-        moves: randomMoves,
-        totalKOs: 0,
-        totalFaints: 0,
-        level: level
-        
-      };
     } catch (err) {
-      console.error(`An error occurred collecting data for ${pokemon}`, err);
-      return null;
+      console.log(`An error occured getting moves for ${pokemon}`, err)
     }
+    const hpCalc = Math.floor(((2 * pokemonData.stats.find(s => s.stat.name == "hp")?.base_stat * level) / 100) + level + 10)
+
+    
+    let url = speciesData.evolution_chain.url
+    const match = url?.match(/\/(\d+)\/?$/);
+    const chainId = match ? match[1] : null;
+    const evoDetails = await getEvolutionRequirements(chainId, speciesData.name)
+
+    //Create the pokemon data with parts from both the API calls
+    return {
+      name: pokemonData.name,
+      id: pokemonData.id,
+      sprite: 10 < randInt && randInt < 15 ? pokemonData.sprites.front_shiny : pokemonData.sprites.front_default,
+      backSprite: 10 < randInt && randInt < 15 ? pokemonData.sprites.back_shiny : pokemonData.sprites.back_default,
+      types: pokemonData.types.map(t => t.type.name),
+      height: pokemonData.height,
+      weight: pokemonData.weight,
+      cry: pokemonData.cries?.latest ? pokemonData.cries.latest : (pokemonData.cries?.legacy || ""),
+      // Pokemon uses a scale of 0-255 for capture rate. this is being converted to a percentage of 100
+      captureRate: Math.round((speciesData.capture_rate / 255) * 100),
+      totalHp: hpCalc,
+      currentHp: hpCalc,
+      stats: pokemonData.stats.map(s => ({ name: s.stat.name, base_stat: s.base_stat, stat: ((2 * s.base_stat * level) / 100) + 5 })),
+      moves: randomMoves,
+      totalKOs: 0,
+      totalFaints: 0,
+      level: level,
+      evoDetails: evoDetails
+
+    };
+  } catch (err) {
+    console.error(`An error occurred collecting data for ${pokemon}`, err);
+    return null;
+  }
 }
 
 export async function getMoveData(move) {
-    return {
-        name: move.name,
-        type: move.type.name,
-        power: move.power,
-        accuracy: move.accuracy,          // null = never misses
-        priority: move.priority,
-        damageClass: move.damage_class.name,
-        targetsSelf: move.target.name === 'user',
-        statChanges: move.stat_changes.map(s => ({
-          stat: s.stat.name,
-          change: s.change,
-        })),
-        statChance: move.meta?.stat_chance ?? 0,
-        ailment: move.meta?.ailment?.name !== 'none' ? move.meta.ailment.name : null,
-        ailmentChance: move.meta?.ailment_chance ?? 0,
-        drain: move.meta?.drain ?? 0,     // negative = recoil
-        healing: move.meta?.healing ?? 0, // % of max HP
-        flinchChance: move.meta?.flinch_chance ?? 0,
-        critRate: move.meta?.crit_rate ?? 0,
-        trap: move.meta?.ailment?.name === 'trap',
-        minTurns: move.meta?.min_turns ?? 0,
-        maxTurns: move.meta?.max_turns ?? 0,
-    }
+  return {
+    name: move.name,
+    type: move.type.name,
+    power: move.power,
+    accuracy: move.accuracy,          // null = never misses
+    priority: move.priority,
+    damageClass: move.damage_class.name,
+    targetsSelf: move.target.name === 'user',
+    statChanges: move.stat_changes.map(s => ({
+      stat: s.stat.name,
+      change: s.change,
+    })),
+    statChance: move.meta?.stat_chance ?? 0,
+    ailment: move.meta?.ailment?.name !== 'none' ? move.meta.ailment.name : null,
+    ailmentChance: move.meta?.ailment_chance ?? 0,
+    drain: move.meta?.drain ?? 0,     // negative = recoil
+    healing: move.meta?.healing ?? 0, // % of max HP
+    flinchChance: move.meta?.flinch_chance ?? 0,
+    critRate: move.meta?.crit_rate ?? 0,
+    trap: move.meta?.ailment?.name === 'trap',
+    minTurns: move.meta?.min_turns ?? 0,
+    maxTurns: move.meta?.max_turns ?? 0,
+  }
 }
 
 async function calculateMaxAndMinLevels(pokemonSpecies, name) {
@@ -244,7 +257,7 @@ function getRandomWithExclusions(min, max, excludeArray) {
 
   // 2. Adjust the max range down by the number of active exclusions
   const availableRangeCount = (max - min + 1) - uniqueExcludes.length;
-  
+
   if (availableRangeCount <= 0) return null; // No available options
 
   // 3. Generate a random index within the newly shrunk range
@@ -260,4 +273,66 @@ function getRandomWithExclusions(min, max, excludeArray) {
   }
 
   return randomNum;
+}
+
+async function getEvolutionRequirements(chainId, pokeName) {
+  const requirements = [];
+
+  if (!chainId) {
+    console.warn(`No valid pokemon ID was found`);
+    return requirements;
+  }
+
+  const evoData = await getEvoChain(chainId);
+
+  if (!evoData) {
+    console.warn(`Could not find the evo chain for ${pokeName}, chain id: ${chainId}`);
+    return requirements;
+  }
+
+  if (evoData.chain.evolves_to?.length === 0) {
+    return requirements;
+  }
+
+  const evos = {
+    firstEvo: evoData.chain,
+    secondEvo: evoData.chain.evolves_to ?? []
+  };
+
+  // --- STAGE 1 (e.g. Bulbasaur, Eevee, Wurmple) ---
+  if (pokeName === evos.firstEvo.species.name) {
+    for (let evo of evos.secondEvo) {
+      const details = evo.evolution_details[0];
+      requirements.push({
+        level: details?.min_level ?? null,
+        item: details?.item?.name ?? null,
+        heldItem: details?.held_item?.name ?? null,
+        trigger: details?.trigger?.name ?? null,
+        nextEvo: evo.species ?? null
+      });
+    }
+    return requirements;
+  }
+
+  // --- STAGE 2 (e.g. Ivysaur, Gloom, Silcoon, Kirlia) ---
+  for (let pokemon of evos.secondEvo) {
+    if (pokeName === pokemon.species.name) {
+      if (pokemon.evolves_to?.length > 0) {
+        for (let evo of pokemon.evolves_to) {
+          const details = evo.evolution_details[0];
+          requirements.push({
+            level: details?.min_level ?? null,
+            item: details?.item?.name ?? null,
+            heldItem: details?.held_item?.name ?? null,
+            trigger: details?.trigger?.name ?? null,
+            nextEvo: evo.species ?? null
+          });
+        }
+      }
+      return requirements;
+    }
+  }
+
+  // --- STAGE 3 / FULLY EVOLVED ---
+  return requirements;
 }
