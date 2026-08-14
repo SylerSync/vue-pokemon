@@ -73,7 +73,7 @@ export const usePokemonStore = defineStore("pokemonStore", {
 
     state: () => ({
         caughtPokemon: [
-            { ...testGodPokemon, instanceId: crypto.randomUUID() },
+            
         ],
         wishlistPokemon: [],
         typeColors: {
