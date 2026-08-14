@@ -16,6 +16,7 @@ import 'primeicons/primeicons.css';
 import { getPokemon } from "@/api/pokeapi"
 import { getSpecies } from "@/api/pokeapi"
 import { getEvoChain } from "@/api/pokeapi"
+import PokemonBattle from "@/components/PokemonBattle.vue"
 
 const settingsStore = useSettingsStore()
 
@@ -129,6 +130,26 @@ function closeDefeatModal() {
     closeCatchModal()
 }
 
+function onBattleEnd({ outcome, opponent }) {
+  // outcome: 'won' | 'lost' | 'caught' | 'fled' | 'closed'
+  isBattleModalOpen.value = false
+  wildPokemon.value.splice(selectedIndex.value, 1)
+  // battleStarted.value = false
+  // isBattleModalOpen.value = false
+  // showDefeat.value = true
+  // if (usersSelectedPokemon.value.currentHp <= 0) {
+  //   usersSelectedPokemon.value.currentHp = 0
+  //   usersSelectedPokemon.value.totalFaints += 1
+  //   usersSelectedPokemon.value = null
+  // }
+  // // usersSelectedPokemon.value.currentHp = usersSelectedPokemon.value.totalHp
+  // if(selectedPokemon.value.currentHp <= 0) {
+  //   battleWin.value = true
+  //   inventoryStore.AddFunds(Math.trunc(3000 - (selectedPokemon.value.captureRate * 10)))
+  //   usersSelectedPokemon.value.totalKOs += 1
+  // }
+}
+
 function CatchStarter(){
     console.log("catching starter")
     if (!selectedPokemon.value || selectedIndex.value === null) {
@@ -214,214 +235,214 @@ async function CatchPokemon() {
 
 }
 
-function checkPokemonFlees() {
-  const fleeChance = Math.min(20, 100 - selectedPokemon.value.captureRate);
-  const fleeRoll = Math.floor(Math.random() * 101);
-  return fleeRoll <= fleeChance
-}
+// function checkPokemonFlees() {
+//   const fleeChance = Math.min(20, 100 - selectedPokemon.value.captureRate);
+//   const fleeRoll = Math.floor(Math.random() * 101);
+//   return fleeRoll <= fleeChance
+// }
 
 function battlePokemon() {
     isBattleModalOpen.value = true
     isCatchModalOpen.value = false
 }
 
-function startBattle() {
-    battleStarted.value = true;
-}
+// function startBattle() {
+//     battleStarted.value = true;
+// }
 
-function endBattle(){
-    battleStarted.value = false
-    isBattleModalOpen.value = false
-    showDefeat.value = true
-    if (usersSelectedPokemon.value.currentHp <= 0) {
-      usersSelectedPokemon.value.currentHp = 0
-      usersSelectedPokemon.value.totalFaints += 1
-      usersSelectedPokemon.value = null
-    }
-    // usersSelectedPokemon.value.currentHp = usersSelectedPokemon.value.totalHp
-    if(selectedPokemon.value.currentHp <= 0) {
-      battleWin.value = true
-      inventoryStore.AddFunds(Math.trunc(3000 - (selectedPokemon.value.captureRate * 10)))
-      usersSelectedPokemon.value.totalKOs += 1
-    }
-    wildPokemon.value.splice(selectedIndex.value, 1)
-    battleLog.value = []
-    isResolving.value = false
-}
+// function endBattle(){
+//     battleStarted.value = false
+//     isBattleModalOpen.value = false
+//     showDefeat.value = true
+//     if (usersSelectedPokemon.value.currentHp <= 0) {
+//       usersSelectedPokemon.value.currentHp = 0
+//       usersSelectedPokemon.value.totalFaints += 1
+//       usersSelectedPokemon.value = null
+//     }
+//     // usersSelectedPokemon.value.currentHp = usersSelectedPokemon.value.totalHp
+//     if(selectedPokemon.value.currentHp <= 0) {
+//       battleWin.value = true
+//       inventoryStore.AddFunds(Math.trunc(3000 - (selectedPokemon.value.captureRate * 10)))
+//       usersSelectedPokemon.value.totalKOs += 1
+//     }
+//     wildPokemon.value.splice(selectedIndex.value, 1)
+//     battleLog.value = []
+//     isResolving.value = false
+// }
 
-async function battleTurn(move) {
-    if(battleStarted.value) {
-      isResolving.value = true
-      let userSpeed = usersSelectedPokemon.value.stats.find(s => s.name == "speed").stat
-      let wildSpeed = selectedPokemon.value.stats.find(s => s.name == "speed").stat
-      const wildMove = selectedPokemon.value.moves.length
-          ? selectedPokemon.value.moves[Math.floor(Math.random() * selectedPokemon.value.moves.length)]
-          : null;
-      if(move == "Catch"){
-        await CatchPokemon()
-        if(!battleStarted.value) {return}
-        await delay(800)
-        battleLog.value.push(`Oh no, ${selectedPokemon.value.name} broke out`)
-        await useMove(selectedPokemon.value, usersSelectedPokemon.value, wildMove)
-        if (usersSelectedPokemon.value.currentHp <= 0) {
-              endBattle()
-              return
-        }
-        isResolving.value = false
-        return
-      }
-      // if(checkPokemonFlees()){
-      //   catchMessage.value = `Oh no! ${selectedPokemon.value.name} fled!`
-      //   showFeedback.value = true
-      //   isFinished.value = true
-      //   battleWin.value = false
-      //   endBattle()
-      //   return
-      // }
-      if(userSpeed > wildSpeed) {
-          await useMove(usersSelectedPokemon.value, selectedPokemon.value, move)
-          if (selectedPokemon.value.currentHp <= 0) {
-              endBattle()
-              return
-          }
-          await useMove(selectedPokemon.value, usersSelectedPokemon.value, wildMove)
-          if (usersSelectedPokemon.value.currentHp <= 0) {
-              endBattle()
-              return
-          }
-      } else if (wildSpeed > userSpeed) {
-          await useMove(selectedPokemon.value, usersSelectedPokemon.value, wildMove)
-          if (usersSelectedPokemon.value.currentHp <= 0) {
-              endBattle()
-              return
-          }
-          await useMove(usersSelectedPokemon.value, selectedPokemon.value, move)
-          if (selectedPokemon.value.currentHp <= 0) {
-              endBattle()
-              return
-          }
-      } else {
-          let tieBreaker = Math.floor(Math.random() * 100) + 1
-          if(tieBreaker > 50) {
-              await useMove(usersSelectedPokemon.value, selectedPokemon.value, move)
-              if (selectedPokemon.value.currentHp <= 0) {
-                  endBattle()
-                  return
-              }
-              await useMove(selectedPokemon.value, usersSelectedPokemon.value, wildMove)
-              if (usersSelectedPokemon.value.currentHp <= 0) {
-                  endBattle()
-                  return
-              }
-          } else {
-              await useMove(selectedPokemon.value, usersSelectedPokemon.value, wildMove)
-              if (usersSelectedPokemon.value.currentHp <= 0) {
-              endBattle()
-              return
-              }
-              await useMove(usersSelectedPokemon.value, selectedPokemon.value, move)
-              if (selectedPokemon.value.currentHp <= 0) {
-                  endBattle()
-                  return
-              }
-          }
-      }
-      isResolving.value = false
-    }
-}
+// async function battleTurn(move) {
+//     if(battleStarted.value) {
+//       isResolving.value = true
+//       let userSpeed = usersSelectedPokemon.value.stats.find(s => s.name == "speed").stat
+//       let wildSpeed = selectedPokemon.value.stats.find(s => s.name == "speed").stat
+//       const wildMove = selectedPokemon.value.moves.length
+//           ? selectedPokemon.value.moves[Math.floor(Math.random() * selectedPokemon.value.moves.length)]
+//           : null;
+//       if(move == "Catch"){
+//         await CatchPokemon()
+//         if(!battleStarted.value) {return}
+//         await delay(800)
+//         battleLog.value.push(`Oh no, ${selectedPokemon.value.name} broke out`)
+//         await useMove(selectedPokemon.value, usersSelectedPokemon.value, wildMove)
+//         if (usersSelectedPokemon.value.currentHp <= 0) {
+//               endBattle()
+//               return
+//         }
+//         isResolving.value = false
+//         return
+//       }
+//       // if(checkPokemonFlees()){
+//       //   catchMessage.value = `Oh no! ${selectedPokemon.value.name} fled!`
+//       //   showFeedback.value = true
+//       //   isFinished.value = true
+//       //   battleWin.value = false
+//       //   endBattle()
+//       //   return
+//       // }
+//       if(userSpeed > wildSpeed) {
+//           await useMove(usersSelectedPokemon.value, selectedPokemon.value, move)
+//           if (selectedPokemon.value.currentHp <= 0) {
+//               endBattle()
+//               return
+//           }
+//           await useMove(selectedPokemon.value, usersSelectedPokemon.value, wildMove)
+//           if (usersSelectedPokemon.value.currentHp <= 0) {
+//               endBattle()
+//               return
+//           }
+//       } else if (wildSpeed > userSpeed) {
+//           await useMove(selectedPokemon.value, usersSelectedPokemon.value, wildMove)
+//           if (usersSelectedPokemon.value.currentHp <= 0) {
+//               endBattle()
+//               return
+//           }
+//           await useMove(usersSelectedPokemon.value, selectedPokemon.value, move)
+//           if (selectedPokemon.value.currentHp <= 0) {
+//               endBattle()
+//               return
+//           }
+//       } else {
+//           let tieBreaker = Math.floor(Math.random() * 100) + 1
+//           if(tieBreaker > 50) {
+//               await useMove(usersSelectedPokemon.value, selectedPokemon.value, move)
+//               if (selectedPokemon.value.currentHp <= 0) {
+//                   endBattle()
+//                   return
+//               }
+//               await useMove(selectedPokemon.value, usersSelectedPokemon.value, wildMove)
+//               if (usersSelectedPokemon.value.currentHp <= 0) {
+//                   endBattle()
+//                   return
+//               }
+//           } else {
+//               await useMove(selectedPokemon.value, usersSelectedPokemon.value, wildMove)
+//               if (usersSelectedPokemon.value.currentHp <= 0) {
+//               endBattle()
+//               return
+//               }
+//               await useMove(usersSelectedPokemon.value, selectedPokemon.value, move)
+//               if (selectedPokemon.value.currentHp <= 0) {
+//                   endBattle()
+//                   return
+//               }
+//           }
+//       }
+//       isResolving.value = false
+//     }
+// }
 
-async function useMove(user, target, move) {
-    const actor = user === usersSelectedPokemon.value ? 'ally' : 'foe';
-    const victim = actor === 'ally' ? 'foe' : 'ally';
+// async function useMove(user, target, move) {
+//     const actor = user === usersSelectedPokemon.value ? 'ally' : 'foe';
+//     const victim = actor === 'ally' ? 'foe' : 'ally';
 
-    battleLog.value.push(`${user.name} used ${move.name}`)
-    await playAnim(actor, 'lunge', 300);
-    const randInt = Math.floor(Math.random() * 100) + 1
-    if(randInt > move.accuracy) {
-        battleLog.value.push(`${move.name} missed`)
-        await delay(800)
-        return
-    }
-    if(move.power) {
-        const results = calculateDamage(user, target, move)
-        if(results.critical) {
-            battleLog.value.push("Critical Hit!")
-        }
-        if(results.immune) {
-          battleLog.value.push(`It doesn't affect ${target.name}...`);
-          return;
-        }
-        if(results.effectiveness == 2){
-            battleLog.value.push("Super Effective")
-        } else if (results.effectiveness == .5){
-            battleLog.value.push("Not very effective")
-        }
-        // await delay(800)
-        await playAnim(victim, 'hit', 400);
-        battleLog.value.push(`${user.name} did ${results.damage} damage`)
-        target.currentHp -= results.damage
-        await delay(800)
-    } else {
-        battleLog.value.push("This move does nothing bozo.")
-    }
-}
+//     battleLog.value.push(`${user.name} used ${move.name}`)
+//     await playAnim(actor, 'lunge', 300);
+//     const randInt = Math.floor(Math.random() * 100) + 1
+//     if(randInt > move.accuracy) {
+//         battleLog.value.push(`${move.name} missed`)
+//         await delay(800)
+//         return
+//     }
+//     if(move.power) {
+//         const results = calculateDamage(user, target, move)
+//         if(results.critical) {
+//             battleLog.value.push("Critical Hit!")
+//         }
+//         if(results.immune) {
+//           battleLog.value.push(`It doesn't affect ${target.name}...`);
+//           return;
+//         }
+//         if(results.effectiveness == 2){
+//             battleLog.value.push("Super Effective")
+//         } else if (results.effectiveness == .5){
+//             battleLog.value.push("Not very effective")
+//         }
+//         // await delay(800)
+//         await playAnim(victim, 'hit', 400);
+//         battleLog.value.push(`${user.name} did ${results.damage} damage`)
+//         target.currentHp -= results.damage
+//         await delay(800)
+//     } else {
+//         battleLog.value.push("This move does nothing bozo.")
+//     }
+// }
 
-function calculateDamage(attacker, defender, move, opts = {}) {
-  const {
-    critical = Math.random() < 1 / 24,
-    randomFactor = Math.max(.85, Math.random()),
-    weatherMod = 1,
-    otherMod = 1,
-  } = opts;
+// function calculateDamage(attacker, defender, move, opts = {}) {
+//   const {
+//     critical = Math.random() < 1 / 24,
+//     randomFactor = Math.max(.85, Math.random()),
+//     weatherMod = 1,
+//     otherMod = 1,
+//   } = opts;
 
-  if (move.class === 'status' || !move.power) {
-    return { damage: 0, effectiveness: 1, critical: false, immune: false };
-  }
+//   if (move.class === 'status' || !move.power) {
+//     return { damage: 0, effectiveness: 1, critical: false, immune: false };
+//   }
 
-  const physical = move.class === 'physical';
-  const atk = physical ? attacker.stats.find(s => s.name == "attack").stat : attacker.stats.find(s => s.name == "special-attack").stat;
-  const def = physical ? defender.stats.find(s => s.name == "defense").stat : defender.stats.find(s => s.name == "special-defense").stat;
+//   const physical = move.class === 'physical';
+//   const atk = physical ? attacker.stats.find(s => s.name == "attack").stat : attacker.stats.find(s => s.name == "special-attack").stat;
+//   const def = physical ? defender.stats.find(s => s.name == "defense").stat : defender.stats.find(s => s.name == "special-defense").stat;
 
-  const base =
-    Math.floor(
-      Math.floor(
-        (Math.floor((2 * attacker.level) / 5 + 2) * move.power * atk) / def
-      ) / 50
-    ) + 2;
+//   const base =
+//     Math.floor(
+//       Math.floor(
+//         (Math.floor((2 * attacker.level) / 5 + 2) * move.power * atk) / def
+//       ) / 50
+//     ) + 2;
 
-  const stab = attacker.types.includes(move.type) ? 1.5 : 1;
-  const effectiveness = typeEffectiveness(move.type, defender.types);
-  const critMod = critical ? 1.5 : 1;
+//   const stab = attacker.types.includes(move.type) ? 1.5 : 1;
+//   const effectiveness = typeEffectiveness(move.type, defender.types);
+//   const critMod = critical ? 1.5 : 1;
 
-  if (effectiveness === 0) {
-    return { damage: 0, effectiveness: 0, critical: false, immune: true };
-  }
+//   if (effectiveness === 0) {
+//     return { damage: 0, effectiveness: 0, critical: false, immune: true };
+//   }
 
-  const damage = Math.max(
-    1,
-    Math.floor(
-      base * weatherMod * critMod * randomFactor * stab * effectiveness * otherMod
-    )
-  );
+//   const damage = Math.max(
+//     1,
+//     Math.floor(
+//       base * weatherMod * critMod * randomFactor * stab * effectiveness * otherMod
+//     )
+//   );
 
-  return { damage, effectiveness, critical, immune: false };
-}
+//   return { damage, effectiveness, critical, immune: false };
+// }
 
-function typeEffectiveness(moveType, defenderTypes) {
-  return defenderTypes.reduce(
-    (mult, t) => mult * (pokemonStore.typeChart[moveType]?.[t] ?? 1),
-    1
-  );
-}
+// function typeEffectiveness(moveType, defenderTypes) {
+//   return defenderTypes.reduce(
+//     (mult, t) => mult * (pokemonStore.typeChart[moveType]?.[t] ?? 1),
+//     1
+//   );
+// }
 
-function hpPercent(p) {
-  return Math.max(0, Math.min(100, (p.currentHp / p.totalHp) * 100));
-}
+// function hpPercent(p) {
+//   return Math.max(0, Math.min(100, (p.currentHp / p.totalHp) * 100));
+// }
 
-function hpTone(p) {
-  const pct = hpPercent(p);
-  return pct > 50 ? 'ok' : pct > 20 ? 'warn' : 'crit';
-}
+// function hpTone(p) {
+//   const pct = hpPercent(p);
+//   return pct > 50 ? 'ok' : pct > 20 ? 'warn' : 'crit';
+// }
 
 // Audio Management Section
 function PlayCry(cry_url) {
@@ -487,14 +508,14 @@ watch(
     }
 );
 
-watch( 
-    () => usersSelectedPokemon.value?.currentHp, 
-    (hp) => {
-        if(typeof hp === 'number' && hp <= 0) {
-            showDefeat.value = true;
-        }
-    }
-)
+// watch( 
+//     () => usersSelectedPokemon.value?.currentHp, 
+//     (hp) => {
+//         if(typeof hp === 'number' && hp <= 0) {
+//             showDefeat.value = true;
+//         }
+//     }
+// )
 
 onUnmounted(() => {
     // clean up the audio when you leave the page.
@@ -563,15 +584,15 @@ watch(selectedRegion, async (region) => {
   }
 });
 
-watch(
-  () => battleLog.value.length,
-  async () => {
-    await nextTick();
-    if (logEl.value) {
-      logEl.value.scrollTop = logEl.value.scrollHeight;
-    }
-  }
-);
+// watch(
+//   () => battleLog.value.length,
+//   async () => {
+//     await nextTick();
+//     if (logEl.value) {
+//       logEl.value.scrollTop = logEl.value.scrollHeight;
+//     }
+//   }
+// );
 
 async function getWildPokemonData(region) {
     // This function will use the list of pokemon generated by the watcher in order to choose 6 random pokemon to display
@@ -888,152 +909,13 @@ async function calculateMaxAndMinLevels(pokemonSpecies, name) {
         </div>
     </Modal>
 
-  <Modal v-if="isBattleModalOpen" @close="endBattle()">
-    <div class="battle">
-      <Splitter :sizes="[70, 30]" class="battle-split">
-        <SplitterPanel :minSize="45" class="battle-stage">
-
-          <!-- pre-battle -->
-          <div v-if="!battleStarted" class="setup">
-            <h2 class="setup-title">Choose your fighter</h2>
-            <Select
-              v-model="usersSelectedPokemon"
-              :options="pokemonStore.caughtPokemon"
-              :optionDisabled="(option) => (option.currentHp ?? option.totalHp) <= 0"
-              optionLabel="name"
-              filter
-              filterBy="name"
-              showClear
-              placeholder="Select a Pokémon"
-              class="setup-select"
-            >
-              <template #value="slotProps">
-                <div v-if="slotProps.value" class="option-row">
-                  <img v-if="slotProps.value.sprite" :src="slotProps.value.sprite" alt="" class="option-sprite" />
-                  <span class="option-name">{{ slotProps.value.name }}</span>
-                </div>
-                <span v-else class="placeholder">{{ slotProps.placeholder }}</span>
-              </template>
-              <template #option="slotProps">
-                <div class="option-row">
-                  <img v-if="slotProps.option.sprite" :src="slotProps.option.sprite" alt="" class="option-sprite" />
-                  <span class="option-name">{{ slotProps.option.name }} Lvl {{ slotProps.option.level }}</span>
-                </div>
-              </template>
-            </Select>
-            <button
-              class="btn btn-primary"
-              :disabled="!usersSelectedPokemon"
-              @click="startBattle()"
-            >
-              Start Battle
-            </button>
-          </div>
-
-          <!-- in battle -->
-          <div v-else class="arena">
-            <!-- opponent: info left, sprite right -->
-            <div class="combatant combatant-foe">
-              <div class="combatant-info">
-                <div class="combatant-head">
-                  <span class="label">Wild</span>
-                  <span class="combatant-name">{{ selectedPokemon.name }} Lvl {{ selectedPokemon.level }}</span>
-                </div>
-                <div class="hp">
-                  <div class="hp-track">
-                    <div
-                      class="hp-fill"
-                      :class="hpTone(selectedPokemon)"
-                      :style="{ width: hpPercent(selectedPokemon) + '%' }"
-                    />
-                  </div>
-                  <span class="hp-text">
-                    {{ Math.max(0, selectedPokemon.currentHp) }}/{{ selectedPokemon.totalHp }}
-                  </span>
-                </div>
-              </div>
-              <img
-                :src="selectedPokemon.sprite"
-                :alt="selectedPokemon.name"
-                class="battle-sprite sprite-foe"
-                :class="anim?.actor === 'foe' ? `anim-${anim.type}` : null"
-              />
-            </div>
-          
-            <!-- player: sprite left, info right -->
-            <div class="combatant combatant-ally">
-              <div class="combatant-info">
-                <div class="combatant-head">
-                  <span class="label">Yours</span>
-                  <span class="combatant-name">{{ usersSelectedPokemon.name }} Lvl {{ usersSelectedPokemon.level }}</span>
-                </div>
-                <div class="hp">
-                  <div class="hp-track">
-                    <div
-                      class="hp-fill"
-                      :class="hpTone(usersSelectedPokemon)"
-                      :style="{ width: hpPercent(usersSelectedPokemon) + '%' }"
-                    />
-                  </div>
-                  <span class="hp-text">
-                    {{ Math.max(0, usersSelectedPokemon.currentHp) }}/{{ usersSelectedPokemon.totalHp }}
-                  </span>
-                </div>
-              </div>
-              <img
-                :src="usersSelectedPokemon.backSprite ?? usersSelectedPokemon.sprite"
-                :alt="usersSelectedPokemon.name"
-                class="battle-sprite sprite-ally"
-                :class="anim?.actor === 'ally' ? `anim-${anim.type}` : null"
-              />
-            </div> 
-                <!-- moves -->
-                <div class="moves">
-                  <button
-                    v-for="move in usersSelectedPokemon.moves"
-                    :key="move.name"
-                    class="move"
-                    :disabled="isResolving"
-                    @click="battleTurn(move)"
-                  >
-                    <span class="move-name">{{ move.name }}</span>
-                    <span class="move-power">{{ move.power ?? '—' }}</span>
-                  </button>
-                </div>
-                <SelectButton
-                v-model="inventoryStore.selectedPokeball"
-                :options="pokeballOptions"
-                optionLabel="label"
-                optionValue="id"
-                :optionDisabled="(option) => option.count <= 0"
-                aria-labelledby="basic"
-                >
-                    <template #option="slotProps">
-                        <div class="pokeball-badge-item">
-                            <span class="ball-name">{{ slotProps.option.label }}</span>
-                            <Badge
-                                :value="slotProps.option.count"
-                                :severity="slotProps.option.count > 0 ? 'info' : 'secondary'"
-                            />
-                        </div>
-                    </template>
-                </SelectButton>
-                <button :disabled="isResolving || !inventoryStore.selectedPokeball" @click="battleTurn('Catch')">
-                    Catch Pokemon
-                </button>
-          </div>
-        </SplitterPanel>
-
-        <!-- log -->
-        <SplitterPanel :minSize="20" class="log-panel">
-          <div class="log-head">Log</div>
-          <div ref="logEl" class="log-body">
-            <p v-for="(entry, i) in battleLog" :key="i" class="log-line">{{ entry }}</p>
-          </div>
-        </SplitterPanel>
-      </Splitter>
-    </div>
-  </Modal>
+    <PokemonBattle
+      v-if="isBattleModalOpen"
+      :opponent="selectedPokemon"
+      :isWild="true"
+      @end="onBattleEnd"
+      @close="selectedPokemon = null"
+    />
 
   <Modal v-if="showDefeat" @close="closeDefeatModal()">
         <div class="catchModal">
