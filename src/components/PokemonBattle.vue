@@ -7,17 +7,8 @@
           <!-- pre-battle -->
           <div v-if="!battleStarted" class="setup">
             <h2 class="setup-title">Choose your fighter</h2>
-            <Select
-              v-model="userPokemon"
-              :options="team"
-              :optionDisabled="isFainted"
-              optionLabel="name"
-              filter
-              filterBy="name"
-              showClear
-              placeholder="Select a Pokémon"
-              class="setup-select"
-            >
+            <Select v-model="userPokemon" :options="team" :optionDisabled="isFainted" optionLabel="name" filter
+              filterBy="name" showClear placeholder="Select a Pokémon" class="setup-select">
               <template #value="slotProps">
                 <div v-if="slotProps.value" class="option-row">
                   <img v-if="slotProps.value.sprite" :src="slotProps.value.sprite" alt="" class="option-sprite" />
@@ -41,108 +32,90 @@
           </div>
 
           <!-- in battle -->
-            <div v-else class="arena">
-                <!-- opponent: info left, sprite right -->
-                <div class="combatant combatant-foe">
-                  <div class="combatant-info">
-                    <div class="combatant-head">
-                      <span class="label">Wild</span>
-                      <span class="combatant-name">{{ foe.name }} · Lv {{ foe.level }}</span>
-                    </div>
-                    <div class="hp">
-                      <div class="hp-track">
-                        <div
-                          class="hp-fill"
-                          :class="hpTone(foe)"
-                          :style="{ width: hpPercent(foe) + '%' }"
-                        />
-                      </div>
-                      <span class="hp-text">
-                        {{ Math.max(0, foe.currentHp) }}/{{ foe.totalHp }}
-                      </span>
-                    </div>
-                  </div>
-                  <img
-                    :src="foe.sprite"
-                    :alt="foe.name"
-                    class="battle-sprite sprite-foe"
-                    :class="anim?.actor === 'foe' ? `anim-${anim.type}` : null"
-                  />
-                </div>      
-                <!-- player: sprite left, info right -->
-                <div class="combatant combatant-ally">
-                  <div class="combatant-info">
-                    <div class="combatant-head">
-                      <span class="label">Yours</span>
-                      <span class="combatant-name">{{ userPokemon.name }} · Lv {{ userPokemon.level }}</span>
-                    </div>
-                    <div class="hp">
-                      <div class="hp-track">
-                        <div
-                          class="hp-fill"
-                          :class="hpTone(userPokemon)"
-                          :style="{ width: hpPercent(userPokemon) + '%' }"
-                        />
-                      </div>
-                      <span class="hp-text">
-                        {{ Math.max(0, userPokemon.currentHp) }}/{{ userPokemon.totalHp }}
-                      </span>
-                    </div>
-                  </div>
-                  <img
-                    :src="userPokemon.backSprite ?? userPokemon.sprite"
-                    :alt="userPokemon.name"
-                    class="battle-sprite sprite-ally"
-                    :class="anim?.actor === 'ally' ? `anim-${anim.type}` : null"
-                  />
-                </div>      
-                <!-- moves -->
-                <div class="moves">
-                  <button
-                    v-for="move in userPokemon.moves"
-                    :key="move.name"
-                    class="move"
-                    :disabled="isResolving || isFainted(userPokemon)"
-                    @click="battleTurn(move)"
-                  >
-                    <span class="move-name">{{ move.name }}</span>
-                    <span class="move-power">{{ move.power ?? '—' }}</span>
-                  </button>
+          <div v-else class="arena">
+            <!-- opponent: info left, sprite right -->
+            <div class="combatant combatant-foe">
+              <div class="combatant-info">
+                <div class="combatant-head">
+                  <span class="label">Lv {{ foe.level }}</span>
+                  <span class="combatant-name">{{ foe.name }}</span>
+                  <!-- Status icons -->
+                  <span v-if="foe.status">
+                    <span v-if="foe.status === 'paralysis'" class="pi pi-bolt"></span>
+                  </span>
                 </div>
+                <div class="hp">
+                  <div class="hp-track">
+                    <div class="hp-fill" :class="hpTone(foe)" :style="{ width: hpPercent(foe) + '%' }" />
+                  </div>
+                  <span class="hp-text">
+                    {{ Math.max(0, foe.currentHp) }}/{{ foe.totalHp }}
+                  </span>
+                </div>
+              </div>
+              <img :src="foe.sprite" :alt="foe.name" class="battle-sprite sprite-foe"
+                :class="anim?.actor === 'foe' ? `anim-${anim.type}` : null" />
+            </div>
+            <!-- player: sprite left, info right -->
+            <div class="combatant combatant-ally">
+              <div class="combatant-info">
+                <div class="combatant-head">
+                  <span class="label">Lv {{ userPokemon.level }}</span>
+                  <span class="combatant-name">{{ userPokemon.name }}</span>
+                  <!-- Status icons -->
+                  <span v-if="userPokemon.status">
+                    <span v-if="userPokemon.status === 'paralysis'" class="pi pi-bolt"></span>
+                  </span>
+                </div>
+                <div class="hp">
+                  <div class="hp-track">
+                    <div class="hp-fill" :class="hpTone(userPokemon)"
+                      :style="{ width: hpPercent(userPokemon) + '%' }" />
+                  </div>
+                  <span class="hp-text">
+                    {{ Math.max(0, userPokemon.currentHp) }}/{{ userPokemon.totalHp }}
+                  </span>
+                </div>
+              </div>
+              <img :src="userPokemon.backSprite ?? userPokemon.sprite" :alt="userPokemon.name"
+                class="battle-sprite sprite-ally" :class="anim?.actor === 'ally' ? `anim-${anim.type}` : null" />
+            </div>
+            <!-- moves -->
+            <div class="moves">
+              <button v-for="move in userPokemon.moves" :key="move.name" class="move"
+                :disabled="isResolving || isFainted(userPokemon)" @click="battleTurn(move)">
+                <span class="move-name">{{ move.name }}</span>
+                <span class="move-power">{{ move.power ?? '—' }}</span>
+              </button>
+            </div>
 
-                <!-- pokeballs -->
-                 <div v-if="isWild">
-                    <SelectButton v-model="inventoryStore.selectedPokeball" :options="pokeballOptions" optionLabel="label"
-                        optionValue="id" :optionDisabled="(option) => option.count <= 0" aria-labelledby="basic"
-                        class="custom-select-button">
-                        <template #option="slotProps">
-                            <div class="pokeball-option" :title="slotProps.option.label">
-                                <img :src="slotProps.option.icon" :alt="slotProps.option.label" class="pokeball-icon" />
-                                <Badge :value="slotProps.option.count"
-                                    :severity="slotProps.option.count === '∞' || slotProps.option.count > 0 ? 'info' : 'secondary'"
-                                    class="pokeball-badge" />
-                            </div>
-                        </template>
-                    </SelectButton>
-                    <button :disabled="isResolving || !inventoryStore.selectedPokeball" @click="battleTurn(null, inventoryStore.selectedPokeball)">
-                        Catch Pokemon
-                    </button>
-                </div>
+            <!-- pokeballs -->
+            <div v-if="isWild">
+              <SelectButton v-model="inventoryStore.selectedPokeball" :options="pokeballOptions" optionLabel="label"
+                optionValue="id" :optionDisabled="(option) => option.count <= 0" aria-labelledby="basic"
+                class="custom-select-button">
+                <template #option="slotProps">
+                  <div class="pokeball-option" :title="slotProps.option.label">
+                    <img :src="slotProps.option.icon" :alt="slotProps.option.label" class="pokeball-icon" />
+                    <Badge :value="slotProps.option.count"
+                      :severity="slotProps.option.count === '∞' || slotProps.option.count > 0 ? 'info' : 'secondary'"
+                      class="pokeball-badge" />
+                  </div>
+                </template>
+              </SelectButton>
+              <button :disabled="isResolving || !inventoryStore.selectedPokeball"
+                @click="battleTurn(null, inventoryStore.selectedPokeball)">
+                Catch Pokemon
+              </button>
+            </div>
           </div>
         </SplitterPanel>
 
         <!-- side panel -->
         <SplitterPanel :minSize="20" class="side-panel">
           <div class="panel-tabs" role="tablist">
-            <button
-              v-for="tab in TABS"
-              :key="tab.id"
-              class="tab-btn"
-              :class="{ active: sidePanel === tab.id }"
-              role="tab"
-              :aria-selected="sidePanel === tab.id"
-              @click="sidePanel = tab.id"
-            >
+            <button v-for="tab in TABS" :key="tab.id" class="tab-btn" :class="{ active: sidePanel === tab.id }"
+              role="tab" :aria-selected="sidePanel === tab.id" @click="sidePanel = tab.id">
               {{ tab.label }}
             </button>
           </div>
@@ -157,16 +130,10 @@
 
             <!-- team -->
             <div v-else-if="sidePanel === 'team'" class="team-body">
-              <div
-                v-for="pokemon in team"
-                :key="pokemon.instanceId"
-                class="team-card"
-                :class="{
-                  fainted: isFainted(pokemon),
-                  active: pokemon.instanceId === userPokemon?.instanceId
-                }"
-                @click="switchActivePokemon(pokemon)"
-              >
+              <div v-for="pokemon in team" :key="pokemon.instanceId" class="team-card" :class="{
+                fainted: isFainted(pokemon),
+                active: pokemon.instanceId === userPokemon?.instanceId
+              }" @click="switchActivePokemon(pokemon)">
                 <img :src="pokemon.sprite" :alt="pokemon.name" class="team-sprite" />
                 <div class="team-info">
                   <span class="team-name">{{ pokemon.name }}</span>
@@ -183,19 +150,14 @@
             <div v-else-if="sidePanel === 'inventory'" class="inventory-body">
               <div class="target-picker-container">
                 <label class="target-label" for="target-select">Target Pokémon</label>
-                <Select
-                  id="target-select"
-                  v-model="selectedTargetPokemon"
-                  :options="team"
-                  optionLabel="name"
-                  placeholder="Select Target"
-                  class="target-select"
-                >
+                <Select id="target-select" v-model="selectedTargetPokemon" :options="team" optionLabel="name"
+                  placeholder="Select Target" class="target-select">
                   <template #value="slotProps">
                     <div v-if="slotProps.value" class="target-option">
                       <span class="target-name">{{ slotProps.value.name }}</span>
                       <span class="target-hp-text">
-                        {{ Math.max(0, slotProps.value.currentHp ?? slotProps.value.totalHp) }}/{{ slotProps.value.totalHp }}
+                        {{ Math.max(0, slotProps.value.currentHp ?? slotProps.value.totalHp) }}/{{
+                        slotProps.value.totalHp }}
                       </span>
                     </div>
                     <span v-else class="placeholder">{{ slotProps.placeholder }}</span>
@@ -205,15 +167,13 @@
                       <div class="target-head">
                         <span class="target-name">{{ slotProps.option.name }}</span>
                         <span class="target-hp-text">
-                          {{ Math.max(0, slotProps.option.currentHp ?? slotProps.option.totalHp) }}/{{ slotProps.option.totalHp }} HP
+                          {{ Math.max(0, slotProps.option.currentHp ?? slotProps.option.totalHp) }}/{{
+                          slotProps.option.totalHp }} HP
                         </span>
                       </div>
                       <div class="hp-track">
-                        <div
-                          class="hp-fill"
-                          :class="hpTone(slotProps.option)"
-                          :style="{ width: hpPercent(slotProps.option) + '%' }"
-                        />
+                        <div class="hp-fill" :class="hpTone(slotProps.option)"
+                          :style="{ width: hpPercent(slotProps.option) + '%' }" />
                       </div>
                     </div>
                   </template>
@@ -225,12 +185,7 @@
                   <span class="item-name">{{ item.id }}</span>
                   <span class="item-count">x{{ item.count }}</span>
                 </div>
-                <Button
-                  label="Use"
-                  size="small"
-                  :disabled="!canUseItem(item)"
-                  @click="useBattleItem(item)"
-                />
+                <Button label="Use" size="small" :disabled="!canUseItem(item)" @click="useBattleItem(item)" />
               </div>
 
               <p v-if="!formattedInventory.length" class="empty-msg">No items in your bag.</p>
@@ -263,7 +218,7 @@ const props = defineProps({
   /** The Pokémon being fought. Cloned internally — never mutated. */
   opponent: { type: Object, required: true },
   /** team of opponents pokemon when fighting a trainer */
-  oppTeam: {type: Object, default: null},
+  oppTeam: { type: Object, default: null },
   /** Roster to fight with. Defaults to the player's caught Pokémon. */
   team: { type: Array, default: null },
   /** Skip the fighter picker and open straight into battle. */
@@ -300,28 +255,28 @@ const selectedTargetPokemon = ref(null);
 
 // Map IDs to PokeAPI sprite URLs
 const pokeballIcons = {
-    pokeball: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/poke-ball.png",
-    greatball: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/great-ball.png",
-    ultraball: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/ultra-ball.png",
-    masterball: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/master-ball.png"
+  pokeball: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/poke-ball.png",
+  greatball: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/great-ball.png",
+  ultraball: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/ultra-ball.png",
+  masterball: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/master-ball.png"
 };
 
 const pokeballOptions = computed(() => {
-    const standardPokeball = {
-        id: "pokeball",
-        label: "Pokeball",
-        icon: pokeballIcons.pokeball,
-        count: '∞'
-    };
+  const standardPokeball = {
+    id: "pokeball",
+    label: "Pokeball",
+    icon: pokeballIcons.pokeball,
+    count: '∞'
+  };
 
-    const storeBalls = Object.keys(inventoryStore.pokeballs).map((key) => ({
-        id: key,
-        label: key.charAt(0).toUpperCase() + key.slice(1),
-        icon: pokeballIcons[key] || pokeballIcons.pokeball,
-        count: inventoryStore.pokeballs[key].count
-    }));
+  const storeBalls = Object.keys(inventoryStore.pokeballs).map((key) => ({
+    id: key,
+    label: key.charAt(0).toUpperCase() + key.slice(1),
+    icon: pokeballIcons[key] || pokeballIcons.pokeball,
+    count: inventoryStore.pokeballs[key].count
+  }));
 
-    return [standardPokeball, ...storeBalls];
+  return [standardPokeball, ...storeBalls];
 });
 
 /** Working copy of the opponent so the parent's object is never mutated. */
@@ -330,22 +285,22 @@ const foe = ref(null)
 const team = computed(() => props.team ?? pokemonStore.caughtPokemon);
 
 const formattedInventory = computed(() => {
-    const items = inventoryStore.recoveryItems;
-    if (!items) return [];
+  const items = inventoryStore.recoveryItems;
+  if (!items) return [];
 
-    return Object.entries(items)
-        .filter(([key, data]) => data.count > 0) // Only show items you actually own
-        .map(([key, data]) => {
-            // Clean up the name for display (e.g., 'maxrevive' -> 'Max Revive')
-            let displayName = key === 'maxrevive' ? 'Max Revive' : key.charAt(0).toUpperCase() + key.slice(1);
+  return Object.entries(items)
+    .filter(([key, data]) => data.count > 0) // Only show items you actually own
+    .map(([key, data]) => {
+      // Clean up the name for display (e.g., 'maxrevive' -> 'Max Revive')
+      let displayName = key === 'maxrevive' ? 'Max Revive' : key.charAt(0).toUpperCase() + key.slice(1);
 
-            return {
-                id: key,            // 'potion', 'revive', etc.
-                name: displayName,
-                count: data.count,
-                effect: data.effect // Passes your { type: "heal", amount: 20 } along!
-            };
-        });
+      return {
+        id: key,            // 'potion', 'revive', etc.
+        name: displayName,
+        count: data.count,
+        effect: data.effect // Passes your { type: "heal", amount: 20 } along!
+      };
+    });
 });
 
 
@@ -363,7 +318,7 @@ const freshStages = () => ({
   'special-defense': 0, speed: 0, accuracy: 0, evasion: 0,
 });
 
-if(props.isWild){
+if (props.isWild) {
   foe.value = makeCombatant(props.opponent);
 } else {
   foe.value = props.oppTeam[0];
@@ -537,29 +492,33 @@ async function handleFaint(pokemon) {
   log(`${pokemon.name} fainted!`);
   await playAnim(pokemon === foe.value ? 'foe' : 'ally', 'faint', 700);
 
-  if (pokemon === foe.value && props.isWild) {
-    const reward = Math.trunc(3000 - (pokemon.captureRate * 10));
-    inventoryStore.AddFunds(reward);
-    log(`You earned ₽${reward}.`);
-    await delay(100)
-    endBattle('won');
-    return true;
-  } else if (pokemon === foe.value && props.oppTeam) {
-    let indexes = []
-    for (const [index, poke] of props.oppTeam.entries()) {
-            // if (foe.value)
-            if (poke.currentHp > 0) {
-                indexes.push(index)
-            }
+  if (pokemon === foe.value) {
+
+    
+    if (props.isWild) {
+      const reward = Math.trunc(3000 - (pokemon.captureRate * 10));
+      inventoryStore.AddFunds(reward);
+      log(`You earned ₽${reward}.`);
+      await delay(100)
+      endBattle('won');
+      return true;
+    } else if (props.oppTeam) {
+      let indexes = []
+      for (const [index, poke] of props.oppTeam.entries()) {
+        // if (foe.value)
+        if (poke.currentHp > 0) {
+          indexes.push(index)
         }
-        if (indexes.length > 0) {
-            const randomIndex = indexes[Math.floor(Math.random() * indexes.length)]
-            foe.value = props.oppTeam[randomIndex]
-            return true
-        }
-        else {
-            endBattle('won')
-        }
+      }
+      if (indexes.length > 0) {
+        const randomIndex = indexes[Math.floor(Math.random() * indexes.length)]
+        foe.value = props.oppTeam[randomIndex]
+        return true
+      }
+      else {
+        endBattle('won')
+      }
+    }
   }
 
   // Player's Pokémon fainted — switch if anyone is left standing.
@@ -695,7 +654,7 @@ async function useMove(user, target, move) {
 
 function calculateDamage(attacker, defender, move, opts = {}) {
   const critStage = (move.critRate ?? 0) + (attacker.critStages ?? 0);
-  const critChance = [1/24, 1/8, 1/2, 1][Math.min(critStage, 3)];
+  const critChance = [1 / 24, 1 / 8, 1 / 2, 1][Math.min(critStage, 3)];
 
   const {
     critical = Math.random() < critChance,
@@ -859,71 +818,71 @@ async function useBattleItem(item) {
 }
 
 async function applyItem(item, target) {
-    if (!target) return;
-    // if (!inventoryStore.UseRecovery?.(item.id)) {
-    //   log(`You have no ${item.label} left.`);
-    //   return;
-    // }
-    
-        console.log(item)
+  if (!target) return;
+  // if (!inventoryStore.UseRecovery?.(item.id)) {
+  //   log(`You have no ${item.label} left.`);
+  //   return;
+  // }
 
-    const currentHp = target.currentHp ?? 0;
-    const isFainted = currentHp <= 0;
-    const isFullHp = currentHp >= target.totalHp;    
-    // 1. Validate item effect against target state BEFORE consuming from store
-    if (item.effect.type === 'heal') {
-        if (isFainted) {
-            battleLog.value.push(`${target.name} is fainted! Use a Revive instead.`);
-            sidePanel.value = 'log';
-            await delay(800);
-            return;
-        }
-        if (isFullHp) {
-            battleLog.value.push(`${target.name} is already at full HP!`);
-            sidePanel.value = 'log';
-            await delay(800);
-            return;
-        }
-    } else if (item.effect.type === 'revive') {
-        if (!isFainted) {
-            battleLog.value.push(`${target.name} is not fainted!`);
-            sidePanel.value = 'log';
-            await delay(800);
-            return;
-        }
+  console.log(item)
+
+  const currentHp = target.currentHp ?? 0;
+  const isFainted = currentHp <= 0;
+  const isFullHp = currentHp >= target.totalHp;
+  // 1. Validate item effect against target state BEFORE consuming from store
+  if (item.effect.type === 'heal') {
+    if (isFainted) {
+      battleLog.value.push(`${target.name} is fainted! Use a Revive instead.`);
+      sidePanel.value = 'log';
+      await delay(800);
+      return;
     }
-
-    // 3. Consume item via Pinia store using return boolean validation
-    const itemUsed = inventoryStore.UseRecovery(item.id);
-    if (!itemUsed) {
-        battleLog.value.push(`Failed to use ${item.name}. None remaining!`);
-        return;
+    if (isFullHp) {
+      battleLog.value.push(`${target.name} is already at full HP!`);
+      sidePanel.value = 'log';
+      await delay(800);
+      return;
     }
-
-    // 4. Apply exact recovery math directly
-    if (item.effect.type === 'heal') {
-        const healAmount = item.effect.amount;
-        const previousHp = target.currentHp;
-
-        target.currentHp = Math.min(
-            target.totalHp,
-            target.currentHp + healAmount
-        );
-
-        const actualHealed = target.currentHp - previousHp;
-        battleLog.value.push(`Used ${item.name}! Restored ${actualHealed} HP to ${target.name}.`);
+  } else if (item.effect.type === 'revive') {
+    if (!isFainted) {
+      battleLog.value.push(`${target.name} is not fainted!`);
+      sidePanel.value = 'log';
+      await delay(800);
+      return;
     }
-    else if (item.effect.type === 'revive') {
-        const revivedHp = Math.floor(target.totalHp * item.effect.percent);
-        target.currentHp = revivedHp;
-        battleLog.value.push(`Used ${item.name}! Revived ${target.name} with ${revivedHp} HP.`);
-    }
+  }
 
-    // Reset dropdown selection
-    selectedTargetPokemon.value = null;
-    sidePanel.value = 'log'; // Flip back to log view
+  // 3. Consume item via Pinia store using return boolean validation
+  const itemUsed = inventoryStore.UseRecovery(item.id);
+  if (!itemUsed) {
+    battleLog.value.push(`Failed to use ${item.name}. None remaining!`);
+    return;
+  }
 
-    await delay(800);
+  // 4. Apply exact recovery math directly
+  if (item.effect.type === 'heal') {
+    const healAmount = item.effect.amount;
+    const previousHp = target.currentHp;
+
+    target.currentHp = Math.min(
+      target.totalHp,
+      target.currentHp + healAmount
+    );
+
+    const actualHealed = target.currentHp - previousHp;
+    battleLog.value.push(`Used ${item.name}! Restored ${actualHealed} HP to ${target.name}.`);
+  }
+  else if (item.effect.type === 'revive') {
+    const revivedHp = Math.floor(target.totalHp * item.effect.percent);
+    target.currentHp = revivedHp;
+    battleLog.value.push(`Used ${item.name}! Revived ${target.name} with ${revivedHp} HP.`);
+  }
+
+  // Reset dropdown selection
+  selectedTargetPokemon.value = null;
+  sidePanel.value = 'log'; // Flip back to log view
+
+  await delay(800);
 }
 
 async function throwPokeball(target, pokeball) {
@@ -1049,7 +1008,9 @@ onMounted(() => {
 }
 
 /* ---- setup ---- */
-.battle-stage { display: flex; }
+.battle-stage {
+  display: flex;
+}
 
 .setup {
   display: flex;
@@ -1071,13 +1032,34 @@ onMounted(() => {
   text-align: center;
 }
 
-.setup-select { width: 100%; }
+.setup-select {
+  width: 100%;
+}
 
-.option-row { display: flex; align-items: center; gap: 0.5rem; }
-.option-row.fainted { opacity: 0.5; }
-.option-sprite { width: 1.5rem; height: 1.5rem; object-fit: contain; image-rendering: pixelated; }
-.option-name { text-transform: capitalize; }
-.placeholder { color: var(--p-text-muted-color); }
+.option-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.option-row.fainted {
+  opacity: 0.5;
+}
+
+.option-sprite {
+  width: 1.5rem;
+  height: 1.5rem;
+  object-fit: contain;
+  image-rendering: pixelated;
+}
+
+.option-name {
+  text-transform: capitalize;
+}
+
+.placeholder {
+  color: var(--p-text-muted-color);
+}
 
 .fnt-tag {
   margin-inline-start: auto;
@@ -1097,9 +1079,21 @@ onMounted(() => {
   overflow-y: auto;
 }
 
-.combatant { display: flex; align-items: center; gap: 1rem; }
-.combatant-foe { flex-direction: row; justify-content: space-between; }
-.combatant-ally { flex-direction: row-reverse; justify-content: space-between; }
+.combatant {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.combatant-foe {
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.combatant-ally {
+  flex-direction: row-reverse;
+  justify-content: space-between;
+}
 
 .combatant-info {
   flex: 1;
@@ -1109,7 +1103,11 @@ onMounted(() => {
   gap: 0.375rem;
 }
 
-.combatant-head { display: flex; align-items: baseline; gap: 0.5rem; }
+.combatant-head {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+}
 
 .label {
   font-size: 0.625rem;
@@ -1119,9 +1117,16 @@ onMounted(() => {
   color: var(--p-text-muted-color);
 }
 
-.combatant-name { font-weight: 600; text-transform: capitalize; }
+.combatant-name {
+  font-weight: 600;
+  text-transform: capitalize;
+}
 
-.hp { display: flex; align-items: center; gap: 0.625rem; }
+.hp {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+}
 
 .hp-track {
   flex: 1;
@@ -1137,9 +1142,17 @@ onMounted(() => {
   transition: width 0.45s ease-out, background-color 0.3s;
 }
 
-.hp-fill.ok   { background: #22c55e; }
-.hp-fill.warn { background: #eab308; }
-.hp-fill.crit { background: #ef4444; }
+.hp-fill.ok {
+  background: #22c55e;
+}
+
+.hp-fill.warn {
+  background: #eab308;
+}
+
+.hp-fill.crit {
+  background: #ef4444;
+}
 
 .hp-text {
   flex: none;
@@ -1158,21 +1171,66 @@ onMounted(() => {
   filter: drop-shadow(0 3px 2px rgb(0 0 0 / 0.25));
 }
 
-.sprite-foe  { width: 4.5rem; height: 4.5rem; align-self: flex-start; }
-.sprite-ally { width: 5.5rem; height: 5.5rem; align-self: flex-end; }
-
-.anim-lunge { animation: lunge 300ms ease-in-out; }
-.sprite-foe.anim-lunge { animation-name: lunge-foe; }
-.anim-hit { animation: hit 400ms steps(2, end) 3; }
-.anim-faint { animation: faint 700ms ease-in forwards; }
-
-@keyframes lunge     { 50% { transform: translate(20px, -20px); } }
-@keyframes lunge-foe { 50% { transform: translate(-20px, 20px); } }
-@keyframes hit {
-  0%, 100% { opacity: 1; transform: translateX(0); }
-  50%      { opacity: 0.2; transform: translateX(-6px); }
+.sprite-foe {
+  width: 4.5rem;
+  height: 4.5rem;
+  align-self: flex-start;
 }
-@keyframes faint { to { transform: translateY(40px); opacity: 0; } }
+
+.sprite-ally {
+  width: 5.5rem;
+  height: 5.5rem;
+  align-self: flex-end;
+}
+
+.anim-lunge {
+  animation: lunge 300ms ease-in-out;
+}
+
+.sprite-foe.anim-lunge {
+  animation-name: lunge-foe;
+}
+
+.anim-hit {
+  animation: hit 400ms steps(2, end) 3;
+}
+
+.anim-faint {
+  animation: faint 700ms ease-in forwards;
+}
+
+@keyframes lunge {
+  50% {
+    transform: translate(20px, -20px);
+  }
+}
+
+@keyframes lunge-foe {
+  50% {
+    transform: translate(-20px, 20px);
+  }
+}
+
+@keyframes hit {
+
+  0%,
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  50% {
+    opacity: 0.2;
+    transform: translateX(-6px);
+  }
+}
+
+@keyframes faint {
+  to {
+    transform: translateY(40px);
+    opacity: 0;
+  }
+}
 
 /* ---- moves ---- */
 .moves {
@@ -1203,9 +1261,19 @@ onMounted(() => {
   border-color: var(--p-primary-color);
 }
 
-.move:disabled { opacity: 0.5; cursor: not-allowed; }
-.move-name { text-transform: capitalize; }
-.move-power { font-variant-numeric: tabular-nums; color: var(--p-text-muted-color); }
+.move:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.move-name {
+  text-transform: capitalize;
+}
+
+.move-power {
+  font-variant-numeric: tabular-nums;
+  color: var(--p-text-muted-color);
+}
 
 /* ---- side panel ---- */
 .side-panel {
@@ -1236,20 +1304,44 @@ onMounted(() => {
   transition: color 0.15s, border-color 0.15s;
 }
 
-.tab-btn:hover { color: var(--p-text-color); }
+.tab-btn:hover {
+  color: var(--p-text-color);
+}
+
 .tab-btn.active {
   color: var(--p-primary-color);
   border-bottom-color: var(--p-primary-color);
 }
 
-.panel-content { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+.panel-content {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
 
 /* ---- log ---- */
-.log-body { flex: 1; overflow-y: auto; padding: 0.75rem 0.875rem; }
-.log-line { margin: 0 0 0.5rem; font-size: 0.75rem; line-height: 1.45; }
+.log-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0.75rem 0.875rem;
+}
+
+.log-line {
+  margin: 0 0 0.5rem;
+  font-size: 0.75rem;
+  line-height: 1.45;
+}
 
 /* ---- team ---- */
-.team-body { flex: 1; overflow-y: auto; padding: 0.5rem; display: flex; flex-direction: column; gap: 0.375rem; }
+.team-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+}
 
 .team-card {
   display: flex;
@@ -1262,14 +1354,43 @@ onMounted(() => {
   transition: background-color 0.15s, border-color 0.15s;
 }
 
-.team-card:hover { background: var(--p-content-hover-background); }
-.team-card.active { border-color: var(--p-primary-color); background: var(--p-highlight-background); }
-.team-card.fainted { opacity: 0.45; cursor: not-allowed; }
+.team-card:hover {
+  background: var(--p-content-hover-background);
+}
 
-.team-sprite { width: 2rem; height: 2rem; object-fit: contain; image-rendering: pixelated; }
-.team-info { display: flex; flex-direction: column; min-width: 0; }
-.team-name { font-size: 0.75rem; text-transform: capitalize; }
-.team-hp { font-size: 0.625rem; color: var(--p-text-muted-color); font-variant-numeric: tabular-nums; }
+.team-card.active {
+  border-color: var(--p-primary-color);
+  background: var(--p-highlight-background);
+}
+
+.team-card.fainted {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.team-sprite {
+  width: 2rem;
+  height: 2rem;
+  object-fit: contain;
+  image-rendering: pixelated;
+}
+
+.team-info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.team-name {
+  font-size: 0.75rem;
+  text-transform: capitalize;
+}
+
+.team-hp {
+  font-size: 0.625rem;
+  color: var(--p-text-muted-color);
+  font-variant-numeric: tabular-nums;
+}
 
 .active-tag {
   margin-inline-start: auto;
@@ -1279,10 +1400,24 @@ onMounted(() => {
 }
 
 /* ---- inventory ---- */
-.inventory-body { flex: 1; overflow-y: auto; padding: 0.5rem; display: flex; flex-direction: column; gap: 0.5rem; }
+.inventory-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
 
-.target-picker-container { display: flex; flex-direction: column; gap: 0.25rem; }
-.target-select { width: 100%; }
+.target-picker-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.target-select {
+  width: 100%;
+}
 
 .target-label {
   font-size: 0.5625rem;
@@ -1292,10 +1427,31 @@ onMounted(() => {
   color: var(--p-text-muted-color);
 }
 
-.target-option, .target-head { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; }
-.target-option-dropdown { display: flex; flex-direction: column; gap: 0.25rem; width: 100%; }
-.target-name { font-size: 0.75rem; text-transform: capitalize; }
-.target-hp-text { font-size: 0.625rem; color: var(--p-text-muted-color); font-variant-numeric: tabular-nums; }
+.target-option,
+.target-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.target-option-dropdown {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  width: 100%;
+}
+
+.target-name {
+  font-size: 0.75rem;
+  text-transform: capitalize;
+}
+
+.target-hp-text {
+  font-size: 0.625rem;
+  color: var(--p-text-muted-color);
+  font-variant-numeric: tabular-nums;
+}
 
 .item-card {
   display: flex;
@@ -1307,9 +1463,21 @@ onMounted(() => {
   border-radius: var(--p-content-border-radius);
 }
 
-.item-info { display: flex; flex-direction: column; min-width: 0; }
-.item-name { font-size: 0.75rem; text-transform: capitalize; }
-.item-count { font-size: 0.625rem; color: var(--p-text-muted-color); }
+.item-info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.item-name {
+  font-size: 0.75rem;
+  text-transform: capitalize;
+}
+
+.item-count {
+  font-size: 0.625rem;
+  color: var(--p-text-muted-color);
+}
 
 .empty-msg {
   margin: auto;
@@ -1330,8 +1498,15 @@ onMounted(() => {
   cursor: pointer;
 }
 
-.btn-primary { background: var(--p-primary-color); color: var(--p-primary-contrast-color); }
-.btn-primary:disabled { opacity: 0.45; cursor: not-allowed; }
+.btn-primary {
+  background: var(--p-primary-color);
+  color: var(--p-primary-contrast-color);
+}
+
+.btn-primary:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
 
 .move:focus-visible,
 .tab-btn:focus-visible,
@@ -1342,12 +1517,22 @@ onMounted(() => {
 }
 
 @media (prefers-color-scheme: dark) {
-  .hp-track { background: var(--p-surface-700); }
+  .hp-track {
+    background: var(--p-surface-700);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .anim-lunge, .anim-hit, .anim-faint { animation: none; }
-  .hp-fill { transition: none; }
+
+  .anim-lunge,
+  .anim-hit,
+  .anim-faint {
+    animation: none;
+  }
+
+  .hp-fill {
+    transition: none;
+  }
 }
 
 .pokeball-body {

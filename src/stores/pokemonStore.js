@@ -55,7 +55,7 @@ const testGodPokemon = {
             targetsSelf: false,        // target is 'selected-pokemon'
             statChanges: [],
             statChance: 0,
-            ailment: 'burn',
+            ailment: 'sleep',
             ailmentChance: 0,          // ⚠️ see below
             drain: 0,
             healing: 0,
