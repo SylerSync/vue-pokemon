@@ -484,6 +484,13 @@ function pickMove(pokemon) {
   return moves.length ? moves[randInt(0, moves.length - 1)] : null;
 }
 
+function calcExperience(pokemon){
+  const baseExp = pokemon?.baseExp ?? 50;
+  const level = pokemon?.level ?? 1;
+  return Math.trunc(((baseExp * level) / 7) * (props.isWild ? 1.0 : 1.5));
+}
+
+
 /**
  * Handles a fainted combatant. Returns true if the turn should stop.
  */
@@ -494,6 +501,7 @@ async function handleFaint(pokemon) {
 
   if (pokemon === foe.value) {
 
+    rewardExp = calcExperience(pokemon)
     
     if (props.isWild) {
       const reward = Math.trunc(3000 - (pokemon.captureRate * 10));

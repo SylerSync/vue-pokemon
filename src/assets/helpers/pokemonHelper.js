@@ -93,7 +93,8 @@ export async function getPokemonData(pokemon, specialForm) {
       totalKOs: 0,
       totalFaints: 0,
       level: randLevel,
-      evoDetails: evoDetails
+      evoDetails: evoDetails,
+      baseExp: pokemonData.base_experience
 
     };
   } catch (err) {
@@ -183,7 +184,8 @@ export async function getPokemonWithLevelData(pokemon, specialForm, level) {
       totalKOs: 0,
       totalFaints: 0,
       level: level,
-      evoDetails: evoDetails
+      evoDetails: evoDetails,
+      baseExp: pokemonData.base_experience
 
     };
   } catch (err) {
