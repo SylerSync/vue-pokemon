@@ -306,10 +306,6 @@ const pokeballIcons = {
     masterball: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/master-ball.png"
 };
 
-const selectedPokeball = computed(() => {
-    return inventoryStore.SelectedPokeballData(inventoryStore.selectedPokeball)
-})
-
 const pokeballOptions = computed(() => {
     const standardPokeball = {
         id: "pokeball",
@@ -519,8 +515,8 @@ async function battleTurn(playerMove, item = null) {
 }
 
 function statOf(pokemon, name) {
-  console.log(name)
-  console.log(pokemon.stages?.[name] ?? 0)
+  // console.log(name)
+  // console.log(pokemon.stages?.[name] ?? 0)
   const raw = pokemon.stats.find(s => s.name === name)?.stat ?? 1;
   let value = raw * stageMultiplier(pokemon.stages?.[name] ?? 0);
   if (name === 'attack' && pokemon.status === 'burn') value *= 0.5;
@@ -795,6 +791,7 @@ const STATUS_MESSAGES = {
 };
 
 async function inflictStatus(target, ailment) {
+  console.log("Inflicting status...")
   if (target.status) {
     log(`But ${target.name} is already ${target.status}!`);
     await delay(700);
@@ -802,7 +799,7 @@ async function inflictStatus(target, ailment) {
   }
   target.status = ailment;
   if (ailment === 'sleep') target.sleepTurns = randInt(1, 3);
-  log((STATUS_MESSAGES[ailment] ?? ((n) => `${n} was afflicted!`))(target.name));
+  log((STATUS_MESSAGES[ailment] ?? ((n) => `${n} was afflicted with ${ailment}!`))(target.name));
   await delay(800);
 }
 

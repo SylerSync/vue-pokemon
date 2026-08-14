@@ -7,14 +7,16 @@ import { getMove } from "@/api/pokeapi"
 // Must be passed the pokeon name
 // If no form the base form will be suplied
 // Note: for regional forms the region's name is the form
-export async function getPokemonData(pokemon, form) {
+export async function getPokemonData(pokemon, specialForm) {
     const randInt = Math.floor(Math.random() * 101);
     try {
       let speciesData = await getSpecies(pokemon)
       let pokemonData = null
       if(speciesData.varieties.length > 1){
         for(let form of speciesData.varieties) {
-          if(form.pokemon.name == (pokemon + "-" + form)) {
+          console.log(form.pokemon.name)
+          console.log(pokemon + "-" + specialForm)
+          if(form.pokemon.name == (pokemon + "-" + specialForm)) {
             pokemonData = await getPokemon(form.pokemon.name)
             break
           }
@@ -93,14 +95,14 @@ export async function getPokemonData(pokemon, form) {
     }
 }
 
-export async function getPokemonWithLevelData(pokemon, form, level) {
+export async function getPokemonWithLevelData(pokemon, specialForm, level) {
     const randInt = Math.floor(Math.random() * 101);
     try {
       let speciesData = await getSpecies(pokemon)
       let pokemonData = null
       if(speciesData.varieties.length > 1){
         for(let form of speciesData.varieties) {
-          if(form.pokemon.name == (pokemon + "-" + form)) {
+          if(form.pokemon.name == (pokemon + "-" + specialForm)) {
             pokemonData = await getPokemon(form.pokemon.name)
             break
           }
@@ -196,6 +198,9 @@ export async function getMoveData(move) {
         healing: move.meta?.healing ?? 0, // % of max HP
         flinchChance: move.meta?.flinch_chance ?? 0,
         critRate: move.meta?.crit_rate ?? 0,
+        trap: move.meta?.ailment?.name === 'trap',
+        minTurns: move.meta?.min_turns ?? 0,
+        maxTurns: move.meta?.max_turns ?? 0,
     }
 }
 

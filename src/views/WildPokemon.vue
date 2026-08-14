@@ -17,9 +17,9 @@ import { getPokemon } from "@/api/pokeapi"
 import { getSpecies } from "@/api/pokeapi"
 import { getEvoChain } from "@/api/pokeapi"
 import PokemonBattle from "@/components/PokemonBattle.vue"
-import { getPokemonData } from "@/assets/helpers/pokemonHelper"
-import { getPokemonWithLevelData } from "@/assets/helpers/pokemonHelper"
-import { getMoveData } from "@/assets/helpers/pokemonHelper"
+import { getPokemonData } from "@/assets/helpers/pokemonHelper.js"
+import { getPokemonWithLevelData } from "@/assets/helpers/pokemonHelper.js"
+import { getMoveData } from "@/assets/helpers/pokemonHelper.js"
 
 const settingsStore = useSettingsStore()
 
@@ -585,8 +585,8 @@ async function getWildPokemonData(region) {
     const randInt = Math.floor(Math.random() * 101);
 
     const pokemonIdentifier = target.name;
-    // const pokemonIdentifier = "deoxys"
-    return await getPokemonData(pokemonIdentifier, selectedRegion)
+    // const pokemonIdentifier = "meowth"
+    return await getPokemonData(pokemonIdentifier, selectedRegion.value)
   });
 
   const wildResults = await Promise.all(wildPromises);
