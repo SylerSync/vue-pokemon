@@ -1,5 +1,6 @@
 import { defineStore } from "pinia"
 import tmsData from "@/assets/data/tms.json"
+import evolutionItems from "@/assets/data/evolutionItems.json"
 
 export const useInventoryStore = defineStore("inventoryStore", {
     state: () => ({
@@ -72,6 +73,10 @@ export const useInventoryStore = defineStore("inventoryStore", {
             }
         },
         tms: {
+
+        },
+        evoItems: {
+
         },
         selectedPokeball: "pokeball",
         funds: 5000
@@ -100,7 +105,8 @@ export const useInventoryStore = defineStore("inventoryStore", {
             const completeInventory = {
                 "pokeballs": state.pokeballs,
                 "recoveryItems": state.recoveryItems,
-                "tms": state.tms
+                "tms": state.tms,
+                "evoItems": state.evoItems
             }
             return completeInventory
         }
@@ -194,6 +200,9 @@ export const useInventoryStore = defineStore("inventoryStore", {
 
             return true
         },
+        /* ================= ================= =================
+            TM FUNCTIONS
+            ================= ================= ================= */
         BuyTM(tmId) {
             // 1. Ensure `tms` object exists on state
             if (!this.tms) {
@@ -231,6 +240,40 @@ export const useInventoryStore = defineStore("inventoryStore", {
                 delete this.tms[tmId]
             }
             return true
+        },
+        /* ================= ================= =================
+            EVOLUTION FUNCTIONS
+            ================= ================= ================= */
+        UseEvoItem(evoId){
+            if(!this.evoItems[evoId] || this.evoItems[evoId] <= 0){
+                console.warn(`No ${evoId} remaining in inventory.`)
+                return false
+            }
+            this.evoItems[evoId]--
+
+            if(this.evoItems[evoId] <= 0){
+                delete this.evoItems[evoId]
+            }
+            return true
+        },
+        BuyEvoItem(evoId){
+            if (!this.evoItems) {
+                this.evoItems = {};
+            }
+            const item = evolutionItems[evoId]
+            if(!item){
+                console.warn(`Could not find item in evolution items with id ${evoId}`)
+                return false
+            }
+            if(this.funds < item.cost){
+                console.warn(`You do not have the funds to purchase item with id: ${evoId}`)
+                return false
+            }
+            this.funds -= item.cost
+            this.evoItems[evoId] = (this.evoItems[evoId] || 0) + 1;
+
+            return true
+
         }
     }
 })
