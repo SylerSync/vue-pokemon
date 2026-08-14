@@ -331,12 +331,6 @@ const pokeballOptions = computed(() => {
 /** Working copy of the opponent so the parent's object is never mutated. */
 const foe = ref(null)
 
-if(props.isWild){
-  foe.value = makeCombatant(props.opponent);
-} else {
-  foe.value = props.oppTeam[0];
-}
-
 const team = computed(() => props.team ?? pokemonStore.caughtPokemon);
 
 const formattedInventory = computed(() => {
@@ -358,6 +352,27 @@ const formattedInventory = computed(() => {
         });
 });
 
+
+
+const STAT_LABEL = {
+  attack: 'Attack', defense: 'Defense',
+  'special-attack': 'Sp. Atk', 'special-defense': 'Sp. Def',
+  speed: 'Speed', accuracy: 'accuracy', evasion: 'evasiveness',
+};
+
+const prettyName = (n) => n.replace(/-/g, ' ');
+
+const freshStages = () => ({
+  attack: 0, defense: 0, 'special-attack': 0,
+  'special-defense': 0, speed: 0, accuracy: 0, evasion: 0,
+});
+
+if(props.isWild){
+  foe.value = makeCombatant(props.opponent);
+} else {
+  foe.value = props.oppTeam[0];
+}
+
 /* ------------------------------------------------------------------ *
  * Helpers
  * ------------------------------------------------------------------ */
@@ -368,7 +383,9 @@ const randInt = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
 function makeCombatant(source) {
   return {
     ...structuredClone(JSON.parse(JSON.stringify(source))),
-    currentHp: source.currentHp ?? source.totalHp,
+    stages: freshStages(),
+    status: null,
+    flinched: false,
   };
 }
 
@@ -417,6 +434,8 @@ function startBattle() {
   if (userPokemon.value.currentHp == null) {
     userPokemon.value.currentHp = userPokemon.value.totalHp;
   }
+  userPokemon.value.stages = freshStages();
+  userPokemon.value.flinched = false;
   battleStarted.value = true;
   selectedTargetPokemon.value = userPokemon.value;
   log(`A wild ${foe.value.name} appeared!`);
@@ -462,6 +481,12 @@ async function battleTurn(playerMove, item = null) {
         await useMove(wild, player, wildMove);
         if (await handleFaint(player)) return;
       }
+
+      endOfTurnDamage(player)
+      endOfTurnDamage(wild)
+      if (await handleFaint(player)) return;
+      if (await handleFaint(wild)) return;
+
       return;
     }
 
@@ -481,6 +506,10 @@ async function battleTurn(playerMove, item = null) {
       await useMove(attacker, defender, move);
       if (await handleFaint(defender)) return;
     }
+    endOfTurnDamage(player)
+    endOfTurnDamage(wild)
+    if (await handleFaint(player)) return;
+    if (await handleFaint(wild)) return;
   } catch (err) {
     console.error('Turn failed:', err);
     log('Something went wrong.');
@@ -490,7 +519,13 @@ async function battleTurn(playerMove, item = null) {
 }
 
 function statOf(pokemon, name) {
-  return pokemon.stats.find(s => s.name === name)?.stat ?? 1;
+  console.log(name)
+  console.log(pokemon.stages?.[name] ?? 0)
+  const raw = pokemon.stats.find(s => s.name === name)?.stat ?? 1;
+  let value = raw * stageMultiplier(pokemon.stages?.[name] ?? 0);
+  if (name === 'attack' && pokemon.status === 'burn') value *= 0.5;
+  if (name === 'speed' && pokemon.status === 'paralysis') value *= 0.5;
+  return Math.floor(value);
 }
 
 function pickMove(pokemon) {
@@ -554,52 +589,120 @@ async function useMove(user, target, move) {
   const actor = user === userPokemon.value ? 'ally' : 'foe';
   const victim = actor === 'ally' ? 'foe' : 'ally';
 
-  log(`${user.name} used ${move.name}!`);
+  // --- pre-move status checks ---
+  if (!(await canAct(user))) return;
+
+  log(`${user.name} used ${prettyName(move.name)}!`);
   await playAnim(actor, 'lunge', 300);
 
-  // accuracy: null means the move never misses
-  if (move.accuracy !== null && randInt(1, 100) > move.accuracy) {
-    log(`${user.name}'s attack missed!`);
-    await delay(800);
-    return;
+  // --- accuracy (null = never misses) ---
+  if (move.accuracy != null) {
+    const accMod =
+      stageMultiplier(user.stages?.accuracy ?? 0, true) /
+      stageMultiplier(target.stages?.evasion ?? 0, true);
+    if (randInt(1, 100) > move.accuracy * accMod) {
+      log(`${user.name}'s attack missed!`);
+      await delay(800);
+      return;
+    }
   }
 
-  if (!move.power) {
-    log(`${move.name} had no effect.`);
-    await delay(800);
-    return;
-  }
+  let dealt = 0;
 
-  const results = calculateDamage(user, target, move);
+  // --- damage ---
+  if (move.power) {
+    const results = calculateDamage(user, target, move);
 
-  if (results.immune) {
-    log(`It doesn't affect ${target.name}...`);
-    await delay(800);
-    return;
-  }
+    if (results.immune) {
+      log(`It doesn't affect ${target.name}...`);
+      await delay(800);
+      return;
+    }
 
-  target.currentHp = Math.max(0, target.currentHp - results.damage);
-  await playAnim(victim, 'hit', 400);
-  log(`${user.name} dealt ${results.damage} damage.`);
+    dealt = Math.min(results.damage, target.currentHp);
+    target.currentHp = Math.max(0, target.currentHp - results.damage);
+    await playAnim(victim, 'hit', 400);
+    log(`${user.name} dealt ${results.damage} damage.`);
 
-  if (results.critical) {
+    if (results.critical) {
+      await delay(600);
+      log('A critical hit!');
+    }
+    if (results.effectiveness > 1) {
+      await delay(600);
+      log("It's super effective!");
+    } else if (results.effectiveness > 0 && results.effectiveness < 1) {
+      await delay(600);
+      log("It's not very effective...");
+    }
     await delay(600);
-    log('A critical hit!');
-  }
-  if (results.effectiveness > 1) {
-    await delay(600);
-    log("It's super effective!");
-  } else if (results.effectiveness > 0 && results.effectiveness < 1) {
-    await delay(600);
-    log("It's not very effective...");
   }
 
-  await delay(800);
+  // fainted — skip every secondary effect
+  if (target.currentHp <= 0) return;
+
+  // --- stat changes ---
+  const statChanges = move.statChanges ?? [];
+  if (statChanges.length) {
+    const chance = move.statChance || 100;
+    if (randInt(1, 100) <= chance) {
+      const recipient = move.targetsSelf ? user : target;
+      for (const { stat, change } of statChanges) {
+        const applied = applyStatChange(recipient, stat, change);
+        log(statChangeMessage(recipient.name, stat, applied, change));
+        await delay(700);
+      }
+    }
+  }
+
+  // --- status ailment ---
+  if (move.ailment) {
+    const chance = move.ailmentChance || 100;
+    if (randInt(1, 100) <= chance) {
+      await inflictStatus(target, move.ailment);
+    }
+  }
+
+  // --- drain / recoil ---
+  if ((move.drain ?? 0) !== 0 && dealt > 0) {
+    const amount = Math.max(1, Math.floor(dealt * (Math.abs(move.drain) / 100)));
+    if (move.drain > 0) {
+      user.currentHp = Math.min(user.totalHp, user.currentHp + amount);
+      log(`${user.name} drained ${amount} HP!`);
+    } else {
+      user.currentHp = Math.max(0, user.currentHp - amount);
+      log(`${user.name} is hit with ${amount} recoil!`);
+    }
+    await delay(700);
+  }
+
+  // --- healing ---
+  if ((move.healing ?? 0) > 0) {
+    const amount = Math.floor(user.totalHp * (move.healing / 100));
+    const before = user.currentHp;
+    user.currentHp = Math.min(user.totalHp, user.currentHp + amount);
+    log(
+      user.currentHp > before
+        ? `${user.name} restored ${user.currentHp - before} HP!`
+        : `${user.name}'s HP is already full!`
+    );
+    await delay(700);
+  }
+
+  // --- flinch ---
+  if ((move.flinchChance ?? 0) > 0 && randInt(1, 100) <= move.flinchChance) {
+    target.flinched = true;
+  }
+
+  await delay(400);
 }
 
 function calculateDamage(attacker, defender, move, opts = {}) {
+  const critStage = (move.critRate ?? 0) + (attacker.critStages ?? 0);
+  const critChance = [1/24, 1/8, 1/2, 1][Math.min(critStage, 3)];
+
   const {
-    critical = Math.random() < 1 / 24,
+    critical = Math.random() < critChance,
     randomFactor = randInt(85, 100) / 100,
     weatherMod = 1,
     otherMod = 1,
@@ -614,9 +717,12 @@ function calculateDamage(attacker, defender, move, opts = {}) {
     return { damage: 0, effectiveness: 0, critical: false, immune: true };
   }
 
-  const physical = move.class === 'physical';
-  const atk = statOf(attacker, physical ? 'attack' : 'special-attack');
-  const def = statOf(defender, physical ? 'defense' : 'special-defense');
+  const physical = move.damageClass === 'physical';
+  const atkStat = physical ? 'attack' : 'special-attack'
+  const defStat = physical ? 'defense' : 'special-defense'
+
+  const atk = critical ? Math.max(statOf(attacker, atkStat), rawStat(attacker, atkStat)) : statOf(attacker, atkStat);
+  const def = critical ? Math.min(statOf(defender, defStat), rawStat(defender, defStat)) : statOf(defender, defStat);
 
   const base =
     Math.floor(
@@ -636,11 +742,115 @@ function calculateDamage(attacker, defender, move, opts = {}) {
   return { damage, effectiveness, critical, immune: false };
 }
 
+function rawStat(pokemon, name) {
+  const raw = pokemon.stats.find(s => s.name === name)?.stat ?? 1;
+  let value = raw;
+  if (name === 'attack' && pokemon.status === 'burn') value *= 0.5;
+  return Math.floor(value);
+}
+
 function typeEffectiveness(moveType, defenderTypes) {
   return defenderTypes.reduce(
     (mult, t) => mult * (pokemonStore.typeChart[moveType]?.[t] ?? 1),
     1
   );
+}
+
+function stageMultiplier(stage, isAccuracy = false) {
+  const base = isAccuracy ? 3 : 2;
+  return stage >= 0 ? (base + stage) / base : base / (base - stage);
+}
+
+function applyStatChange(target, statName, change) {
+  if (!target.stages) target.stages = freshStages();
+  const current = target.stages[statName] ?? 0;
+  const next = Math.max(-6, Math.min(6, current + change));
+  const applied = next - current;
+  target.stages[statName] = next;
+  return applied;
+}
+
+function statChangeMessage(name, statName, applied, requested) {
+  const label = STAT_LABEL[statName] ?? statName;
+  if (applied === 0) {
+    return requested > 0
+      ? `${name}'s ${label} won't go higher!`
+      : `${name}'s ${label} won't go lower!`;
+  }
+  const mag = Math.abs(applied);
+  const verb = applied > 0
+    ? (mag >= 3 ? 'rose drastically' : mag === 2 ? 'rose sharply' : 'rose')
+    : (mag >= 3 ? 'fell severely' : mag === 2 ? 'harshly fell' : 'fell');
+  return `${name}'s ${label} ${verb}!`;
+}
+
+const STATUS_MESSAGES = {
+  burn: (n) => `${n} was burned!`,
+  poison: (n) => `${n} was poisoned!`,
+  'bad-poison': (n) => `${n} was badly poisoned!`,
+  paralysis: (n) => `${n} is paralyzed! It may be unable to move!`,
+  freeze: (n) => `${n} was frozen solid!`,
+  sleep: (n) => `${n} fell asleep!`,
+  confusion: (n) => `${n} became confused!`,
+};
+
+async function inflictStatus(target, ailment) {
+  if (target.status) {
+    log(`But ${target.name} is already ${target.status}!`);
+    await delay(700);
+    return;
+  }
+  target.status = ailment;
+  if (ailment === 'sleep') target.sleepTurns = randInt(1, 3);
+  log((STATUS_MESSAGES[ailment] ?? ((n) => `${n} was afflicted!`))(target.name));
+  await delay(800);
+}
+
+async function canAct(pokemon) {
+  if (pokemon.flinched) {
+    pokemon.flinched = false;
+    log(`${pokemon.name} flinched and couldn't move!`);
+    await delay(800);
+    return false;
+  }
+  if (pokemon.status === 'sleep') {
+    if (--pokemon.sleepTurns <= 0) {
+      pokemon.status = null;
+      log(`${pokemon.name} woke up!`);
+      await delay(800);
+      return true;
+    }
+    log(`${pokemon.name} is fast asleep.`);
+    await delay(800);
+    return false;
+  }
+  if (pokemon.status === 'freeze') {
+    if (randInt(1, 100) <= 20) {
+      pokemon.status = null;
+      log(`${pokemon.name} thawed out!`);
+      await delay(800);
+      return true;
+    }
+    log(`${pokemon.name} is frozen solid!`);
+    await delay(800);
+    return false;
+  }
+  if (pokemon.status === 'paralysis' && randInt(1, 100) <= 25) {
+    log(`${pokemon.name} is paralyzed! It can't move!`);
+    await delay(800);
+    return false;
+  }
+  return true;
+}
+
+async function endOfTurnDamage(pokemon) {
+  if (pokemon.currentHp <= 0) return;
+  const chip = { burn: 1 / 16, poison: 1 / 8, 'bad-poison': 1 / 8 }[pokemon.status];
+  if (!chip) return;
+  const amount = Math.max(1, Math.floor(pokemon.totalHp * chip));
+  pokemon.currentHp = Math.max(0, pokemon.currentHp - amount);
+  log(`${pokemon.name} is hurt by its ${pokemon.status}!`);
+  await delay(800);
 }
 
 /* ------------------------------------------------------------------ *
@@ -774,6 +984,9 @@ async function switchActivePokemon(pokemon) {
     userPokemon.value = pokemon;
     return;
   }
+
+  userPokemon.value.stages = freshStages();
+  userPokemon.value.flinched = false;
 
   isResolving.value = true;
   try {
