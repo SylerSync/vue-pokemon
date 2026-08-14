@@ -1,0 +1,296 @@
+{
+    "fire-stone": {
+        "id": "fire-stone",
+        "name": "Fire Stone",
+        "category": "evolution-stones",
+        "cost": 3000,
+        "description": "A peculiar stone that can make certain species of Pokémon evolve. It has a fiery orange heart."
+    },
+    "water-stone": {
+        "id": "water-stone",
+        "name": "Water Stone",
+        "category": "evolution-stones",
+        "cost": 3000,
+        "description": "A peculiar stone that can make certain species of Pokémon evolve. It is a clear, light blue."
+    },
+    "thunder-stone": {
+        "id": "thunder-stone",
+        "name": "Thunder Stone",
+        "category": "evolution-stones",
+        "cost": 3000,
+        "description": "A peculiar stone that can make certain species of Pokémon evolve. It has a distinct thunderbolt pattern."
+    },
+    "leaf-stone": {
+        "id": "leaf-stone",
+        "name": "Leaf Stone",
+        "category": "evolution-stones",
+        "cost": 3000,
+        "description": "A peculiar stone that can make certain species of Pokémon evolve. It has an unmistakable leaf pattern."
+    },
+    "moon-stone": {
+        "id": "moon-stone",
+        "name": "Moon Stone",
+        "category": "evolution-stones",
+        "cost": 3000,
+        "description": "A peculiar stone that can make certain species of Pokémon evolve. It is as black as the night sky."
+    },
+    "sun-stone": {
+        "id": "sun-stone",
+        "name": "Sun Stone",
+        "category": "evolution-stones",
+        "cost": 3000,
+        "description": "A peculiar stone that can make certain species of Pokémon evolve. It burns red like the evening sun."
+    },
+    "shiny-stone": {
+        "id": "shiny-stone",
+        "name": "Shiny Stone",
+        "category": "evolution-stones",
+        "cost": 4500,
+        "description": "A peculiar stone that can make certain species of Pokémon evolve. It shines with a dazzling light."
+    },
+    "dusk-stone": {
+        "id": "dusk-stone",
+        "name": "Dusk Stone",
+        "category": "evolution-stones",
+        "cost": 4500,
+        "description": "A peculiar stone that can make certain species of Pokémon evolve. It holds a dark shadow."
+    },
+    "dawn-stone": {
+        "id": "dawn-stone",
+        "name": "Dawn Stone",
+        "category": "evolution-stones",
+        "cost": 4500,
+        "description": "A peculiar stone that can make certain species of Pokémon evolve. It sparkles like a glittering eye."
+    },
+    "ice-stone": {
+        "id": "ice-stone",
+        "name": "Ice Stone",
+        "category": "evolution-stones",
+        "cost": 3000,
+        "description": "A peculiar stone that can make certain species of Pokémon evolve. It has a snowflake pattern."
+    },
+    "kings-rock": {
+        "id": "kings-rock",
+        "name": "King's Rock",
+        "category": "held-items",
+        "cost": 4500,
+        "description": "An item to be held by a Pokémon. When held, it may cause the target to flinch upon taking damage."
+    },
+    "metal-coat": {
+        "id": "metal-coat",
+        "name": "Metal Coat",
+        "category": "held-items",
+        "cost": 4500,
+        "description": "An item to be held by a Pokémon. It is a special metallic film that boosts Steel-type moves."
+    },
+    "dragon-scale": {
+        "id": "dragon-scale",
+        "name": "Dragon Scale",
+        "category": "held-items",
+        "cost": 4500,
+        "description": "A thick, tough scale. Dragon-type Pokémon may be holding it."
+    },
+    "up-grade": {
+        "id": "up-grade",
+        "name": "Upgrade",
+        "category": "held-items",
+        "cost": 5000,
+        "description": "A transparent device filled with all sorts of data. It was produced by Silph Co."
+    },
+    "dubious-disc": {
+        "id": "dubious-disc",
+        "name": "Dubious Disc",
+        "category": "held-items",
+        "cost": 5000,
+        "description": "A transparent device overflowing with dubious data. Its producer is unknown."
+    },
+    "protector": {
+        "id": "protector",
+        "name": "Protector",
+        "category": "held-items",
+        "cost": 4500,
+        "description": "A protective item. It is extremely stiff and heavy."
+    },
+    "electirizer": {
+        "id": "electirizer",
+        "name": "Electirizer",
+        "category": "held-items",
+        "cost": 5000,
+        "description": "A box packed with a tremendous amount of electric energy."
+    },
+    "magmarizer": {
+        "id": "magmarizer",
+        "name": "Magmarizer",
+        "category": "held-items",
+        "cost": 5000,
+        "description": "A box packed with a tremendous amount of magma energy."
+    },
+    "reaper-cloth": {
+        "id": "reaper-cloth",
+        "name": "Reaper Cloth",
+        "category": "held-items",
+        "cost": 4500,
+        "description": "A cloth imbued with terrible spiritual energy."
+    },
+    "deep-sea-tooth": {
+        "id": "deep-sea-tooth",
+        "name": "Deep Sea Tooth",
+        "category": "held-items",
+        "cost": 4000,
+        "description": "A tooth that glints a sharp silver. It raises Special Attack when held by Clamperl."
+    },
+    "deep-sea-scale": {
+        "id": "deep-sea-scale",
+        "name": "Deep Sea Scale",
+        "category": "held-items",
+        "cost": 4000,
+        "description": "A scale that shines a faint pink. It raises Special Defense when held by Clamperl."
+    },
+    "prism-scale": {
+        "id": "prism-scale",
+        "name": "Prism Scale",
+        "category": "held-items",
+        "cost": 4500,
+        "description": "A mysterious scale that shines in rainbow colors. It causes certain Pokémon to evolve."
+    },
+    "oval-stone": {
+        "id": "oval-stone",
+        "name": "Oval Stone",
+        "category": "held-items",
+        "cost": 3000,
+        "description": "A peculiar stone that can make certain species of Pokémon evolve. It's shaped like an egg."
+    },
+    "sachet": {
+        "id": "sachet",
+        "name": "Sachet",
+        "category": "held-items",
+        "cost": 4000,
+        "description": "A sachet filled with fragrant sachet powder that exhales a faint perfume."
+    },
+    "whipped-dream": {
+        "id": "whipped-dream",
+        "name": "Whipped Dream",
+        "category": "held-items",
+        "cost": 4000,
+        "description": "A soft and sweet treat made of fluffy whipped cream."
+    },
+    "razor-claw": {
+        "id": "razor-claw",
+        "name": "Razor Claw",
+        "category": "held-items",
+        "cost": 4500,
+        "description": "An item to be held by a Pokémon. It is a sharply hooked claw that boosts critical-hit ratio."
+    },
+    "razor-fang": {
+        "id": "razor-fang",
+        "name": "Razor Fang",
+        "category": "held-items",
+        "cost": 4500,
+        "description": "An item to be held by a Pokémon. It may cause the target to flinch on attack."
+    },
+    "sweet-apple": {
+        "id": "sweet-apple",
+        "name": "Sweet Apple",
+        "category": "evolution",
+        "cost": 3500,
+        "description": "A peculiar apple that can make a certain species of Pokémon evolve. It is exceptionally sweet."
+    },
+    "tart-apple": {
+        "id": "tart-apple",
+        "name": "Tart Apple",
+        "category": "evolution",
+        "cost": 3500,
+        "description": "A peculiar apple that can make a certain species of Pokémon evolve. It is exceptionally tart."
+    },
+    "syrupy-apple": {
+        "id": "syrupy-apple",
+        "name": "Syrupy Apple",
+        "category": "evolution",
+        "cost": 3500,
+        "description": "A peculiar apple that can make a certain species of Pokémon evolve. It is covered in sweet syrup."
+    },
+    "chipped-pot": {
+        "id": "chipped-pot",
+        "name": "Chipped Pot",
+        "category": "evolution",
+        "cost": 4000,
+        "description": "A peculiar teapot that can make a certain species of Pokémon evolve. It has a chip on it."
+    },
+    "cracked-pot": {
+        "id": "cracked-pot",
+        "name": "Cracked Pot",
+        "category": "evolution",
+        "cost": 4000,
+        "description": "A peculiar teapot that can make a certain species of Pokémon evolve. It has a crack in it."
+    },
+    "unremarkable-teacup": {
+        "id": "unremarkable-teacup",
+        "name": "Unremarkable Teacup",
+        "category": "evolution",
+        "cost": 4000,
+        "description": "A peculiar teacup that can make a certain species of Pokémon evolve. It is quite plain."
+    },
+    "masterpiece-teacup": {
+        "id": "masterpiece-teacup",
+        "name": "Masterpiece Teacup",
+        "category": "evolution",
+        "cost": 5000,
+        "description": "A peculiar teacup that can make a certain species of Pokémon evolve. It is a masterpiece."
+    },
+    "galarica-cuff": {
+        "id": "galarica-cuff",
+        "name": "Galarica Cuff",
+        "category": "evolution",
+        "cost": 4500,
+        "description": "A cuff made from woven Galarica Twigs that can make a Galarian Slowpoke evolve."
+    },
+    "galarica-wreath": {
+        "id": "galarica-wreath",
+        "name": "Galarica Wreath",
+        "category": "evolution",
+        "cost": 4500,
+        "description": "A wreath made from woven Galarica Twigs that can make a Galarian Slowpoke evolve."
+    },
+    "black-augurite": {
+        "id": "black-augurite",
+        "name": "Black Augurite",
+        "category": "evolution",
+        "cost": 5000,
+        "description": "A glass-like black stone that can make a certain species of Pokémon evolve."
+    },
+    "peat-block": {
+        "id": "peat-block",
+        "name": "Peat Block",
+        "category": "evolution",
+        "cost": 5000,
+        "description": "A block of muddy peat that can make Ursaring evolve during a full moon."
+    },
+    "auspicious-armor": {
+        "id": "auspicious-armor",
+        "name": "Auspicious Armor",
+        "category": "evolution",
+        "cost": 5500,
+        "description": "A peculiar suit of armor that can make Charcadet evolve into Armarouge."
+    },
+    "malicious-armor": {
+        "id": "malicious-armor",
+        "name": "Malicious Armor",
+        "category": "evolution",
+        "cost": 5500,
+        "description": "A peculiar suit of armor that can make Charcadet evolve into Ceruledge."
+    },
+    "scroll-of-darkness": {
+        "id": "scroll-of-darkness",
+        "name": "Scroll of Darkness",
+        "category": "evolution",
+        "cost": 6000,
+        "description": "A secret scroll that can make Kubfu evolve into Single Strike Style Urshifu."
+    },
+    "scroll-of-waters": {
+        "id": "scroll-of-waters",
+        "name": "Scroll of Waters",
+        "category": "evolution",
+        "cost": 6000,
+        "description": "A secret scroll that can make Kubfu evolve into Rapid Strike Style Urshifu."
+    }
+}

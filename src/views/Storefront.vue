@@ -1,15 +1,26 @@
 <script setup>
-import { computed } from "vue"
+import { ref, computed } from "vue"
 import { useInventoryStore } from "@/stores/inventoryStore";
 import { usePokemonStore } from "@/stores/pokemonStore";
+import SelectButton from "primevue/selectbutton"
 import DataTable from "primevue/datatable"
 import Column from "primevue/column"
 import Button from "primevue/button"
 import Tag from "primevue/tag"
 import tms from "@/assets/data/tms.json"
+import evolutionItems from "@/assets/data/evolutionItems.json"
 
 const inventoryStore = useInventoryStore();
 const pokemonStore = usePokemonStore();
+
+const shopCats = ref([
+    { label: "Pokeballs", value: "pokeballs" },
+    { label: "Recovery Items", value: "recovery" },
+    { label: "TM Shop", value: "tms" },
+    { label: "Evolution Items", value: "evolution" }
+])
+
+const shopTab = ref("pokeballs")
 
 // --- 1. POKEBALLS COMPUTED ---
 const shopPokeball = computed(() => {
@@ -51,6 +62,20 @@ const shopTMs = computed(() => {
     })
 })
 
+// --- Evo Items COMPUTED ---
+const evoItems = computed(() => {
+    return Object.entries(evolutionItems).map(([id, item]) => {
+        return {
+            id: id,
+            name: item.name,
+            category: item.category,
+            description: item.description,
+            cost: item.cost,
+            count: inventoryStore.evoItems?.[id] || 0
+        }
+    })
+})
+
 // --- PURCHASE FUNCTIONS ---
 function buyPokeball(itemType) {
     console.log(`Attempting to purchase pokeball: ${itemType}`)
@@ -75,6 +100,14 @@ function buyTM(tmId) {
         console.warn(`Not enough funds to buy TM ${tmId}`)
     }
 }
+
+function buyEvo(evoId) {
+    console.log(`Attempting to purchase Evo Item: ${evoId}`)
+    const success = inventoryStore.BuyEvoItem(evoId)
+    if (!success) {
+        console.warn(`Not enough funds to buy ${evoId}`)
+    }
+}
 </script>
 
 <template>
@@ -88,73 +121,104 @@ function buyTM(tmId) {
             </Tag>
         </div>
 
+        <SelectButton v-model="shopTab" :options="shopCats" optionLabel="label" optionValue="value"
+                aria-labelledby="basic" class="shopSelection"/>
+
         <!-- TABLE 1: POKEBALLS -->
-        <h3 class="shopTab">Pokeballs</h3>
-        <DataTable :value="shopPokeball" responsiveLayout="scroll" class="p-datatable-sm dataTable">
-            <Column field="name" header="Item" style="width: 40%"></Column>
-            <Column field="cost" header="Cost" style="width: 20%">
-                <template #body="slotProps">
-                    ${{ slotProps.data.cost.toLocaleString() }}
-                </template>
-            </Column>
-            <Column field="count" header="In Bag" style="width: 20%"></Column>
-            <Column header="Action" style="width: 20%">
-                <template #body="slotProps">
-                    <Button label="Buy" icon="pi pi-shopping-cart" severity="primary" size="small" class="shop-btn"
-                        :disabled="inventoryStore.funds < slotProps.data.cost"
-                        @click="buyPokeball(slotProps.data.id)" />
-                </template>
-            </Column>
-        </DataTable>
+        <template v-if="shopTab === 'pokeballs'">
+            <h3 class="shopTab">Pokeballs</h3>
+            <DataTable :value="shopPokeball" paginator :rows="5" responsiveLayout="scroll"
+                class="p-datatable-sm dataTable">
+                <Column field="name" header="Item" style="width: 40%"></Column>
+                <Column field="cost" header="Cost" style="width: 20%">
+                    <template #body="slotProps">
+                        ${{ slotProps.data.cost.toLocaleString() }}
+                    </template>
+                </Column>
+                <Column field="count" header="In Bag" style="width: 20%"></Column>
+                <Column header="Action" style="width: 20%">
+                    <template #body="slotProps">
+                        <Button label="Buy" icon="pi pi-shopping-cart" severity="primary" size="small" class="shop-btn"
+                            :disabled="inventoryStore.funds < slotProps.data.cost"
+                            @click="buyPokeball(slotProps.data.id)" />
+                    </template>
+                </Column>
+            </DataTable>
+        </template>
 
         <!-- TABLE 2: RECOVERY ITEMS -->
-        <h3 class="shopTab">Recovery Items</h3>
-        <DataTable :value="shopRecovery" responsiveLayout="scroll" class="p-datatable-sm dataTable">
-            <Column field="name" header="Item" style="width: 40%"></Column>
-            <Column field="cost" header="Cost" style="width: 20%">
-                <template #body="slotProps">
-                    ${{ slotProps.data.cost.toLocaleString() }}
-                </template>
-            </Column>
-            <Column field="count" header="In Bag" style="width: 20%"></Column>
-            <Column header="Action" style="width: 20%">
-                <template #body="slotProps">
-                    <Button label="Buy" icon="pi pi-shopping-cart" severity="primary" size="small" class="shop-btn"
-                        :disabled="inventoryStore.funds < slotProps.data.cost"
-                        @click="buyRecovery(slotProps.data.id)" />
-                </template>
-            </Column>
-        </DataTable>
+        <template v-if="shopTab === 'recovery'">
+            <h3 class="shopTab">Recovery Items</h3>
+            <DataTable :value="shopRecovery" paginator :rows="5" responsiveLayout="scroll"
+                class="p-datatable-sm dataTable">
+                <Column field="name" header="Item" style="width: 40%"></Column>
+                <Column field="cost" header="Cost" style="width: 20%">
+                    <template #body="slotProps">
+                        ${{ slotProps.data.cost.toLocaleString() }}
+                    </template>
+                </Column>
+                <Column field="count" header="In Bag" style="width: 20%"></Column>
+                <Column header="Action" style="width: 20%">
+                    <template #body="slotProps">
+                        <Button label="Buy" icon="pi pi-shopping-cart" severity="primary" size="small" class="shop-btn"
+                            :disabled="inventoryStore.funds < slotProps.data.cost"
+                            @click="buyRecovery(slotProps.data.id)" />
+                    </template>
+                </Column>
+            </DataTable>
+        </template>
 
         <!-- TABLE 3: TMs -->
-        <h3 class="shopTab">Technical Machines (TMs)</h3>
-        <DataTable :value="shopTMs" paginator :rows="5" responsiveLayout="scroll" class="p-datatable-sm dataTable">
-            <!-- CUSTOM TYPE-COLORED ITEM COLUMN -->
-            <Column field="name" header="Item" style="width: 40%">
-                <template #body="slotProps">
-                    <div class="tm-item-cell">
-                        <span class="tm-type-badge"
-                            :style="{ backgroundColor: pokemonStore.typeColors[slotProps.data.type] || '#777' }">
-                            {{ slotProps.data.type }}
-                        </span>
-                        <span class="tm-name-text">{{ slotProps.data.name }}</span>
-                    </div>
-                </template>
-            </Column>
+        <template v-if="shopTab === 'tms'">
+            <h3 class="shopTab">Technical Machines (TMs)</h3>
+            <DataTable :value="shopTMs" paginator :rows="5" responsiveLayout="scroll" class="p-datatable-sm dataTable">
+                <!-- CUSTOM TYPE-COLORED ITEM COLUMN -->
+                <Column field="name" header="Item" style="width: 40%">
+                    <template #body="slotProps">
+                        <div class="tm-item-cell">
+                            <span class="tm-type-badge"
+                                :style="{ backgroundColor: pokemonStore.typeColors[slotProps.data.type] || '#777' }">
+                                {{ slotProps.data.type }}
+                            </span>
+                            <span class="tm-name-text">{{ slotProps.data.name }}</span>
+                        </div>
+                    </template>
+                </Column>
 
-            <Column field="cost" header="Cost" style="width: 20%">
-                <template #body="slotProps">
-                    ${{ slotProps.data.cost.toLocaleString() }}
-                </template>
-            </Column>
-            <Column field="count" header="In Bag" style="width: 20%"></Column>
-            <Column header="Action" style="width: 20%">
-                <template #body="slotProps">
-                    <Button label="Buy" icon="pi pi-shopping-cart" severity="primary" size="small" class="shop-btn"
-                        :disabled="inventoryStore.funds < slotProps.data.cost" @click="buyTM(slotProps.data.id)" />
-                </template>
-            </Column>
-        </DataTable>
+                <Column field="cost" header="Cost" style="width: 20%">
+                    <template #body="slotProps">
+                        ${{ slotProps.data.cost.toLocaleString() }}
+                    </template>
+                </Column>
+                <Column field="count" header="In Bag" style="width: 20%"></Column>
+                <Column header="Action" style="width: 20%">
+                    <template #body="slotProps">
+                        <Button label="Buy" icon="pi pi-shopping-cart" severity="primary" size="small" class="shop-btn"
+                            :disabled="inventoryStore.funds < slotProps.data.cost" @click="buyTM(slotProps.data.id)" />
+                    </template>
+                </Column>
+            </DataTable>
+        </template>
+
+        <!-- Table 4: Evolution Items -->
+        <template v-if="shopTab === 'evolution'">
+            <h3 class="shopTab">Recovery Items</h3>
+            <DataTable :value="evoItems" paginator :rows="5" responsiveLayout="scroll" class="p-datatable-sm dataTable">
+                <Column field="name" header="Item" style="width: 40%"></Column>
+                <Column field="cost" header="Cost" style="width: 20%">
+                    <template #body="slotProps">
+                        ${{ slotProps.data.cost.toLocaleString() }}
+                    </template>
+                </Column>
+                <Column field="count" header="In Bag" style="width: 20%"></Column>
+                <Column header="Action" style="width: 20%">
+                    <template #body="slotProps">
+                        <Button label="Buy" icon="pi pi-shopping-cart" severity="primary" size="small" class="shop-btn"
+                            :disabled="inventoryStore.funds < slotProps.data.cost" @click="buyEvo(slotProps.data.id)" />
+                    </template>
+                </Column>
+            </DataTable>
+        </template>
 
     </div>
 </template>
@@ -216,5 +280,10 @@ function buyTM(tmId) {
 
 .tm-name-text {
     font-weight: 600;
+}
+
+.shopSelection{
+    display: flex;
+    justify-content: center;
 }
 </style>
