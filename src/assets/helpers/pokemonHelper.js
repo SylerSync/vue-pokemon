@@ -52,6 +52,7 @@ export async function getPokemonData(pokemon, specialForm) {
                 selectedMoves.push(randMoveIndex)
                 let spiltUrl = movePool[randMoveIndex].move.url.split("/")
                 move = await getMove(spiltUrl.at(-2))
+                // move = await getMove(147)
                 let moveInfo = await getMoveData(move)
                 randomMoves.push(moveInfo)
             }
