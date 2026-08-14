@@ -12,6 +12,7 @@ export const getPokemon = (name) => get(`/pokemon/${name}`)
 export const getSpecies = (name) => get(`/pokemon-species/${name}`)
 export const getPokemonByGen    = (generation) => get(`/generation/${generation}`)
 export const getMove = (index) => get(`/move/${index}`)
+export const getEvoChain = (index) => get(`/evolution-chain/${index}`)
 
 export async function fetchTrainerTeam(roster) {
   const teamPromises = roster.map(async (member) => {
