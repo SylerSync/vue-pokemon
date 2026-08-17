@@ -267,7 +267,7 @@ function handleUseRecoveryItem(item) {
                     return
                 }
                 if (inventoryStore.UseRecovery(item.id)) {
-                    target.currentHp = Math.min(target.totalHp, target.currentHp + 20);
+                    target.currentHp = Math.min(target.totalHp, target.currentHp + item.effect.amount);
                     return
                 }
             }
