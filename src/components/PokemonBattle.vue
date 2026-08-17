@@ -201,7 +201,7 @@
       <div class="move-swap-container">
         <div class="modal-header">
           <h3><strong>{{ userPokemon.name }}</strong> wants to learn <span class="highlight-move">{{ pendingMove.name
-              }}</span></h3>
+          }}</span></h3>
           <p>Select a move to forget, or skip learning {{ pendingMove.name }}.</p>
         </div>
 
@@ -567,7 +567,9 @@ async function checkLevelUp(pokemon) {
     if (pokemon.currentExp >= requiredExp) {
       pokemon.currentExp -= requiredExp;
       pokemon.level++;
-      await checkNewMoves(pokemon)
+      console.log(`${userPokemon.value.name} has leveled up to ${userPokemon.value.level}!`)
+      await checkEvolution(pokemon)
+      await checkNewMoves(userPokemon.value)
       await processLeveling();
     }
   }
@@ -576,6 +578,37 @@ async function checkLevelUp(pokemon) {
 
   return pokemon.level > startingLevel;
 }
+
+//check for evolution by level
+async function checkEvolution(pokemon) {
+  if (!pokemon.evoDetails || !Array.isArray(pokemon.evoDetails) || pokemon.evoDetails.length === 0) {
+    return false;
+  }
+
+  for (const evo of pokemon.evoDetails) {
+
+    if (pokemon.level >= evo.level && evo.trigger === "level-up") {
+
+      if (evo.heldItem && pokemon.heldItem !== evo.heldItem) {
+        console.log(`Cannot evolve: Needs to be holding ${evo.heldItem} while leveling up.`);
+        continue; // Try next evolution condition if available
+      }
+
+      console.log(`${pokemon.name} is ready to evolve into ${evo.nextEvo.name}!`);
+
+      const evoSuccess = await pokemonHelper.handleEvolution(pokemon, evo.nextEvo.name);
+      if(evoSuccess){
+        const updated = pokemonStore.caughtPokemon.find(p => p.instanceId === pokemon.instanceId)
+        userPokemon.value = updated
+        userPokemon.value.heldItem = ""
+      }
+      return evoSuccess 
+    }
+  }
+
+  return false;
+}
+
 
 //Recalculate stats
 function recalcStats(pokemon) {
@@ -660,7 +693,6 @@ async function handleFaint(pokemon) {
     console.log(`${rewardExp} EXP has been rewarded!`)
     userPokemon.value.currentExp += rewardExp
     if (await checkLevelUp(userPokemon.value)) {
-      console.log(`${userPokemon.value.name} has leveled up to ${userPokemon.value.level}!`)
       recalcStats(userPokemon.value)
     }
 

@@ -80,9 +80,9 @@ const testBulbasaur = {
   "captureRate": 18,
   "totalHp": 22,
   "currentHp": 22,
-  "level": 12,
+  "level": 15,
   "baseExp": 64,
-  "currentExp": 468,
+  "currentExp": 720,
   "totalKOs": 0,
   "totalFaints": 0,
   "instanceId": "test-bulbasaur-lvl6",
@@ -190,12 +190,135 @@ const testBulbasaur = {
   ]
 }
 
+const testGligar = {
+  "name": "gligar",
+  "id": 207,
+  "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/207.png",
+  "backSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/207.png",
+  "types": ["ground", "flying"],
+  "height": 11,
+  "weight": 648,
+  "cry": "https://raw.githubusercontent.com/PokeAPI/cries/main/cries/pokemon/latest/207.ogg",
+  "captureRate": 60,
+  "totalHp": 48,
+  "currentHp": 48,
+  "level": 15,
+  "baseExp": 86,
+  "currentExp": 720,
+  "totalKOs": 0,
+  "totalFaints": 0,
+  "heldItem":"razor-fang",
+  "instanceId": "test-gligar-item-evo",
+  "stats": [
+    { "name": "hp", "base_stat": 65, "stat": 48 },
+    { "name": "attack", "base_stat": 75, "stat": 29 },
+    { "name": "defense", "base_stat": 105, "stat": 38 },
+    { "name": "special-attack", "base_stat": 35, "stat": 17 },
+    { "name": "special-defense", "base_stat": 65, "stat": 26 },
+    { "name": "speed", "base_stat": 85, "stat": 32 }
+  ],
+  "moves": [
+    {
+      "name": "poison-sting",
+      "type": "poison",
+      "power": 15,
+      "accuracy": 100,
+      "priority": 0,
+      "damageClass": "physical",
+      "targetsSelf": false,
+      "statChanges": [],
+      "statChance": 0,
+      "ailment": "poison",
+      "ailmentChance": 30,
+      "drain": 0,
+      "healing": 0,
+      "flinchChance": 0,
+      "critRate": 0,
+      "trap": false,
+      "minTurns": 0,
+      "maxTurns": 0
+    },
+    {
+      "name": "sand-attack",
+      "type": "ground",
+      "power": null,
+      "accuracy": 100,
+      "priority": 0,
+      "damageClass": "status",
+      "targetsSelf": false,
+      "statChanges": [{ "stat": "accuracy", "change": -1 }],
+      "statChance": 0,
+      "ailment": null,
+      "ailmentChance": 0,
+      "drain": 0,
+      "healing": 0,
+      "flinchChance": 0,
+      "critRate": 0,
+      "trap": false,
+      "minTurns": 0,
+      "maxTurns": 0
+    },
+    {
+      "name": "harden",
+      "type": "normal",
+      "power": null,
+      "accuracy": null,
+      "priority": 0,
+      "damageClass": "status",
+      "targetsSelf": true,
+      "statChanges": [{ "stat": "defense", "change": 1 }],
+      "statChance": 0,
+      "ailment": null,
+      "ailmentChance": 0,
+      "drain": 0,
+      "healing": 0,
+      "flinchChance": 0,
+      "critRate": 0,
+      "trap": false,
+      "minTurns": 0,
+      "maxTurns": 0
+    },
+    {
+      "name": "knock-off",
+      "type": "dark",
+      "power": 65,
+      "accuracy": 100,
+      "priority": 0,
+      "damageClass": "physical",
+      "targetsSelf": false,
+      "statChanges": [],
+      "statChance": 0,
+      "ailment": null,
+      "ailmentChance": 0,
+      "drain": 0,
+      "healing": 0,
+      "flinchChance": 0,
+      "critRate": 0,
+      "trap": false,
+      "minTurns": 0,
+      "maxTurns": 0
+    }
+  ],
+  "evoDetails": [
+    {
+      "level": 1,
+      "item": null,
+      "heldItem": "razor-fang",
+      "trigger": "level-up",
+      "nextEvo": {
+        "name": "gliscor",
+        "url": "https://pokeapi.co/api/v2/pokemon-species/472/"
+      }
+    }
+  ]
+}
+
 export const usePokemonStore = defineStore("pokemonStore", {
 
 
     state: () => ({
         caughtPokemon: [
-            testBulbasaur
+            testGligar
         ],
         wishlistPokemon: [],
         typeColors: {
