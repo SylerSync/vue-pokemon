@@ -15,6 +15,8 @@ import { useInventoryStore } from "@/stores/inventoryStore";
 import tmData from '@/assets/data/tms.json';
 import expChart from "@/assets/data/levelThresholds.json"
 import evolutionItems from "@/assets//data/evolutionItems.json"
+import SelectButton from "primevue/selectbutton"
+import * as pokemonHelper from "@/assets/helpers/pokemonHelper"
 
 const pokemonStore = usePokemonStore()
 const inventoryStore = useInventoryStore()
@@ -28,6 +30,12 @@ const isReplaceModalOpen = ref(false);
 const isEvoItemModalOpen = ref(false)
 const pendingNewMove = ref(null);
 const pendingTmId = ref(null);
+const inventoryTab = ref("recovery")
+
+const inventoryTabs = [
+    { label: "Recovery Items", value: "recovery" },
+    { label: "Evolution Items", value: "evoItems" }
+]
 
 function openReplaceMoveModal(newMove, tmId) {
     pendingNewMove.value = newMove;
@@ -229,7 +237,7 @@ const closeItemModal = () => {
     isItemModalOpen.value = false
 }
 
-function handleUseItem(item) {
+function handleUseRecoveryItem(item) {
     if (!inventoryStore.recoveryItems[item.id]) {
         console.warn(`Can not find item ${item.id} in the inventory.`)
         return
@@ -320,7 +328,40 @@ const heldInventory = computed(() => {
         });
 });
 
-// Placeholder for Held Item click handler
+async function useEvoItem(itemId) {
+    const pokemon = selectedPokemon.value;
+    if (!pokemon?.evoDetails || !Array.isArray(pokemon.evoDetails)) {
+        console.log(`You can't evolve ${pokemon?.name} using a ${itemId}`);
+        return;
+    }
+
+    // Search the array directly for a matching trigger + item
+    const matchingEvo = pokemon.evoDetails.find(
+        evo => evo.trigger === "use-item" && evo.item === itemId
+    );
+
+    if (matchingEvo) {
+        const evoName = matchingEvo.nextEvo.name;
+
+        // Run evolution helper
+        const success = await pokemonHelper.handleEvolution(pokemon, evoName);
+
+        if (success) {
+            // Deduct stone from inventory
+            inventoryStore.UseEvoItem(itemId, 1);
+
+            // Re-sync active modal reference to newly evolved species
+            selectedPokemon.value = pokemonStore.caughtPokemon.find(
+                p => p.instanceId === pokemon.instanceId
+            );
+            closeItemModal()
+            closeDetailModal();
+        }
+    } else {
+        console.log(`You can't evolve ${pokemon.name} using a ${itemId}`);
+    }
+}
+
 function handleHeldItem() {
     if (selectedPokemon.value.heldItem && selectedPokemon.value.heldItem !== "") {
         inventoryStore.AddEvoItem(selectedPokemon.value.heldItem)
@@ -332,7 +373,7 @@ function handleHeldItem() {
     }
 }
 
-function givePokemonItem(itemID){
+function givePokemonItem(itemID) {
     selectedPokemon.value.heldItem = itemID
     inventoryStore.UseEvoItem(itemID)
     closeEvoItemModal()
@@ -457,7 +498,7 @@ function closeEvoItemModal() {
             <div class="modal-actions">
                 <!-- 3 Top Buttons: Heal, TM, Held Item -->
                 <div class="top-actions">
-                    <Button label="Heal / Recover" icon="pi pi-heart-fill" severity="success" class="action-btn"
+                    <Button label="Use Items" icon="pi pi-heart-fill" severity="success" class="action-btn"
                         @click="openItemModal" />
                     <Button label="Use TM" icon="pi pi-bolt" severity="info" class="action-btn" @click="openTmModal" />
                     <Button :label="selectedPokemon.heldItem ? `Item: ${selectedPokemon.heldItem}` : 'Held Item: None'"
@@ -471,21 +512,51 @@ function closeEvoItemModal() {
         </div>
     </Modal>
 
-    <!-- RECOVERY ITEM SELECTION MODAL -->
+    <!-- ITEM SELECTION MODAL (RECOVERY & EVO ITEMS) -->
     <Modal v-if="isItemModalOpen" @close="closeItemModal">
         <div class="itemModal-container">
-            <h3 class="section-title mb-2">Select Recovery Item</h3>
-            <DataTable :value="itemInventory" responsiveLayout="scroll" class="p-datatable-sm itemMenu">
-                <Column field="name" header="Item" style="width: 30%"></Column>
-                <Column field="effectDescription" header="Effect" style="width: 35%"></Column>
-                <Column field="count" header="In Bag" style="width: 15%"></Column>
-                <Column header="Action" style="width: 20%">
-                    <template #body="slotProps">
-                        <Button label="Use" severity="primary" size="small" :disabled="slotProps.data.count <= 0"
-                            @click="handleUseItem(slotProps.data)" />
-                    </template>
-                </Column>
-            </DataTable>
+            <!-- TAB SELECTOR -->
+            <div class="inventory-tab-header">
+                <SelectButton v-model="inventoryTab" :options="inventoryTabs" optionLabel="label" optionValue="value"
+                    class="inventory-select-button" />
+            </div>
+
+            <!-- TAB 1: RECOVERY ITEMS -->
+            <div v-if="inventoryTab === 'recovery'">
+                <h3 class="section-title mb-2">Select Recovery Item</h3>
+                <DataTable :value="itemInventory" responsiveLayout="scroll" class="p-datatable-sm itemMenu">
+                    <Column field="name" header="Item" style="width: 30%"></Column>
+                    <Column field="effectDescription" header="Effect" style="width: 35%"></Column>
+                    <Column field="count" header="In Bag" style="width: 15%"></Column>
+                    <Column header="Action" style="width: 20%">
+                        <template #body="slotProps">
+                            <Button label="Use" severity="primary" size="small" :disabled="slotProps.data.count <= 0"
+                                @click="handleUseRecoveryItem(slotProps.data)" />
+                        </template>
+                    </Column>
+                </DataTable>
+            </div>
+
+            <!-- TAB 2: EVOLUTION & HELD ITEMS -->
+            <div v-else-if="inventoryTab === 'evoItems'">
+                <h3 class="section-title mb-2">Select Evolution / Held Item</h3>
+                <DataTable :value="heldInventory" responsiveLayout="scroll" class="p-datatable-sm itemMenu">
+                    <Column field="name" header="Item" style="width: 25%"></Column>
+                    <Column field="description" header="Effect" style="width: 40%"></Column>
+                    <Column field="count" header="In Bag" style="width: 15%"></Column>
+                    <Column header="Action" style="width: 20%">
+                        <template #body="slotProps">
+                            <!-- DIRECT USE (Evolution Stones) -->
+                            <Button v-if="slotProps.data.category === 'evolution-stones'" label="Use" severity="warn"
+                                size="small" :disabled="slotProps.data.count <= 0"
+                                @click="useEvolutionStone(slotProps.data)" />
+                            <!-- EQUIP (Held & Trade Items) -->
+                            <Button v-else label="Give" severity="success" size="small"
+                                :disabled="slotProps.data.count <= 0" @click="useEvoItem(slotProps.data.id)" />
+                        </template>
+                    </Column>
+                </DataTable>
+            </div>
         </div>
     </Modal>
 
