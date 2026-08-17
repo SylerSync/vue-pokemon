@@ -93,7 +93,9 @@ export async function getPokemonData(pokemon, specialForm) {
       totalKOs: 0,
       totalFaints: 0,
       level: randLevel,
-      evoDetails: evoDetails
+      evoDetails: evoDetails,
+      baseExp: pokemonData.base_experience,
+      currentExp: 0
 
     };
   } catch (err) {
@@ -183,7 +185,9 @@ export async function getPokemonWithLevelData(pokemon, specialForm, level) {
       totalKOs: 0,
       totalFaints: 0,
       level: level,
-      evoDetails: evoDetails
+      evoDetails: evoDetails,
+      baseExp: pokemonData.base_experience,
+      currentExp: 0
 
     };
   } catch (err) {
@@ -216,6 +220,10 @@ export async function getMoveData(move) {
     minTurns: move.meta?.min_turns ?? 0,
     maxTurns: move.meta?.max_turns ?? 0,
   }
+}
+
+export async function handleEvolution(currPokemon, evoPokemon){
+  // Eventually this will handle the evolution processing
 }
 
 async function calculateMaxAndMinLevels(pokemonSpecies, name) {

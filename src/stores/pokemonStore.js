@@ -68,12 +68,134 @@ const testGodPokemon = {
     ]
 }
 
+const testBulbasaur = {
+  "name": "bulbasaur",
+  "id": 1,
+  "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1.png",
+  "backSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/1.png",
+  "types": ["grass", "poison"],
+  "height": 7,
+  "weight": 69,
+  "cry": "https://raw.githubusercontent.com/PokeAPI/cries/main/cries/pokemon/latest/1.ogg",
+  "captureRate": 18,
+  "totalHp": 22,
+  "currentHp": 22,
+  "level": 12,
+  "baseExp": 64,
+  "currentExp": 468,
+  "totalKOs": 0,
+  "totalFaints": 0,
+  "instanceId": "test-bulbasaur-lvl6",
+  "stats": [
+    { "name": "hp", "base_stat": 45, "stat": 10.4 },
+    { "name": "attack", "base_stat": 49, "stat": 99 },
+    { "name": "defense", "base_stat": 49, "stat": 10.88 },
+    { "name": "special-attack", "base_stat": 65, "stat": 12.8 },
+    { "name": "special-defense", "base_stat": 65, "stat": 12.8 },
+    { "name": "speed", "base_stat": 45, "stat": 10.4 }
+  ],
+  "moves": [
+    {
+      "name": "tackle",
+      "type": "normal",
+      "power": 40,
+      "accuracy": 100,
+      "priority": 0,
+      "damageClass": "physical",
+      "targetsSelf": false,
+      "statChanges": [],
+      "statChance": 0,
+      "ailment": null,
+      "ailmentChance": 0,
+      "drain": 0,
+      "healing": 0,
+      "flinchChance": 0,
+      "critRate": 0,
+      "trap": false,
+      "minTurns": 0,
+      "maxTurns": 0
+    },
+    {
+      "name": "growl",
+      "type": "normal",
+      "power": null,
+      "accuracy": 100,
+      "priority": 0,
+      "damageClass": "status",
+      "targetsSelf": false,
+      "statChanges": [{ "stat": "attack", "change": -1 }],
+      "statChance": 0,
+      "ailment": null,
+      "ailmentChance": 0,
+      "drain": 0,
+      "healing": 0,
+      "flinchChance": 0,
+      "critRate": 0,
+      "trap": false,
+      "minTurns": 0,
+      "maxTurns": 0
+    },
+    {
+      "name": "scratch",
+      "type": "normal",
+      "power": 40,
+      "accuracy": 100,
+      "priority": 0,
+      "damageClass": "physical",
+      "targetsSelf": false,
+      "statChanges": [],
+      "statChance": 0,
+      "ailment": null,
+      "ailmentChance": 0,
+      "drain": 0,
+      "healing": 0,
+      "flinchChance": 0,
+      "critRate": 0,
+      "trap": false,
+      "minTurns": 0,
+      "maxTurns": 0
+    },
+    {
+      "name": "leech-seed",
+      "type": "grass",
+      "power": null,
+      "accuracy": 90,
+      "priority": 0,
+      "damageClass": "status",
+      "targetsSelf": false,
+      "statChanges": [],
+      "statChance": 0,
+      "ailment": null,
+      "ailmentChance": 0,
+      "drain": 0,
+      "healing": 0,
+      "flinchChance": 0,
+      "critRate": 0,
+      "trap": false,
+      "minTurns": 0,
+      "maxTurns": 0
+    }
+  ],
+  "evoDetails": [
+    {
+      "level": 16,
+      "item": null,
+      "heldItem": null,
+      "trigger": "level-up",
+      "nextEvo": {
+        "name": "ivysaur",
+        "url": "https://pokeapi.co/api/v2/pokemon-species/2/"
+      }
+    }
+  ]
+}
+
 export const usePokemonStore = defineStore("pokemonStore", {
 
 
     state: () => ({
         caughtPokemon: [
-            
+            testBulbasaur
         ],
         wishlistPokemon: [],
         typeColors: {
