@@ -70,7 +70,48 @@ export const useInventoryStore = defineStore("inventoryStore", {
                     type: "heal",
                     amount: 1000
                 }
+            },
+            antidote: {
+                count: 0,
+                cost: 100,
+                effect: {
+                    type: "status-heal",
+                    status: "poison"
+                }
+            },
+            burn_heal: {
+                count: 0,
+                cost: 250,
+                effect: {
+                    type: "status-heal",
+                    status: "burn"
+                }
+            },
+            ice_heal: {
+                count: 0,
+                cost: 250,
+                effect: {
+                    type: "status-heal",
+                    status: "freeze"
+                }
+            },
+            awakening: {
+                count: 0,
+                cost: 250,
+                effect: {
+                    type: "status-heal",
+                    status: "sleep"
+                }
+            },
+            paralyze_heal: {
+                count: 0,
+                cost: 200,
+                effect: {
+                    type: "status-heal",
+                    status: "paralysis"
+                }
             }
+
         },
         tms: {
 
@@ -244,28 +285,28 @@ export const useInventoryStore = defineStore("inventoryStore", {
         /* ================= ================= =================
             EVOLUTION FUNCTIONS
             ================= ================= ================= */
-        UseEvoItem(evoId){
-            if(!this.evoItems[evoId] || this.evoItems[evoId] <= 0){
+        UseEvoItem(evoId) {
+            if (!this.evoItems[evoId] || this.evoItems[evoId] <= 0) {
                 console.warn(`No ${evoId} remaining in inventory.`)
                 return false
             }
             this.evoItems[evoId]--
 
-            if(this.evoItems[evoId] <= 0){
+            if (this.evoItems[evoId] <= 0) {
                 delete this.evoItems[evoId]
             }
             return true
         },
-        BuyEvoItem(evoId){
+        BuyEvoItem(evoId) {
             if (!this.evoItems) {
                 this.evoItems = {};
             }
             const item = evolutionItems[evoId]
-            if(!item){
+            if (!item) {
                 console.warn(`Could not find item in evolution items with id ${evoId}`)
                 return false
             }
-            if(this.funds < item.cost){
+            if (this.funds < item.cost) {
                 console.warn(`You do not have the funds to purchase item with id: ${evoId}`)
                 return false
             }
@@ -274,6 +315,19 @@ export const useInventoryStore = defineStore("inventoryStore", {
 
             return true
 
+        },
+        AddEvoItem(evoId) {
+            if (!this.evoItems) {
+                this.evoItems = {};
+            }
+            const item = evolutionItems[evoId]
+            if (!item) {
+                console.warn(`Could not find item in evolution items with id ${evoId}`)
+                return false
+            }
+            this.evoItems[evoId] = (this.evoItems[evoId] || 0) + 1;
+
+            return true
         }
     }
 })
