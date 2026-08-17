@@ -95,8 +95,8 @@ export async function getPokemonData(pokemon, specialForm) {
       level: randLevel,
       evoDetails: evoDetails,
       baseExp: pokemonData.base_experience,
-      currentExp: 0
-
+      currentExp: 0,
+      minorStatus: []
     };
   } catch (err) {
     console.error(`An error occurred collecting data for ${pokemon}`, err);
@@ -187,7 +187,8 @@ export async function getPokemonWithLevelData(pokemon, specialForm, level) {
       level: level,
       evoDetails: evoDetails,
       baseExp: pokemonData.base_experience,
-      currentExp: 0
+      currentExp: 0,
+      minorStatus: []
 
     };
   } catch (err) {
@@ -216,7 +217,6 @@ export async function getMoveData(move) {
     healing: move.meta?.healing ?? 0, // % of max HP
     flinchChance: move.meta?.flinch_chance ?? 0,
     critRate: move.meta?.crit_rate ?? 0,
-    trap: move.meta?.ailment?.name === 'trap',
     minTurns: move.meta?.min_turns ?? 0,
     maxTurns: move.meta?.max_turns ?? 0,
   }
