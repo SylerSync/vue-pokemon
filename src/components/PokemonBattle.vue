@@ -209,6 +209,9 @@ import { useInventoryStore } from '@/stores/inventoryStore';
 import { label } from '@primeuix/themes/aura/metergroup';
 import SelectButton from 'primevue/selectbutton';
 import Badge from 'primevue/badge';
+import expChart from "@/assets/data/levelThresholds.json"
+import * as pokeapi from "@/api/pokeapi";
+import * as pokemonHelper from "@/assets/helpers/pokemonHelper.js"
 
 /* ------------------------------------------------------------------ *
  * Props & emits
@@ -490,6 +493,63 @@ function calcExperience(pokemon){
   return Math.trunc(((baseExp * level) / 7) * (props.isWild ? 1.0 : 1.5));
 }
 
+function checkLevelUp(pokemon) {
+  const startingLevel = pokemon.level;
+
+  // Internal recusive function incase multiple levels are gained
+  function processLeveling() {
+    if (pokemon.level >= 100) {
+      pokemon.currentExp = 0;
+      return;
+    }
+
+    const nextLevel = pokemon.level + 1;
+    const requiredExp = expChart[nextLevel];
+
+    if (pokemon.currentExp >= requiredExp) {
+      pokemon.currentExp -= requiredExp;
+      pokemon.level++;
+      processLeveling();
+    }
+  }
+
+  processLeveling();
+
+  return pokemon.level > startingLevel;
+}
+
+//Recalculate stats
+function recalcStats(pokemon){
+  pokemon.stats = pokemon.stats.map(s => ({
+    name: s.name,
+    base_stat: s.base_stat,
+    stat: Math.floor(((2 * s.base_stat * pokemon.level) / 100) + 5)
+  }))
+  let oldHp = pokemon.totalHp
+  console.log(oldHp)
+  pokemon.totalHp = Math.floor(((2 * pokemon.stats.find(s => s.name == "hp")?.base_stat * pokemon.level) / 100) + pokemon.level + 10)
+  pokemon.currentHp += pokemon.totalHp - oldHp
+}
+
+//Check for new moves by level
+async function checkNewMoves(pokemon){
+  let pokeData = await pokeapi.getPokemon(pokemon.name)
+  for(let move of pokeData.moves){
+    if(move?.version_group_details[0]?.level_learned_at == pokemon.level && 
+      move?.version_group_details[0]?.move_learn_method?.name === "level-up"){
+        //get move information
+        const url = move.move.url
+        const match = url.match(/\/(\d+)\/?$/);
+        const id = match ? parseInt(match[1], 10) : null;
+        let moveData = pokemonHelper.getMoveData(await pokeapi.getMove(id))
+        //Check if pokemon already has 4 moves
+        if(pokemon.moves.length < 4){
+          pokemon.moves.push(moveData)
+        }
+    }
+  }
+}
+
 
 /**
  * Handles a fainted combatant. Returns true if the turn should stop.
@@ -501,7 +561,14 @@ async function handleFaint(pokemon) {
 
   if (pokemon === foe.value) {
 
-    rewardExp = calcExperience(pokemon)
+    // Reward experience to the pokemon
+    let rewardExp = calcExperience(pokemon)
+    console.log(`${rewardExp} EXP has been rewarded!`)
+    userPokemon.value.currentExp += rewardExp
+    if(checkLevelUp(userPokemon.value)){
+      console.log(`${userPokemon.value.name} has leveled up to ${userPokemon.value.level}!`)
+      recalcStats(userPokemon.value)
+    }
     
     if (props.isWild) {
       const reward = Math.trunc(3000 - (pokemon.captureRate * 10));
@@ -528,6 +595,8 @@ async function handleFaint(pokemon) {
       }
     }
   }
+
+  pokemon.status = ""
 
   // Player's Pokémon fainted — switch if anyone is left standing.
   const next = team.value.find(p => !isFainted(p) && p.instanceId !== pokemon.instanceId);
