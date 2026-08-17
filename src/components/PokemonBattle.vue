@@ -1062,7 +1062,7 @@ async function handleUseRecoveryItem(item, targetPokemon) {
           return;
         }
         if (inventoryStore.UseRecovery(item.id)) {
-          target.currentHp = Math.min(target.totalHp, target.currentHp + 20);
+          target.currentHp = Math.min(target.totalHp, target.currentHp + item.effect.amount);
           battleLog.value.push(`${item.name} has been used on ${target.name}.`)
           selectedTargetPokemon.value = null;
           sidePanel.value = "log"
