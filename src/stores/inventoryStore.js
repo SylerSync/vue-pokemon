@@ -274,6 +274,19 @@ export const useInventoryStore = defineStore("inventoryStore", {
 
             return true
 
+        },
+        AddEvoItem(evoId){
+            if (!this.evoItems) {
+                this.evoItems = {};
+            }
+            const item = evolutionItems[evoId]
+            if(!item){
+                console.warn(`Could not find item in evolution items with id ${evoId}`)
+                return false
+            }
+            this.evoItems[evoId] = (this.evoItems[evoId] || 0) + 1;
+
+            return true
         }
     }
 })

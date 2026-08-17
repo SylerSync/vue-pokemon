@@ -221,7 +221,7 @@ export async function getMoveData(move) {
     maxTurns: move.meta?.max_turns ?? 0,
   }
 }
-
+// Takes in pokemon to evolve object, and the name of the evolution
 export async function handleEvolution(currPokemon, evoPokemonName) {
   console.log("attempting evolution")
   const moveset = currPokemon.moves
