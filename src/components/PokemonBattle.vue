@@ -157,7 +157,7 @@
                       <span class="target-name">{{ slotProps.value.name }}</span>
                       <span class="target-hp-text">
                         {{ Math.max(0, slotProps.value.currentHp ?? slotProps.value.totalHp) }}/{{
-                        slotProps.value.totalHp }}
+                          slotProps.value.totalHp }}
                       </span>
                     </div>
                     <span v-else class="placeholder">{{ slotProps.placeholder }}</span>
@@ -168,7 +168,7 @@
                         <span class="target-name">{{ slotProps.option.name }}</span>
                         <span class="target-hp-text">
                           {{ Math.max(0, slotProps.option.currentHp ?? slotProps.option.totalHp) }}/{{
-                          slotProps.option.totalHp }} HP
+                            slotProps.option.totalHp }} HP
                         </span>
                       </div>
                       <div class="hp-track">
@@ -195,6 +195,61 @@
       </Splitter>
     </div>
   </Modal>
+
+  <Modal v-if="isSwapModalOpen" @close="closeReplaceMoveModal()">
+    <template #default>
+      <div class="move-swap-container">
+        <div class="modal-header">
+          <h3><strong>{{ userPokemon.name }}</strong> wants to learn <span class="highlight-move">{{ pendingMove.name
+              }}</span></h3>
+          <p>Select a move to forget, or skip learning {{ pendingMove.name }}.</p>
+        </div>
+
+        <!-- Current 4 Moves Grid -->
+        <div class="moves-section">
+          <span class="section-title">Current Moves</span>
+          <div class="current-moves">
+            <Card v-for="(move, index) in userPokemon.moves" :key="move.name + index" class="move-card select-card"
+              @click="replaceMove(index)">
+              <template #content>
+                <div class="card-top">
+                  <span class="move-title">{{ move.name }}</span>
+                  <span class="type-pill"
+                    :style="{ backgroundColor: pokemonStore.typeColors[move.type?.toLowerCase()] || '#777' }">
+                    {{ move.type }}
+                  </span>
+                </div>
+                <div class="card-details">
+                  <span><strong>PWR:</strong> {{ move.power || '—' }}</span>
+                </div>
+                <div class="hover-action">Forget Move</div>
+              </template>
+            </Card>
+          </div>
+        </div>
+
+        <!-- Cancel / Skip Learning Card -->
+        <div class="cancel-section">
+          <span class="section-title">New Move</span>
+          <Card class="move-card cancel-card" @click="closeReplaceMoveModal()">
+            <template #content>
+              <div class="card-top">
+                <span class="move-title">{{ pendingMove.name }}</span>
+                <span class="type-pill"
+                  :style="{ backgroundColor: pokemonStore.typeColors[pendingMove.type?.toLowerCase()] || '#777' }">
+                  {{ pendingMove.type }}
+                </span>
+              </div>
+              <div class="card-details">
+                <span><strong>PWR:</strong> {{ pendingMove.power || '—' }}</span>
+              </div>
+              <div class="hover-action cancel">Don't Learn</div>
+            </template>
+          </Card>
+        </div>
+      </div>
+    </template>
+  </Modal>
 </template>
 
 <script setup>
@@ -207,6 +262,7 @@ import Modal from '@/components/Modal.vue';
 import { usePokemonStore } from '@/stores/pokemonStore';
 import { useInventoryStore } from '@/stores/inventoryStore';
 import { label } from '@primeuix/themes/aura/metergroup';
+import Card from "primevue/card"
 import SelectButton from 'primevue/selectbutton';
 import Badge from 'primevue/badge';
 import expChart from "@/assets/data/levelThresholds.json"
@@ -252,6 +308,8 @@ const battleLog = ref([]);
 const sidePanel = ref('log');
 const logEl = ref(null);
 const anim = ref(null);
+const isSwapModalOpen = ref(false)
+const pendingMove = ref(null)
 
 const userPokemon = ref(null);
 const selectedTargetPokemon = ref(null);
@@ -487,17 +545,17 @@ function pickMove(pokemon) {
   return moves.length ? moves[randInt(0, moves.length - 1)] : null;
 }
 
-function calcExperience(pokemon){
+function calcExperience(pokemon) {
   const baseExp = pokemon?.baseExp ?? 50;
   const level = pokemon?.level ?? 1;
   return Math.trunc(((baseExp * level) / 7) * (props.isWild ? 1.0 : 1.5));
 }
 
-function checkLevelUp(pokemon) {
+async function checkLevelUp(pokemon) {
   const startingLevel = pokemon.level;
 
   // Internal recusive function incase multiple levels are gained
-  function processLeveling() {
+  async function processLeveling() {
     if (pokemon.level >= 100) {
       pokemon.currentExp = 0;
       return;
@@ -509,17 +567,18 @@ function checkLevelUp(pokemon) {
     if (pokemon.currentExp >= requiredExp) {
       pokemon.currentExp -= requiredExp;
       pokemon.level++;
-      processLeveling();
+      await checkNewMoves(pokemon)
+      await processLeveling();
     }
   }
 
-  processLeveling();
+  await processLeveling();
 
   return pokemon.level > startingLevel;
 }
 
 //Recalculate stats
-function recalcStats(pokemon){
+function recalcStats(pokemon) {
   pokemon.stats = pokemon.stats.map(s => ({
     name: s.name,
     base_stat: s.base_stat,
@@ -532,22 +591,57 @@ function recalcStats(pokemon){
 }
 
 //Check for new moves by level
-async function checkNewMoves(pokemon){
+async function checkNewMoves(pokemon) {
   let pokeData = await pokeapi.getPokemon(pokemon.name)
-  for(let move of pokeData.moves){
-    if(move?.version_group_details[0]?.level_learned_at == pokemon.level && 
-      move?.version_group_details[0]?.move_learn_method?.name === "level-up"){
-        //get move information
-        const url = move.move.url
-        const match = url.match(/\/(\d+)\/?$/);
-        const id = match ? parseInt(match[1], 10) : null;
-        let moveData = pokemonHelper.getMoveData(await pokeapi.getMove(id))
-        //Check if pokemon already has 4 moves
-        if(pokemon.moves.length < 4){
-          pokemon.moves.push(moveData)
-        }
+  for (let move of pokeData.moves) {
+    if (move?.version_group_details[0]?.level_learned_at == pokemon.level &&
+      move?.version_group_details[0]?.move_learn_method?.name === "level-up") {
+      console.log(`A new move has been found! ${move.move.name}`)
+      //get move information
+      const url = move.move.url
+      const match = url.match(/\/(\d+)\/?$/);
+      const id = match ? parseInt(match[1], 10) : null;
+      let moveData = await pokemonHelper.getMoveData(await pokeapi.getMove(id))
+      //Check if pokemon already has 4 moves
+      if (pokemon.moves.length < 4) {
+        pokemon.moves.push(moveData)
+      }
+      else if (pokemon.moves.length == 4) {
+        pendingMove.value = moveData;
+        await openReplaceMoveModal()
+      }
     }
   }
+}
+let resolveMoveSwap = null
+
+function openReplaceMoveModal() {
+  isSwapModalOpen.value = true
+  return new Promise((resolve) => {
+    resolveMoveSwap = resolve;
+  })
+}
+
+function closeReplaceMoveModal() {
+  isSwapModalOpen.value = false
+  pendingMove.value = null
+
+  if (resolveMoveSwap) {
+    resolveMoveSwap();
+    resolveMoveSwap = null; // Clean up after buzzing
+  }
+
+}
+
+function replaceMove(index) {
+  if (userPokemon.value && pendingMove.value) {
+    // Overwrite the move in the selected card slot
+    userPokemon.value.moves[index] = pendingMove.value;
+    console.log(`${userPokemon.value.name} forgot a move and learned ${pendingMove.value.name}!`);
+  }
+
+  // Close modal and release the Promise
+  closeReplaceMoveModal();
 }
 
 
@@ -565,11 +659,11 @@ async function handleFaint(pokemon) {
     let rewardExp = calcExperience(pokemon)
     console.log(`${rewardExp} EXP has been rewarded!`)
     userPokemon.value.currentExp += rewardExp
-    if(checkLevelUp(userPokemon.value)){
+    if (await checkLevelUp(userPokemon.value)) {
       console.log(`${userPokemon.value.name} has leveled up to ${userPokemon.value.level}!`)
       recalcStats(userPokemon.value)
     }
-    
+
     if (props.isWild) {
       const reward = Math.trunc(3000 - (pokemon.captureRate * 10));
       inventoryStore.AddFunds(reward);
@@ -1671,5 +1765,113 @@ onMounted(() => {
 .throw-btn {
   width: 100%;
   margin-top: auto;
+}
+
+.move-swap-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  padding: 0.5rem;
+  color: #2c3e50;
+}
+
+.modal-header h3 {
+  margin: 0 0 0.25rem 0;
+  font-size: 1.25rem;
+  text-transform: capitalize;
+}
+
+.highlight-move {
+  color: #e74c3c;
+  font-weight: bold;
+}
+
+.modal-header p {
+  margin: 0;
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.section-title {
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #888;
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+/* Grids & Cards */
+.current-moves {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
+}
+
+.move-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 0.85rem;
+  border-radius: 8px;
+  border: 2px solid #e2e8f0;
+  background: Canvas;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  overflow: hidden;
+}
+
+.move-card:hover {
+  transform: translateY(-2px);
+  border-color: #3b82f6;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+}
+
+.cancel-card:hover {
+  border-color: #ef4444;
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.15);
+}
+
+.card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.move-title {
+  font-weight: 700;
+  font-size: 1rem;
+  text-transform: capitalize;
+}
+
+.type-pill {
+  color: CanvasText;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  text-shadow: 0px 1px 2px rgba(0, 0, 0, 0.4);
+}
+
+.card-details {
+  font-size: 0.85rem;
+  color: #475569;
+}
+
+.hover-action {
+  margin-top: 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #2563eb;
+  text-align: right;
+}
+
+.hover-action.cancel {
+  color: #dc2626;
 }
 </style>
