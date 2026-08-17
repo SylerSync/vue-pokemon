@@ -2,7 +2,9 @@ import { getPokemon } from "@/api/pokeapi"
 import { getSpecies } from "@/api/pokeapi"
 import { getEvoChain } from "@/api/pokeapi"
 import { getMove } from "@/api/pokeapi"
+import { usePokemonStore } from "@/stores/pokemonStore";
 
+const pokemonStore = usePokemonStore()
 
 // Must be passed the pokeon name
 // If no form the base form will be suplied
@@ -70,7 +72,7 @@ export async function getPokemonData(pokemon, specialForm) {
     const match = url?.match(/\/(\d+)\/?$/);
     const chainId = match ? match[1] : null;
     const evoDetails = await getEvolutionRequirements(chainId, speciesData.name)
-    
+
 
     //Create the pokemon data with parts from both the API calls
     return {
@@ -158,7 +160,7 @@ export async function getPokemonWithLevelData(pokemon, specialForm, level) {
     }
     const hpCalc = Math.floor(((2 * pokemonData.stats.find(s => s.stat.name == "hp")?.base_stat * level) / 100) + level + 10)
 
-    
+
     let url = speciesData.evolution_chain.url
     const match = url?.match(/\/(\d+)\/?$/);
     const chainId = match ? match[1] : null;
@@ -220,8 +222,42 @@ export async function getMoveData(move) {
   }
 }
 
-export async function handleEvolution(currPokemon, evoPokemonUrl){
+export async function handleEvolution(currPokemon, evoPokemonName) {
   console.log("attempting evolution")
+  const moveset = currPokemon.moves
+  const pokeId = currPokemon.instanceId
+  const currLevel = currPokemon.level
+  const newPokemon = await getPokemonData(evoPokemonName)
+  const KOs = currPokemon.totalKOs
+  const faints = currPokemon.totalFaints
+  const heldItem = currPokemon.heldItem
+
+  // Save data from previous evolution and transfer data to new pokemon object
+  newPokemon.moves = moveset
+  newPokemon.level = currLevel
+  newPokemon.instanceId = pokeId
+  newPokemon.totalFaints = faints
+  newPokemon.totalKOs = KOs
+  newPokemon.heldItem = heldItem
+  newPokemon.stats = newPokemon.stats.map(s => ({
+    name: s.name,
+    base_stat: s.base_stat,
+    stat: Math.floor(((2 * s.base_stat * currLevel) / 100) + 5)
+  }))
+  const hpBase = newPokemon.stats.find(s => s.name === "hp")?.base_stat || 45
+  newPokemon.totalHp = Math.floor(((2 * hpBase * currLevel) / 100) + currLevel + 10)
+  newPokemon.currentHp = newPokemon.totalHp
+
+  const index = pokemonStore.caughtPokemon.findIndex(p => p.instanceId === newPokemon.instanceId)
+
+  if(index !== -1){
+    pokemonStore.caughtPokemon[index] = newPokemon
+    console.log(`Successfully evolved ${currPokemon.name} into ${newPokemon.name}!`)
+    return true
+  }
+  
+  console.log(`Failed to evoled ${currPokemon.name}`)
+  return false
 }
 
 async function calculateMaxAndMinLevels(pokemonSpecies, name) {

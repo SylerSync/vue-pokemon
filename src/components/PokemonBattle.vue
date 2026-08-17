@@ -569,7 +569,7 @@ async function checkLevelUp(pokemon) {
       pokemon.level++;
       console.log(`${userPokemon.value.name} has leveled up to ${userPokemon.value.level}!`)
       await checkEvolution(pokemon)
-      await checkNewMoves(pokemon)
+      await checkNewMoves(userPokemon.value)
       await processLeveling();
     }
   }
@@ -596,17 +596,19 @@ async function checkEvolution(pokemon) {
 
       console.log(`${pokemon.name} is ready to evolve into ${evo.nextEvo.name}!`);
 
-      await pokemonHelper.handleEvolution(pokemon, evo.nextEvo.url);
-      return true;
+      const evoSuccess = await pokemonHelper.handleEvolution(pokemon, evo.nextEvo.name);
+      if(evoSuccess){
+        const updated = pokemonStore.caughtPokemon.find(p => p.instanceId === pokemon.instanceId)
+        userPokemon.value = updated
+        userPokemon.value.heldItem = ""
+      }
+      return evoSuccess 
     }
   }
 
   return false;
 }
 
-async function triggerEvolution(){
-
-}
 
 //Recalculate stats
 function recalcStats(pokemon) {
