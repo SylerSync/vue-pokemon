@@ -201,7 +201,7 @@
       <div class="move-swap-container">
         <div class="modal-header">
           <h3><strong>{{ userPokemon.name }}</strong> wants to learn <span class="highlight-move">{{ pendingMove.name
-              }}</span></h3>
+          }}</span></h3>
           <p>Select a move to forget, or skip learning {{ pendingMove.name }}.</p>
         </div>
 
@@ -567,6 +567,8 @@ async function checkLevelUp(pokemon) {
     if (pokemon.currentExp >= requiredExp) {
       pokemon.currentExp -= requiredExp;
       pokemon.level++;
+      console.log(`${userPokemon.value.name} has leveled up to ${userPokemon.value.level}!`)
+      await checkEvolution(pokemon)
       await checkNewMoves(pokemon)
       await processLeveling();
     }
@@ -575,6 +577,35 @@ async function checkLevelUp(pokemon) {
   await processLeveling();
 
   return pokemon.level > startingLevel;
+}
+
+//check for evolution by level
+async function checkEvolution(pokemon) {
+  if (!pokemon.evoDetails || !Array.isArray(pokemon.evoDetails) || pokemon.evoDetails.length === 0) {
+    return false;
+  }
+
+  for (const evo of pokemon.evoDetails) {
+
+    if (pokemon.level >= evo.level && evo.trigger === "level-up") {
+
+      if (evo.heldItem && pokemon.heldItem !== evo.heldItem) {
+        console.log(`Cannot evolve: Needs to be holding ${evo.heldItem} while leveling up.`);
+        continue; // Try next evolution condition if available
+      }
+
+      console.log(`${pokemon.name} is ready to evolve into ${evo.nextEvo.name}!`);
+
+      await pokemonHelper.handleEvolution(pokemon, evo.nextEvo.url);
+      return true;
+    }
+  }
+
+  return false;
+}
+
+async function triggerEvolution(){
+
 }
 
 //Recalculate stats
@@ -660,7 +691,6 @@ async function handleFaint(pokemon) {
     console.log(`${rewardExp} EXP has been rewarded!`)
     userPokemon.value.currentExp += rewardExp
     if (await checkLevelUp(userPokemon.value)) {
-      console.log(`${userPokemon.value.name} has leveled up to ${userPokemon.value.level}!`)
       recalcStats(userPokemon.value)
     }
 

@@ -14,8 +14,6 @@ export async function getPokemonData(pokemon, specialForm) {
     let pokemonData = null
     if (speciesData.varieties.length > 1) {
       for (let form of speciesData.varieties) {
-        console.log(form.pokemon.name)
-        console.log(pokemon + "-" + specialForm)
         if (form.pokemon.name == (pokemon + "-" + specialForm)) {
           pokemonData = await getPokemon(form.pokemon.name)
           break
@@ -222,8 +220,8 @@ export async function getMoveData(move) {
   }
 }
 
-export async function handleEvolution(currPokemon, evoPokemon){
-  // Eventually this will handle the evolution processing
+export async function handleEvolution(currPokemon, evoPokemonUrl){
+  console.log("attempting evolution")
 }
 
 async function calculateMaxAndMinLevels(pokemonSpecies, name) {
