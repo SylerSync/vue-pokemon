@@ -270,7 +270,16 @@ function handleUseRecoveryItem(item) {
                     target.currentHp = Math.min(target.totalHp, target.currentHp + 20);
                     return
                 }
-
+            }
+        case "status-heal":
+            if(target.status !== "" && target.status){
+                if(target.status === item.effect.status)
+                target.status = ""
+            inventoryStore.UseRecovery(item.id)
+            return
+            }
+            else{
+                console.log(`${target.name} is not effected by ${item.effect.status}. Can't use this item.`)
             }
     }
 }

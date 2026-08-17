@@ -486,7 +486,7 @@ async function battleTurn(playerMove, item = null) {
         if (caught) return endBattle('caught');
         if (!battleStarted.value) return; // it fled
       } else {
-        await applyItem(item, selectedTargetPokemon.value);
+        await handleUseRecoveryItem(item, selectedTargetPokemon.value);
       }
 
       if (wildMove) {
@@ -597,12 +597,12 @@ async function checkEvolution(pokemon) {
       console.log(`${pokemon.name} is ready to evolve into ${evo.nextEvo.name}!`);
 
       const evoSuccess = await pokemonHelper.handleEvolution(pokemon, evo.nextEvo.name);
-      if(evoSuccess){
+      if (evoSuccess) {
         const updated = pokemonStore.caughtPokemon.find(p => p.instanceId === pokemon.instanceId)
         userPokemon.value = updated
         userPokemon.value.heldItem = ""
       }
-      return evoSuccess 
+      return evoSuccess
     }
   }
 
@@ -1018,6 +1018,75 @@ async function endOfTurnDamage(pokemon) {
 
 async function useBattleItem(item) {
   await battleTurn(null, item);
+}
+
+async function handleUseRecoveryItem(item, targetPokemon) {
+  if (!inventoryStore.recoveryItems[item.id]) {
+    console.warn(`Can not find item ${item.id} in the inventory.`)
+    return
+  }
+
+  const target = targetPokemon;
+  if (!target) return;
+
+  switch (item.effect.type) {
+    case "revive":
+      if (target.currentHp <= 0) {
+        if (inventoryStore.UseRecovery(item.id)) {
+          target.currentHp = Math.trunc(target.totalHp * item.effect.percent)
+          battleLog.value.push(`${target.name} has been revived!`)
+          selectedTargetPokemon.value = null;
+          sidePanel.value = "log"
+          await delay(800)
+          return
+        }
+      }
+      else {
+        battleLog.value.push(`${target.name} is not fainted!`);
+        sidePanel.value = 'log';
+        await delay(800);
+        return;
+      }
+    case "heal":
+      if (target.currentHp <= 0) {
+        battleLog.value.push(`${target.name} is fainted! Use a Revive instead.`);
+        sidePanel.value = 'log';
+        await delay(800);
+        return;
+      }
+      else {
+        if (target.currentHp == target.totalHp) {
+          battleLog.value.push(`${target.name} is already at full HP!`);
+          sidePanel.value = 'log';
+          await delay(800);
+          return;
+        }
+        if (inventoryStore.UseRecovery(item.id)) {
+          target.currentHp = Math.min(target.totalHp, target.currentHp + 20);
+          battleLog.value.push(`${item.name} has been used on ${target.name}.`)
+          selectedTargetPokemon.value = null;
+          sidePanel.value = "log"
+          await delay(800)
+          return
+        }
+      }
+    case "status-heal":
+      if (target.status !== "" && target.status) {
+        if (target.status === item.effect.status)
+          target.status = ""
+        inventoryStore.UseRecovery(item.id)
+        battleLog.value.push(`${target.name} has been heal from status: ${item.effect.status}`)
+        selectedTargetPokemon.value = null;
+        await delay(800)
+        return
+      }
+      else {
+        battleLog.value.push(`${target.name} is not effected by ${item.effect.status}. Can't use this item.`)
+        sidePanel.value = "log"
+        await delay(800)
+        return
+      }
+  }
 }
 
 async function applyItem(item, target) {
