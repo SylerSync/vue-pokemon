@@ -13,6 +13,8 @@ import IconField from 'primevue/iconfield'
 import InputIcon from 'primevue/inputicon'
 import { useInventoryStore } from "@/stores/inventoryStore";
 import tmData from '@/assets/data/tms.json';
+import expChart from "@/assets/data/levelThresholds.json"
+import evolutionItems from "@/assets//data/evolutionItems.json"
 
 const pokemonStore = usePokemonStore()
 const inventoryStore = useInventoryStore()
@@ -23,6 +25,7 @@ const sortOrder = ref(null)
 const sortField = ref(null)
 const isTmModalOpen = ref(false)
 const isReplaceModalOpen = ref(false);
+const isEvoItemModalOpen = ref(false)
 const pendingNewMove = ref(null);
 const pendingTmId = ref(null);
 
@@ -275,6 +278,73 @@ function hpTone(p) {
     return pct > 50 ? 'ok' : pct > 20 ? 'warn' : 'crit';
 }
 
+function expPercent(pokemon) {
+    if (!pokemon || pokemon.level >= 100) return 100;
+
+    const requiredExp = expChart[pokemon.level + 1];
+    if (!requiredExp) return 0;
+
+    return Math.min(100, Math.floor((pokemon.currentExp / requiredExp) * 100));
+}
+
+const heldInventory = computed(() => {
+    if (!inventoryStore.evoItems) return [];
+
+    return Object.entries(inventoryStore.evoItems)
+        .filter(([_, count]) => count > 0) // Only list items the player currently owns
+        .map(([evoId, count]) => {
+            // Lookup static details from JSON catalog
+            const itemData = evolutionItems[evoId] || {};
+
+            // Fallback string formatter if JSON name is missing
+            const formattedName = itemData.name || evoId
+                .replace(/([A-Z])/g, ' $1')
+                .replace(/^./, (str) => str.toUpperCase())
+                .trim();
+
+            let effectDescription = itemData.description || '';
+            if (!effectDescription && itemData.effect) {
+                if (itemData.effect.type === 'evolution') {
+                    effectDescription = 'Causes certain species to evolve when held or used';
+                }
+            }
+
+            return {
+                id: evoId,
+                name: formattedName,
+                count: count,
+                cost: itemData.cost || 0,
+                effect: itemData.effect || null,
+                effectDescription
+            };
+        });
+});
+
+// Placeholder for Held Item click handler
+function handleHeldItem() {
+    if (selectedPokemon.value.heldItem && selectedPokemon.value.heldItem !== "") {
+        inventoryStore.AddEvoItem(selectedPokemon.value.heldItem)
+        selectedPokemon.value.heldItem = ""
+        console.log(`Removed held item.`)
+    }
+    else {
+        openEvoItemModal()
+    }
+}
+
+function givePokemonItem(itemID){
+    selectedPokemon.value.heldItem = itemID
+    inventoryStore.UseEvoItem(itemID)
+    closeEvoItemModal()
+}
+
+function openEvoItemModal() {
+    isEvoItemModalOpen.value = true
+}
+function closeEvoItemModal() {
+    isEvoItemModalOpen.value = false
+}
+
 </script>
 
 <template>
@@ -333,8 +403,9 @@ function hpTone(p) {
                 </div>
             </div>
 
-            <!-- HEALTH BAR SECTION -->
+            <!-- STATS SECTION: HP + EXP -->
             <div class="stats-section">
+                <!-- HEALTH BAR -->
                 <div class="hp-header">
                     <span class="hp-label">HP</span>
                     <span class="hp-value">
@@ -344,6 +415,17 @@ function hpTone(p) {
                 <div class="hp-track">
                     <div class="hp-fill" :class="hpTone(selectedPokemon)"
                         :style="{ width: hpPercent(selectedPokemon) + '%' }" />
+                </div>
+
+                <!-- EXP BAR SECTION -->
+                <div class="exp-header">
+                    <span class="exp-label">EXP</span>
+                    <span class="exp-value">
+                        {{ selectedPokemon.currentExp || 0 }} / {{ expChart[selectedPokemon.level + 1] || 'MAX' }}
+                    </span>
+                </div>
+                <div class="exp-track">
+                    <div class="exp-fill" :style="{ width: expPercent(selectedPokemon) + '%' }" />
                 </div>
             </div>
 
@@ -371,13 +453,18 @@ function hpTone(p) {
                 </div>
             </div>
 
-            <!-- ACTION BUTTONS: 2 Top (Heal + TM), 1 Bottom (Release) -->
+            <!-- ACTION BUTTONS -->
             <div class="modal-actions">
+                <!-- 3 Top Buttons: Heal, TM, Held Item -->
                 <div class="top-actions">
                     <Button label="Heal / Recover" icon="pi pi-heart-fill" severity="success" class="action-btn"
                         @click="openItemModal" />
                     <Button label="Use TM" icon="pi pi-bolt" severity="info" class="action-btn" @click="openTmModal" />
+                    <Button :label="selectedPokemon.heldItem ? `Item: ${selectedPokemon.heldItem}` : 'Held Item: None'"
+                        icon="pi pi-briefcase" severity="warn" class="action-btn" @click="handleHeldItem" />
                 </div>
+
+                <!-- Bottom Button: Release -->
                 <Button label="Release Pokémon" icon="pi pi-trash" severity="danger" variant="outlined" class="full-btn"
                     @click="ReleasePokemon" />
             </div>
@@ -426,6 +513,47 @@ function hpTone(p) {
                 </Column>
             </DataTable>
         </div>
+    </Modal>
+
+    <!-- OPEN EVO ITEMS MENU -->
+    <Modal v-if="isEvoItemModalOpen" @close="closeEvoItemModal">
+        <DataTable :value="heldInventory" responsiveLayout="scroll" paginator :rows="5" class="p-datatable-sm">
+            <!-- Item Name Column -->
+            <Column field="name" header="Item">
+                <template #body="slotProps">
+                    <span class="item-name">{{ slotProps.data.name }}</span>
+                </template>
+            </Column>
+
+            <!-- Description / Effect Column -->
+            <Column field="effectDescription" header="Description">
+                <template #body="slotProps">
+                    <span class="item-desc">{{ slotProps.data.effectDescription || 'No description available.' }}</span>
+                </template>
+            </Column>
+
+            <!-- Quantity Owned Column -->
+            <Column field="count" header="Owned" style="width: 5rem; text-align: center;">
+                <template #body="slotProps">
+                    <span class="item-count">x{{ slotProps.data.count }}</span>
+                </template>
+            </Column>
+
+            <!-- Equip Action Column -->
+            <Column header="Action" style="width: 7rem; text-align: right;">
+                <template #body="slotProps">
+                    <Button label="Give" icon="pi pi-check" severity="success" size="small"
+                        @click="givePokemonItem(slotProps.data.id)" />
+                </template>
+            </Column>
+
+            <!-- Empty State Fallback -->
+            <template #empty>
+                <div class="empty-inventory">
+                    No evolution or held items in your bag.
+                </div>
+            </template>
+        </DataTable>
     </Modal>
 
     <!-- REPLACE MOVE SELECTION MODAL -->
@@ -772,5 +900,64 @@ function hpTone(p) {
 .replace-card:hover {
     transform: translateY(-2px);
     border-color: #ef4444;
+}
+
+/* --- EXP BAR STYLING --- */
+.exp-header {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.75rem;
+    font-weight: 600;
+    margin-top: 0.5rem;
+    /* Separates EXP from HP track */
+}
+
+.exp-label {
+    color: var(--p-text-muted-color);
+}
+
+.exp-value {
+    font-variant-numeric: tabular-nums;
+    font-size: 0.7rem;
+    color: var(--p-text-muted-color);
+}
+
+.exp-track {
+    width: 100%;
+    height: 6px;
+    /* Slightly thinner than HP bar for visual hierarchy */
+    border-radius: 3px;
+    background: var(--p-surface-200);
+    overflow: hidden;
+}
+
+.exp-fill {
+    height: 100%;
+    border-radius: 3px;
+    background: #3b82f6;
+    /* Classic Pokemon cyan/blue EXP bar color */
+    transition: width 0.4s ease-out;
+}
+
+/* --- ACTION BUTTONS ADJUSTMENTS --- */
+/* Formats 3 equal-width buttons across the top row */
+.top-actions {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.5rem;
+    width: 100%;
+}
+
+/* Reduces padding & font size slightly so text doesn't wrap on smaller modals */
+.top-actions .action-btn {
+    width: 100%;
+    padding: 0.5rem 0.25rem;
+    font-size: 0.75rem;
+}
+
+/* Ensures PrimeVue button icons don't crowd button text */
+.top-actions :deep(.p-button-icon) {
+    font-size: 0.85rem;
+    margin-right: 0.25rem;
 }
 </style>
