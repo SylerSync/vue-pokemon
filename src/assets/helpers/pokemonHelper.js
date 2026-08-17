@@ -14,8 +14,8 @@ export async function getPokemonData(pokemon, specialForm) {
     let pokemonData = null
     if (speciesData.varieties.length > 1) {
       for (let form of speciesData.varieties) {
-        console.log(form.pokemon.name)
-        console.log(pokemon + "-" + specialForm)
+        // console.log(form.pokemon.name)
+        // console.log(pokemon + "-" + specialForm)
         if (form.pokemon.name == (pokemon + "-" + specialForm)) {
           pokemonData = await getPokemon(form.pokemon.name)
           break
@@ -93,8 +93,8 @@ export async function getPokemonData(pokemon, specialForm) {
       totalKOs: 0,
       totalFaints: 0,
       level: randLevel,
-      evoDetails: evoDetails
-
+      evoDetails: evoDetails,
+      minorStatus: []
     };
   } catch (err) {
     console.error(`An error occurred collecting data for ${pokemon}`, err);
@@ -183,7 +183,8 @@ export async function getPokemonWithLevelData(pokemon, specialForm, level) {
       totalKOs: 0,
       totalFaints: 0,
       level: level,
-      evoDetails: evoDetails
+      evoDetails: evoDetails,
+      minorStatus: []
 
     };
   } catch (err) {
@@ -212,7 +213,6 @@ export async function getMoveData(move) {
     healing: move.meta?.healing ?? 0, // % of max HP
     flinchChance: move.meta?.flinch_chance ?? 0,
     critRate: move.meta?.crit_rate ?? 0,
-    trap: move.meta?.ailment?.name === 'trap',
     minTurns: move.meta?.min_turns ?? 0,
     maxTurns: move.meta?.max_turns ?? 0,
   }
