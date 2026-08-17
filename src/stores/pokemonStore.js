@@ -30,11 +30,12 @@ const testGodPokemon = {
             pp: 99
         },
         {
-            name: "hyper-beam-god",
+            name: "major-status",
             type: "normal",
-            class: "special",
-            power: 300,
+            class: "status",
+            power: 0,
             accuracy: 100,
+            ailment: 'sleep',
             pp: 99
         },
         {
@@ -55,13 +56,12 @@ const testGodPokemon = {
             targetsSelf: false,        // target is 'selected-pokemon'
             statChanges: [],
             statChance: 0,
-            ailment: 'sleep',
+            ailment: 'leech-seed',
             ailmentChance: 0,          // ⚠️ see below
             drain: 0,
             healing: 0,
             flinchChance: 0,
             critRate: 0,
-            trap: false,
             minTurns: 0,               // null in API
             maxTurns: 0,               // null in API
         },
@@ -373,7 +373,7 @@ export const usePokemonStore = defineStore("pokemonStore", {
 
     state: () => ({
         caughtPokemon: [
-            testEevee
+            testEevee, testGodPokemon
         ],
         wishlistPokemon: [],
         typeColors: {
