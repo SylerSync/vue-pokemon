@@ -329,6 +329,7 @@ const testEevee = {
     height: 3,
     weight: 65,
     baseExp: 65,
+    status:"poison",
 
     // Base stats matching your getPokemonData structure
     stats: [
