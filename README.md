@@ -1,38 +1,27 @@
-# vue-pokemon
+# Pokemon Battle
 
-This template should help get you started developing with Vue 3 in Vite.
+Written by Syler Bushlack and Brendan Klostermann
+Built using [Vue.js](https://vuejs.org/) and [Vite](https://vite.dev/). Data is pulled from [PokeApi](https://pokeapi.co/).
+[Primevue](https://primevue.dev/) and [Pinia](https://pinia.vuejs.org/) are a few tools used during this project.
 
-## Recommended IDE Setup
+## Catch Pokemon
 
-[VS Code](https://code.visualstudio.com/) + [Vue (Official)](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
+Choose whichever starter you like, starters are available from all regions!
+Once you select a starter, visit the wilds in search of more party members.
+Select a region from the drop down and 6 random pokemon available in that region will appear at random levels.
 
-## Recommended Browser Setup
+## Earn money
 
-- Chromium-based browsers (Chrome, Edge, Brave, etc.):
-  - [Vue.js devtools](https://chromewebstore.google.com/detail/vuejs-devtools/nhdogjmejiglipccpnnnanhbledajbpd)
-  - [Turn on Custom Object Formatter in Chrome DevTools](http://bit.ly/object-formatters)
-- Firefox:
-  - [Vue.js devtools](https://addons.mozilla.org/en-US/firefox/addon/vue-js-devtools/)
-  - [Turn on Custom Object Formatter in Firefox DevTools](https://fxdx.dev/firefox-devtools-custom-object-formatters/)
+The PokeMart has all the items you could need. Collect funds by defeating wild pokemon or battling trainers.
+You can buy better pokeballs, medicines, TMs, and evolution items from the shop.
 
-## Customize configuration
 
-See [Vite Configuration Reference](https://vite.dev/config/).
+## Build your team
 
-## Project Setup
+Level up and evolve your pokemon by fighting your way through the wilds. Strengthen your party and prepare for the battles ahead.
 
-```sh
-npm install
-```
+## Battle Trainers
 
-### Compile and Hot-Reload for Development
-
-```sh
-npm run dev
-```
-
-### Compile and Minify for Production
-
-```sh
-npm run build
-```
+Once you feel strong enough, you can take on the gym leaders, elite four, and champions from each region.
+For each battle you will be allowed to select up to 6 pokemon to fight.
+Overcome all the challenges and become the greatest pokemon trainer there has ever been!
