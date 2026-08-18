@@ -14,7 +14,7 @@ const testGodPokemon = {
     instanceId: "test-god-mewtwo-uuid",
     stats: [
         { name: "hp", stat: 999 },
-        { name: "attack", stat: 999 },
+        { name: "attack", stat: 100 },
         { name: "defense", stat: 999 },
         { name: "special-attack", stat: 999 },
         { name: "special-defense", stat: 999 },
@@ -28,26 +28,28 @@ const testGodPokemon = {
             power: 300,
             accuracy: 100,
             pp: 99
-        }, 
+        },
         {
-            name: 'guillotine',
+            name: 'outrage',
             type: 'normal',
-            power: null,               
-            accuracy: 30,
+            power: 18,
+            accuracy: 80,
             priority: 0,
             damageClass: 'physical',
-            targetsSelf: false,
+            targetsSelf: false,      // target is 'selected-pokemon'
             statChanges: [],
             statChance: 0,
-            ailment: null,
+            ailment: null,           // meta.ailment.name is 'none'
             ailmentChance: 0,
             drain: 0,
             healing: 0,
             flinchChance: 0,
             critRate: 0,
-            minTurns: 0,
-            maxTurns: 0,        
-            category: 'ohko',
+            minTurns: 0,             // null in API
+            maxTurns: 0,             // null in API
+            minHits: 0,
+            maxHits: 0,
+            category: 'damage',
         },
         {
             name: "pass-turn",
