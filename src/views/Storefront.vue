@@ -9,6 +9,7 @@ import Button from "primevue/button"
 import Tag from "primevue/tag"
 import tms from "@/assets/data/tms.json"
 import evolutionItems from "@/assets/data/evolutionItems.json"
+import megaEvoStones from "@/assets/data/megaEvos.json"
 
 const inventoryStore = useInventoryStore();
 const pokemonStore = usePokemonStore();
@@ -17,7 +18,8 @@ const shopCats = ref([
     { label: "Pokeballs", value: "pokeballs" },
     { label: "Recovery Items", value: "recovery" },
     { label: "TM Shop", value: "tms" },
-    { label: "Evolution Items", value: "evolution" }
+    { label: "Evolution Items", value: "evolution" },
+    { label: "Mega Evolution", value: "megaEvo" }
 ])
 
 const shopTab = ref("pokeballs")
@@ -76,6 +78,20 @@ const evoItems = computed(() => {
     })
 })
 
+// --- Mega Evo Items COMPUTED ---
+const megaStones = computed(() => {
+    return Object.entries(megaEvoStones).map(([id, item]) => {
+        return {
+            id: id,
+            name: item.name,
+            category: item.category,
+            cost: item.cost,
+            pokemon: item.pokemon,
+            description: item.description
+        }
+    })
+})
+
 // --- PURCHASE FUNCTIONS ---
 function buyPokeball(itemType) {
     console.log(`Attempting to purchase pokeball: ${itemType}`)
@@ -108,6 +124,14 @@ function buyEvo(evoId) {
         console.warn(`Not enough funds to buy ${evoId}`)
     }
 }
+
+function buyMega(stoneId) {
+    console.log(`Attempting to puchase Mega Item: ${stoneId}`)
+    const success = inventoryStore.BuyMegaStone(stoneId)
+    if(!success){
+        console.warn(`Not enough funds to buy ${stoneId}.`)
+    }
+}
 </script>
 
 <template>
@@ -122,7 +146,7 @@ function buyEvo(evoId) {
         </div>
 
         <SelectButton v-model="shopTab" :options="shopCats" optionLabel="label" optionValue="value"
-                aria-labelledby="basic" class="shopSelection"/>
+            aria-labelledby="basic" class="shopSelection" />
 
         <!-- TABLE 1: POKEBALLS -->
         <template v-if="shopTab === 'pokeballs'">
@@ -202,7 +226,7 @@ function buyEvo(evoId) {
 
         <!-- Table 4: Evolution Items -->
         <template v-if="shopTab === 'evolution'">
-            <h3 class="shopTab">Recovery Items</h3>
+            <h3 class="shopTab">Evolution Items</h3>
             <DataTable :value="evoItems" paginator :rows="5" responsiveLayout="scroll" class="p-datatable-sm dataTable">
                 <Column field="name" header="Item" style="width: 40%"></Column>
                 <Column field="cost" header="Cost" style="width: 20%">
@@ -215,6 +239,27 @@ function buyEvo(evoId) {
                     <template #body="slotProps">
                         <Button label="Buy" icon="pi pi-shopping-cart" severity="primary" size="small" class="shop-btn"
                             :disabled="inventoryStore.funds < slotProps.data.cost" @click="buyEvo(slotProps.data.id)" />
+                    </template>
+                </Column>
+            </DataTable>
+        </template>
+
+        <!-- Table 5: Mega Evolution Items -->
+        <template v-if="shopTab === 'megaEvo'">
+            <h3 class="shopTab">Mega Evolution Items</h3>
+            <DataTable :value="megaStones" paginator :rows="5" responsiveLayout="scroll"
+                class="p-datatable-sm dataTable">
+                <Column field="name" header="Item" style="width: 40%"></Column>
+                <Column field="cost" header="Cost" style="width: 20%">
+                    <template #body="slotProps">
+                        ${{ slotProps.data.cost.toLocaleString() }}
+                    </template>
+                </Column>
+                <Column field="count" header="In Bag" style="width: 20%"></Column>
+                <Column header="Action" style="width: 20%">
+                    <template #body="slotProps">
+                        <Button label="Buy" icon="pi pi-shopping-cart" severity="primary" size="small" class="shop-btn"
+                            :disabled="inventoryStore.funds < slotProps.data.cost" @click="buyMega(slotProps.data.id)" />
                     </template>
                 </Column>
             </DataTable>
@@ -282,7 +327,7 @@ function buyEvo(evoId) {
     font-weight: 600;
 }
 
-.shopSelection{
+.shopSelection {
     display: flex;
     justify-content: center;
 }
