@@ -219,6 +219,7 @@ export async function getMoveData(move) {
     critRate: move.meta?.crit_rate ?? 0,
     minTurns: move.meta?.min_turns ?? 0,
     maxTurns: move.meta?.max_turns ?? 0,
+    category: move.meta?.category?.name ?? null,
   }
 }
 // Takes in pokemon to evolve object, and the name of the evolution
