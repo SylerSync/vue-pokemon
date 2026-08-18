@@ -28,15 +28,26 @@ const testGodPokemon = {
             power: 300,
             accuracy: 100,
             pp: 99
-        },
+        }, 
         {
-            name: "major-status",
-            type: "normal",
-            class: "status",
-            power: 0,
-            accuracy: 100,
-            ailment: 'sleep',
-            pp: 99
+            name: 'guillotine',
+            type: 'normal',
+            power: null,               
+            accuracy: 30,
+            priority: 0,
+            damageClass: 'physical',
+            targetsSelf: false,
+            statChanges: [],
+            statChance: 0,
+            ailment: null,
+            ailmentChance: 0,
+            drain: 0,
+            healing: 0,
+            flinchChance: 0,
+            critRate: 0,
+            minTurns: 0,
+            maxTurns: 0,        
+            category: 'ohko',
         },
         {
             name: "pass-turn",
@@ -56,7 +67,7 @@ const testGodPokemon = {
             targetsSelf: false,        // target is 'selected-pokemon'
             statChanges: [],
             statChance: 0,
-            ailment: 'leech-seed',
+            ailment: 'perish-song',
             ailmentChance: 0,          // ⚠️ see below
             drain: 0,
             healing: 0,
@@ -329,7 +340,7 @@ const testEevee = {
     height: 3,
     weight: 65,
     baseExp: 65,
-    status:"poison",
+    status: "poison",
 
     // Base stats matching your getPokemonData structure
     stats: [

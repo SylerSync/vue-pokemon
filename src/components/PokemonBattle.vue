@@ -210,7 +210,7 @@
       <div class="move-swap-container">
         <div class="modal-header">
           <h3><strong>{{ userPokemon.name }}</strong> wants to learn <span class="highlight-move">{{ pendingMove.name
-          }}</span></h3>
+              }}</span></h3>
           <p>Select a move to forget, or skip learning {{ pendingMove.name }}.</p>
         </div>
 
@@ -405,6 +405,11 @@ const STAT_LABEL = {
   speed: 'Speed', accuracy: 'accuracy', evasion: 'evasiveness',
 };
 
+const SELF_KO_MOVES = new Set([
+  'self-destruct', 'explosion', 'misty-explosion', 'final-gambit',
+  'memento', 'healing-wish', 'lunar-dance',
+]);
+
 const prettyName = (n) => n.replace(/-/g, ' ');
 
 const freshStages = () => ({
@@ -474,6 +479,15 @@ function isHealBlocked(pokemon) {
   return pokemon.minorStatus?.includes('heal-block') ?? false;
 }
 
+function applyPerishSong(pokemon) {
+  if (!pokemon) return false;
+  if (!pokemon.minorStatus) pokemon.minorStatus = [];
+  if (pokemon.minorStatus.includes('perish-song')) return false;
+  pokemon.minorStatus.push('perish-song');
+  pokemon.perishTurns = 4;
+  return true;
+}
+
 /* ------------------------------------------------------------------ *
  * Battle lifecycle
  * ------------------------------------------------------------------ */
@@ -523,24 +537,23 @@ async function battleTurn(playerMove, item = null) {
         if (caught) return endBattle('caught');
         if (!battleStarted.value) return; // it fled
       } else {
-        await handleUseRecoveryItem(item, selectedTargetPokemon.value);
+        const itemTarget = selectedTargetPokemon.value;
+        if (itemTarget?.minorStatus?.includes('embargo')) {
+          log(`${itemTarget.name} can't use items due to Embargo!`);
+          await delay(800);
+        } else {
+          await handleUseRecoveryItem(item, selectedTargetPokemon.value);
+        }
       }
 
       if (wildMove) {
         await useMove(wild, player, wildMove);
         if (await handleFaint(player)) return;
       }
-
-      await endOfTurnDamage(wild)
-      await endOfTurnTrap(wild)
-      await endOfTurnLeechSeed(wild, player)
-      if (await handleFaint(wild)) return;
-      await endOfTurnHealBlock(wild)
-      await endOfTurnDamage(player)
-      await endOfTurnTrap(player)
-      await endOfTurnLeechSeed(player, wild)
-      if (await handleFaint(player)) return;
-      await endOfTurnHealBlock(player)
+      await endOfTurnPerish(wild);
+      await endOfTurnPerish(player);
+      if (await endOfTurn(wild, player)) return;
+      if (await endOfTurn(player, wild)) return;
 
       return;
     }
@@ -556,21 +569,21 @@ async function battleTurn(playerMove, item = null) {
       ? [[player, wild, playerMove], [wild, player, wildMove]]
       : [[wild, player, wildMove], [player, wild, playerMove]];
 
+
     for (const [attacker, defender, move] of order) {
       if (!move || isFainted(attacker)) continue;
       await useMove(attacker, defender, move);
-      if (await handleFaint(defender)) return;
+      const attackerDown = isFainted(attacker);
+      if (await handleFaint(defender)) {
+        if (attackerDown) await handleFaint(attacker);
+        return;
+      }
+      if (attackerDown && await handleFaint(attacker)) return;
     }
-    await endOfTurnDamage(wild)
-    await endOfTurnTrap(wild)
-    await endOfTurnLeechSeed(wild, player)
-    if (await handleFaint(wild)) return;
-    await endOfTurnHealBlock(wild)
-    await endOfTurnDamage(player)
-    await endOfTurnTrap(player)
-    await endOfTurnLeechSeed(player, wild)
-    if (await handleFaint(player)) return;
-    await endOfTurnHealBlock(player)
+    await endOfTurnPerish(wild);
+    await endOfTurnPerish(player);
+    if (await endOfTurn(wild, player)) return;
+    if (await endOfTurn(player, wild)) return;
 
     // drowsy logic
     if (player.minorStatus?.includes('yawn')) {
@@ -612,23 +625,24 @@ function statOf(pokemon, name) {
 
 function pickMove(pokemon) {
   // let move = {
-  //   name: 'status-test',
-  //   type: 'electric',
-  //   power: null,
+  //   name: 'self-destruct',
+  //   type: 'normal',
+  //   power: 200,
   //   accuracy: 100,
   //   priority: 0,
-  //   damageClass: 'status',
-  //   targetsSelf: false,        // target is 'selected-pokemon'
+  //   damageClass: 'physical',
+  //   targetsSelf: false,        // target is 'all-other-pokemon'
   //   statChanges: [],
   //   statChance: 0,
-  //   ailment: 'heal-block',
-  //   ailmentChance: 0,          // ⚠️ see below
-  //   drain: 0,
+  //   ailment: null,
+  //   ailmentChance: 0,
+  //   drain: 0,                  // ⚠️ not -100 — the self-KO isn't here
   //   healing: 0,
   //   flinchChance: 0,
   //   critRate: 0,
   //   minTurns: 0,               // null in API
   //   maxTurns: 0,               // null in API
+  //   category: 'damage',        // ⚠️ not 'unique' or anything self-KO-ish
   // }
   // return move
   const moves = pokemon.moves ?? [];
@@ -905,19 +919,50 @@ async function useMove(user, target, move) {
 
   // --- accuracy (null = never misses) ---
   if (move.accuracy != null) {
-    const evasion = target.minorStatus?.includes('no-type-immunity')
-      ? 0
-      : (target.stages?.evasion ?? 0);
-    const accMod =
-      stageMultiplier(user.stages?.accuracy ?? 0, true) / stageMultiplier(evasion, true);
-    if (randInt(1, 100) > move.accuracy * accMod) {
-      log(`${user.name}'s attack missed!`);
-      await delay(800);
-      return;
+    if (move.category === 'ohko') {
+      if (randInt(1, 100) > move.accuracy + (user.level - target.level)) {
+        log(`${user.name}'s attack missed!`);
+        await delay(800);
+        return;
+      }
+    } else {
+      const evasion = target.minorStatus?.includes('no-type-immunity')
+        ? 0
+        : (target.stages?.evasion ?? 0);
+      const accMod =
+        stageMultiplier(user.stages?.accuracy ?? 0, true) / stageMultiplier(evasion, true);
+      if (randInt(1, 100) > move.accuracy * accMod) {
+        log(`${user.name}'s attack missed!`);
+        await delay(800);
+        return;
+      }
     }
   }
 
+  if (SELF_KO_MOVES.has(move.name)) {
+    user.currentHp = 0;
+  }
+
   let dealt = 0;
+
+  // --- OHKO ---
+  if (move.category === 'ohko') {
+    if (target.level > user.level) {
+      log(`${target.name} is unaffected!`);
+      await delay(800);
+      return;
+    }
+    if (typeEffectiveness(move.type, target.types) === 0) {
+      log(`It doesn't affect ${target.name}...`);
+      await delay(800);
+      return;
+    }
+    target.currentHp = 0;
+    await playAnim(victim, 'hit', 400);
+    log("It's a one-hit KO!");
+    await delay(800);
+    return;
+  }
 
   // --- damage ---
   if (move.power) {
@@ -969,7 +1014,8 @@ async function useMove(user, target, move) {
   if (move.ailment) {
     const chance = move.ailmentChance || 100;
     if (randInt(1, 100) <= chance) {
-      await inflictStatus(target, move.ailment, move);
+      const recipient = move.targetsSelf ? user : target;
+      await inflictStatus(recipient, move.ailment, move);
     }
   }
 
@@ -1027,7 +1073,8 @@ function calculateDamage(attacker, defender, move, opts = {}) {
   }
 
   let effectiveness = typeEffectiveness(move.type, defender.types);
-  if (defender.minorStatus?.includes('no-type-immunity') && effectiveness == 0) effectiveness = 1
+  const grounded = defender.minorStatus?.includes('no-type-immunity') || (move.type === 'ground' && defender.minorStatus?.includes('ingrain'));
+  if (grounded && effectiveness == 0) effectiveness = 1
   if (effectiveness === 0) {
     return { damage: 0, effectiveness: 0, critical: false, immune: true };
   }
@@ -1109,6 +1156,7 @@ const STATUS_MESSAGES = {
   confusion: (n) => `${n} became confused!`,
   'heal-block': (n) => `${n} was prevented from healing!`,
   'leech-seed': (n) => `${n} was seeded!`,
+  ingrain: (n) => `${n} planted its roots!`,
 };
 
 async function inflictStatus(target, ailment, move) {
@@ -1123,6 +1171,19 @@ async function inflictStatus(target, ailment, move) {
     target.status = ailment;
     if (ailment === 'sleep') target.sleepTurns = randInt(2, 4);
     log((STATUS_MESSAGES[ailment] ?? ((n) => `${n} was afflicted with ${ailment}!`))(target.name));
+    await delay(800);
+    return;
+  }
+
+  if (ailment === 'perish-song') {
+    const field = [userPokemon.value, foe.value].filter(Boolean);
+    const affected = field.filter(applyPerishSong).length;
+    if (!affected) {
+      log('But it failed!');
+      await delay(700);
+      return;
+    }
+    log('All Pokémon that hear the song will faint in three turns!');
     await delay(800);
     return;
   }
@@ -1187,6 +1248,9 @@ async function inflictStatus(target, ailment, move) {
       return;
     }
     target.minorStatus.push(ailment);
+  } else if (ailment === 'embargo') {
+    target.minorStatus.push(ailment)
+    target.embargoTurns = 5
   }
   else {
     target.minorStatus.push(ailment)
@@ -1233,6 +1297,21 @@ async function canAct(pokemon) {
     return false;
   }
   return true;
+}
+
+async function endOfTurn(target, reciver) {
+  await endOfTurnIngrain(target)
+  await endOfTurnDamage(target)
+  await endOfTurnTrap(target)
+  await endOfTurnLeechSeed(target, reciver)
+  if (await handleFaint(target)) return true;
+  await endOfTurnHealBlock(target)
+  if (target.embargoTurns && --target.embargoTurns <= 0) {
+    target.minorStatus = target.minorStatus.filter(s => s !== 'embargo');
+    target.embargoTurns = null
+    log(`${target.name}'s embargo has ended`)
+  }
+  return false
 }
 
 async function endOfTurnDamage(pokemon) {
@@ -1299,6 +1378,39 @@ async function endOfTurnLeechSeed(target, receiver) {
   }
 }
 
+async function endOfTurnPerish(pokemon) {
+  if (!pokemon.minorStatus?.includes('perish-song')) return;
+  if (pokemon.currentHp <= 0) return;
+
+  pokemon.perishTurns = (pokemon.perishTurns ?? PERISH_TURNS) - 1;
+  log(`${pokemon.name}'s perish count fell to ${pokemon.perishTurns}!`);
+  await delay(800);
+
+  if (pokemon.perishTurns <= 0) {
+    pokemon.minorStatus = pokemon.minorStatus.filter(s => s !== 'perish-song');
+    pokemon.perishTurns = 0;
+    pokemon.currentHp = 0;
+  }
+}
+
+async function endOfTurnIngrain(pokemon) {
+  if (!pokemon.minorStatus?.includes('ingrain')) return;
+  if (pokemon.currentHp <= 0) return;
+
+  if (isHealBlocked(pokemon)) {
+    log(`${pokemon.name}'s roots can't absorb nutrients due to Heal Block!`);
+    await delay(700);
+    return;
+  }
+  if (pokemon.currentHp >= pokemon.totalHp) return;
+
+  const amount = Math.max(1, Math.floor(pokemon.totalHp / 16));
+  const before = pokemon.currentHp;
+  pokemon.currentHp = Math.min(pokemon.totalHp, pokemon.currentHp + amount);
+  log(`${pokemon.name} absorbed nutrients with its roots! (+${pokemon.currentHp - before} HP)`);
+  await delay(800);
+}
+
 /* ------------------------------------------------------------------ *
  * Items
  * ------------------------------------------------------------------ */
@@ -1315,6 +1427,13 @@ async function handleUseRecoveryItem(item, targetPokemon) {
 
   const target = targetPokemon;
   if (!target) return;
+
+  if (item.effect.type === 'heal' && isHealBlocked(target)) {
+    log(`${target.name} can't be healed right now!`);
+    sidePanel.value = 'log';
+    await delay(800);
+    return;
+  }
 
   switch (item.effect.type) {
     case "revive":
@@ -1475,8 +1594,8 @@ async function throwPokeball(target, pokeball) {
   await delay(800);
 
   if (checkPokemonFlees(target)) {
-    if (foe.value?.trapped) {
-      log(`${target.name} is trapped and can't flee!`);
+    if (foe.value?.trapped || foe.value?.minorStatus?.includes('ingrain')) {
+      log(`${target.name} can't flee!`);
       return false;
     }
     log(`${target.name} fled!`);
@@ -1505,6 +1624,11 @@ async function switchActivePokemon(pokemon) {
     sidePanel.value = 'log';
     return;
   }
+  if (battleStarted.value && userPokemon.value?.minorStatus?.includes('ingrain')) {
+    log(`${userPokemon.value.name} can't get its roots up!`);
+    sidePanel.value = 'log';
+    return;
+  }
 
   if (!battleStarted.value) {
     userPokemon.value = pokemon;
@@ -1516,6 +1640,8 @@ async function switchActivePokemon(pokemon) {
   userPokemon.value.minorStatus = [];
   userPokemon.value.healBlockTurns = 0;
   userPokemon.value.confusionTurns = 0;
+  userPokemon.value.perishTurns = 0;
+  userPokemon.value.embargoTurns = 0;
   userPokemon.value.trapped = null;
   userPokemon.value.disabled = false;
 
@@ -1535,6 +1661,10 @@ async function switchActivePokemon(pokemon) {
       await useMove(foe.value, userPokemon.value, wildMove);
       await handleFaint(userPokemon.value);
     }
+    await endOfTurnPerish(foe.value);
+    await endOfTurnPerish(pokemon);
+    if (await endOfTurn(foe.value, pokemon)) return;
+    if (await endOfTurn(pokemon, foe.value)) return;
   } finally {
     isResolving.value = false;
   }
