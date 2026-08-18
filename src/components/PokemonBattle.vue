@@ -97,6 +97,14 @@
                 <span class="move-power">{{ move.power ?? '—' }}</span>
               </button>
             </div>
+            <!-- Mega Evolution Button -->
+            <div class="megaEvo">
+              <button class="mega-btn"
+                :disabled="isResolving || isFainted(userPokemon) || userPokemon?.minorStatus?.includes('embargo')"
+                v-if="canMegaEvolve && !hasMegaEvo" @click="handleMegaEvo(userPokemon)">
+                Mega Evolve
+              </button>
+            </div>
 
             <!-- pokeballs -->
             <div v-if="isWild">
@@ -270,7 +278,6 @@ import Button from 'primevue/button';
 import Modal from '@/components/Modal.vue';
 import { usePokemonStore } from '@/stores/pokemonStore';
 import { useInventoryStore } from '@/stores/inventoryStore';
-import { label } from '@primeuix/themes/aura/metergroup';
 import Card from "primevue/card"
 import SelectButton from 'primevue/selectbutton';
 import Badge from 'primevue/badge';
@@ -283,6 +290,7 @@ import frozenIcon from '@/assets/statusIcons/frozen.png';
 import burnIcon from '@/assets/statusIcons/burn.png';
 import poisonIcon from '@/assets/statusIcons/poison.png';
 import { getRandomWithExclusions } from '@/assets/helpers/numberHelper.js'
+import megaEvos from "@/assets/data/megaEvos.json"
 
 /* ------------------------------------------------------------------ *
  * Status Icons
@@ -322,6 +330,8 @@ const emit = defineEmits(['close', 'end', 'caught', 'fled']);
 
 const pokemonStore = usePokemonStore();
 const inventoryStore = useInventoryStore();
+
+const canMegaEvolve = ref(false)
 
 /* ------------------------------------------------------------------ *
  * State
@@ -430,6 +440,52 @@ if (props.isWild) {
 const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 const randInt = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
 
+const hasMegaEvo = ref(false)
+
+function checkMegaEvo() {
+  const rawItem = userPokemon.value?.heldItem
+  if(userPokemon.value.name.toLowerCase() === "rayquaza" && userPokemon.value.moves.some(m => m.name.toLowerCase() === "dragon-ascent")){
+    canMegaEvolve.value = true
+  }
+  if (rawItem && rawItem !== "") {
+    // 1. Normalize key: "Charizardite-X" -> "charizardite-x"
+    const key = rawItem.toLowerCase().trim()
+
+    // 2. Safely resolve megaEvos whether it's imported directly or wrapped in .default
+    const catalog = megaEvos.default || megaEvos
+
+    // 3. Try exact key, normalized key, or case-insensitive search
+    const hItem = catalog[rawItem] || catalog[key] ||
+      Object.values(catalog).find(item => item.name?.toLowerCase() === key)
+
+    if (hItem) {
+      if (
+        hItem.pokemon?.toLowerCase() === userPokemon.value.name.toLowerCase() &&
+        !hasMegaEvo.value
+      ) {
+        canMegaEvolve.value = true
+      } else {
+        console.log(
+          `Held item ${hItem.name} does not work for ${userPokemon.value.name}. ` +
+          `Requires: ${hItem.pokemon} - Current: ${userPokemon.value.name}`
+        )
+      }
+    } else {
+      console.log(`Could not find key "${key}" in megaEvos dictionary. Available keys:`, Object.keys(catalog))
+    }
+  }
+}
+
+async function handleMegaEvo(pokemon) {
+  console.log(`Converting ${pokemon.name}.`)
+  const megaEvo = await pokemonHelper.handleMegaEvo(pokemon)
+
+  userPokemon.value = megaEvo
+  hasMegaEvo.value = true
+  console.log(userPokemon.value)
+}
+
+
 function makeCombatant(source) {
   return {
     ...structuredClone(JSON.parse(JSON.stringify(source))),
@@ -497,6 +553,8 @@ function startBattle() {
   if (userPokemon.value.currentHp == null) {
     userPokemon.value.currentHp = userPokemon.value.totalHp;
   }
+  console.log(userPokemon.value)
+  checkMegaEvo()
   userPokemon.value.stages = freshStages();
   userPokemon.value.flinched = false;
   battleStarted.value = true;
@@ -508,6 +566,7 @@ function startBattle() {
 function endBattle(outcome = 'ended') {
   battleStarted.value = false;
   isResolving.value = false;
+  canMegaEvolve.value = false
   emit('end', { outcome, opponent: foe.value, pokemon: userPokemon.value });
   emit('close');
 }
@@ -800,6 +859,7 @@ function replaceMove(index) {
 async function handleFaint(pokemon) {
   if (!isFainted(pokemon)) return false;
   log(`${pokemon.name} fainted!`);
+  canMegaEvolve.value = false
   await playAnim(pokemon === foe.value ? 'foe' : 'ally', 'faint', 700);
 
   if (pokemon === foe.value) {
