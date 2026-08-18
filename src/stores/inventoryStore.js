@@ -1,6 +1,7 @@
 import { defineStore } from "pinia"
 import tmsData from "@/assets/data/tms.json"
 import evolutionItems from "@/assets/data/evolutionItems.json"
+import megaEvoStones from "@/assets/data/megaEvos.json"
 
 export const useInventoryStore = defineStore("inventoryStore", {
     state: () => ({
@@ -119,6 +120,9 @@ export const useInventoryStore = defineStore("inventoryStore", {
         evoItems: {
 
         },
+        megaStones:{
+
+        },
         selectedPokeball: "pokeball",
         funds: 5000
     }),
@@ -147,7 +151,8 @@ export const useInventoryStore = defineStore("inventoryStore", {
                 "pokeballs": state.pokeballs,
                 "recoveryItems": state.recoveryItems,
                 "tms": state.tms,
-                "evoItems": state.evoItems
+                "evoItems": state.evoItems,
+                "megaStones": state.megaStones
             }
             return completeInventory
         }
@@ -326,6 +331,52 @@ export const useInventoryStore = defineStore("inventoryStore", {
                 return false
             }
             this.evoItems[evoId] = (this.evoItems[evoId] || 0) + 1;
+
+            return true
+        },
+        /* ================= ================= =================
+            MEGA EVOLUTION FUNCTIONS
+            ================= ================= ================= */
+        UseMegaStone(stoneName){
+            if(!this.megaStones[stoneName] || this.megaStones[stoneName]<=0){
+                console.warn(`You dont have any ${stoneName}`)
+                return false
+            }
+            this.megaStones[stoneName]--
+
+            if(this.megaStones[stoneName] <= 0){
+                delete this.megaStones[stoneName]
+            }
+            return true
+        },
+        BuyMegaStone(stoneName){
+            if(!this.megaStones){
+                this.megaStones = {}
+            }
+            const item = megaEvoStones[stoneName]
+            if(!item){
+                console.warn(`Could not find the megastone named: ${stoneName}`)
+                return false
+            }
+            if(this.funds < item.cost){
+                console.warn(`You do not have the funds to purchase Mega stone with ID: ${stoneName}`)
+                return false
+            }
+            this.funds -= item.cost
+            this.megaStones[stoneName] = (this.megaStones[stoneName] || 0) + 1;
+
+            return true
+        },
+        AddEvoItem(stoneName){
+            if(!this.megaStones){
+                this.megaStones = {}
+            }
+            const item = megaEvoStones[stoneName]
+            if(!item){
+                console.warn(`Could not find item in Mega Stones with ID: ${stoneName}`)
+                return false
+            }
+            this.megaStones[stoneName] = (this.megaStones[stoneName] || 0) + 1
 
             return true
         }

@@ -50,7 +50,6 @@ function toggleModal() {
 function wishList() {
     if (selectedPokemon.value) {
         pokemonStore.addWishlistPokemon(selectedPokemon.value);
-        // console.log('Added to wishlist:', selectedPokemon.value);
     }
 }
 

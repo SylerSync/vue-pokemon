@@ -1,25 +1,20 @@
 <script setup>
-import { watch, ref, onUnmounted, nextTick } from "vue"
+import { watch, ref, onUnmounted} from "vue"
 import { computed } from "vue"
 import Select from "primevue/select"
 import Card from "primevue/card"
 import Modal from "@/components/Modal.vue"
 import { usePokemonStore } from "@/stores/pokemonStore"
 import { useSettingsStore } from "@/stores/settingsStore"
-import { getMove } from "@/api/pokeapi"
-import Splitter from 'primevue/splitter';
-import SplitterPanel from 'primevue/splitterpanel';
 import { useInventoryStore } from "@/stores/inventoryStore"
-import SelectButton from 'primevue/selectbutton';
-import Badge from 'primevue/badge';
 import 'primeicons/primeicons.css';
-import { getPokemon } from "@/api/pokeapi"
 import { getSpecies } from "@/api/pokeapi"
-import { getEvoChain } from "@/api/pokeapi"
 import PokemonBattle from "@/components/PokemonBattle.vue"
 import { getPokemonData } from "@/assets/helpers/pokemonHelper"
 import { getPokemonWithLevelData } from "@/assets/helpers/pokemonHelper"
-import { getMoveData } from "@/assets/helpers/pokemonHelper"
+import { useErrorStore } from "@/stores/errorStore"
+
+const errorStore = useErrorStore()
 
 const settingsStore = useSettingsStore()
 
@@ -81,7 +76,7 @@ const battleWin = ref(false)
 
 const openCatchModal = (pokemon, index) => {
   if (!pokemon) {
-    console.warn("Unable to open the modal, failed to find selected Pokemon.")
+    errorStore.SetErrorDetails("Selection Issue", `Unable to find the selected pokemon, try again.`)
     return
   }
   selectedPokemon.value = pokemon
@@ -115,7 +110,7 @@ function onBattleEnd({ outcome, opponent }) {
 function CatchStarter() {
   console.log("catching starter")
   if (!selectedPokemon.value || selectedIndex.value === null) {
-    console.warn("Unable to catch pokemon, pokemon data was not found")
+    errorStore.SetErrorDetails("Collection Issue", `Unable to catch pokemon due to an issue collecting pokemon data.`)
     return
   }
 
@@ -131,7 +126,7 @@ async function CatchPokemon() {
   console.log(selectedPokemon.value)
   console.log("Attempting catch!")
   if (!selectedPokemon.value || selectedIndex.value === null) {
-    console.warn("Unable to catch pokemon, pokemon data was not found")
+    errorStore.SetErrorDetails("Collection Issue", `Unable to catch pokemon due to an issue collecting pokemon data.`)
     return
   }
   if (pokemonStore.caughtPokemon.length === 0) {
@@ -192,7 +187,8 @@ async function CatchPokemon() {
     }
   }
   catch (err) {
-    console.error("Unable to catch pokemon", err)
+    errorStore.SetErrorDetails("Collection Issue", `Unable to catch pokemon due to the following issue. ${err}`)
+    console.error(`An error occured catching pokemon. ${err}`)
   }
 
 }
@@ -205,7 +201,6 @@ function battlePokemon() {
 // Audio Management Section
 function PlayCry(cry_url) {
   // IF the cry URL is exists we will lowered volume on background music, play the cry, and return the background volume to normal
-  console.log("Playing cry using URL: " + cry_url)
   if (!cry_url || settingsStore.muteAudio) return
 
   if (bgmTrack && !settingsStore.muteAudio) {
@@ -216,6 +211,7 @@ function PlayCry(cry_url) {
   cry.currentTime = 0;
   cry.play()
     .catch((err) => {
+      errorStore.SetErrorDetails("Audio Issue", `Unable to play pokemon cry at this time.`)
       console.warn("Could not play audio at url: " + cry_url, err)
       if (bgmTrack) {
         bgmTrack.volume = 1.0
@@ -238,6 +234,7 @@ function PlayRegionAudio(region) {
   const audioUrl = regionMusic[region.value]
   console.log("Using url: " + audioUrl)
   if (!audioUrl) {
+    errorStore.SetErrorDetails("Audio Issue", `Unable to play battle music at this time.`)
     console.warn("Failed to grab audio URL for region: " + region.value)
     bgmTrack = null
     return
@@ -329,6 +326,7 @@ watch(selectedRegion, async (region) => {
     gettingWildPokemon.value = false
 
   } catch (err) {
+    errorStore.SetErrorDetails("Collection Issue", `Unable to find region data for ${region}. ${err}`)
     console.warn("An error occurred loading region data for: " + region, err);
   }
 });
@@ -344,6 +342,7 @@ async function getWildPokemonData(region) {
     const starterIDs = pokemonStore.getStartersByRegion(region);
 
     if (!starterIDs || starterIDs.length === 0) {
+      errorStore.SetErrorDetails("Collection Issue", `An error occured finding starter data for ${region}.`)
       console.error(`Unable to collect starter pokemon for ${region}`);
       return;
     }
@@ -354,6 +353,7 @@ async function getWildPokemonData(region) {
         const data = await fetch("https://pokeapi.co/api/v2/pokemon/" + pokemonID);
         let speciesData = await getSpecies(pokemonID)
         if (!data.ok || !speciesData) {
+          errorStore.SetErrorDetails("Collection Issue", `An error occured finding data for starter pokemon ${pokemonID}.`)
           console.error(`An error occurred collecting json data for starter ${pokemonID}`);
           return null;
         }
@@ -361,6 +361,7 @@ async function getWildPokemonData(region) {
         const dataJson = await data.json();
         return await getPokemonWithLevelData(dataJson.name, selectedRegion.value, 5)
       } catch (err) {
+        errorStore.SetErrorDetails("Collection Issue", `An error occured finding data for starter pokemon ${pokemonID}.`)
         console.error(`An error occurred loading data for starter: ${pokemonID}`, err);
         return null;
       }
@@ -373,6 +374,7 @@ async function getWildPokemonData(region) {
 
   if (!list || list.length === 0) {
     wildPokemon.value = [];
+    errorStore.SetErrorDetails("Collection Issue", `An error occured finding the pokemon list.`)
     console.error("An error occurred finding the provided pokemon list.");
     return;
   }
