@@ -9,6 +9,7 @@ import 'primeicons/primeicons.css';
 import { useSettingsStore } from '@/stores/settingsStore';
 import { useInventoryStore } from './stores/inventoryStore';
 import { computed } from "vue";
+import ErrorModal from '@/components/ErrorModal.vue'
 
 const settingsStore = useSettingsStore();
 const inventoryStore = useInventoryStore();
@@ -73,6 +74,7 @@ const pokeballOptions = computed(() => {
 
 
       <router-view />
+    <ErrorModal />
 </template>
 
 <style scoped>
@@ -157,5 +159,4 @@ custom-tab.p-tab-active {
     opacity: 0.4;
     cursor: not-allowed;
 }
-
 </style>

@@ -16,7 +16,9 @@ import Splitter from 'primevue/splitter';
 import SplitterPanel from 'primevue/splitterpanel';
 import { useInventoryStore } from '@/stores/inventoryStore';
 import PokemonBattle from "@/components/PokemonBattle.vue"
+import { useErrorStore } from '@/stores/errorStore';
 
+const errorStore = useErrorStore()
 const pokemonStore = usePokemonStore()
 const inventoryStore = useInventoryStore()
 const selectedRegion = ref(null)
@@ -174,13 +176,13 @@ function ToggleSelectedPokemon(pokemon) {
 
 async function openBattleModal() {
     if (!selectedTrainer.value) {
-        console.warn(`A trainer must be selected to battle!`)
+        errorStore.SetErrorDetails("Selection Issue", `You must select and opponent to battle.`)
         return
     }
 
     // 1. Verify the user has selected at least one Pokemon for their own team
     if (!selectedPokemonTeam.value || selectedPokemonTeam.value.length < 1) {
-        console.warn(`You must select at least one pokemon!`)
+        errorStore.SetErrorDetails("Selection Issue", `You must select atleast one pokemon!`)
         return
     }
 
@@ -190,6 +192,7 @@ async function openBattleModal() {
     // Verify hydration succeeded
     if (!opponentPokemonTeam.value || opponentPokemonTeam.value.length < 1) {
         console.error(`Failed to hydrate opponent team!`)
+        errorStore.SetErrorDetails("Collection Issue", `Unable to collect opponent team details.`)
         return
     }
 

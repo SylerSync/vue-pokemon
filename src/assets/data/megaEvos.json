@@ -1,0 +1,646 @@
+{
+  "abomasite": {
+    "name": "Abomasite",
+    "category": "held-items",
+    "cost": 10000,
+    "pokemon": "abomasnow",
+    "description": "Allows Abomasnow to Mega Evolve in battle when held."
+  },
+  "absolite": {
+    "name": "Absolite",
+    "category": "held-items",
+    "cost": 10000,
+    "pokemon": "absol",
+    "description": "Allows Absol to Mega Evolve in battle when held."
+  },
+  "absolite-z": {
+    "name": "Absolite Z",
+    "category": "held-items",
+    "cost": 12000,
+    "pokemon": "absol",
+    "description": "Allows Absol to Mega Evolve into Mega Absol Z in battle when held."
+  },
+  "aerodactylite": {
+    "name": "Aerodactylite",
+    "category": "held-items",
+    "cost": 10000,
+    "pokemon": "aerodactyl",
+    "description": "Allows Aerodactyl to Mega Evolve in battle when held."
+  },
+  "aggronite": {
+    "name": "Aggronite",
+    "category": "held-items",
+    "cost": 10000,
+    "pokemon": "aggron",
+    "description": "Allows Aggron to Mega Evolve in battle when held."
+  },
+  "alakazamite": {
+    "name": "Alakazamite",
+    "category": "held-items",
+    "cost": 10000,
+    "pokemon": "alakazam",
+    "description": "Allows Alakazam to Mega Evolve in battle when held."
+  },
+  "altarianite": {
+    "name": "Altarianite",
+    "category": "held-items",
+    "cost": 10000,
+    "pokemon": "altaria",
+    "description": "Allows Altaria to Mega Evolve in battle when held."
+  },
+  "ampharosite": {
+    "name": "Ampharosite",
+    "category": "held-items",
+    "cost": 10000,
+    "pokemon": "ampharos",
+    "description": "Allows Ampharos to Mega Evolve in battle when held."
+  },
+  "audinite": {
+    "name": "Audinite",
+    "category": "held-items",
+    "cost": 10000,
+    "pokemon": "audino",
+    "description": "Allows Audino to Mega Evolve in battle when held."
+  },
+  "banettite": {
+    "name": "Banettite",
+    "category": "held-items",
+    "cost": 10000,
+    "pokemon": "banette",
+    "description": "Allows Banette to Mega Evolve in battle when held."
+  },
+  "barbaracite": {
+    "name": "Barbaracite",
+    "category": "held-items",
+    "cost": 10000,
+    "pokemon": "barbaracle",
+    "description": "Allows Barbaracle to Mega Evolve in battle when held."
+  },
+  "baxcalibrite": {
+    "name": "Baxcalibrite",
+    "category": "held-items",
+    "cost": 12000,
+    "pokemon": "baxcalibur",
+    "description": "Allows Baxcalibur to Mega Evolve in battle when held."
+  },
+  "beedrillite": {
+    "name": "Beedrillite",
+    "category": "held-items",
+    "cost": 10000,
+    "pokemon": "beedrill",
+    "description": "Allows Beedrill to Mega Evolve in battle when held."
+  },
+  "blastoisinite": {
+    "name": "Blastoisinite",
+    "category": "held-items",
+    "cost": 10000,
+    "pokemon": "blastoise",
+    "description": "Allows Blastoise to Mega Evolve in battle when held."
+  },
+  "blazikenite": {
+    "name": "Blazikenite",
+    "category": "held-items",
+    "cost": 10000,
+    "pokemon": "blaziken",
+    "description": "Allows Blaziken to Mega Evolve in battle when held."
+  },
+  "cameruptite": {
+    "name": "Cameruptite",
+    "category": "held-items",
+    "cost": 10000,
+    "pokemon": "camerupt",
+    "description": "Allows Camerupt to Mega Evolve in battle when held."
+  },
+  "chandelurite": {
+    "name": "Chandelurite",
+    "category": "held-items",
+    "cost": 10000,
+    "pokemon": "chandelure",
+    "description": "Allows Chandelure to Mega Evolve in battle when held."
+  },
+  "charizardite-x": {
+    "name": "Charizardite X",
+    "category": "held-items",
+    "cost": 10000,
+    "pokemon": "charizard",
+    "description": "Allows Charizard to Mega Evolve into Mega Charizard X in battle when held."
+  },
+  "charizardite-y": {
+    "name": "Charizardite Y",
+    "category": "held-items",
+    "cost": 10000,
+    "pokemon": "charizard",
+    "description": "Allows Charizard to Mega Evolve into Mega Charizard Y in battle when held."
+  },
+  "chesnaughtite": {
+    "name": "Chesnaughtite",
+    "category": "held-items",
+    "cost": 10000,
+    "pokemon": "chesnaught",
+    "description": "Allows Chesnaught to Mega Evolve in battle when held."
+  },
+  "chimechite": {
+    "name": "Chimechite",
+    "category": "held-items",
+    "cost": 10000,
+    "pokemon": "chimecho",
+    "description": "Allows Chimecho to Mega Evolve in battle when held."
+  },
+  "clefablite": {
+    "name": "Clefablite",
+    "category": "held-items",
+    "cost": 10000,
+    "pokemon": "clefable",
+    "description": "Allows Clefable to Mega Evolve in battle when held."
+  },
+  "crabominite": {
+    "name": "Crabominite",
+    "category": "held-items",
+    "cost": 10000,
+    "pokemon": "crabominable",
+    "description": "Allows Crabominable to Mega Evolve in battle when held."
+  },
+  "darkranite": {
+    "name": "Darkranite",
+    "category": "held-items",
+    "cost": 15000,
+    "pokemon": "darkrai",
+    "description": "Allows Darkrai to Mega Evolve in battle when held."
+  },
+  "delphoxite": {
+    "name": "Delphoxite",
+    "category": "held-items",
+    "cost": 10000,
+    "pokemon": "delphox",
+    "description": "Allows Delphox to Mega Evolve in battle when held."
+  },
+  "diancite": {
+    "name": "Diancite",
+    "category": "held-items",
+    "cost": 10000,
+    "pokemon": "diancie",
+    "description": "Allows Diancie to Mega Evolve in battle when held."
+  },
+  "dragalgite": {
+    "name": "Dragalgite",
+    "category": "held-items",
+    "cost": 10000,
+    "pokemon": "dragalge",
+    "description": "Allows Dragalge to Mega Evolve in battle when held."
+  },
+  "dragoninite": {
+    "name": "Dragoninite",
+    "category": "held-items",
+    "cost": 12000,
+    "pokemon": "dragonite",
+    "description": "Allows Dragonite to Mega Evolve in battle when held."
+  },
+  "drampanite": {
+    "name": "Drampanite",
+    "category": "held-items",
+    "cost": 10000,
+    "pokemon": "drampa",
+    "description": "Allows Drampa to Mega Evolve in battle when held."
+  },
+  "eelektrossite": {
+    "name": "Eelektrossite",
+    "category": "held-items",
+    "cost": 10000,
+    "pokemon": "eelektross",
+    "description": "Allows Eelektross to Mega Evolve in battle when held."
+  },
+  "emboarite": {
+    "name": "Emboarite",
+    "category": "held-items",
+    "cost": 10000,
+    "pokemon": "emboar",
+    "description": "Allows Emboar to Mega Evolve in battle when held."
+  },
+  "excadrite": {
+    "name": "Excadrite",
+    "category": "held-items",
+    "cost": 10000,
+    "pokemon": "excadrill",
+    "description": "Allows Excadrill to Mega Evolve in battle when held."
+  },
+  "falinksite": {
+    "name": "Falinksite",
+    "category": "held-items",
+    "cost": 10000,
+    "pokemon": "falinks",
+    "description": "Allows Falinks to Mega Evolve in battle when held."
+  },
+  "feraligite": {
+    "name": "Feraligite",
+    "category": "held-items",
+    "cost": 10000,
+    "pokemon": "feraligatr",
+    "description": "Allows Feraligatr to Mega Evolve in battle when held."
+  },
+  "floettite": {
+    "name": "Floettite",
+    "category": "held-items",
+    "cost": 10000,
+    "pokemon": "floette",
+    "description": "Allows Eternal Flower Floette to Mega Evolve in battle when held."
+  },
+  "froslassite": {
+    "name": "Froslassite",
+    "category": "held-items",
+    "cost": 10000,
+    "pokemon": "froslass",
+    "description": "Allows Froslass to Mega Evolve in battle when held."
+  },
+  "galladite": {
+    "name": "Galladite",
+    "category": "held-items",
+    "cost": 10000,
+    "pokemon": "gallade",
+    "description": "Allows Gallade to Mega Evolve in battle when held."
+  },
+  "garchompite": {
+    "name": "Garchompite",
+    "category": "held-items",
+    "cost": 10000,
+    "pokemon": "garchomp",
+    "description": "Allows Garchomp to Mega Evolve in battle when held."
+  },
+  "garchompite-z": {
+    "name": "Garchompite Z",
+    "category": "held-items",
+    "cost": 12000,
+    "pokemon": "garchomp",
+    "description": "Allows Garchomp to Mega Evolve into Mega Garchomp Z in battle when held."
+  },
+  "gardevoirite": {
+    "name": "Gardevoirite",
+    "category": "held-items",
+    "cost": 10000,
+    "pokemon": "gardevoir",
+    "description": "Allows Gardevoir to Mega Evolve in battle when held."
+  },
+  "gengarite": {
+    "name": "Gengarite",
+    "category": "held-items",
+    "cost": 10000,
+    "pokemon": "gengar",
+    "description": "Allows Gengar to Mega Evolve in battle when held."
+  },
+  "glalitite": {
+    "name": "Glalitite",
+    "category": "held-items",
+    "cost": 10000,
+    "pokemon": "glalie",
+    "description": "Allows Glalie to Mega Evolve in battle when held."
+  },
+  "glimmoranite": {
+    "name": "Glimmoranite",
+    "category": "held-items",
+    "cost": 10000,
+    "pokemon": "glimmora",
+    "description": "Allows Glimmora to Mega Evolve in battle when held."
+  },
+  "golisopite": {
+    "name": "Golisopite",
+    "category": "held-items",
+    "cost": 10000,
+    "pokemon": "golisopod",
+    "description": "Allows Golisopod to Mega Evolve in battle when held."
+  },
+  "golurkite": {
+    "name": "Golurkite",
+    "category": "held-items",
+    "cost": 10000,
+    "pokemon": "golurk",
+    "description": "Allows Golurk to Mega Evolve in battle when held."
+  },
+  "greninjite": {
+    "name": "Greninjite",
+    "category": "held-items",
+    "cost": 10000,
+    "pokemon": "greninja",
+    "description": "Allows Greninja to Mega Evolve in battle when held."
+  },
+  "gyaradosite": {
+    "name": "Gyaradosite",
+    "category": "held-items",
+    "cost": 10000,
+    "pokemon": "gyarados",
+    "description": "Allows Gyarados to Mega Evolve in battle when held."
+  },
+  "hawluchanite": {
+    "name": "Hawluchanite",
+    "category": "held-items",
+    "cost": 10000,
+    "pokemon": "hawlucha",
+    "description": "Allows Hawlucha to Mega Evolve in battle when held."
+  },
+  "heatranite": {
+    "name": "Heatranite",
+    "category": "held-items",
+    "cost": 15000,
+    "pokemon": "heatran",
+    "description": "Allows Heatran to Mega Evolve in battle when held."
+  },
+  "heracronite": {
+    "name": "Heracronite",
+    "category": "held-items",
+    "cost": 10000,
+    "pokemon": "heracross",
+    "description": "Allows Heracross to Mega Evolve in battle when held."
+  },
+  "houndoominite": {
+    "name": "Houndoominite",
+    "category": "held-items",
+    "cost": 10000,
+    "pokemon": "houndoom",
+    "description": "Allows Houndoom to Mega Evolve in battle when held."
+  },
+  "kangaskhanite": {
+    "name": "Kangaskhanite",
+    "category": "held-items",
+    "cost": 10000,
+    "pokemon": "kangaskhan",
+    "description": "Allows Kangaskhan to Mega Evolve in battle when held."
+  },
+  "latiasite": {
+    "name": "Latiasite",
+    "category": "held-items",
+    "cost": 10000,
+    "pokemon": "latias",
+    "description": "Allows Latias to Mega Evolve in battle when held."
+  },
+  "latiosite": {
+    "name": "Latiosite",
+    "category": "held-items",
+    "cost": 10000,
+    "pokemon": "latios",
+    "description": "Allows Latios to Mega Evolve in battle when held."
+  },
+  "lopunnite": {
+    "name": "Lopunnite",
+    "category": "held-items",
+    "cost": 10000,
+    "pokemon": "lopunny",
+    "description": "Allows Lopunny to Mega Evolve in battle when held."
+  },
+  "lucarionite": {
+    "name": "Lucarionite",
+    "category": "held-items",
+    "cost": 10000,
+    "pokemon": "lucario",
+    "description": "Allows Lucario to Mega Evolve in battle when held."
+  },
+  "lucarionite-z": {
+    "name": "Lucarionite Z",
+    "category": "held-items",
+    "cost": 12000,
+    "pokemon": "lucario",
+    "description": "Allows Lucario to Mega Evolve into Mega Lucario Z in battle when held."
+  },
+  "magearnite": {
+    "name": "Magearnite",
+    "category": "held-items",
+    "cost": 15000,
+    "pokemon": "magearna",
+    "description": "Allows Magearna to Mega Evolve in battle when held."
+  },
+  "malamarite": {
+    "name": "Malamarite",
+    "category": "held-items",
+    "cost": 10000,
+    "pokemon": "malamar",
+    "description": "Allows Malamar to Mega Evolve in battle when held."
+  },
+  "manectite": {
+    "name": "Manectite",
+    "category": "held-items",
+    "cost": 10000,
+    "pokemon": "manectric",
+    "description": "Allows Manectric to Mega Evolve in battle when held."
+  },
+  "mawilite": {
+    "name": "Mawilite",
+    "category": "held-items",
+    "cost": 10000,
+    "pokemon": "mawile",
+    "description": "Allows Mawile to Mega Evolve in battle when held."
+  },
+  "medichamite": {
+    "name": "Medichamite",
+    "category": "held-items",
+    "cost": 10000,
+    "pokemon": "medicham",
+    "description": "Allows Medicham to Mega Evolve in battle when held."
+  },
+  "meganiumite": {
+    "name": "Meganiumite",
+    "category": "held-items",
+    "cost": 10000,
+    "pokemon": "meganium",
+    "description": "Allows Meganium to Mega Evolve in battle when held."
+  },
+  "meowsticite": {
+    "name": "Meowsticite",
+    "category": "held-items",
+    "cost": 10000,
+    "pokemon": "meowstic",
+    "description": "Allows Meowstic to Mega Evolve in battle when held."
+  },
+  "metagrossite": {
+    "name": "Metagrossite",
+    "category": "held-items",
+    "cost": 10000,
+    "pokemon": "metagross",
+    "description": "Allows Metagross to Mega Evolve in battle when held."
+  },
+  "mewtwonite-x": {
+    "name": "Mewtwonite X",
+    "category": "held-items",
+    "cost": 10000,
+    "pokemon": "mewtwo",
+    "description": "Allows Mewtwo to Mega Evolve into Mega Mewtwo X in battle when held."
+  },
+  "mewtwonite-y": {
+    "name": "Mewtwonite Y",
+    "category": "held-items",
+    "cost": 10000,
+    "pokemon": "mewtwo",
+    "description": "Allows Mewtwo to Mega Evolve into Mega Mewtwo Y in battle when held."
+  },
+  "pidgeotite": {
+    "name": "Pidgeotite",
+    "category": "held-items",
+    "cost": 10000,
+    "pokemon": "pidgeot",
+    "description": "Allows Pidgeot to Mega Evolve in battle when held."
+  },
+  "pinsirite": {
+    "name": "Pinsirite",
+    "category": "held-items",
+    "cost": 10000,
+    "pokemon": "pinsir",
+    "description": "Allows Pinsir to Mega Evolve in battle when held."
+  },
+  "pyroarite": {
+    "name": "Pyroarite",
+    "category": "held-items",
+    "cost": 10000,
+    "pokemon": "pyroar",
+    "description": "Allows Pyroar to Mega Evolve in battle when held."
+  },
+  "raichunite-x": {
+    "name": "Raichunite X",
+    "category": "held-items",
+    "cost": 10000,
+    "pokemon": "raichu",
+    "description": "Allows Raichu to Mega Evolve into Mega Raichu X in battle when held."
+  },
+  "raichunite-y": {
+    "name": "Raichunite Y",
+    "category": "held-items",
+    "cost": 10000,
+    "pokemon": "raichu",
+    "description": "Allows Raichu to Mega Evolve into Mega Raichu Y in battle when held."
+  },
+  "sablenite": {
+    "name": "Sablenite",
+    "category": "held-items",
+    "cost": 10000,
+    "pokemon": "sableye",
+    "description": "Allows Sableye to Mega Evolve in battle when held."
+  },
+  "salamencite": {
+    "name": "Salamencite",
+    "category": "held-items",
+    "cost": 10000,
+    "pokemon": "salamence",
+    "description": "Allows Salamence to Mega Evolve in battle when held."
+  },
+  "sceptilite": {
+    "name": "Sceptilite",
+    "category": "held-items",
+    "cost": 10000,
+    "pokemon": "sceptile",
+    "description": "Allows Sceptile to Mega Evolve in battle when held."
+  },
+  "scizorite": {
+    "name": "Scizorite",
+    "category": "held-items",
+    "cost": 10000,
+    "pokemon": "scizor",
+    "description": "Allows Scizor to Mega Evolve in battle when held."
+  },
+  "scolipite": {
+    "name": "Scolipite",
+    "category": "held-items",
+    "cost": 10000,
+    "pokemon": "scolipede",
+    "description": "Allows Scolipede to Mega Evolve in battle when held."
+  },
+  "scovillainite": {
+    "name": "Scovillainite",
+    "category": "held-items",
+    "cost": 10000,
+    "pokemon": "scovillain",
+    "description": "Allows Scovillain to Mega Evolve in battle when held."
+  },
+  "scraftinite": {
+    "name": "Scraftinite",
+    "category": "held-items",
+    "cost": 10000,
+    "pokemon": "scrafty",
+    "description": "Allows Scrafty to Mega Evolve in battle when held."
+  },
+  "sharpedonite": {
+    "name": "Sharpedonite",
+    "category": "held-items",
+    "cost": 10000,
+    "pokemon": "sharpedo",
+    "description": "Allows Sharpedo to Mega Evolve in battle when held."
+  },
+  "skarmorite": {
+    "name": "Skarmorite",
+    "category": "held-items",
+    "cost": 10000,
+    "pokemon": "skarmory",
+    "description": "Allows Skarmory to Mega Evolve in battle when held."
+  },
+  "slowbronite": {
+    "name": "Slowbronite",
+    "category": "held-items",
+    "cost": 10000,
+    "pokemon": "slowbro",
+    "description": "Allows Slowbro to Mega Evolve in battle when held."
+  },
+  "staraptite": {
+    "name": "Staraptite",
+    "category": "held-items",
+    "cost": 10000,
+    "pokemon": "staraptor",
+    "description": "Allows Staraptor to Mega Evolve in battle when held."
+  },
+  "starminite": {
+    "name": "Starminite",
+    "category": "held-items",
+    "cost": 10000,
+    "pokemon": "starmie",
+    "description": "Allows Starmie to Mega Evolve in battle when held."
+  },
+  "steelixite": {
+    "name": "Steelixite",
+    "category": "held-items",
+    "cost": 10000,
+    "pokemon": "steelix",
+    "description": "Allows Steelix to Mega Evolve in battle when held."
+  },
+  "swampertite": {
+    "name": "Swampertite",
+    "category": "held-items",
+    "cost": 10000,
+    "pokemon": "swampert",
+    "description": "Allows Swampert to Mega Evolve in battle when held."
+  },
+  "tatsugirinite": {
+    "name": "Tatsugirinite",
+    "category": "held-items",
+    "cost": 10000,
+    "pokemon": "tatsugiri",
+    "description": "Allows Tatsugiri to Mega Evolve in battle when held."
+  },
+  "tyranitarite": {
+    "name": "Tyranitarite",
+    "category": "held-items",
+    "cost": 10000,
+    "pokemon": "tyranitar",
+    "description": "Allows Tyranitar to Mega Evolve in battle when held."
+  },
+  "venusaurite": {
+    "name": "Venusaurite",
+    "category": "held-items",
+    "cost": 10000,
+    "pokemon": "venusaur",
+    "description": "Allows Venusaur to Mega Evolve in battle when held."
+  },
+  "victreebelite": {
+    "name": "Victreebelite",
+    "category": "held-items",
+    "cost": 10000,
+    "pokemon": "victreebel",
+    "description": "Allows Victreebel to Mega Evolve in battle when held."
+  },
+  "zeraorite": {
+    "name": "Zeraorite",
+    "category": "held-items",
+    "cost": 15000,
+    "pokemon": "zeraora",
+    "description": "Allows Zeraora to Mega Evolve in battle when held."
+  },
+  "zygardite": {
+    "name": "Zygardite",
+    "category": "held-items",
+    "cost": 15000,
+    "pokemon": "zygarde",
+    "description": "Allows Zygarde Complete Forme to Mega Evolve in battle when held."
+  }
+}
