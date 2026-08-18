@@ -3,6 +3,7 @@ import { getSpecies } from "@/api/pokeapi"
 import { getEvoChain } from "@/api/pokeapi"
 import { getMove } from "@/api/pokeapi"
 import { usePokemonStore } from "@/stores/pokemonStore";
+import megaEvos from "@/assets/data/megaEvos.json"
 
 const pokemonStore = usePokemonStore()
 
@@ -224,44 +225,108 @@ export async function getMoveData(move) {
     category: move.meta?.category?.name ?? null,
   }
 }
-// Takes in pokemon to evolve object, and the name of the evolution
-export async function handleEvolution(currPokemon, evoPokemonName) {
-  console.log("attempting evolution")
-  const moveset = currPokemon.moves
-  const pokeId = currPokemon.instanceId
-  const currLevel = currPokemon.level
-  const newPokemon = await getPokemonData(evoPokemonName)
-  const KOs = currPokemon.totalKOs
-  const faints = currPokemon.totalFaints
-  const heldItem = currPokemon.heldItem
 
-  // Save data from previous evolution and transfer data to new pokemon object
-  newPokemon.moves = moveset
-  newPokemon.level = currLevel
-  newPokemon.instanceId = pokeId
-  newPokemon.totalFaints = faints
-  newPokemon.totalKOs = KOs
-  newPokemon.heldItem = heldItem
-  newPokemon.stats = newPokemon.stats.map(s => ({
-    name: s.name,
-    base_stat: s.base_stat,
-    stat: Math.floor(((2 * s.base_stat * currLevel) / 100) + 5)
-  }))
-  const hpBase = newPokemon.stats.find(s => s.name === "hp")?.base_stat || 45
-  newPokemon.totalHp = Math.floor(((2 * hpBase * currLevel) / 100) + currLevel + 10)
-  newPokemon.currentHp = newPokemon.totalHp
+export function buildEvolvedPokemonObject(baseApiData, currentPokemon) {
+    const currLevel = currentPokemon.level
+    
+    // Calculate new stat values based on Mega base stats
+    const mappedStats = baseApiData.stats.map(s => ({
+        name: s.name,
+        base_stat: s.base_stat,
+        stat: Math.floor(((2 * s.base_stat * currLevel) / 100) + 5)
+    }))
 
-  const index = pokemonStore.caughtPokemon.findIndex(p => p.instanceId === newPokemon.instanceId)
+    const hpBase = baseApiData.stats.find(s => s.name === "hp")?.base_stat || 45
+    const totalHp = Math.floor(((2 * hpBase * currLevel) / 100) + currLevel + 10)
 
-  if (index !== -1) {
-    pokemonStore.caughtPokemon[index] = newPokemon
-    console.log(`Successfully evolved ${currPokemon.name} into ${newPokemon.name}!`)
-    return true
-  }
-
-  console.log(`Failed to evoled ${currPokemon.name}`)
-  return false
+    // Preserve original object properties while overwriting only transformed fields
+    return {
+        ...currentPokemon,
+        name: baseApiData.name,
+        id: baseApiData.id,
+        // ✅ Read flat properties from baseApiData directly:
+        sprite: baseApiData.sprite || baseApiData.sprites?.front_default || currentPokemon.sprite,
+        backSprite: baseApiData.backSprite || baseApiData.sprites?.back_default || currentPokemon.backSprite,
+        types: baseApiData.types,
+        height: baseApiData.height,
+        weight: baseApiData.weight,
+        cry: baseApiData.cry || currentPokemon.cry,
+        baseExp: baseApiData.baseExp || baseApiData.base_experience,
+        stats: mappedStats,
+        totalHp: totalHp,
+        currentHp: totalHp
+    }
 }
+
+export async function handleEvolution(currPokemon, evoPokemonName) {
+    const apiData = await getPokemonData(evoPokemonName)
+    const newPokemon = buildEvolvedPokemonObject(apiData, currPokemon)
+
+    const index = pokemonStore.caughtPokemon.findIndex(p => p.instanceId === newPokemon.instanceId)
+
+    if (index !== -1) {
+        pokemonStore.caughtPokemon[index] = newPokemon // PERMANENT SAVE
+        return true
+    }
+    return false
+}
+
+export async function handleMegaEvo(currPokemon) {
+    if (!currPokemon) return currPokemon
+
+    let baseSpecies = ""
+    let specialForm = ""
+
+    // 1. Rayquaza Special Case (Bypasses held-item check)
+    if (currPokemon.name?.toLowerCase() === "rayquaza") {
+        baseSpecies = "rayquaza"
+        specialForm = "mega"
+    } else {
+        // 2. Standard Held-Item Lookup for all other Pokémon
+        const rawItem = currPokemon?.heldItem
+
+        if (!rawItem) {
+            console.error("Cannot Mega Evolve: No held item string found.")
+            return currPokemon
+        }
+
+        const key = rawItem.toLowerCase().trim().replace(/\s+/g, '-')
+        const catalog = megaEvos.default || megaEvos
+
+        const itemData = catalog[rawItem] || catalog[key] || 
+            Object.values(catalog).find(item => item.name?.toLowerCase() === rawItem.toLowerCase())
+
+        const megaSlug = itemData?.megaForm // e.g. "charizard-mega-x" or "lucario-mega"
+
+        if (!megaSlug) {
+            console.error(`Could not find a valid megaForm slug for held item: "${rawItem}"`)
+            return currPokemon
+        }
+
+        baseSpecies = itemData.pokemon.toLowerCase()
+        specialForm = megaSlug.replace(`${baseSpecies}-`, '')
+    }
+
+    // 3. Fetch Mega Data (e.g. "rayquaza" & "mega" -> "rayquaza-mega")
+    const apiData = await getPokemonData(baseSpecies, specialForm)
+
+    if (!apiData) {
+        console.error(`Failed to fetch API data for ${baseSpecies} (${specialForm})`)
+        return currPokemon
+    }
+
+    // 4. Build the fresh Mega object
+    const megaPokemon = buildEvolvedPokemonObject(apiData, currPokemon)
+
+    // Preserve battle damage taken in base form
+    const damageTaken = currPokemon.totalHp - currPokemon.currentHp
+    megaPokemon.currentHp = Math.max(1, megaPokemon.totalHp - damageTaken)
+    megaPokemon.isMega = true
+
+    console.log("returning mega evolution")
+    return megaPokemon
+}
+
 
 async function calculateMaxAndMinLevels(pokemonSpecies, name) {
   let max = 100;

@@ -203,6 +203,186 @@ const testBulbasaur = {
     ]
 }
 
+const testCharizard = {
+  "name": "charizard",
+  "id": 6,
+  "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/6.png",
+  "backSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/6.png",
+  "types": ["fire", "flying"],
+  "height": 17,
+  "weight": 905,
+  "cry": "https://raw.githubusercontent.com/PokeAPI/cries/main/cries/pokemon/latest/6.ogg",
+  "captureRate": 45,
+  "totalHp": 108,
+  "currentHp": 108,
+  "level": 36,
+  "baseExp": 240,
+  "currentExp": 14200,
+  "totalKOs": 0,
+  "totalFaints": 0,
+  "instanceId": "test-charizard-mega-x",
+  "heldItem": "Charizardite-X",
+  "stats": [
+    { "name": "hp", "base_stat": 78, "stat": 108 },
+    { "name": "attack", "base_stat": 84, "stat": 65.44 },
+    { "name": "defense", "base_stat": 78, "stat": 61.12 },
+    { "name": "special-attack", "base_stat": 109, "stat": 83.48 },
+    { "name": "special-defense", "base_stat": 85, "stat": 66.2 },
+    { "name": "speed", "base_stat": 100, "stat": 77.0 }
+  ],
+  "moves": [
+    {
+      "name": "flamethrower",
+      "type": "fire",
+      "power": 90,
+      "accuracy": 100,
+      "priority": 0,
+      "damageClass": "special",
+      "targetsSelf": false,
+      "statChanges": [],
+      "statChance": 0,
+      "ailment": "burn",
+      "ailmentChance": 10,
+      "drain": 0,
+      "healing": 0,
+      "flinchChance": 0,
+      "critRate": 0,
+      "trap": false,
+      "minTurns": 0,
+      "maxTurns": 0
+    },
+    {
+      "name": "dragon-claw",
+      "type": "dragon",
+      "power": 80,
+      "accuracy": 100,
+      "priority": 0,
+      "damageClass": "physical",
+      "targetsSelf": false,
+      "statChanges": [],
+      "statChance": 0,
+      "ailment": null,
+      "ailmentChance": 0,
+      "drain": 0,
+      "healing": 0,
+      "flinchChance": 0,
+      "critRate": 0,
+      "trap": false,
+      "minTurns": 0,
+      "maxTurns": 0
+    },
+    {
+      "name": "air-slash",
+      "type": "flying",
+      "power": 75,
+      "accuracy": 95,
+      "priority": 0,
+      "damageClass": "special",
+      "targetsSelf": false,
+      "statChanges": [],
+      "statChance": 0,
+      "ailment": null,
+      "ailmentChance": 0,
+      "drain": 0,
+      "healing": 0,
+      "flinchChance": 30,
+      "critRate": 0,
+      "trap": false,
+      "minTurns": 0,
+      "maxTurns": 0
+    },
+    {
+      "name": "slash",
+      "type": "normal",
+      "power": 70,
+      "accuracy": 100,
+      "priority": 0,
+      "damageClass": "physical",
+      "targetsSelf": false,
+      "statChanges": [],
+      "statChance": 0,
+      "ailment": null,
+      "ailmentChance": 0,
+      "drain": 0,
+      "healing": 0,
+      "flinchChance": 0,
+      "critRate": 1,
+      "trap": false,
+      "minTurns": 0,
+      "maxTurns": 0
+    }
+  ],
+  "evoDetails": []
+}
+
+const testRayquaza = {
+  name: "rayquaza",
+  id: 384,
+  instanceId: "test-mega-rayquaza-001",
+  level: 70,
+  heldItem: "Mega Cuff", // Or whatever mega item key your check system uses
+  sprite: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/384.png",
+  backSprite: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/384.png",
+  types: ["dragon", "flying"],
+  height: 70,
+  weight: 2065,
+  baseExp: 340,
+  currentExp: 0,
+  captureRate: 18,
+  totalHp: 248,
+  currentHp: 248,
+  totalKOs: 0,
+  totalFaints: 0,
+  minorStatus: [],
+  cry: "https://raw.githubusercontent.com/PokeAPI/cries/main/cries/pokemon/latest/384.ogg",
+  stats: [
+    { name: "hp", base_stat: 105, stat: 248 },
+    { name: "attack", base_stat: 150, stat: 215 },
+    { name: "defense", base_stat: 90, stat: 131 },
+    { name: "special-attack", base_stat: 150, stat: 215 },
+    { name: "special-defense", base_stat: 90, stat: 131 },
+    { name: "speed", base_stat: 95, stat: 138 }
+  ],
+  moves: [
+    {
+      name: "dragon-ascent",
+      type: "flying",
+      power: 120,
+      accuracy: 100,
+      damageClass: "physical",
+      pp: 5,
+      maxPp: 5
+    },
+    {
+      name: "dragon-claw",
+      type: "dragon",
+      power: 80,
+      accuracy: 100,
+      damageClass: "physical",
+      pp: 15,
+      maxPp: 15
+    },
+    {
+      name: "extreme-speed",
+      type: "normal",
+      power: 80,
+      accuracy: 100,
+      damageClass: "physical",
+      pp: 5,
+      maxPp: 5
+    },
+    {
+      name: "dragon-dance",
+      type: "dragon",
+      power: null,
+      accuracy: null,
+      damageClass: "status",
+      pp: 20,
+      maxPp: 20
+    }
+  ]
+};
+
 const testGligar = {
     "name": "gligar",
     "id": 207,
@@ -387,7 +567,7 @@ export const usePokemonStore = defineStore("pokemonStore", {
 
     state: () => ({
         caughtPokemon: [
-            testEevee, testGodPokemon
+            testEevee, testGodPokemon, testBulbasaur, testGligar, testCharizard, testRayquaza
         ],
         wishlistPokemon: [],
         typeColors: {
