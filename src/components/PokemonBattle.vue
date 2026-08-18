@@ -91,7 +91,9 @@
             <!-- moves -->
             <div class="moves">
               <button v-for="move in userPokemon.moves" :key="move.name" class="move"
-                :disabled="isResolving || move.disabled || (userPokemon.minorStatus?.includes('torment') && userPokemon.lastUsedMove?.name == move.name) || isFainted(userPokemon)"
+                :disabled="isResolving || move.disabled 
+                || (userPokemon.charging && userPokemon.charging.move.name !== move.name) || (userPokemon.locked && userPokemon.locked.move.name !== move.name) 
+                || (userPokemon.minorStatus?.includes('torment') && userPokemon.lastUsedMove?.name == move.name) || isFainted(userPokemon)"
                 @click="battleTurn(move)">
                 <span class="move-name">{{ move.name }}</span>
                 <span class="move-power">{{ move.power ?? '—' }}</span>
@@ -420,6 +422,58 @@ const SELF_KO_MOVES = new Set([
   'memento', 'healing-wish', 'lunar-dance',
 ]);
 
+const RECHARGE_MOVES = new Set([
+  'hyper-beam', 'giga-impact', 'blast-burn', 'hydro-cannon', 'frenzy-plant',
+  'rock-wrecker', 'roar-of-time', 'prismatic-laser', 'eternabeam',
+  'meteor-assault',
+]);
+
+const TWO_TURN_MOVES = {
+  // semi-invulnerable — can't be touched during the charge turn
+  fly:             { message: (n) => `${n} flew up high!`, invulnerable: true },
+  bounce:          { message: (n) => `${n} sprang up!`, invulnerable: true },
+  dig:             { message: (n) => `${n} burrowed its way under the ground!`, invulnerable: true },
+  dive:            { message: (n) => `${n} hid underwater!`, invulnerable: true },
+  'phantom-force': { message: (n) => `${n} vanished instantly!`, invulnerable: true },
+  'shadow-force':  { message: (n) => `${n} vanished instantly!`, invulnerable: true },
+
+  // plain charge — vulnerable while charging
+  'solar-beam':   { message: (n) => `${n} absorbed light!` },
+  'solar-blade':  { message: (n) => `${n} absorbed light!` },
+  'razor-wind':   { message: (n) => `${n} whipped up a whirlwind!` },
+  'sky-attack':   { message: (n) => `${n} became cloaked in a harsh light!` },
+  'freeze-shock': { message: (n) => `${n} became cloaked in a freezing light!` },
+  'ice-burn':     { message: (n) => `${n} became cloaked in freezing air!` },
+
+  // charge turn also raises a stat
+  'skull-bash':  { message: (n) => `${n} tucked in its head!`,
+                   chargeStatChanges: [{ stat: 'defense', change: 1 }] },
+  'meteor-beam': { message: (n) => `${n} is overflowing with space power!`,
+                   chargeStatChanges: [{ stat: 'special-attack', change: 1 }] },
+  'electro-shot':{ message: (n) => `${n} absorbed electricity!`,
+                   chargeStatChanges: [{ stat: 'special-attack', change: 1 }] },
+};
+
+// moves that connect anyway, keyed by the charge move being used
+const HITS_THROUGH = {
+  fly:    ['gust', 'twister', 'thunder', 'hurricane', 'sky-uppercut', 'smack-down'],
+  bounce: ['gust', 'twister', 'thunder', 'hurricane', 'smack-down'],
+  dig:    ['earthquake', 'magnitude', 'fissure'],
+  dive:   ['surf', 'whirlpool'],
+};
+
+const LOCKING_MOVES = {
+  outrage:       { confusionAfter: true },
+  thrash:        { confusionAfter: true },
+  'petal-dance': { confusionAfter: true },
+  'raging-fury': { confusionAfter: true },
+  uproar:        { confusionAfter: false },
+};
+
+function isSemiInvulnerable(pokemon) {
+  return !!pokemon?.charging?.invulnerable;
+}
+
 const prettyName = (n) => n.replace(/-/g, ' ');
 
 const freshStages = () => ({
@@ -544,6 +598,18 @@ function applyPerishSong(pokemon) {
   return true;
 }
 
+function rollHitCount(move) {
+  const min = move.minHits ?? 1;
+  const max = move.maxHits ?? 1;
+  if (max <= 1) return 1;
+  if (min === max) return min;
+  if (min === 2 && max === 5) {
+    const r = randInt(1, 100);
+    return r <= 35 ? 2 : r <= 70 ? 3 : r <= 85 ? 4 : 5;
+  }
+  return randInt(min, max);
+}
+
 /* ------------------------------------------------------------------ *
  * Battle lifecycle
  * ------------------------------------------------------------------ */
@@ -557,6 +623,9 @@ function startBattle() {
   checkMegaEvo()
   userPokemon.value.stages = freshStages();
   userPokemon.value.flinched = false;
+  userPokemon.value.charging = null;
+  userPokemon.value.mustRecharge = false;
+  userPokemon.value.locked = null
   battleStarted.value = true;
   selectedTargetPokemon.value = userPokemon.value;
   log(`A wild ${foe.value.name} appeared!`);
@@ -704,6 +773,8 @@ function pickMove(pokemon) {
   //   category: 'damage',        // ⚠️ not 'unique' or anything self-KO-ish
   // }
   // return move
+  if (pokemon.charging) return pokemon.charging.move;
+  if (pokemon.locked) return pokemon.locked.move;
   const moves = pokemon.moves ?? [];
   let disabledMoves = []
   if (pokemon.minorStatus?.includes("torment") && pokemon.lastUsedMove) {
@@ -858,6 +929,9 @@ function replaceMove(index) {
  */
 async function handleFaint(pokemon) {
   if (!isFainted(pokemon)) return false;
+  pokemon.charging = null;
+  pokemon.mustRecharge = false;
+  pokemon.locked = null;
   log(`${pokemon.name} fainted!`);
   canMegaEvolve.value = false
   await playAnim(pokemon === foe.value ? 'foe' : 'ally', 'faint', 700);
@@ -922,11 +996,27 @@ async function handleFaint(pokemon) {
 async function useMove(user, target, move) {
   let actor = user === userPokemon.value ? 'ally' : 'foe';
   let victim = actor === 'ally' ? 'foe' : 'ally';
-  let hitsSelf = false
-  user.lastUsedMove = move
+  let hitsSelf = false;
+
+  // --- recharge: the turn is spent before anything else happens ---
+  if (user.mustRecharge) {
+    user.mustRecharge = false;
+    log(`${user.name} must recharge!`);
+    await delay(800);
+    return;
+  }
+
+  const releasing = !!user.charging;
+  if (releasing) move = user.charging.move;
+  else if (user.locked) move = user.locked.move;
+
+  user.lastUsedMove = move;
 
   // --- pre-move status checks ---
-  if (!(await canAct(user))) return;
+  if (!(await canAct(user))){
+    user.charging = null;  
+    return;
+  }
   if (user.minorStatus?.includes("confusion")) {
     if (--user.confusionTurns <= 0) {
       user.minorStatus = user.minorStatus.filter(s => s !== 'confusion');
@@ -941,6 +1031,7 @@ async function useMove(user, target, move) {
   if (user.minorStatus?.includes("infatuation")) {
     if (randInt(1, 2) == 1) {
       log(`${user.name} is immobilized by love.`);
+      user.charging = null;  
       return
     }
   }
@@ -957,6 +1048,7 @@ async function useMove(user, target, move) {
   }
 
   if (hitsSelf) {
+    user.charging = null;  
     log(`${user.name} hit itself in confusion.`);
     target = user;
     victim = "foe"
@@ -966,15 +1058,44 @@ async function useMove(user, target, move) {
       accuracy: null,
       damageClass: 'physical'
     }
+  } else if (releasing) {
+    log(`${user.name} unleashed ${prettyName(move.name)}!`);
+    await playAnim(actor, 'lunge', 300);
   } else {
     log(`${user.name} used ${prettyName(move.name)}!`);
     await playAnim(actor, 'lunge', 300);
   }
+
+  // --- two-turn moves ---
+  const charge = TWO_TURN_MOVES[move.name];
+  if (charge && !releasing && !hitsSelf) {
+    user.charging = { move, invulnerable: !!charge.invulnerable };
+    log(charge.message(user.name));
+    await delay(800);
+    for (const { stat, change } of charge.chargeStatChanges ?? []) {
+      const applied = applyStatChange(user, stat, change);
+      log(statChangeMessage(user.name, stat, applied, change));
+      await delay(700);
+    }
+    return;
+  }
+  if (releasing) user.charging = null;
+
   // --- heal block: healing moves fail entirely ---
   if ((move.healing ?? 0) > 0 && isHealBlocked(user)) {
     log(`But ${user.name} can't use it due to Heal Block!`);
     await delay(800);
     return;
+  }
+
+    // --- target is off the field ---
+  if (isSemiInvulnerable(target) && target !== user) {
+    const through = HITS_THROUGH[target.charging.move.name] ?? [];
+    if (!through.includes(move.name)) {
+      log(`${target.name} avoided the attack!`);
+      await delay(800);
+      return;
+    }
   }
 
   // --- accuracy (null = never misses) ---
@@ -993,6 +1114,7 @@ async function useMove(user, target, move) {
         stageMultiplier(user.stages?.accuracy ?? 0, true) / stageMultiplier(evasion, true);
       if (randInt(1, 100) > move.accuracy * accMod) {
         log(`${user.name}'s attack missed!`);
+        user.locked = null;
         await delay(800);
         return;
       }
@@ -1026,31 +1148,48 @@ async function useMove(user, target, move) {
 
   // --- damage ---
   if (move.power) {
-    const results = calculateDamage(user, target, move);
+    const hits = rollHitCount(move);
+    let landed = 0;
+    let effectiveness = 1;
+    let anyCrit = false;
 
-    if (results.immune) {
-      log(`It doesn't affect ${target.name}...`);
-      await delay(800);
-      return;
+    for (let i = 0; i < hits; i++) {
+      const results = calculateDamage(user, target, move);
+      if (results.immune) {
+        log(`It doesn't affect ${target.name}...`);
+        user.locked = null;
+        await delay(800);
+        return;
+      }
+      effectiveness = results.effectiveness;
+      anyCrit ||= results.critical;
+      dealt += Math.min(results.damage, target.currentHp);
+      target.currentHp = Math.max(0, target.currentHp - results.damage);
+      await playAnim(victim, 'hit', 250);
+      landed++;
+      if (target.currentHp <= 0) break;
     }
 
-    dealt = Math.min(results.damage, target.currentHp);
-    target.currentHp = Math.max(0, target.currentHp - results.damage);
-    await playAnim(victim, 'hit', 400);
-    log(`${user.name} dealt ${results.damage} damage.`);
-
-    if (results.critical) {
-      await delay(600);
-      log('A critical hit!');
-    }
-    if (results.effectiveness > 1) {
-      await delay(600);
-      log("It's super effective!");
-    } else if (results.effectiveness > 0 && results.effectiveness < 1) {
-      await delay(600);
-      log("It's not very effective...");
-    }
+    if (hits > 1) { log(`Hit ${landed} time${landed === 1 ? '' : 's'}!`); await delay(400); }
+    log(`${user.name} dealt ${dealt} damage.`);
+    if (anyCrit) { await delay(600); log('A critical hit!'); }
+    if (effectiveness > 1) { await delay(600); log("It's super effective!"); }
+    else if (effectiveness > 0 && effectiveness < 1) { await delay(600); log("It's not very effective..."); }
     await delay(600);
+
+    if (RECHARGE_MOVES.has(move.name)) user.mustRecharge = true;
+  }
+
+  // --- lock-in moves ---
+  const lock = LOCKING_MOVES[move.name];
+  if (lock) {
+    if (!user.locked) {
+      user.locked = { move, turns: randInt(move.minTurns || 2, move.maxTurns || 3) };
+    }
+    if (--user.locked.turns <= 0) {
+      user.locked = null;
+      if (lock.confusionAfter) await inflictStatus(user, 'confusion');
+    }
   }
 
   // fainted — skip every secondary effect
@@ -1071,7 +1210,7 @@ async function useMove(user, target, move) {
   }
 
   // --- status ailment ---
-  if (move.ailment) {
+  if (move.ailment && !LOCKING_MOVES[move.name]) {
     const chance = move.ailmentChance || 100;
     if (randInt(1, 100) <= chance) {
       const recipient = move.targetsSelf ? user : target;
@@ -1279,6 +1418,10 @@ async function inflictStatus(target, ailment, move) {
   } else if (ailment === 'disable') {
     if (!target.lastUsedMove) {
       log(`${target.name} has not used a move, ${prettyName(move.name)} failed!`);
+      await delay(800);
+      return
+    } else if (target.locked || target.charging) {
+      log(`${prettyName(move.name)} failed!`);
       await delay(800);
       return
     }
@@ -1697,6 +1840,7 @@ async function switchActivePokemon(pokemon) {
 
   userPokemon.value.stages = freshStages();
   userPokemon.value.flinched = false;
+  userPokemon.value.charging = null;
   userPokemon.value.minorStatus = [];
   userPokemon.value.healBlockTurns = 0;
   userPokemon.value.confusionTurns = 0;
@@ -1704,6 +1848,8 @@ async function switchActivePokemon(pokemon) {
   userPokemon.value.embargoTurns = 0;
   userPokemon.value.trapped = null;
   userPokemon.value.disabled = false;
+  userPokemon.value.mustRecharge = false;
+  userPokemon.value.locked = null
 
   isResolving.value = true;
   try {

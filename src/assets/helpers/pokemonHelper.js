@@ -212,7 +212,7 @@ export async function getMoveData(move) {
       change: s.change,
     })),
     statChance: move.meta?.stat_chance ?? 0,
-    ailment: move.meta?.ailment?.name !== 'none' ? move.meta.ailment.name : null,
+    ailment: move.meta?.ailment?.name && move.meta.ailment.name !== 'none' ? move.meta.ailment.name : null,
     ailmentChance: move.meta?.ailment_chance ?? 0,
     drain: move.meta?.drain ?? 0,     // negative = recoil
     healing: move.meta?.healing ?? 0, // % of max HP
@@ -220,6 +220,8 @@ export async function getMoveData(move) {
     critRate: move.meta?.crit_rate ?? 0,
     minTurns: move.meta?.min_turns ?? 0,
     maxTurns: move.meta?.max_turns ?? 0,
+    minHits: move.meta?.min_hits ?? null,
+    maxHits: move.meta?.max_hits ?? null,
     category: move.meta?.category?.name ?? null,
   }
 }
