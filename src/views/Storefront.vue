@@ -10,9 +10,12 @@ import Tag from "primevue/tag"
 import tms from "@/assets/data/tms.json"
 import evolutionItems from "@/assets/data/evolutionItems.json"
 import megaEvoStones from "@/assets/data/megaEvos.json"
+import { useErrorStore } from "@/stores/errorStore.js"
+
 
 const inventoryStore = useInventoryStore();
 const pokemonStore = usePokemonStore();
+const errorStore = useErrorStore()
 
 const shopCats = ref([
     { label: "Pokeballs", value: "pokeballs" },
@@ -97,7 +100,7 @@ function buyPokeball(itemType) {
     console.log(`Attempting to purchase pokeball: ${itemType}`)
     const success = inventoryStore.BuyPokeball(itemType, 1)
     if (!success) {
-        console.warn(`Not enough funds to buy ${itemType}`)
+        errorStore.SetErrorDetails("Low funds", `Unable to buy a(n) ${itemType} due to lack of funds.`)
     }
 }
 
@@ -105,7 +108,7 @@ function buyRecovery(itemType) {
     console.log(`Attempting to purchase recovery item: ${itemType}`)
     const success = inventoryStore.BuyRecovery(itemType, 1)
     if (!success) {
-        console.warn(`Not enough funds to buy ${itemType}`)
+        errorStore.SetErrorDetails("Low funds", `Unable to buy a(n) ${itemType} due to lack of funds.`)
     }
 }
 
@@ -113,7 +116,7 @@ function buyTM(tmId) {
     console.log(`Attempting to purchase TM: ${tmId}`)
     const success = inventoryStore.BuyTM(tmId)
     if (!success) {
-        console.warn(`Not enough funds to buy TM ${tmId}`)
+        errorStore.SetErrorDetails("Low funds", `Unable to buy a(n) ${tmId} due to lack of funds.`)
     }
 }
 
@@ -121,7 +124,7 @@ function buyEvo(evoId) {
     console.log(`Attempting to purchase Evo Item: ${evoId}`)
     const success = inventoryStore.BuyEvoItem(evoId)
     if (!success) {
-        console.warn(`Not enough funds to buy ${evoId}`)
+        errorStore.SetErrorDetails("Low funds", `Unable to buy a(n) ${evoId} due to lack of funds.`)
     }
 }
 
@@ -129,7 +132,7 @@ function buyMega(stoneId) {
     console.log(`Attempting to puchase Mega Item: ${stoneId}`)
     const success = inventoryStore.BuyMegaStone(stoneId)
     if(!success){
-        console.warn(`Not enough funds to buy ${stoneId}.`)
+        errorStore.SetErrorDetails("Low funds", `Unable to buy a(n) ${stoneId} due to lack of funds.`)
     }
 }
 </script>
@@ -259,7 +262,7 @@ function buyMega(stoneId) {
                 <Column header="Action" style="width: 20%">
                     <template #body="slotProps">
                         <Button label="Buy" icon="pi pi-shopping-cart" severity="primary" size="small" class="shop-btn"
-                            :disabled="inventoryStore.funds < slotProps.data.cost" @click="buyMega(slotProps.data.id)" />
+                             @click="buyMega(slotProps.data.id)" />
                     </template>
                 </Column>
             </DataTable>
