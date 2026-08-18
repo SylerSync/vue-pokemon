@@ -405,6 +405,11 @@ const STAT_LABEL = {
   speed: 'Speed', accuracy: 'accuracy', evasion: 'evasiveness',
 };
 
+const SELF_KO_MOVES = new Set([
+  'self-destruct', 'explosion', 'misty-explosion', 'final-gambit',
+  'memento', 'healing-wish', 'lunar-dance',
+]);
+
 const prettyName = (n) => n.replace(/-/g, ' ');
 
 const freshStages = () => ({
@@ -564,10 +569,16 @@ async function battleTurn(playerMove, item = null) {
       ? [[player, wild, playerMove], [wild, player, wildMove]]
       : [[wild, player, wildMove], [player, wild, playerMove]];
 
+
     for (const [attacker, defender, move] of order) {
       if (!move || isFainted(attacker)) continue;
       await useMove(attacker, defender, move);
-      if (await handleFaint(defender)) return;
+      const attackerDown = isFainted(attacker);
+      if (await handleFaint(defender)) {
+        if (attackerDown) await handleFaint(attacker);
+        return;
+      }
+      if (attackerDown && await handleFaint(attacker)) return;
     }
     await endOfTurnPerish(wild);
     await endOfTurnPerish(player);
@@ -613,6 +624,27 @@ function statOf(pokemon, name) {
 }
 
 function pickMove(pokemon) {
+  // let move = {
+  //   name: 'self-destruct',
+  //   type: 'normal',
+  //   power: 200,
+  //   accuracy: 100,
+  //   priority: 0,
+  //   damageClass: 'physical',
+  //   targetsSelf: false,        // target is 'all-other-pokemon'
+  //   statChanges: [],
+  //   statChance: 0,
+  //   ailment: null,
+  //   ailmentChance: 0,
+  //   drain: 0,                  // ⚠️ not -100 — the self-KO isn't here
+  //   healing: 0,
+  //   flinchChance: 0,
+  //   critRate: 0,
+  //   minTurns: 0,               // null in API
+  //   maxTurns: 0,               // null in API
+  //   category: 'damage',        // ⚠️ not 'unique' or anything self-KO-ish
+  // }
+  // return move
   const moves = pokemon.moves ?? [];
   let disabledMoves = []
   if (pokemon.minorStatus?.includes("torment") && pokemon.lastUsedMove) {
@@ -887,19 +919,50 @@ async function useMove(user, target, move) {
 
   // --- accuracy (null = never misses) ---
   if (move.accuracy != null) {
-    const evasion = target.minorStatus?.includes('no-type-immunity')
-      ? 0
-      : (target.stages?.evasion ?? 0);
-    const accMod =
-      stageMultiplier(user.stages?.accuracy ?? 0, true) / stageMultiplier(evasion, true);
-    if (randInt(1, 100) > move.accuracy * accMod) {
-      log(`${user.name}'s attack missed!`);
-      await delay(800);
-      return;
+    if (move.category === 'ohko') {
+      if (randInt(1, 100) > move.accuracy + (user.level - target.level)) {
+        log(`${user.name}'s attack missed!`);
+        await delay(800);
+        return;
+      }
+    } else {
+      const evasion = target.minorStatus?.includes('no-type-immunity')
+        ? 0
+        : (target.stages?.evasion ?? 0);
+      const accMod =
+        stageMultiplier(user.stages?.accuracy ?? 0, true) / stageMultiplier(evasion, true);
+      if (randInt(1, 100) > move.accuracy * accMod) {
+        log(`${user.name}'s attack missed!`);
+        await delay(800);
+        return;
+      }
     }
   }
 
+  if (SELF_KO_MOVES.has(move.name)) {
+    user.currentHp = 0;
+  }
+
   let dealt = 0;
+
+  // --- OHKO ---
+  if (move.category === 'ohko') {
+    if (target.level > user.level) {
+      log(`${target.name} is unaffected!`);
+      await delay(800);
+      return;
+    }
+    if (typeEffectiveness(move.type, target.types) === 0) {
+      log(`It doesn't affect ${target.name}...`);
+      await delay(800);
+      return;
+    }
+    target.currentHp = 0;
+    await playAnim(victim, 'hit', 400);
+    log("It's a one-hit KO!");
+    await delay(800);
+    return;
+  }
 
   // --- damage ---
   if (move.power) {
