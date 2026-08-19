@@ -91,11 +91,11 @@
             <!-- moves -->
             <div class="moves">
               <button v-for="move in userPokemon.moves" :key="move.name" class="move"
-                :disabled="isResolving || move.disabled
+                :disabled="isResolving || move.disabled || move.currentPP == 0
                   || (userPokemon.charging && userPokemon.charging.move.name !== move.name) || (userPokemon.locked && userPokemon.locked.move.name !== move.name)
                   || (userPokemon.minorStatus?.includes('torment') && userPokemon.lastUsedMove?.name == move.name) || isFainted(userPokemon)" @click="battleTurn(move)">
                 <span class="move-name">{{ move.name }}</span>
-                <span class="move-power">{{ move.power ?? '—' }}</span>
+                <span class="move-power">{{ move.currentPP }}/{{ move.maxPP }}</span>
               </button>
             </div>
             <!-- Mega Evolution Button -->
@@ -214,60 +214,12 @@
     </div>
   </Modal>
 
-  <Modal v-if="isSwapModalOpen" @close="closeReplaceMoveModal()">
-    <template #default>
-      <div class="move-swap-container">
-        <div class="modal-header">
-          <h3><strong>{{ userPokemon.name }}</strong> wants to learn <span class="highlight-move">{{ pendingMove.name
-              }}</span></h3>
-          <p>Select a move to forget, or skip learning {{ pendingMove.name }}.</p>
-        </div>
-
-        <!-- Current 4 Moves Grid -->
-        <div class="moves-section">
-          <span class="section-title">Current Moves</span>
-          <div class="current-moves">
-            <Card v-for="(move, index) in userPokemon.moves" :key="move.name + index" class="move-card select-card"
-              @click="replaceMove(index)">
-              <template #content>
-                <div class="card-top">
-                  <span class="move-title">{{ move.name }}</span>
-                  <span class="type-pill"
-                    :style="{ backgroundColor: pokemonStore.typeColors[move.type?.toLowerCase()] || '#777' }">
-                    {{ move.type }}
-                  </span>
-                </div>
-                <div class="card-details">
-                  <span><strong>PWR:</strong> {{ move.power || '—' }}</span>
-                </div>
-                <div class="hover-action">Forget Move</div>
-              </template>
-            </Card>
-          </div>
-        </div>
-
-        <!-- Cancel / Skip Learning Card -->
-        <div class="cancel-section">
-          <span class="section-title">New Move</span>
-          <Card class="move-card cancel-card" @click="closeReplaceMoveModal()">
-            <template #content>
-              <div class="card-top">
-                <span class="move-title">{{ pendingMove.name }}</span>
-                <span class="type-pill"
-                  :style="{ backgroundColor: pokemonStore.typeColors[pendingMove.type?.toLowerCase()] || '#777' }">
-                  {{ pendingMove.type }}
-                </span>
-              </div>
-              <div class="card-details">
-                <span><strong>PWR:</strong> {{ pendingMove.power || '—' }}</span>
-              </div>
-              <div class="hover-action cancel">Don't Learn</div>
-            </template>
-          </Card>
-        </div>
-      </div>
-    </template>
-  </Modal>
+  <SelectMove  v-if="isSwapModalOpen" @close="closeReplaceMoveModal()"
+    :userPokemon="userPokemon"
+    :pendingMove="pendingMove"
+  >
+  </SelectMove>
+  
 </template>
 
 <script setup>
@@ -292,6 +244,7 @@ import burnIcon from '@/assets/statusIcons/burn.png';
 import poisonIcon from '@/assets/statusIcons/poison.png';
 import { getRandomWithExclusions } from '@/assets/helpers/numberHelper.js'
 import megaEvos from "@/assets/data/megaEvos.json"
+import SelectMove from './SelectMove.vue';
 
 /* ------------------------------------------------------------------ *
  * Status Icons
@@ -1174,6 +1127,8 @@ async function useMove(user, target, move) {
     user.disabled = false
     await delay(800);
   }
+
+  move.currentPP--
 
   if (hitsSelf) {
     user.charging = null;
@@ -2693,7 +2648,7 @@ onMounted(() => {
   margin-top: auto;
 }
 
-.move-swap-container {
+/* .move-swap-container {
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
@@ -2728,7 +2683,7 @@ onMounted(() => {
   display: block;
 }
 
-/* Grids & Cards */
+
 .current-moves {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -2799,7 +2754,7 @@ onMounted(() => {
 
 .hover-action.cancel {
   color: #dc2626;
-}
+} */
 
 .status-icon {
   flex: none;
