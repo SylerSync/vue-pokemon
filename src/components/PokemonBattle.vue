@@ -703,7 +703,7 @@ function syncMegaPokemon() {
     }
 
     base.level = mega.level
-    base.xp = mega.xp
+    base.currentExp = mega.currentExp
     base.moves = mega.moves
     base.status = mega.status || null
     if (mega.totalKOs) base.totalKOs = mega.totalKOs
