@@ -33,68 +33,69 @@
 
           <!-- in battle -->
           <div v-else class="arena">
-            <!-- opponent: info left, sprite right -->
-            <div class="combatant combatant-foe">
-              <div class="combatant-info">
-                <div class="combatant-head">
-                  <span class="label">Lv {{ foe.level }}</span>
-                  <span class="combatant-name">{{ foe.name }}</span>
-                  <!-- Status icons -->
-                  <template v-if="foe.status">
-                    <img v-if="STATUS_ICONS[foe.status]" :src="STATUS_ICONS[foe.status]" :alt="foe.status"
-                      :title="foe.status" class="status-icon" />
-                    <span v-else class="status-chip" :title="foe.status">
-                      {{ STATUS_ABBR[foe.status] ?? foe.status }}
-                    </span>
-                  </template>
-                </div>
-                <div class="hp">
-                  <div class="hp-track">
-                    <div class="hp-fill" :class="hpTone(foe)" :style="{ width: hpPercent(foe) + '%' }" />
+            <div class="battlefield">
+              <!-- opponent: info left, sprite right -->
+              <div class="combatant combatant-foe">
+                <div class="combatant-info">
+                  <div class="combatant-head">
+                    <span class="label">Lv {{ foe.level }}</span>
+                    <span class="combatant-name">{{ foe.name }}</span>
+                    <!-- Status icons -->
+                    <template v-if="foe.status">
+                      <img v-if="STATUS_ICONS[foe.status]" :src="STATUS_ICONS[foe.status]" :alt="foe.status"
+                        :title="foe.status" class="status-icon" />
+                      <span v-else class="status-chip" :title="foe.status">
+                        {{ STATUS_ABBR[foe.status] ?? foe.status }}
+                      </span>
+                    </template>
                   </div>
-                  <span class="hp-text">
-                    {{ Math.max(0, foe.currentHp) }}/{{ foe.totalHp }}
-                  </span>
-                </div>
-              </div>
-              <img :src="foe.sprite" :alt="foe.name" class="battle-sprite sprite-foe"
-                :class="anim?.actor === 'foe' ? `anim-${anim.type}` : null" />
-            </div>
-            <!-- player: sprite left, info right -->
-            <div class="combatant combatant-ally">
-              <div class="combatant-info">
-                <div class="combatant-head">
-                  <span class="label">Lv {{ userPokemon.level }}</span>
-                  <span class="combatant-name">{{ userPokemon.name }}</span>
-                  <!-- Status icons -->
-                  <template v-if="userPokemon.status">
-                    <img v-if="STATUS_ICONS[userPokemon.status]" :src="STATUS_ICONS[userPokemon.status]"
-                      :alt="userPokemon.status" :title="userPokemon.status" class="status-icon" />
-                    <span v-else class="status-chip" :title="userPokemon.status">
-                      {{ STATUS_ABBR[userPokemon.status] ?? userPokemon.status }}
+                  <div class="hp">
+                    <div class="hp-track">
+                      <div class="hp-fill" :class="hpTone(foe)" :style="{ width: hpPercent(foe) + '%' }" />
+                    </div>
+                    <span class="hp-text">
+                      {{ Math.max(0, foe.currentHp) }}/{{ foe.totalHp }}
                     </span>
-                  </template>
-                </div>
-                <div class="hp">
-                  <div class="hp-track">
-                    <div class="hp-fill" :class="hpTone(userPokemon)"
-                      :style="{ width: hpPercent(userPokemon) + '%' }" />
                   </div>
-                  <span class="hp-text">
-                    {{ Math.max(0, userPokemon.currentHp) }}/{{ userPokemon.totalHp }}
-                  </span>
                 </div>
+                <img :src="foe.sprite" :alt="foe.name" class="battle-sprite sprite-foe"
+                  :class="anim?.actor === 'foe' ? `anim-${anim.type}` : null" />
               </div>
-              <img :src="userPokemon.backSprite ?? userPokemon.sprite" :alt="userPokemon.name"
-                class="battle-sprite sprite-ally" :class="anim?.actor === 'ally' ? `anim-${anim.type}` : null" />
+              <!-- player: sprite left, info right -->
+              <div class="combatant combatant-ally">
+                <div class="combatant-info">
+                  <div class="combatant-head">
+                    <span class="label">Lv {{ userPokemon.level }}</span>
+                    <span class="combatant-name">{{ userPokemon.name }}</span>
+                    <!-- Status icons -->
+                    <template v-if="userPokemon.status">
+                      <img v-if="STATUS_ICONS[userPokemon.status]" :src="STATUS_ICONS[userPokemon.status]"
+                        :alt="userPokemon.status" :title="userPokemon.status" class="status-icon" />
+                      <span v-else class="status-chip" :title="userPokemon.status">
+                        {{ STATUS_ABBR[userPokemon.status] ?? userPokemon.status }}
+                      </span>
+                    </template>
+                  </div>
+                  <div class="hp">
+                    <div class="hp-track">
+                      <div class="hp-fill" :class="hpTone(userPokemon)"
+                        :style="{ width: hpPercent(userPokemon) + '%' }" />
+                    </div>
+                    <span class="hp-text">
+                      {{ Math.max(0, userPokemon.currentHp) }}/{{ userPokemon.totalHp }}
+                    </span>
+                  </div>
+                </div>
+                <img :src="userPokemon.backSprite ?? userPokemon.sprite" :alt="userPokemon.name"
+                  class="battle-sprite sprite-ally" :class="anim?.actor === 'ally' ? `anim-${anim.type}` : null" />
+              </div>
             </div>
             <!-- moves -->
             <div class="moves">
-              <button v-for="move in userPokemon.moves" :key="move.name" class="move"
-                :disabled="isResolving || move.disabled 
-                || (userPokemon.charging && userPokemon.charging.move.name !== move.name) || (userPokemon.locked && userPokemon.locked.move.name !== move.name) 
-                || (userPokemon.minorStatus?.includes('torment') && userPokemon.lastUsedMove?.name == move.name) || isFainted(userPokemon)"
-                @click="battleTurn(move)">
+              <button v-for="move in userPokemon.moves" :key="move.name" class="move" :style="{backgroundColor: pokemonStore.typeColors[move.type]}"
+                :disabled="isResolving || move.disabled
+                  || (userPokemon.charging && userPokemon.charging.move.name !== move.name) || (userPokemon.locked && userPokemon.locked.move.name !== move.name)
+                  || (userPokemon.minorStatus?.includes('torment') && userPokemon.lastUsedMove?.name == move.name) || isFainted(userPokemon)" @click="battleTurn(move)">
                 <span class="move-name">{{ move.name }}</span>
                 <span class="move-power">{{ move.power ?? '—' }}</span>
               </button>
@@ -143,7 +144,7 @@
 
             <!-- log -->
             <div v-if="sidePanel === 'log'" ref="logEl" class="log-body">
-              <p v-for="(entry, i) in battleLog" :key="i" class="log-line">{{ entry }}</p>
+              <p v-for="(entry, i) in battleLog" :key="i" class="log-line" :class="{ 'turn-header': entry.startsWith('Battle Turn') }">{{ entry }}</p>
               <p v-if="!battleLog.length" class="empty-msg">The battle hasn't started.</p>
             </div>
 
@@ -220,7 +221,7 @@
       <div class="move-swap-container">
         <div class="modal-header">
           <h3><strong>{{ userPokemon.name }}</strong> wants to learn <span class="highlight-move">{{ pendingMove.name
-              }}</span></h3>
+          }}</span></h3>
           <p>Select a move to forget, or skip learning {{ pendingMove.name }}.</p>
         </div>
 
@@ -353,6 +354,7 @@ const logEl = ref(null);
 const anim = ref(null);
 const isSwapModalOpen = ref(false)
 const pendingMove = ref(null)
+let turnValue = 1
 
 const userPokemon = ref(null);
 const selectedTargetPokemon = ref(null);
@@ -386,7 +388,23 @@ const pokeballOptions = computed(() => {
 /** Working copy of the opponent so the parent's object is never mutated. */
 const foe = ref(null)
 
-const team = computed(() => props.team ?? pokemonStore.caughtPokemon);
+const activeMegaPokemon = ref(null)
+
+const team = computed(() => {
+  const sourceTeam = props.team ?? pokemonStore.caughtPokemon
+  if(!activeMegaPokemon.value){
+    return sourceTeam
+  }
+
+  const filtered = sourceTeam.filter(
+    p => p.instanceId !== activeMegaPokemon.value.instanceId
+  )
+
+  return [...filtered, activeMegaPokemon.value]
+
+});
+
+
 
 const formattedInventory = computed(() => {
   const items = inventoryStore.recoveryItems;
@@ -430,44 +448,50 @@ const RECHARGE_MOVES = new Set([
 
 const TWO_TURN_MOVES = {
   // semi-invulnerable — can't be touched during the charge turn
-  fly:             { message: (n) => `${n} flew up high!`, invulnerable: true },
-  bounce:          { message: (n) => `${n} sprang up!`, invulnerable: true },
-  dig:             { message: (n) => `${n} burrowed its way under the ground!`, invulnerable: true },
-  dive:            { message: (n) => `${n} hid underwater!`, invulnerable: true },
+  fly: { message: (n) => `${n} flew up high!`, invulnerable: true },
+  bounce: { message: (n) => `${n} sprang up!`, invulnerable: true },
+  dig: { message: (n) => `${n} burrowed its way under the ground!`, invulnerable: true },
+  dive: { message: (n) => `${n} hid underwater!`, invulnerable: true },
   'phantom-force': { message: (n) => `${n} vanished instantly!`, invulnerable: true },
-  'shadow-force':  { message: (n) => `${n} vanished instantly!`, invulnerable: true },
+  'shadow-force': { message: (n) => `${n} vanished instantly!`, invulnerable: true },
 
   // plain charge — vulnerable while charging
-  'solar-beam':   { message: (n) => `${n} absorbed light!` },
-  'solar-blade':  { message: (n) => `${n} absorbed light!` },
-  'razor-wind':   { message: (n) => `${n} whipped up a whirlwind!` },
-  'sky-attack':   { message: (n) => `${n} became cloaked in a harsh light!` },
+  'solar-beam': { message: (n) => `${n} absorbed light!` },
+  'solar-blade': { message: (n) => `${n} absorbed light!` },
+  'razor-wind': { message: (n) => `${n} whipped up a whirlwind!` },
+  'sky-attack': { message: (n) => `${n} became cloaked in a harsh light!` },
   'freeze-shock': { message: (n) => `${n} became cloaked in a freezing light!` },
-  'ice-burn':     { message: (n) => `${n} became cloaked in freezing air!` },
+  'ice-burn': { message: (n) => `${n} became cloaked in freezing air!` },
 
   // charge turn also raises a stat
-  'skull-bash':  { message: (n) => `${n} tucked in its head!`,
-                   chargeStatChanges: [{ stat: 'defense', change: 1 }] },
-  'meteor-beam': { message: (n) => `${n} is overflowing with space power!`,
-                   chargeStatChanges: [{ stat: 'special-attack', change: 1 }] },
-  'electro-shot':{ message: (n) => `${n} absorbed electricity!`,
-                   chargeStatChanges: [{ stat: 'special-attack', change: 1 }] },
+  'skull-bash': {
+    message: (n) => `${n} tucked in its head!`,
+    chargeStatChanges: [{ stat: 'defense', change: 1 }]
+  },
+  'meteor-beam': {
+    message: (n) => `${n} is overflowing with space power!`,
+    chargeStatChanges: [{ stat: 'special-attack', change: 1 }]
+  },
+  'electro-shot': {
+    message: (n) => `${n} absorbed electricity!`,
+    chargeStatChanges: [{ stat: 'special-attack', change: 1 }]
+  },
 };
 
 // moves that connect anyway, keyed by the charge move being used
 const HITS_THROUGH = {
-  fly:    ['gust', 'twister', 'thunder', 'hurricane', 'sky-uppercut', 'smack-down'],
+  fly: ['gust', 'twister', 'thunder', 'hurricane', 'sky-uppercut', 'smack-down'],
   bounce: ['gust', 'twister', 'thunder', 'hurricane', 'smack-down'],
-  dig:    ['earthquake', 'magnitude', 'fissure'],
-  dive:   ['surf', 'whirlpool'],
+  dig: ['earthquake', 'magnitude', 'fissure'],
+  dive: ['surf', 'whirlpool'],
 };
 
 const LOCKING_MOVES = {
-  outrage:       { confusionAfter: true },
-  thrash:        { confusionAfter: true },
+  outrage: { confusionAfter: true },
+  thrash: { confusionAfter: true },
   'petal-dance': { confusionAfter: true },
   'raging-fury': { confusionAfter: true },
-  uproar:        { confusionAfter: false },
+  uproar: { confusionAfter: false },
 };
 
 function isSemiInvulnerable(pokemon) {
@@ -498,7 +522,7 @@ const hasMegaEvo = ref(false)
 
 function checkMegaEvo() {
   const rawItem = userPokemon.value?.heldItem
-  if(userPokemon.value.name.toLowerCase() === "rayquaza" && userPokemon.value.moves.some(m => m.name.toLowerCase() === "dragon-ascent")){
+  if (userPokemon.value.name.toLowerCase() === "rayquaza" && userPokemon.value.moves.some(m => m.name.toLowerCase() === "dragon-ascent")) {
     canMegaEvolve.value = true
   }
   if (rawItem && rawItem !== "") {
@@ -530,12 +554,44 @@ function checkMegaEvo() {
   }
 }
 
+function syncMegaPokemon() {
+  if (!activeMegaPokemon.value) return
+
+  const mega = activeMegaPokemon.value
+  
+  const base = pokemonStore.caughtPokemon.find(p => p.instanceId === mega.instanceId)
+
+  if (base) {
+    if (mega.currentHp <= 0) {
+      base.currentHp = 0
+      base.totalFaints = (base.totalFaints || 0) + 1
+    } else {
+      const hpRatio = mega.currentHp / mega.totalHp
+      base.currentHp = Math.max(1, Math.round(base.totalHp * hpRatio))
+    }
+
+    base.level = mega.level
+    base.xp = mega.xp
+    base.moves = mega.moves
+    base.status = mega.status || null
+    if (mega.totalKOs) base.totalKOs = mega.totalKOs
+  }
+
+  activeMegaPokemon.value = null
+}
+
 async function handleMegaEvo(pokemon) {
   console.log(`Converting ${pokemon.name}.`)
-  const megaEvo = await pokemonHelper.handleMegaEvo(pokemon)
+  const megaData = await pokemonHelper.handleMegaEvo(pokemon)
 
-  userPokemon.value = megaEvo
-  hasMegaEvo.value = true
+  if(megaData){
+    activeMegaPokemon.value = megaData
+    userPokemon.value = megaData
+    hasMegaEvo.value = true
+    canMegaEvolve.value = false
+    log(`${pokemon.name} has evolved into ${activeMegaPokemon.value.name}!`)
+  }
+  
   console.log(userPokemon.value)
 }
 
@@ -633,6 +689,9 @@ function startBattle() {
 }
 
 function endBattle(outcome = 'ended') {
+  if(activeMegaPokemon.value){
+    syncMegaPokemon()
+  }
   battleStarted.value = false;
   isResolving.value = false;
   canMegaEvolve.value = false
@@ -654,6 +713,8 @@ async function battleTurn(playerMove, item = null) {
   isResolving.value = true;
 
   try {
+    log(`Battle Turn ${turnValue}`)
+    turnValue++
     const player = userPokemon.value;
     const wild = foe.value;
     const wildMove = pickMove(wild);
@@ -799,6 +860,7 @@ function calcExperience(pokemon) {
 
 async function checkLevelUp(pokemon) {
   const startingLevel = pokemon.level;
+  console.log(`${pokemon.name} current has ${pokemon.currentExp} experience points.`)
 
   // Internal recusive function incase multiple levels are gained
   async function processLeveling() {
@@ -1013,8 +1075,8 @@ async function useMove(user, target, move) {
   user.lastUsedMove = move;
 
   // --- pre-move status checks ---
-  if (!(await canAct(user))){
-    user.charging = null;  
+  if (!(await canAct(user))) {
+    user.charging = null;
     return;
   }
   if (user.minorStatus?.includes("confusion")) {
@@ -1031,7 +1093,7 @@ async function useMove(user, target, move) {
   if (user.minorStatus?.includes("infatuation")) {
     if (randInt(1, 2) == 1) {
       log(`${user.name} is immobilized by love.`);
-      user.charging = null;  
+      user.charging = null;
       return
     }
   }
@@ -1048,7 +1110,7 @@ async function useMove(user, target, move) {
   }
 
   if (hitsSelf) {
-    user.charging = null;  
+    user.charging = null;
     log(`${user.name} hit itself in confusion.`);
     target = user;
     victim = "foe"
@@ -1088,7 +1150,7 @@ async function useMove(user, target, move) {
     return;
   }
 
-    // --- target is off the field ---
+  // --- target is off the field ---
   if (isSemiInvulnerable(target) && target !== user) {
     const through = HITS_THROUGH[target.charging.move.name] ?? [];
     if (!through.includes(move.name)) {
@@ -1988,6 +2050,7 @@ onMounted(() => {
   height: 100%;
   padding: 1rem;
   overflow-y: auto;
+
 }
 
 .combatant {
@@ -2179,11 +2242,12 @@ onMounted(() => {
 
 .move-name {
   text-transform: capitalize;
+  color: Canvas;
 }
 
 .move-power {
   font-variant-numeric: tabular-nums;
-  color: var(--p-text-muted-color);
+  color: Canvas;
 }
 
 /* ---- side panel ---- */
@@ -2635,6 +2699,69 @@ onMounted(() => {
   background: var(--p-surface-200);
   color: var(--p-text-color);
 }
+
+.battlefield{
+  background-image: url("@/assets/img/pokemonField.png");
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  border: solid 2px DarkBlue;
+}
+
+.combatant-foe .combatant-name {
+  color: black; /* Change to desired color */
+}
+.combatant-foe .label {
+  color: black;
+}
+
+.combatant-foe .hp-text {
+  color: black;
+}
+
+.combatant-ally .combatant-name {
+  color: black; /* Change to desired color */
+}
+
+/* Player Level ("Lv 50") */
+.combatant-ally .label {
+  color:black;
+}
+
+/* Player HP Text ("120/120") */
+.combatant-ally .hp-text {
+  color:black;
+}
+
+.arena{
+  background-color: white;
+  border: 3px solid red;
+  overflow: hidden;
+}
+
+.mega-btn {
+  display: flex;
+  justify-content: center; 
+  align-items: center;
+  justify-self: center;
+  width: 75%;
+  background-color: Canvas;
+  color: CanvasText;
+  border-radius: 3px;
+  border: 2px solid gray;
+}
+.mega-btn:hover{
+  border:2px solid red;
+  cursor: pointer;
+}
+
+.log-line.turn-header {
+  border-bottom: 2px solid currentColor;
+  font-weight: bold;
+  margin-top: 10px;
+  padding-bottom: 4px;
+}
+
 
 @media (prefers-color-scheme: dark) {
   .status-chip {
