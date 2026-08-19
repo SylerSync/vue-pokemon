@@ -651,5 +651,9 @@ export const usePokemonStore = defineStore("pokemonStore", {
         removeWishlistPokemon(pokemon) {
             this.wishlistPokemon = this.wishlistPokemon.filter(pok => pok.name !== pokemon)
         }
+    },
+    persist:{
+        key: "pokemon-store-save",
+        pick:['caughtPokemon','wishlistPokemon']
     }
 })
