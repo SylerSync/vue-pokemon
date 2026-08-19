@@ -813,9 +813,13 @@ async function battleTurn(playerMove, item = null) {
     // --- normal turn: order by speed, ties broken randomly ---
     const playerSpeed = statOf(player, 'speed');
     const wildSpeed = statOf(wild, 'speed');
+    const playerPriority = playerMove?.priority ?? 0;
+    const wildPriority = wildMove?.priority ?? 0;
     const playerFirst =
-      playerSpeed > wildSpeed ||
-      (playerSpeed === wildSpeed && Math.random() < 0.5);
+      playerPriority !== wildPriority
+        ? playerPriority > wildPriority
+        : playerSpeed > wildSpeed ||
+        (playerSpeed === wildSpeed && Math.random() < 0.5);
 
     const order = playerFirst
       ? [[player, wild, playerMove], [wild, player, wildMove]]
