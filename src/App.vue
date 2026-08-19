@@ -52,6 +52,7 @@ const pokeballOptions = computed(() => {
             <Tab class="custom-tab" value="/wishList" as="router-link" to="/wishList">WishList</Tab>
             <Tab class="custom-tab" value="/shop" as="router-link" to="/shop">Shop</Tab>
             <Tab class="custom-tab" value="/trainers" as="router-link" to="/trainers">Trainers</Tab>
+            <Tab class="custom-tab" value="/adventure" as="router-link" to="/adventure">Adventure</Tab>
             <SelectButton v-model="inventoryStore.selectedPokeball" :options="pokeballOptions" optionLabel="label"
                 optionValue="id" :optionDisabled="(option) => option.count <= 0" aria-labelledby="basic"
                 class="custom-select-button">
