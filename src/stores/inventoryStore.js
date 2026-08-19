@@ -120,7 +120,7 @@ export const useInventoryStore = defineStore("inventoryStore", {
         evoItems: {
 
         },
-        megaStones:{
+        megaStones: {
 
         },
         selectedPokeball: "pokeball",
@@ -337,28 +337,28 @@ export const useInventoryStore = defineStore("inventoryStore", {
         /* ================= ================= =================
             MEGA EVOLUTION FUNCTIONS
             ================= ================= ================= */
-        UseMegaStone(stoneName){
-            if(!this.megaStones[stoneName] || this.megaStones[stoneName]<=0){
+        UseMegaStone(stoneName) {
+            if (!this.megaStones[stoneName] || this.megaStones[stoneName] <= 0) {
                 console.warn(`You dont have any ${stoneName}`)
                 return false
             }
             this.megaStones[stoneName]--
 
-            if(this.megaStones[stoneName] <= 0){
+            if (this.megaStones[stoneName] <= 0) {
                 delete this.megaStones[stoneName]
             }
             return true
         },
-        BuyMegaStone(stoneName){
-            if(!this.megaStones){
+        BuyMegaStone(stoneName) {
+            if (!this.megaStones) {
                 this.megaStones = {}
             }
             const item = megaEvoStones[stoneName]
-            if(!item){
+            if (!item) {
                 console.warn(`Could not find the megastone named: ${stoneName}`)
                 return false
             }
-            if(this.funds < item.cost){
+            if (this.funds < item.cost) {
                 console.warn(`You do not have the funds to purchase Mega stone with ID: ${stoneName}`)
                 return false
             }
@@ -367,12 +367,12 @@ export const useInventoryStore = defineStore("inventoryStore", {
 
             return true
         },
-        AddEvoItem(stoneName){
-            if(!this.megaStones){
+        AddEvoItem(stoneName) {
+            if (!this.megaStones) {
                 this.megaStones = {}
             }
             const item = megaEvoStones[stoneName]
-            if(!item){
+            if (!item) {
                 console.warn(`Could not find item in Mega Stones with ID: ${stoneName}`)
                 return false
             }
@@ -380,5 +380,17 @@ export const useInventoryStore = defineStore("inventoryStore", {
 
             return true
         }
+    },
+    persist: {
+        key: "inventory-store-save",
+        pick: [
+            "pokeballs",
+            "funds",
+            "recoveryItems",
+            "tms",
+            "evoItems",
+            "megaStones",
+            "selectedPokeball"
+        ]
     }
 })
