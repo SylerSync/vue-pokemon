@@ -91,10 +91,9 @@
             <!-- moves -->
             <div class="moves">
               <button v-for="move in userPokemon.moves" :key="move.name" class="move"
-                :disabled="isResolving || move.disabled 
-                || (userPokemon.charging && userPokemon.charging.move.name !== move.name) || (userPokemon.locked && userPokemon.locked.move.name !== move.name) 
-                || (userPokemon.minorStatus?.includes('torment') && userPokemon.lastUsedMove?.name == move.name) || isFainted(userPokemon)"
-                @click="battleTurn(move)">
+                :disabled="isResolving || move.disabled
+                  || (userPokemon.charging && userPokemon.charging.move.name !== move.name) || (userPokemon.locked && userPokemon.locked.move.name !== move.name)
+                  || (userPokemon.minorStatus?.includes('torment') && userPokemon.lastUsedMove?.name == move.name) || isFainted(userPokemon)" @click="battleTurn(move)">
                 <span class="move-name">{{ move.name }}</span>
                 <span class="move-power">{{ move.power ?? '—' }}</span>
               </button>
@@ -418,7 +417,7 @@ const STAT_LABEL = {
 };
 
 const SELF_KO_MOVES = new Set([
-  'self-destruct', 'explosion', 'misty-explosion', 'final-gambit',
+  'self-destruct', 'explosion', 'misty-explosion',
   'memento', 'healing-wish', 'lunar-dance',
 ]);
 
@@ -430,45 +429,161 @@ const RECHARGE_MOVES = new Set([
 
 const TWO_TURN_MOVES = {
   // semi-invulnerable — can't be touched during the charge turn
-  fly:             { message: (n) => `${n} flew up high!`, invulnerable: true },
-  bounce:          { message: (n) => `${n} sprang up!`, invulnerable: true },
-  dig:             { message: (n) => `${n} burrowed its way under the ground!`, invulnerable: true },
-  dive:            { message: (n) => `${n} hid underwater!`, invulnerable: true },
+  fly: { message: (n) => `${n} flew up high!`, invulnerable: true },
+  bounce: { message: (n) => `${n} sprang up!`, invulnerable: true },
+  dig: { message: (n) => `${n} burrowed its way under the ground!`, invulnerable: true },
+  dive: { message: (n) => `${n} hid underwater!`, invulnerable: true },
   'phantom-force': { message: (n) => `${n} vanished instantly!`, invulnerable: true },
-  'shadow-force':  { message: (n) => `${n} vanished instantly!`, invulnerable: true },
+  'shadow-force': { message: (n) => `${n} vanished instantly!`, invulnerable: true },
 
   // plain charge — vulnerable while charging
-  'solar-beam':   { message: (n) => `${n} absorbed light!` },
-  'solar-blade':  { message: (n) => `${n} absorbed light!` },
-  'razor-wind':   { message: (n) => `${n} whipped up a whirlwind!` },
-  'sky-attack':   { message: (n) => `${n} became cloaked in a harsh light!` },
+  'solar-beam': { message: (n) => `${n} absorbed light!` },
+  'solar-blade': { message: (n) => `${n} absorbed light!` },
+  'razor-wind': { message: (n) => `${n} whipped up a whirlwind!` },
+  'sky-attack': { message: (n) => `${n} became cloaked in a harsh light!` },
   'freeze-shock': { message: (n) => `${n} became cloaked in a freezing light!` },
-  'ice-burn':     { message: (n) => `${n} became cloaked in freezing air!` },
+  'ice-burn': { message: (n) => `${n} became cloaked in freezing air!` },
 
   // charge turn also raises a stat
-  'skull-bash':  { message: (n) => `${n} tucked in its head!`,
-                   chargeStatChanges: [{ stat: 'defense', change: 1 }] },
-  'meteor-beam': { message: (n) => `${n} is overflowing with space power!`,
-                   chargeStatChanges: [{ stat: 'special-attack', change: 1 }] },
-  'electro-shot':{ message: (n) => `${n} absorbed electricity!`,
-                   chargeStatChanges: [{ stat: 'special-attack', change: 1 }] },
+  'skull-bash': {
+    message: (n) => `${n} tucked in its head!`,
+    chargeStatChanges: [{ stat: 'defense', change: 1 }]
+  },
+  'meteor-beam': {
+    message: (n) => `${n} is overflowing with space power!`,
+    chargeStatChanges: [{ stat: 'special-attack', change: 1 }]
+  },
+  'electro-shot': {
+    message: (n) => `${n} absorbed electricity!`,
+    chargeStatChanges: [{ stat: 'special-attack', change: 1 }]
+  },
 };
 
 // moves that connect anyway, keyed by the charge move being used
 const HITS_THROUGH = {
-  fly:    ['gust', 'twister', 'thunder', 'hurricane', 'sky-uppercut', 'smack-down'],
+  fly: ['gust', 'twister', 'thunder', 'hurricane', 'sky-uppercut', 'smack-down'],
   bounce: ['gust', 'twister', 'thunder', 'hurricane', 'smack-down'],
-  dig:    ['earthquake', 'magnitude', 'fissure'],
-  dive:   ['surf', 'whirlpool'],
+  dig: ['earthquake', 'magnitude', 'fissure'],
+  dive: ['surf', 'whirlpool'],
 };
 
 const LOCKING_MOVES = {
-  outrage:       { confusionAfter: true },
-  thrash:        { confusionAfter: true },
+  outrage: { confusionAfter: true },
+  thrash: { confusionAfter: true },
   'petal-dance': { confusionAfter: true },
   'raging-fury': { confusionAfter: true },
-  uproar:        { confusionAfter: false },
+  uproar: { confusionAfter: false },
 };
+
+const FIXED_DAMAGE_MOVES = {
+  'seismic-toss': (user) => user.level,
+  'night-shade': (user) => user.level,
+  'dragon-rage': () => 40,
+  'sonic-boom': () => 20,
+  psywave: (user) => Math.max(1, Math.floor(user.level * (randInt(0, 100) + 50) / 100)),
+  'super-fang': (user, target) => Math.max(1, Math.floor(target.currentHp / 2)),
+  'natures-madness': (user, target) => Math.max(1, Math.floor(target.currentHp / 2)),
+  ruination: (user, target) => Math.max(1, Math.floor(target.currentHp / 2)),
+  // null = the move fails
+  endeavor: (user, target) =>
+    target.currentHp > user.currentHp ? target.currentHp - user.currentHp : null,
+  'final-gambit': (user) => Math.max(1, user.currentHp),
+};
+
+// each returns a base power; move.power is null for all of these
+const VARIABLE_POWER_MOVES = {
+  // --- target weight (hectograms) ---
+  'low-kick': (u, t) => weightPower(t.weight),
+  'grass-knot': (u, t) => weightPower(t.weight),
+
+  // --- weight ratio, user vs target ---
+  'heavy-slam': (u, t) => weightRatioPower(u.weight, t.weight),
+  'heat-crash': (u, t) => weightRatioPower(u.weight, t.weight),
+
+  // --- speed ratio ---
+  'electro-ball': (u, t) => {
+    const us = Math.max(1, statOf(u, 'speed'));
+    const ts = Math.max(1, statOf(t, 'speed'));
+    const r = ts / us;
+    return r <= 0.25 ? 150 : r <= 1 / 3 ? 120 : r <= 0.5 ? 80 : r < 1 ? 60 : 40;
+  },
+  'gyro-ball': (u, t) => {
+    const us = Math.max(1, statOf(u, 'speed'));
+    const ts = Math.max(1, statOf(t, 'speed'));
+    return Math.min(150, Math.max(1, Math.floor((25 * ts) / us) + 1));
+  },
+
+  // --- user's remaining HP (lower = stronger) ---
+  flail: (u) => flailPower(u),
+  reversal: (u) => flailPower(u),
+
+  // --- user's remaining HP (higher = stronger) ---
+  eruption: (u) => Math.max(1, Math.floor(150 * (u.currentHp / u.totalHp))),
+  'water-spout': (u) => Math.max(1, Math.floor(150 * (u.currentHp / u.totalHp))),
+  'dragon-energy': (u) => Math.max(1, Math.floor(150 * (u.currentHp / u.totalHp))),
+
+  // --- target's remaining HP ---
+  'wring-out': (u, t) => Math.max(1, Math.floor(120 * (t.currentHp / t.totalHp))),
+  'crush-grip': (u, t) => Math.max(1, Math.floor(120 * (t.currentHp / t.totalHp))),
+  'hard-press': (u, t) => Math.max(1, Math.floor(100 * (t.currentHp / t.totalHp))),
+
+  // --- target's positive stat stages ---
+  punishment: (u, t) => {
+    const boosts = Object.values(t.stages ?? {}).reduce((n, s) => n + Math.max(0, s), 0);
+    return Math.min(200, 60 + 20 * boosts);
+  },
+
+  // --- user's own stages, positive only ---
+  'stored-power': (u) => {
+    const boosts = Object.values(u.stages ?? {}).reduce((n, s) => n + Math.max(0, s), 0);
+    return Math.min(860, 20 + 20 * boosts);
+  },
+  'power-trip': (u) => {
+    const boosts = Object.values(u.stages ?? {}).reduce((n, s) => n + Math.max(0, s), 0);
+    return Math.min(860, 20 + 20 * boosts);
+  },
+
+  // --- friendship: we have no happiness stat, so these are flat ---
+  'return': () => 102,   // max-happiness value
+  frustration: () => 102,   // min-happiness value
+
+  magnitude: () => {
+    const r = randInt(1, 100);
+    return r <= 5 ? 10 : r <= 15 ? 30 : r <= 35 ? 50 : r <= 65 ? 70
+      : r <= 85 ? 90 : r <= 95 ? 110 : 150;
+  },
+
+  present: () => {
+    const r = randInt(1, 100);
+    return r <= 40 ? 40 : r <= 70 ? 80 : r <= 80 ? 120 : 0;  // 0 = heal branch
+  },
+};
+
+const CONDITIONAL_POWER = {
+  facade: (u) => ['burn', 'poison', 'bad-poison', 'paralysis'].includes(u.status) ? 2 : 1,
+  hex: (u, t) => t.status ? 2 : 1,
+  venoshock: (u, t) => ['poison', 'bad-poison'].includes(t.status) ? 2 : 1,
+  brine: (u, t) => t.currentHp <= t.totalHp / 2 ? 2 : 1,
+  'barb-barrage': (u, t) => ['poison', 'bad-poison'].includes(t.status) ? 2 : 1,
+  'infernal-parade': (u, t) => t.status ? 2 : 1,
+};
+
+function weightPower(hg) {
+  const w = hg ?? 0;
+  return w < 100 ? 20 : w < 250 ? 40 : w < 500 ? 60 : w < 1000 ? 80 : w < 2000 ? 100 : 120;
+}
+
+function weightRatioPower(userHg, targetHg) {
+  const r = (targetHg || 1) / (userHg || 1);
+  return r <= 0.2 ? 120 : r <= 0.25 ? 100 : r <= 1 / 3 ? 80 : r <= 0.5 ? 60 : 40;
+}
+
+function flailPower(u) {
+  const x = Math.floor((48 * u.currentHp) / u.totalHp);
+  return x < 1 ? 200 : x < 5 ? 150 : x < 13 ? 100 : x < 22 ? 80 : x < 43 ? 40 : 20;
+}
+
+
 
 function isSemiInvulnerable(pokemon) {
   return !!pokemon?.charging?.invulnerable;
@@ -498,7 +613,7 @@ const hasMegaEvo = ref(false)
 
 function checkMegaEvo() {
   const rawItem = userPokemon.value?.heldItem
-  if(userPokemon.value.name.toLowerCase() === "rayquaza" && userPokemon.value.moves.some(m => m.name.toLowerCase() === "dragon-ascent")){
+  if (userPokemon.value.name.toLowerCase() === "rayquaza" && userPokemon.value.moves.some(m => m.name.toLowerCase() === "dragon-ascent")) {
     canMegaEvolve.value = true
   }
   if (rawItem && rawItem !== "") {
@@ -608,6 +723,15 @@ function rollHitCount(move) {
     return r <= 35 ? 2 : r <= 70 ? 3 : r <= 85 ? 4 : 5;
   }
   return randInt(min, max);
+}
+
+function isImmuneTo(move, target) {
+  if (!move.type) return false;
+  let eff = typeEffectiveness(move.type, target.types);
+  const grounded = target.minorStatus?.includes('no-type-immunity') ||
+    (move.type === 'ground' && target.minorStatus?.includes('ingrain'));
+  if (grounded && eff === 0) eff = 1;
+  return eff === 0;
 }
 
 /* ------------------------------------------------------------------ *
@@ -1013,8 +1137,8 @@ async function useMove(user, target, move) {
   user.lastUsedMove = move;
 
   // --- pre-move status checks ---
-  if (!(await canAct(user))){
-    user.charging = null;  
+  if (!(await canAct(user))) {
+    user.charging = null;
     return;
   }
   if (user.minorStatus?.includes("confusion")) {
@@ -1031,7 +1155,7 @@ async function useMove(user, target, move) {
   if (user.minorStatus?.includes("infatuation")) {
     if (randInt(1, 2) == 1) {
       log(`${user.name} is immobilized by love.`);
-      user.charging = null;  
+      user.charging = null;
       return
     }
   }
@@ -1048,7 +1172,7 @@ async function useMove(user, target, move) {
   }
 
   if (hitsSelf) {
-    user.charging = null;  
+    user.charging = null;
     log(`${user.name} hit itself in confusion.`);
     target = user;
     victim = "foe"
@@ -1088,7 +1212,7 @@ async function useMove(user, target, move) {
     return;
   }
 
-    // --- target is off the field ---
+  // --- target is off the field ---
   if (isSemiInvulnerable(target) && target !== user) {
     const through = HITS_THROUGH[target.charging.move.name] ?? [];
     if (!through.includes(move.name)) {
@@ -1146,6 +1270,62 @@ async function useMove(user, target, move) {
     return;
   }
 
+  // --- fixed damage (power is null, so the normal damage block skips these) ---
+  const fixed = FIXED_DAMAGE_MOVES[move.name];
+  if (fixed) {
+    if (isImmuneTo(move, target)) {
+      log(`It doesn't affect ${target.name}...`);
+      await delay(800);
+      return;
+    }
+    const amount = fixed(user, target);
+    if (amount == null) {
+      log('But it failed!');
+      await delay(800);
+      return;
+    }
+    dealt = Math.min(amount, target.currentHp);
+    target.currentHp = Math.max(0, target.currentHp - amount);
+    await playAnim(victim, 'hit', 400);
+    log(`${user.name} dealt ${dealt} damage.`);
+    await delay(600);
+
+    if (move.name === 'final-gambit') {
+      user.currentHp = 0;
+      log(`${user.name} gave it everything it had!`);
+      await delay(600);
+    }
+  }
+
+  // --- variable power: compute before the damage block reads move.power ---
+  const scaler = VARIABLE_POWER_MOVES[move.name];
+  if (scaler && !hitsSelf) {
+    move = { ...move, power: Math.max(1, scaler(user, target)) };
+  }
+  if (move.name === 'magnitude') {
+    const tier = { 10: 4, 30: 5, 50: 6, 70: 7, 90: 8, 110: 9, 150: 10 }[move.power];
+    log(`Magnitude ${tier}!`);
+    await delay(600);
+  }
+  if (move.name === 'present' && move.power === 0) {
+    if (isHealBlocked(target)) {
+      log(`${target.name}'s HP was not restored due to Heal Block!`);
+    } else {
+      const amount = Math.max(1, Math.floor(target.totalHp / 4));
+      const before = target.currentHp;
+      target.currentHp = Math.min(target.totalHp, target.currentHp + amount);
+      log(`${target.name} restored ${target.currentHp - before} HP!`);
+    }
+    await delay(800);
+    return;
+  }
+  const mult = CONDITIONAL_POWER[move.name];
+  if (mult && !hitsSelf && move.power) {
+    console.log(mult(user, target))
+    move = { ...move, power: move.power * mult(user, target) };
+    // console.log(move)
+  }
+
   // --- damage ---
   if (move.power) {
     const hits = rollHitCount(move);
@@ -1195,9 +1375,11 @@ async function useMove(user, target, move) {
   // fainted — skip every secondary effect
   if (target.currentHp <= 0) return;
 
+  console.log(move.statChanges)
   // --- stat changes ---
   const statChanges = move.statChanges ?? [];
   if (statChanges.length) {
+    console.log(move.statChanges)
     const chance = move.statChance || 100;
     if (randInt(1, 100) <= chance) {
       const recipient = move.targetsSelf ? user : target;

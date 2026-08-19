@@ -30,10 +30,10 @@ const testGodPokemon = {
             pp: 99
         },
         {
-            name: 'outrage',
+            name: 'hex',
             type: 'normal',
-            power: 18,
-            accuracy: 80,
+            power: 70,
+            accuracy: 100,
             priority: 0,
             damageClass: 'physical',
             targetsSelf: false,      // target is 'selected-pokemon'
@@ -69,7 +69,7 @@ const testGodPokemon = {
             targetsSelf: false,        // target is 'selected-pokemon'
             statChanges: [],
             statChance: 0,
-            ailment: 'perish-song',
+            ailment: 'paralysis',
             ailmentChance: 0,          // ⚠️ see below
             drain: 0,
             healing: 0,
