@@ -33,64 +33,70 @@
 
           <!-- in battle -->
           <div v-else class="arena">
-            <!-- opponent: info left, sprite right -->
-            <div class="combatant combatant-foe">
-              <div class="combatant-info">
-                <div class="combatant-head">
-                  <span class="label">Lv {{ foe.level }}</span>
-                  <span class="combatant-name">{{ foe.name }}</span>
-                  <!-- Status icons -->
-                  <template v-if="foe.status">
-                    <img v-if="STATUS_ICONS[foe.status]" :src="STATUS_ICONS[foe.status]" :alt="foe.status"
-                      :title="foe.status" class="status-icon" />
-                    <span v-else class="status-chip" :title="foe.status">
-                      {{ STATUS_ABBR[foe.status] ?? foe.status }}
-                    </span>
-                  </template>
-                </div>
-                <div class="hp">
-                  <div class="hp-track">
-                    <div class="hp-fill" :class="hpTone(foe)" :style="{ width: hpPercent(foe) + '%' }" />
+            <div class="battlefield">
+              <!-- opponent: info left, sprite right -->
+              <div class="combatant combatant-foe">
+                <div class="combatant-info">
+                  <div class="combatant-head">
+                    <span class="label">Lv {{ foe.level }}</span>
+                    <span class="combatant-name">{{ foe.name }}</span>
+                    <!-- Status icons -->
+                    <template v-if="foe.status">
+                      <img v-if="STATUS_ICONS[foe.status]" :src="STATUS_ICONS[foe.status]" :alt="foe.status"
+                        :title="foe.status" class="status-icon" />
+                      <span v-else class="status-chip" :title="foe.status">
+                        {{ STATUS_ABBR[foe.status] ?? foe.status }}
+                      </span>
+                    </template>
                   </div>
-                  <span class="hp-text">
-                    {{ Math.max(0, foe.currentHp) }}/{{ foe.totalHp }}
-                  </span>
-                </div>
-              </div>
-              <img :src="foe.sprite" :alt="foe.name" class="battle-sprite sprite-foe"
-                :class="anim?.actor === 'foe' ? `anim-${anim.type}` : null" />
-            </div>
-            <!-- player: sprite left, info right -->
-            <div class="combatant combatant-ally">
-              <div class="combatant-info">
-                <div class="combatant-head">
-                  <span class="label">Lv {{ userPokemon.level }}</span>
-                  <span class="combatant-name">{{ userPokemon.name }}</span>
-                  <!-- Status icons -->
-                  <template v-if="userPokemon.status">
-                    <img v-if="STATUS_ICONS[userPokemon.status]" :src="STATUS_ICONS[userPokemon.status]"
-                      :alt="userPokemon.status" :title="userPokemon.status" class="status-icon" />
-                    <span v-else class="status-chip" :title="userPokemon.status">
-                      {{ STATUS_ABBR[userPokemon.status] ?? userPokemon.status }}
+                  <div class="hp">
+                    <div class="hp-track">
+                      <div class="hp-fill" :class="hpTone(foe)" :style="{ width: hpPercent(foe) + '%' }" />
+                    </div>
+                    <span class="hp-text">
+                      {{ Math.max(0, foe.currentHp) }}/{{ foe.totalHp }}
                     </span>
-                  </template>
-                </div>
-                <div class="hp">
-                  <div class="hp-track">
-                    <div class="hp-fill" :class="hpTone(userPokemon)"
-                      :style="{ width: hpPercent(userPokemon) + '%' }" />
                   </div>
-                  <span class="hp-text">
-                    {{ Math.max(0, userPokemon.currentHp) }}/{{ userPokemon.totalHp }}
-                  </span>
                 </div>
+                <img :src="foe.sprite" :alt="foe.name" class="battle-sprite sprite-foe"
+                  :class="anim?.actor === 'foe' ? `anim-${anim.type}` : null" />
               </div>
-              <img :src="userPokemon.backSprite ?? userPokemon.sprite" :alt="userPokemon.name"
-                class="battle-sprite sprite-ally" :class="anim?.actor === 'ally' ? `anim-${anim.type}` : null" />
+              <!-- player: sprite left, info right -->
+              <div class="combatant combatant-ally">
+                <div class="combatant-info">
+                  <div class="combatant-head">
+                    <span class="label">Lv {{ userPokemon.level }}</span>
+                    <span class="combatant-name">{{ userPokemon.name }}</span>
+                    <!-- Status icons -->
+                    <template v-if="userPokemon.status">
+                      <img v-if="STATUS_ICONS[userPokemon.status]" :src="STATUS_ICONS[userPokemon.status]"
+                        :alt="userPokemon.status" :title="userPokemon.status" class="status-icon" />
+                      <span v-else class="status-chip" :title="userPokemon.status">
+                        {{ STATUS_ABBR[userPokemon.status] ?? userPokemon.status }}
+                      </span>
+                    </template>
+                  </div>
+                  <div class="hp">
+                    <div class="hp-track">
+                      <div class="hp-fill" :class="hpTone(userPokemon)"
+                        :style="{ width: hpPercent(userPokemon) + '%' }" />
+                    </div>
+                    <span class="hp-text">
+                      {{ Math.max(0, userPokemon.currentHp) }}/{{ userPokemon.totalHp }}
+                    </span>
+                  </div>
+                </div>
+                <img :src="userPokemon.backSprite ?? userPokemon.sprite" :alt="userPokemon.name"
+                  class="battle-sprite sprite-ally" :class="[
+                    anim?.actor === 'ally' ? `anim-${anim.type}` : null,
+                    { 'mega-evolving': isMegaEvolving }
+                  ]" />
+              </div>
             </div>
             <!-- moves -->
             <div class="moves">
               <button v-for="move in userPokemon.moves" :key="move.name" class="move"
+                :style="{ backgroundColor: pokemonStore.typeColors[move.type] }"
                 :disabled="isResolving || move.disabled || move.currentPP == 0
                   || (userPokemon.charging && userPokemon.charging.move.name !== move.name) || (userPokemon.locked && userPokemon.locked.move.name !== move.name)
                   || (userPokemon.minorStatus?.includes('torment') && userPokemon.lastUsedMove?.name == move.name) || isFainted(userPokemon)" @click="battleTurn(move)">
@@ -142,7 +148,8 @@
 
             <!-- log -->
             <div v-if="sidePanel === 'log'" ref="logEl" class="log-body">
-              <p v-for="(entry, i) in battleLog" :key="i" class="log-line">{{ entry }}</p>
+              <p v-for="(entry, i) in battleLog" :key="i" class="log-line"
+                :class="{ 'turn-header': entry.startsWith('Battle Turn') }">{{ entry }}</p>
               <p v-if="!battleLog.length" class="empty-msg">The battle hasn't started.</p>
             </div>
 
@@ -219,6 +226,18 @@
     :pendingMove="pendingMove"
   >
   </SelectMove>
+
+  <!-- Evolution Overlay -->
+  <div v-if="evoOverlay.active" class="evo-modal-overlay">
+    <div class="evo-stage">
+      <h3>What? {{ evoOverlay.currentMon.name }} is evolving!</h3>
+
+      <img :src="evoOverlay.phase === 'complete' ? userPokemon.sprite : evoOverlay.currentMon.sprite" :class="{
+        'evo-pulse': evoOverlay.phase === 'pulsing',
+        'evo-burst': evoOverlay.phase === 'complete'
+      }" />
+    </div>
+  </div>
   
 </template>
 
@@ -305,6 +324,13 @@ const logEl = ref(null);
 const anim = ref(null);
 const isSwapModalOpen = ref(false)
 const pendingMove = ref(null)
+let turnValue = 1
+const evoOverlay = ref({
+  active: false,
+  phase: 'idle', // 'pulsing' | 'swapping' | 'complete'
+  currentMon: null,
+  nextEvoMon: null
+})
 
 const userPokemon = ref(null);
 const selectedTargetPokemon = ref(null);
@@ -338,7 +364,23 @@ const pokeballOptions = computed(() => {
 /** Working copy of the opponent so the parent's object is never mutated. */
 const foe = ref(null)
 
-const team = computed(() => props.team ?? pokemonStore.caughtPokemon);
+const activeMegaPokemon = ref(null)
+
+const team = computed(() => {
+  const sourceTeam = props.team ?? pokemonStore.caughtPokemon
+  if (!activeMegaPokemon.value) {
+    return sourceTeam
+  }
+
+  const filtered = sourceTeam.filter(
+    p => p.instanceId !== activeMegaPokemon.value.instanceId
+  )
+
+  return [...filtered, activeMegaPokemon.value]
+
+});
+
+
 
 const formattedInventory = computed(() => {
   const items = inventoryStore.recoveryItems;
@@ -598,13 +640,61 @@ function checkMegaEvo() {
   }
 }
 
+function syncMegaPokemon() {
+  if (!activeMegaPokemon.value) return
+
+  const mega = activeMegaPokemon.value
+
+  const base = pokemonStore.caughtPokemon.find(p => p.instanceId === mega.instanceId)
+
+  if (base) {
+    if (mega.currentHp <= 0) {
+      base.currentHp = 0
+      base.totalFaints = (base.totalFaints || 0) + 1
+    } else {
+      const hpRatio = mega.currentHp / mega.totalHp
+      base.currentHp = Math.max(1, Math.round(base.totalHp * hpRatio))
+    }
+
+    base.level = mega.level
+    base.currentExp = mega.currentExp
+    base.moves = mega.moves
+    base.status = mega.status || null
+    if (mega.totalKOs) base.totalKOs = mega.totalKOs
+  }
+
+  activeMegaPokemon.value = null
+}
+
+const isMegaEvolving = ref(false)
+
 async function handleMegaEvo(pokemon) {
   console.log(`Converting ${pokemon.name}.`)
-  const megaEvo = await pokemonHelper.handleMegaEvo(pokemon)
+  
+  // 1. Fetch data from helper script
+  const megaData = await pokemonHelper.handleMegaEvo(pokemon)
 
-  userPokemon.value = megaEvo
-  hasMegaEvo.value = true
-  console.log(userPokemon.value)
+  if (megaData) {
+    // 2. Start energy buildup
+    isMegaEvolving.value = true
+    log(`${pokemon.name}'s Mega Ring is reacting to the Key Stone!`)
+
+    // 3. Pause while energy charges (600ms)
+    await new Promise(resolve => setTimeout(resolve, 600))
+
+    // 4. Swap data to Mega form mid-flash
+    activeMegaPokemon.value = megaData
+    userPokemon.value = megaData
+    hasMegaEvo.value = true
+    canMegaEvolve.value = false
+
+    // 5. Hold burst/shatter phase (600ms)
+    await new Promise(resolve => setTimeout(resolve, 600))
+
+    // 6. Finish animation
+    isMegaEvolving.value = false
+    log(`${pokemon.name} has Mega Evolved into ${activeMegaPokemon.value.name}!`)
+  }
 }
 
 
@@ -710,6 +800,9 @@ function startBattle() {
 }
 
 function endBattle(outcome = 'ended') {
+  if (activeMegaPokemon.value) {
+    syncMegaPokemon()
+  }
   battleStarted.value = false;
   isResolving.value = false;
   canMegaEvolve.value = false
@@ -731,6 +824,8 @@ async function battleTurn(playerMove, item = null) {
   isResolving.value = true;
 
   try {
+    log(`Battle Turn ${turnValue}`)
+    turnValue++
     const player = userPokemon.value;
     const wild = foe.value;
     const wildMove = pickMove(wild);
@@ -880,6 +975,7 @@ function calcExperience(pokemon) {
 
 async function checkLevelUp(pokemon) {
   const startingLevel = pokemon.level;
+  console.log(`${pokemon.name} current has ${pokemon.currentExp} experience points.`)
 
   // Internal recusive function incase multiple levels are gained
   async function processLeveling() {
@@ -913,29 +1009,53 @@ async function checkEvolution(pokemon) {
   }
 
   for (const evo of pokemon.evoDetails) {
-
     if (pokemon.level >= evo.level && evo.trigger === "level-up") {
 
       if (evo.heldItem && pokemon.heldItem !== evo.heldItem) {
         console.log(`Cannot evolve: Needs to be holding ${evo.heldItem} while leveling up.`);
-        continue; // Try next evolution condition if available
+        continue;
       }
 
       console.log(`${pokemon.name} is ready to evolve into ${evo.nextEvo.name}!`);
 
+      // ─── 🎨 TRIGGER ANIMATION OVERLAY START ─────────────────────────
+      evoOverlay.value = {
+        active: true,
+        phase: 'pulsing',
+        currentMon: pokemon,
+        nextEvoName: evo.nextEvo.name
+      }
+
+      // Wait 3 seconds while the sprite pulses as a silhouette
+      await new Promise(r => setTimeout(r, 3000))
+      // ───────────────────────────────────────────────────────────────
+
+      // Perform your existing data transformation in helper
       const evoSuccess = await pokemonHelper.handleEvolution(pokemon, evo.nextEvo.name);
+
       if (evoSuccess) {
         const updated = pokemonStore.caughtPokemon.find(p => p.instanceId === pokemon.instanceId)
         userPokemon.value = updated
         userPokemon.value.heldItem = ""
+
+        // ─── 🎨 FINISH ANIMATION ────────────────────────────────────
+        evoOverlay.value.phase = 'complete'
+
+        // Hold success screen for 2 seconds so player sees evolved form
+        await new Promise(r => setTimeout(r, 2000))
+        evoOverlay.value.active = false
+        // ───────────────────────────────────────────────────────────────
+      } else {
+        // If helper failed or user cancelled
+        evoOverlay.value.active = false
       }
+
       return evoSuccess
     }
   }
 
   return false;
 }
-
 
 //Recalculate stats
 function recalcStats(pokemon) {
@@ -2129,6 +2249,7 @@ onMounted(() => {
   height: 100%;
   padding: 1rem;
   overflow-y: auto;
+
 }
 
 .combatant {
@@ -2320,11 +2441,12 @@ onMounted(() => {
 
 .move-name {
   text-transform: capitalize;
+  color: Canvas;
 }
 
 .move-power {
   font-variant-numeric: tabular-nums;
-  color: var(--p-text-muted-color);
+  color: Canvas;
 }
 
 /* ---- side panel ---- */
@@ -2775,6 +2897,145 @@ onMounted(() => {
   letter-spacing: 0.04em;
   background: var(--p-surface-200);
   color: var(--p-text-color);
+}
+
+.battlefield {
+  background-image: url("@/assets/img/pokemonField.png");
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  border: solid 2px DarkBlue;
+}
+
+.combatant-foe .combatant-name {
+  color: black;
+  /* Change to desired color */
+}
+
+.combatant-foe .label {
+  color: black;
+}
+
+.combatant-foe .hp-text {
+  color: black;
+}
+
+.combatant-ally .combatant-name {
+  color: black;
+  /* Change to desired color */
+}
+
+/* Player Level ("Lv 50") */
+.combatant-ally .label {
+  color: black;
+}
+
+/* Player HP Text ("120/120") */
+.combatant-ally .hp-text {
+  color: black;
+}
+
+.arena {
+  background-color: white;
+  border: 3px solid red;
+  overflow: hidden;
+}
+
+.mega-btn {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  justify-self: center;
+  width: 75%;
+  background-color: Canvas;
+  color: CanvasText;
+  border-radius: 3px;
+  border: 2px solid gray;
+}
+
+.mega-btn:hover {
+  border: 2px solid red;
+  cursor: pointer;
+}
+
+.log-line.turn-header {
+  border-bottom: 2px solid currentColor;
+  font-weight: bold;
+  margin-top: 10px;
+  padding-bottom: 4px;
+}
+
+.evo-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.85);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  color: white;
+  text-align: center;
+}
+
+/* Glowing silhouette during pulse phase */
+.evo-pulse {
+  filter: brightness(0) invert(1) drop-shadow(0 0 12px white);
+  animation: pulseScale 1s infinite ease-in-out;
+}
+
+@keyframes pulseScale {
+
+  0%,
+  100% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(0.8);
+  }
+}
+
+/* Bright pop when evolution finishes */
+.evo-burst {
+  animation: burstIn 0.8s ease-out;
+}
+
+@keyframes burstIn {
+  0% {
+    transform: scale(0.2);
+    filter: brightness(3);
+  }
+
+  100% {
+    transform: scale(1);
+    filter: brightness(1);
+  }
+}
+
+/* Mega Evolution Energy Burst Effect */
+.battle-sprite.sprite-ally.mega-evolving {
+  animation: megaBurst 1.2s ease-in-out infinite;
+}
+
+@keyframes megaBurst {
+  0% { 
+    filter: brightness(1) drop-shadow(0 0 0px transparent);
+    transform: scale(1);
+  }
+  40% { 
+    /* Energy buildup: Magenta/Purple glow */
+    filter: brightness(1.8) saturate(2) drop-shadow(0 0 18px #e056fd); 
+    transform: scale(1.1) rotate(-2deg); 
+  }
+  50% { 
+    /* Cyan white-hot energy flash right at the sprite swap */
+    filter: brightness(4) drop-shadow(0 0 35px #00d2d3); 
+    transform: scale(1.25) rotate(2deg); 
+  }
+  100% { 
+    filter: brightness(1) drop-shadow(0 0 0px transparent); 
+    transform: scale(1); 
+  }
 }
 
 @media (prefers-color-scheme: dark) {

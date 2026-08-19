@@ -433,5 +433,17 @@ export const useInventoryStore = defineStore("inventoryStore", {
 
             return true
         }
+    },
+    persist: {
+        key: "inventory-store-save",
+        pick: [
+            "pokeballs",
+            "funds",
+            "recoveryItems",
+            "tms",
+            "evoItems",
+            "megaStones",
+            "selectedPokeball"
+        ]
     }
 })

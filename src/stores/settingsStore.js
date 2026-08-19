@@ -12,6 +12,10 @@ export const useSettingsStore = defineStore("settingsStore",{
             this.muteAudio = !this.muteAudio
             console.log("toggle audio")
         }
+    },
+    persist: {
+        key: "pokemon-settings-save",
+        pick: ["muteAudio"]
     }
 
 })
