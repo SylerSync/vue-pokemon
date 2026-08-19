@@ -203,6 +203,8 @@ export async function getMoveData(move) {
     name: move.name,
     type: move.type.name,
     power: move.power,
+    maxPP: move.pp,
+    currentPP: move.pp,
     accuracy: move.accuracy,          // null = never misses
     priority: move.priority,
     damageClass: move.damage_class.name,

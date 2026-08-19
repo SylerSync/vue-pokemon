@@ -111,8 +111,61 @@ export const useInventoryStore = defineStore("inventoryStore", {
                     type: "status-heal",
                     status: "paralysis"
                 }
+            },
+            ether: {
+                count: 0,
+                cost: 1200,
+                effect: {
+                    type: "pp-heal",
+                    scope: "single",
+                    amount: 10
+                }
+            },
+            max_ether: {
+                count: 0,
+                cost: 2000,
+                effect: {
+                    type: "pp-heal",
+                    scope: "single",
+                    amount: 1000
+                }
+            },
+            elixir: {
+                count: 0,
+                cost: 3000,
+                effect: {
+                    type: "pp-heal",
+                    scope: "all",
+                    amount: 10
+                }
+            },
+            max_elixir: {
+                count: 0,
+                cost: 4500,
+                effect: {
+                    type: "pp-heal",
+                    scope: "all",
+                    amount: 1000
+                }
+            },
+            pp_up: {
+                count: 0,
+                cost: 9800,
+                effect: {
+                    type: "pp-max-raise",
+                    scope: "single",
+                    stages: 1
+                }
+            },
+            pp_max: {
+                count: 0,
+                cost: 9800,
+                effect: {
+                    type: "pp-max-raise",
+                    scope: "single",
+                    stages: 3
+                }
             }
-
         },
         tms: {
 
