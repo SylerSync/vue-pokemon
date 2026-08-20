@@ -1,26 +1,62 @@
 <template>
   <div class="game-container">
-    <!-- Main Canvas Viewport -->
-    <canvas ref="canvasRef"></canvas>
+    <!-- Centered Viewport Container matching canvas bounds -->
+    <div class="viewport-wrapper">
+      <canvas ref="canvasRef"></canvas>
 
-    <!-- Overlay Modal for Wild Pokémon Battles -->
-    <div v-if="isBattleModalOpen" class="modal-overlay">
-      <div class="modal-card">
-        <h2>⚡ Wild Pokémon Encounter!</h2>
-        <p>A wild Pokémon appeared in the tall grass!</p>
-        <button class="modal-btn" @click="closeModals">Run / Close</button>
+      <!-- HUD Menu Button -->
+      <button class="hud-menu-btn" @click="toggleMenu">
+        ☰ Menu
+      </button>
+
+      <!-- Main RPG Menu Overlay -->
+      <div v-if="isMenuOpen" class="menu-overlay" @click.self="toggleMenu">
+        <div class="menu-card">
+          <div class="menu-header">
+            <h2>Pause Menu</h2>
+            <button class="close-btn" @click="toggleMenu">✕</button>
+          </div>
+
+          <ul class="menu-list">
+            <li @click="selectMenuOption('Party')">
+              <span class="icon">🐾</span>
+              <span>Party</span>
+            </li>
+            <li @click="selectMenuOption('Bag')">
+              <span class="icon">🎒</span>
+              <span>Bag</span>
+            </li>
+            <li @click="selectMenuOption('Save')">
+              <span class="icon">💾</span>
+              <span>Save</span>
+            </li>
+            <li @click="toggleMenu">
+              <span class="icon">❌</span>
+              <span>Close</span>
+            </li>
+          </ul>
+        </div>
       </div>
-    </div>
 
-    <!-- Overlay Modal for Doorway Transitions -->
-    <div v-if="isDoorwayModalOpen" class="modal-overlay">
-      <div class="modal-card">
-        <h2>🚪 Entering {{ activeBuildingName }}</h2>
-        <p>Would you like to step inside?</p>
+      <!-- Overlay Modal for Wild Pokémon Battles -->
+      <div v-if="isBattleModalOpen" class="modal-overlay">
+        <div class="modal-card">
+          <h2>⚡ Wild Pokémon Encounter!</h2>
+          <p>A wild Pokémon appeared in the tall grass!</p>
+          <button class="modal-btn" @click="closeModals">Run / Close</button>
+        </div>
+      </div>
 
-        <div class="modal-actions">
-          <button class="modal-btn primary" @click="enterBuilding">Enter</button>
-          <button class="modal-btn secondary" @click="closeModals">Cancel</button>
+      <!-- Overlay Modal for Doorway Transitions -->
+      <div v-if="isDoorwayModalOpen" class="modal-overlay">
+        <div class="modal-card">
+          <h2>🚪 Entering {{ activeBuildingName }}</h2>
+          <p>Would you like to step inside?</p>
+
+          <div class="modal-actions">
+            <button class="modal-btn primary" @click="enterBuilding">Enter</button>
+            <button class="modal-btn secondary" @click="closeModals">Cancel</button>
+          </div>
         </div>
       </div>
     </div>
@@ -28,33 +64,43 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted, nextTick } from 'vue';
-import mapData from '@/assets/data/mapData/map1.json';
+import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue';
+
+// Import Maps
+import overworldMap from '@/assets/data/mapData/map1.json';
+import pokeMartMap from '@/assets/data/mapData/PokeMart.json';
+import pokeCenterMap from '@/assets/data/mapData/PokeCenter.json';
 
 const canvasRef = ref(null);
 
-// Modal UI State Controls
+// Dynamic Map State
+const activeMapData = ref(overworldMap);
+const activeMapName = ref('overworld');
+const outdoorReturnPosition = ref({ x: 0, y: 0 });
+
+// Reactive Map Dimensions
+const tileSize = computed(() => activeMapData.value.tilewidth);
+const mapWidth = computed(() => activeMapData.value.width);
+const mapHeight = computed(() => activeMapData.value.height);
+
+// Viewport Camera Settings
+const viewportWidth = computed(() => 15 * tileSize.value);  
+const viewportHeight = computed(() => 15 * tileSize.value); 
+const zoomScale = 2.8;
+
+// Menu & Modal UI State Controls
+const isMenuOpen = ref(false);
 const isBattleModalOpen = ref(false);
 const isDoorwayModalOpen = ref(false);
 const activeBuildingName = ref('');
 
-// Map dimensions
-const tileSize = mapData.tilewidth; // 16px
-const mapWidth = mapData.width;     // 60 tiles
-const mapHeight = mapData.height;   // 60 tiles
-
-// Viewport Camera Settings
-const viewportWidth = 15 * tileSize;  
-const viewportHeight = 15 * tileSize; 
-const zoomScale = 2.8;
-
 // Player starting position
 const player = ref({ 
-  x: Math.floor(mapWidth / 2), 
-  y: Math.floor(mapHeight / 2) 
+  x: Math.floor(overworldMap.width / 2), 
+  y: Math.floor(overworldMap.height / 2) 
 });
 
-const moveSpeedPerSec = 3.2; // Smooth movement speed in tiles/sec
+const moveSpeedPerSec = 3.2; 
 
 // Cache structure & state
 const tileImages = {};
@@ -62,11 +108,18 @@ const keysPressed = {};
 let animationFrameId = null;
 let lastFrameTime = performance.now();
 
-// Collision & Special Tile Tracking
+// Dynamic Collision & Special Tile Sets
 const treeTileGids = new Set();
 const waterTileGids = new Set();
 const buildingTileGids = new Set();
 const grassTileGids = new Set();
+const interiorSolidGids = new Set(); 
+
+// Individual Feature GID Sets for Interactions
+const martCounterGids = new Set();
+const centerCounterGids = new Set();
+const pokeBoxPcGids = new Set();
+
 const buildingBoxes = [];
 
 // Discrete Tile Event States
@@ -77,24 +130,46 @@ let currentGridTile = {
 };
 const ENCOUNTER_CHANCE = 0.10; 
 
-// Reset all input states when opening modals to prevent stuck keypresses
+// Placeholder Interaction Callbacks
+function onPokeMartCounterContact() {
+  console.log('🛍️ [INTERACTION EVENT] Contacted PokéMart Counter!');
+  // TODO: Trigger Shop UI
+}
+
+function onPokeCenterCounterContact() {
+  console.log('🏥 [INTERACTION EVENT] Contacted Pokémon Center Counter!');
+  // TODO: Trigger Nurse Joy Healing Dialogue / UI
+}
+
+function onPokeBoxPcContact() {
+  console.log('💻 [INTERACTION EVENT] Contacted Pokémon Box PC!');
+  // TODO: Trigger PC Storage Box UI
+}
+
 function clearInputs() {
   Object.keys(keysPressed).forEach((key) => {
     keysPressed[key] = false;
   });
 }
 
+function toggleMenu() {
+  clearInputs();
+  isMenuOpen.value = !isMenuOpen.value;
+}
+
+function selectMenuOption(option) {
+  console.log(`[Menu Selected]: ${option}`);
+}
+
 function openBattleModal() {
   clearInputs();
   isBattleModalOpen.value = true;
-  console.log('⚡ [WILD ENCOUNTER TRIGGERED!] Battle Modal opened.');
 }
 
 function openDoorwayModal(buildingName) {
   clearInputs();
   activeBuildingName.value = buildingName;
   isDoorwayModalOpen.value = true;
-  console.log(`🚪 [DOORWAY CONTACT] Prompting entrance for ${buildingName}.`);
 }
 
 function closeModals() {
@@ -103,15 +178,68 @@ function closeModals() {
   clearInputs();
 }
 
+// Master Map Swapping Function
+async function loadMap(newMapData, mapName, spawnX, spawnY) {
+  clearInputs();
+
+  // 1. Reset dynamic collision sets for the new map
+  treeTileGids.clear();
+  waterTileGids.clear();
+  buildingTileGids.clear();
+  grassTileGids.clear();
+  interiorSolidGids.clear();
+  martCounterGids.clear();
+  centerCounterGids.clear();
+  pokeBoxPcGids.clear();
+  buildingBoxes.length = 0;
+
+  // 2. Assign active map data
+  activeMapData.value = newMapData;
+  activeMapName.value = mapName;
+
+  // 3. Preload tilesets and recalculate colliders for this map
+  await loadTileImages();
+
+  // 4. Update canvas size and set player position
+  const canvas = canvasRef.value;
+  if (canvas) {
+    canvas.width = viewportWidth.value * zoomScale;
+    canvas.height = viewportHeight.value * zoomScale;
+  }
+
+  player.value = { x: spawnX, y: spawnY };
+  currentGridTile = { x: Math.floor(spawnX), y: Math.floor(spawnY) };
+}
+
 function enterBuilding() {
-  console.log(`Loading interior map for ${activeBuildingName.value}...`);
+  outdoorReturnPosition.value = { ...player.value };
+
+  if (activeBuildingName.value === 'PokeMart') {
+    const spawnX = Math.floor(pokeMartMap.width / 2);
+    const spawnY = pokeMartMap.height - 2;
+    loadMap(pokeMartMap, 'PokeMart', spawnX, spawnY);
+  } else if (activeBuildingName.value === 'PokeCenter') {
+    const spawnX = Math.floor(pokeCenterMap.width / 2);
+    const spawnY = pokeCenterMap.height - 2;
+    loadMap(pokeCenterMap, 'PokeCenter', spawnX, spawnY);
+  }
+
   closeModals();
+}
+
+function exitBuilding() {
+  loadMap(
+    overworldMap, 
+    'overworld', 
+    outdoorReturnPosition.value.x, 
+    outdoorReturnPosition.value.y + 1
+  );
 }
 
 async function loadTileImages() {
   const promises = [];
 
-  mapData.tilesets.forEach((tileset) => {
+  activeMapData.value.tilesets.forEach((tileset) => {
     tileset.tiles?.forEach((tile) => {
       const promise = new Promise((resolve) => {
         const fileName = tile.image.split('/').pop().trim();
@@ -127,9 +255,31 @@ async function loadTileImages() {
 
         const globalId = tileset.firstgid + tile.id;
 
+        // Overworld Colliders
         if (fileName === 'Trees.png') treeTileGids.add(globalId);
         if (fileName === 'Water.png') waterTileGids.add(globalId);
         if (fileName === 'TallGrass.png') grassTileGids.add(globalId);
+
+        // General Interior Colliders
+        if (fileName === 'PokeMartShelves.png') {
+          interiorSolidGids.add(globalId);
+        }
+
+        // Specific Interactive Feature Registration
+        if (fileName === 'PokeMartCounter.png') {
+          martCounterGids.add(globalId);
+          interiorSolidGids.add(globalId);
+        }
+
+        if (fileName === 'PokeCenterCounter.png') {
+          centerCounterGids.add(globalId);
+          interiorSolidGids.add(globalId);
+        }
+
+        if (fileName === 'PokeBoxPC.png') {
+          pokeBoxPcGids.add(globalId);
+          interiorSolidGids.add(globalId);
+        }
 
         const buildingFiles = ['Gym.png', 'EliteFour.png', 'PokeCenter.png', 'PokeMart.png'];
         if (buildingFiles.includes(fileName)) buildingTileGids.add(globalId);
@@ -137,8 +287,8 @@ async function loadTileImages() {
         tileImages[globalId] = {
           img,
           fileName,
-          width: tile.imagewidth || img.naturalWidth || tileSize,
-          height: tile.imageheight || img.naturalHeight || tileSize
+          width: tile.imagewidth || img.naturalWidth || tileSize.value,
+          height: tile.imageheight || img.naturalHeight || tileSize.value
         };
       });
 
@@ -148,18 +298,19 @@ async function loadTileImages() {
 
   await Promise.all(promises);
 
-  mapData.layers.forEach((layer) => {
+  // Scan building bounding boxes for overworld maps
+  activeMapData.value.layers.forEach((layer) => {
     if (layer.type === 'tilelayer' && layer.visible) {
       layer.data.forEach((tileId, index) => {
         if (buildingTileGids.has(tileId)) {
           const tileData = tileImages[tileId];
           if (!tileData) return;
 
-          const wTiles = Math.round(tileData.width / tileSize);
-          const hTiles = Math.round(tileData.height / tileSize);
+          const wTiles = Math.round(tileData.width / tileSize.value);
+          const hTiles = Math.round(tileData.height / tileSize.value);
 
-          const anchorX = index % mapWidth;
-          const anchorY = Math.floor(index / mapWidth);
+          const anchorX = index % mapWidth.value;
+          const anchorY = Math.floor(index / mapWidth.value);
 
           const leftX = anchorX;
           const topY = anchorY - (hTiles - 1);
@@ -178,38 +329,76 @@ async function loadTileImages() {
   });
 }
 
-// Continuous Game Engine Loop
 function gameLoop(currentTime) {
   const deltaTime = (currentTime - lastFrameTime) / 1000;
   lastFrameTime = currentTime;
 
-  // ONLY update movement if no modal overlay is currently active
-  if (!isBattleModalOpen.value && !isDoorwayModalOpen.value) {
+  if (!isMenuOpen.value && !isBattleModalOpen.value && !isDoorwayModalOpen.value) {
     updatePlayerPosition(Math.min(deltaTime, 0.1));
   }
 
-  drawMap(); // Keep background rendered smoothly
+  drawMap(); 
   animationFrameId = requestAnimationFrame(gameLoop);
+}
+
+// Check adjacent neighbor tiles for interactive features
+function checkAdjacentInteractions(tileX, tileY) {
+  const adjacentOffsets = [
+    { x: 0, y: -1 }, // North
+    { x: 0, y: 1 },  // South
+    { x: -1, y: 0 }, // West
+    { x: 1, y: 0 }   // East
+  ];
+
+  for (const layer of activeMapData.value.layers) {
+    if (layer.type === 'tilelayer' && layer.visible) {
+      for (const offset of adjacentOffsets) {
+        const checkX = tileX + offset.x;
+        const checkY = tileY + offset.y;
+
+        if (checkX >= 0 && checkX < mapWidth.value && checkY >= 0 && checkY < mapHeight.value) {
+          const tileIndex = checkY * mapWidth.value + checkX;
+          const tileId = layer.data[tileIndex];
+
+          if (martCounterGids.has(tileId)) {
+            onPokeMartCounterContact();
+            return;
+          }
+          if (centerCounterGids.has(tileId)) {
+            onPokeCenterCounterContact();
+            return;
+          }
+          if (pokeBoxPcGids.has(tileId)) {
+            onPokeBoxPcContact();
+            return;
+          }
+        }
+      }
+    }
+  }
 }
 
 function isSolidTile(tileX, tileY) {
   const floorX = Math.floor(tileX);
   const floorY = Math.floor(tileY);
 
-  if (floorX < 0 || floorX >= mapWidth || floorY < 0 || floorY >= mapHeight) {
+  if (floorX < 0 || floorX >= mapWidth.value || floorY < 0 || floorY >= mapHeight.value) {
     return true;
   }
 
-  for (const layer of mapData.layers) {
+  for (const layer of activeMapData.value.layers) {
     if (layer.type === 'tilelayer' && layer.visible) {
-      const tileIndex = floorY * mapWidth + floorX;
+      const tileIndex = floorY * mapWidth.value + floorX;
       const tileId = layer.data[tileIndex];
-      if (treeTileGids.has(tileId) || waterTileGids.has(tileId)) {
+
+      // Check solid environmental objects
+      if (treeTileGids.has(tileId) || waterTileGids.has(tileId) || interiorSolidGids.has(tileId)) {
         return true;
       }
     }
   }
 
+  // Overworld Building Bounding Box Check
   for (const b of buildingBoxes) {
     if (
       floorX >= b.leftX &&
@@ -226,9 +415,9 @@ function isSolidTile(tileX, tileY) {
 }
 
 function isGrassTile(tileX, tileY) {
-  for (const layer of mapData.layers) {
+  for (const layer of activeMapData.value.layers) {
     if (layer.type === 'tilelayer' && layer.visible) {
-      const tileIndex = tileY * mapWidth + tileX;
+      const tileIndex = tileY * mapWidth.value + tileX;
       const tileId = layer.data[tileIndex];
       if (grassTileGids.has(tileId)) return true;
     }
@@ -237,24 +426,35 @@ function isGrassTile(tileX, tileY) {
 }
 
 function handleNewTileStep(tileX, tileY) {
-  // 1. Doorway Contact
-  const activeDoor = buildingBoxes.find(
-    (b) => tileX >= b.leftX && tileX < b.leftX + b.wTiles && tileY === b.bottomY
-  );
+  if (activeMapName.value !== 'overworld') {
+    // Check adjacent tiles for interactive counter/PC triggers
+    checkAdjacentInteractions(tileX, tileY);
 
-  if (activeDoor) {
-    if (!isCurrentlyOnDoorway) {
-      isCurrentlyOnDoorway = true;
-      openDoorwayModal(activeDoor.name);
+    // Interior Exit Check: Step on bottom row to return outside
+    if (tileY >= mapHeight.value - 1) {
+      exitBuilding();
+      return;
     }
   } else {
-    isCurrentlyOnDoorway = false;
-  }
+    // Overworld Doorway Contact
+    const activeDoor = buildingBoxes.find(
+      (b) => tileX >= b.leftX && tileX < b.leftX + b.wTiles && tileY === b.bottomY
+    );
 
-  // 2. Tall Grass Encounter Roll
-  if (isGrassTile(tileX, tileY)) {
-    if (Math.random() < ENCOUNTER_CHANCE) {
-      openBattleModal();
+    if (activeDoor) {
+      if (!isCurrentlyOnDoorway) {
+        isCurrentlyOnDoorway = true;
+        openDoorwayModal(activeDoor.name);
+      }
+    } else {
+      isCurrentlyOnDoorway = false;
+    }
+
+    // Tall Grass Encounter Roll
+    if (isGrassTile(tileX, tileY)) {
+      if (Math.random() < ENCOUNTER_CHANCE) {
+        openBattleModal();
+      }
     }
   }
 }
@@ -281,7 +481,6 @@ function updatePlayerPosition(deltaTime) {
 
   const margin = 0.2;
 
-  // Horizontal Collision
   if (moveX !== 0) {
     const nextX = player.value.x + moveX;
     const targetTileY1 = player.value.y + margin;
@@ -300,7 +499,6 @@ function updatePlayerPosition(deltaTime) {
     }
   }
 
-  // Vertical Collision
   if (moveY !== 0) {
     const nextY = player.value.y + moveY;
     const targetTileX1 = player.value.x + margin;
@@ -336,19 +534,18 @@ function drawMap() {
   ctx.imageSmoothingEnabled = false;
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  const playerPixelX = player.value.x * tileSize;
-  const playerPixelY = player.value.y * tileSize;
+  const playerPixelX = player.value.x * tileSize.value;
+  const playerPixelY = player.value.y * tileSize.value;
 
-  const cameraX = Math.max(0, Math.min(mapWidth * tileSize - viewportWidth, playerPixelX - viewportWidth / 2));
-  const cameraY = Math.max(0, Math.min(mapHeight * tileSize - viewportHeight, playerPixelY - viewportHeight / 2));
+  const cameraX = Math.max(0, Math.min(mapWidth.value * tileSize.value - viewportWidth.value, playerPixelX - viewportWidth.value / 2));
+  const cameraY = Math.max(0, Math.min(mapHeight.value * tileSize.value - viewportHeight.value, playerPixelY - viewportHeight.value / 2));
 
   ctx.save();
   
   ctx.scale(zoomScale, zoomScale);
   ctx.translate(-cameraX, -cameraY);
 
-  // 1. Draw Map Tile Layers
-  mapData.layers.forEach((layer) => {
+  activeMapData.value.layers.forEach((layer) => {
     if (layer.type === 'tilelayer' && layer.visible) {
       layer.data.forEach((tileId, index) => {
         if (tileId === 0) return;
@@ -356,16 +553,16 @@ function drawMap() {
         const tileData = tileImages[tileId];
         if (!tileData || !tileData.img.complete || tileData.img.naturalWidth === 0) return;
 
-        const tileX = (index % mapWidth) * tileSize;
-        const tileY = Math.floor(index / mapWidth) * tileSize;
+        const tileX = (index % mapWidth.value) * tileSize.value;
+        const tileY = Math.floor(index / mapWidth.value) * tileSize.value;
 
-        const drawY = tileY - (tileData.height - tileSize);
+        const drawY = tileY - (tileData.height - tileSize.value);
 
         if (
           tileX + tileData.width >= cameraX &&
-          tileX <= cameraX + viewportWidth &&
+          tileX <= cameraX + viewportWidth.value &&
           drawY + tileData.height >= cameraY &&
-          drawY <= cameraY + viewportHeight
+          drawY <= cameraY + viewportHeight.value
         ) {
           ctx.drawImage(
             tileData.img, 
@@ -379,20 +576,19 @@ function drawMap() {
     }
   });
 
-  // 2. Draw Player Character
+  // Draw Player Character
   ctx.fillStyle = '#e74c3c';
-  ctx.fillRect(playerPixelX + 2, playerPixelY + 2, tileSize - 4, tileSize - 4);
+  ctx.fillRect(playerPixelX + 2, playerPixelY + 2, tileSize.value - 4, tileSize.value - 4);
 
   ctx.strokeStyle = '#ffffff';
   ctx.lineWidth = 1;
-  ctx.strokeRect(playerPixelX + 2, playerPixelY + 2, tileSize - 4, tileSize - 4);
+  ctx.strokeRect(playerPixelX + 2, playerPixelY + 2, tileSize.value - 4, tileSize.value - 4);
 
   ctx.restore();
 }
 
 function handleKeyDown(event) {
-  // Ignore controls if a modal is open
-  if (isBattleModalOpen.value || isDoorwayModalOpen.value) return;
+  if (isMenuOpen.value || isBattleModalOpen.value || isDoorwayModalOpen.value) return;
 
   const keysToDisableScroll = ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', ' '];
   if (keysToDisableScroll.includes(event.key)) {
@@ -409,13 +605,13 @@ function handleKeyUp(event) {
 onMounted(async () => {
   await nextTick();
 
-  const canvas = canvasRef.value;
-  if (!canvas) return;
-
-  canvas.width = viewportWidth * zoomScale;
-  canvas.height = viewportHeight * zoomScale;
-
-  await loadTileImages();
+  // Initialize overworld map
+  await loadMap(
+    overworldMap, 
+    'overworld', 
+    Math.floor(overworldMap.width / 2), 
+    Math.floor(overworldMap.height / 2)
+  );
 
   window.addEventListener('keydown', handleKeyDown, { capture: true });
   window.addEventListener('keyup', handleKeyUp, { capture: true });
@@ -438,20 +634,27 @@ onUnmounted(() => {
 
 <style scoped>
 .game-container {
-  position: relative;
   display: flex;
   justify-content: center;
   align-items: center;
   background: #111;
   width: 100vw;
-  height: 70vh;
+  height: 80vh;
   margin: 0;
   padding: 0;
   overflow: hidden;
   box-sizing: border-box;
 }
 
+.viewport-wrapper {
+  position: relative;
+  display: inline-block;
+  max-width: 90vw;
+  max-height: 90vh;
+}
+
 canvas {
+  display: block;
   image-rendering: pixelated;
   border: 3px solid #444;
   box-shadow: 0 0 20px rgba(0, 0, 0, 0.8);
@@ -460,13 +663,106 @@ canvas {
   object-fit: contain;
 }
 
-/* Modal Overlay Styling */
+.hud-menu-btn {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 50;
+  background: #2c3e50;
+  color: #fff;
+  border: 2px solid #ecf0f1;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+}
+
+.hud-menu-btn:hover {
+  background: #34495e;
+}
+
+.menu-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-start;
+  padding: 50px 12px 12px 12px;
+  z-index: 90;
+  box-sizing: border-box;
+}
+
+.menu-card {
+  background: #2b2b2b;
+  border: 3px solid #e74c3c;
+  border-radius: 8px;
+  width: 160px;
+  padding: 12px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.7);
+}
+
+.menu-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 2px solid #444;
+  padding-bottom: 6px;
+  margin-bottom: 10px;
+}
+
+.menu-header h2 {
+  margin: 0;
+  font-size: 1rem;
+  color: #f1c40f;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  color: #aaa;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.menu-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.menu-list li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: 4px;
+  color: #fff;
+  font-size: 0.9rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.menu-list li:hover {
+  background: #333;
+  color: #f1c40f;
+}
+
+.menu-list .icon {
+  font-size: 1rem;
+}
+
 .modal-overlay {
   position: absolute;
   top: 0;
   left: 0;
-  width: 100vw;
-  height: 100vh;
+  width: 100%;
+  height: 100%;
   background: rgba(0, 0, 0, 0.65);
   display: flex;
   justify-content: center;
@@ -483,7 +779,7 @@ canvas {
   color: #fff;
   text-align: center;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
-  min-width: 280px;
+  min-width: 240px;
 }
 
 .modal-card h2 {
