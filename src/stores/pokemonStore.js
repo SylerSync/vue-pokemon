@@ -31,27 +31,27 @@ const testGodPokemon = {
             maxPP: 99
         },
         {
-            name: 'hex',
+            name: 'bide',
             type: 'normal',
-            power: 70,
-            currentPP: 0,
-            maxPP: 99,
-            accuracy: 100,
-            priority: 0,
+            power: null,
+            maxPP: 10,
+            currentPP: 10,
+            accuracy: null,          // never misses
+            priority: 1,             // ⚠️ +1
             damageClass: 'physical',
-            targetsSelf: false,      // target is 'selected-pokemon'
+            targetsSelf: true,       // ⚠️ target is 'user'
             statChanges: [],
             statChance: 0,
-            ailment: null,           // meta.ailment.name is 'none'
+            ailment: null,
             ailmentChance: 0,
             drain: 0,
             healing: 0,
             flinchChance: 0,
             critRate: 0,
-            minTurns: 0,             // null in API
-            maxTurns: 0,             // null in API
-            minHits: 0,
-            maxHits: 0,
+            minTurns: 2,
+            maxTurns: 3,
+            minHits: null,
+            maxHits: null,
             category: 'damage',
         },
         {
@@ -682,8 +682,8 @@ export const usePokemonStore = defineStore("pokemonStore", {
             this.wishlistPokemon = this.wishlistPokemon.filter(pok => pok.name !== pokemon)
         }
     },
-    persist:{
+    persist: {
         key: "pokemon-store-save",
-        pick:['caughtPokemon','wishlistPokemon']
+        pick: ['caughtPokemon', 'wishlistPokemon']
     }
 })
