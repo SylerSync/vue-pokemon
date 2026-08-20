@@ -38,15 +38,6 @@
                 </div>
             </div>
 
-            <!-- Overlay Modal for Wild Pokémon Battles -->
-            <div v-if="isBattleModalOpen" class="modal-overlay">
-                <div class="modal-card">
-                    <h2>⚡ Wild Pokémon Encounter!</h2>
-                    <p>A wild Pokémon appeared in the tall grass!</p>
-                    <button class="modal-btn" @click="closeModals">Run / Close</button>
-                </div>
-            </div>
-
             <!-- Overlay Modal for Doorway Transitions -->
             <div v-if="isDoorwayModalOpen" class="modal-overlay">
                 <div class="modal-card">
@@ -94,15 +85,83 @@
             </div>
         </div>
     </Modal>
+
+    <Modal v-if="isPokeBoxModalOpen" class="box-modal-wide" @close="closePokeBoxModal">
+        <div class="box-layout-container">
+
+            <!-- LEFT PANEL: Party List (6 Slots Fixed) -->
+            <div class="panel-left">
+                <div class="panel-header">
+                    <h3>Party ({{ pokemonStore.pokemonParty?.length || 0 }}/6)</h3>
+                </div>
+
+                <div class="party-list">
+                    <div v-for="(poke, index) in pokemonStore.pokemonParty" :key="poke?.id || index"
+                        class="party-card-row" @click="selectPartyMember(poke)">
+                        <img :src="poke?.sprite || poke?.sprites || poke?.image" :alt="poke?.name"
+                            class="party-sprite-icon" />
+
+                        <div class="party-details">
+                            <div class="party-top">
+                                <span class="poke-name">{{ poke?.name }}</span>
+                                <span class="poke-lvl">Lv. {{ poke?.level }}</span>
+                            </div>
+
+                            <div class="hp-row">
+                                <div class="hp-bar-track">
+                                    <div class="hp-bar-fill" :class="getHpBarSeverity(poke)"
+                                        :style="{ width: getHpPercentage(poke) + '%' }"></div>
+                                </div>
+                                <span class="hp-num">{{ poke?.currentHp ?? poke?.stats?.hp }}/{{ poke?.maxHp ??
+                                    poke?.stats?.hp }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RIGHT PANEL: 30-Slot Paginated Storage Box -->
+            <div class="panel-right">
+                <div class="panel-header">
+                    <h3>Storage Box</h3>
+                </div>
+
+                <DataView :value="pokemonStore.caughtPokemon" layout="grid" :paginator="true" :rows="30"
+                    class="box-dataview-paginated">
+                    <template #grid="slotProps">
+                        <div class="box-grid-30">
+                            <div v-for="poke in slotProps.items" :key="poke?.id" class="box-slot-card"
+                                :class="{ 'in-party-outline': isMemberInParty(poke) }" @click="selectBoxPokemon(poke)">
+                                <img :src="poke?.sprite || poke?.sprites || poke?.image" :alt="poke?.name"
+                                    class="box-sprite-icon" />
+                                <span class="box-name-label">{{ poke?.name }}</span>
+                                <span class="box-lvl-label">L{{ poke?.level }}</span>
+                            </div>
+                        </div>
+                    </template>
+                </DataView>
+            </div>
+
+        </div>
+    </Modal>
+
+    <PokemonBattle v-if="isBattleModalOpen" :team="pokemonStore.pokemonParty" :opponent="wildPokemon" :isWild="true"
+        @end="onBattleEnd" @close="wildPokemon = null" />
 </template>
 
 <script setup>
 import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue';
 import { usePokemonStore } from '@/stores/pokemonStore';
 import { useInventoryStore } from '@/stores/inventoryStore';
+import { useErrorStore } from '@/stores/errorStore'
 import * as pokemonHelper from "@/assets/helpers/pokemonHelper.js"
+import Splitter from 'primevue/splitter';
+import SplitterPanel from 'primevue/splitterpanel';
+import ProgressBar from 'primevue/progressbar';
 import Modal from "@/components/Modal.vue"
 import DataView from "primevue/dataview"
+import wildJson from "@/assets/data/wildPokemon.json"
+import PokemonBattle from "@/components/PokemonBattle.vue"
 
 // Import Maps
 import overworldMap from '@/assets/data/mapData/map1.json';
@@ -112,11 +171,16 @@ import pokeCenterMap from '@/assets/data/mapData/PokeCenter.json';
 // store setups
 const pokemonStore = usePokemonStore()
 const inventoryStore = useInventoryStore()
+const errorStore = useErrorStore()
+
 
 // modal values
 const isStarterModalOpen = ref(false)
+const isPokeBoxModalOpen = ref(false)
 
 const starters = ref({})
+const wildPokemon = ref(null)
+const isEncounterLoading = ref(false);
 
 // Control Functions
 // #region CONTROLS
@@ -147,9 +211,8 @@ async function generateStarterList() {
     starters.value = result;
 }
 
-function chooseStarter(starter){
-    pokemonStore.caughtPokemon.push(starter)
-    pokemonStore.pokemonParty.push(starter)
+function chooseStarter(starter) {
+    pokemonStore.addPokemon(starter)
     closeStarterModal()
 }
 
@@ -157,6 +220,178 @@ function closeStarterModal() {
     starters.value = {}
     isStarterModalOpen.value = false
 }
+
+function openPokeBox() {
+    isPokeBoxModalOpen.value = true
+}
+
+function closePokeBoxModal() {
+    isPokeBoxModalOpen.value = false
+}
+
+function isMemberInParty(poke) {
+    if (!poke || !pokemonStore.pokemonParty) return false;
+    return pokemonStore.pokemonParty.some(p => p.id === poke.id);
+}
+
+function getHpPercentage(poke) {
+    const current = poke?.currentHp ?? poke?.stats?.hp ?? 1;
+    const max = poke?.maxHp ?? poke?.stats?.hp ?? 1;
+    return Math.max(0, Math.min(100, Math.round((current / max) * 100)));
+}
+
+function getHpBarSeverity(poke) {
+    const pct = getHpPercentage(poke);
+    if (pct > 50) return 'hp-green';
+    if (pct > 20) return 'hp-yellow';
+    return 'hp-red';
+}
+
+function selectPartyMember(poke) {
+
+    if (pokemonStore.pokemonParty.length <= 1) {
+        errorStore.SetErrorDetails("Party Issue", "You can't remove your last pokemon from party!");
+        return;
+    }
+
+    pokemonStore.removePokemonParty(poke);
+}
+
+function selectBoxPokemon(poke) {
+    // Check if this specific instance or ID is already in party
+    const isAlreadyInParty = pokemonStore.pokemonParty.some(
+        p => (p.instanceId && poke.instanceId && p.instanceId === poke.instanceId) || p.id === poke.id
+    );
+
+    if (isAlreadyInParty) {
+        errorStore.SetErrorDetails("Party Issue", "That pokemon is already in your party.")
+        return;
+    }
+
+    if (pokemonStore.pokemonParty.length >= 6) {
+        errorStore.SetErrorDetails("Party Issue", "Your party already has 6 members!");
+        return;
+    }
+
+    pokemonStore.addPokemonParty(poke);
+}
+
+function calcWildWeightedLevel() {
+    let totalParty = 0
+    let partyLevel = 0
+    for (let pokemon of pokemonStore.pokemonParty) {
+        totalParty++
+        partyLevel += pokemon.level
+    }
+    let avgLevel = partyLevel / totalParty
+
+    function generateWeightedWildLevel(targetLevel, spread = 4) {
+        // Box-Muller transform to generate a standard normal distribution value
+        let u1 = Math.random();
+        let u2 = Math.random();
+
+        // Standard Normal Variate (mean = 0, stdev = 1)
+        let z = Math.sqrt(-2.0 * Math.log(u1)) * Math.cos(2.0 * Math.PI * u2);
+
+        // Scale by spread (standard deviation) and center around targetLevel
+        let generatedLevel = Math.round(targetLevel + z * spread);
+
+        // Clamp strictly between 1 and 100
+        return Math.max(1, Math.min(100, generatedLevel));
+    }
+
+    let weightedLevel = generateWeightedWildLevel(avgLevel)
+
+
+    console.log(`Average Level: ${avgLevel}. Wild level Level: ${weightedLevel}.`)
+    return weightedLevel
+}
+
+async function generateWildPokemon() {
+    let wildLevel = Number(calcWildWeightedLevel());
+    let canLegend = wildLevel >= 70
+    // This increases rarity of legends at lvl 70+
+    let allowLegendThisRoll = canLegend && Math.random() < 0.10;
+    console.log(wildLevel)
+    let availablePokemon = wildJson.filter(poke => {
+        // Level range check
+        let levelMatches = poke.stageMin <= wildLevel && wildLevel <= poke.stageMax;
+
+        // Non-legendaries are ALWAYS allowed. Legendaries are ONLY allowed if canLegend is true.
+        let legendaryMatches = !poke.isLegendary || allowLegendThisRoll;
+
+        return levelMatches && legendaryMatches;
+    });
+
+    if (availablePokemon.length === 0) {
+        errorStore.SetErrorDetails("Collection Issue", "An error occured trying to get available wild pokemon.")
+        return false
+    }
+    let randPoke = availablePokemon[Math.floor(Math.random() * availablePokemon.length)]
+    if (!randPoke) {
+        errorStore.SetErrorDetails("Cellection Issue", "An error occured trying to generate a wild pokemon.")
+        return false
+    }
+    console.log(`Wild pokemon ${randPoke.name} has spawned at level ${wildLevel}.`)
+
+    let wildPoke = await pokemonHelper.getPokemonWithLevelData(randPoke.name, "", wildLevel)
+    if (!wildPoke) {
+        errorStore.SetErrorDetails("Collection Issue", `An error occured trying to generate ${randPoke.name}`)
+        return false
+    }
+    wildPokemon.value = wildPoke
+
+    return true
+}
+
+async function startWildEncounter() {
+    clearInputs()
+    isEncounterLoading.value = true
+    let didGen = await generateWildPokemon()
+    if (didGen) {
+        openBattleModal()
+    }
+    else {
+        errorStore.SetErrorDetails("Generation Issue", "There was an issue generating the Wild Pokemon.")
+    }
+    isEncounterLoading.value = false
+}
+
+function onBattleEnd() {
+    let canContinue = false
+    for (let poke of pokemonStore.pokemonParty) {
+        if (poke.currentHp > 0) {
+            canContinue = true
+        }
+    }
+    isEncounterLoading.value = false
+    isBattleModalOpen.value = false
+    if (!canContinue) {
+        handlePartyFainted()
+    }
+}
+
+function handlePartyFainted() {
+    healParty(true)
+    loadMap(pokeCenterMap, 'PokeCenter', 5, 6)
+    outdoorReturnPosition.value = {
+        x: 31,
+        y: 25
+    }
+    errorStore.SetErrorDetails("Blacked Out!", "All of your Pokemon fainted! You rushed to the nearest Pokemon Center.")
+}
+
+function healParty(partyFainted) {
+    for (let poke of pokemonStore.pokemonParty) {
+        poke.currentHp = poke.totalHp
+        poke.status = null
+        poke.minorStatus = []
+    }
+    if(!partyFainted){
+        errorStore.SetErrorDetails("PokeCenter", "Your party has been fully healed.")
+    }
+}
+
 // #endregion
 
 /* 
@@ -232,13 +467,12 @@ function onPokeMartCounterContact() {
 }
 
 function onPokeCenterCounterContact() {
-    console.log('🏥 [INTERACTION EVENT] Contacted Pokémon Center Counter!');
-    // TODO: Trigger Nurse Joy Healing Dialogue / UI
+    healParty(false)
 }
 
 function onPokeBoxPcContact() {
     console.log('💻 [INTERACTION EVENT] Contacted Pokémon Box PC!');
-    // TODO: Trigger PC Storage Box UI
+    openPokeBox()
 }
 
 function clearInputs() {
@@ -548,7 +782,7 @@ function handleNewTileStep(tileX, tileY) {
         // Tall Grass Encounter Roll
         if (isGrassTile(tileX, tileY)) {
             if (Math.random() < ENCOUNTER_CHANCE) {
-                openBattleModal();
+                startWildEncounter()
             }
         }
     }
@@ -683,7 +917,7 @@ function drawMap() {
 }
 
 function handleKeyDown(event) {
-    if (isMenuOpen.value || isBattleModalOpen.value || isDoorwayModalOpen.value) return;
+    if (isMenuOpen.value || isBattleModalOpen.value || isDoorwayModalOpen.value || isEncounterLoading.value) return;
 
     const keysToDisableScroll = ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', ' '];
     if (keysToDisableScroll.includes(event.key)) {
@@ -733,6 +967,9 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
+/* ==========================================================================
+   1. MAIN GAME & VIEWPORT
+   ========================================================================== */
 .game-container {
     display: flex;
     justify-content: center;
@@ -763,6 +1000,9 @@ canvas {
     object-fit: contain;
 }
 
+/* ==========================================================================
+   2. OVERLAYS & HUD MENUS
+   ========================================================================== */
 .hud-menu-btn {
     position: absolute;
     top: 12px;
@@ -782,19 +1022,28 @@ canvas {
     background: #34495e;
 }
 
-.menu-overlay {
+.menu-overlay,
+.modal-overlay {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.4);
+    background: rgba(0, 0, 0, 0.65);
     display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 100;
+    backdrop-filter: blur(2px);
+    box-sizing: border-box;
+}
+
+.menu-overlay {
+    background: rgba(0, 0, 0, 0.4);
     justify-content: flex-end;
     align-items: flex-start;
     padding: 50px 12px 12px 12px;
     z-index: 90;
-    box-sizing: border-box;
 }
 
 .menu-card {
@@ -806,19 +1055,28 @@ canvas {
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.7);
 }
 
-.menu-header {
+.menu-header,
+.panel-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-bottom: 2px solid #444;
+    border-bottom: 2px solid #333;
     padding-bottom: 6px;
-    margin-bottom: 10px;
+    margin-bottom: 8px;
 }
 
 .menu-header h2 {
     margin: 0;
     font-size: 1rem;
     color: #f1c40f;
+}
+
+.panel-header h3 {
+    margin: 0;
+    font-size: 0.85rem;
+    color: #f1c40f;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
 .close-btn {
@@ -857,49 +1115,46 @@ canvas {
     font-size: 1rem;
 }
 
-.modal-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.65);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 100;
-    backdrop-filter: blur(2px);
-}
-
+/* ==========================================================================
+   3. STANDARD MODAL DIALOGS
+   ========================================================================== */
 .modal-card {
     background: #222;
     border: 2px solid #555;
     border-radius: 8px;
-    padding: 24px 32px;
+    padding: 16px 20px;
     color: #fff;
     text-align: center;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
-    min-width: 240px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.7);
+
+    /* FORCE SHRINK TO CONTENT */
+    width: max-content !important;
+    max-width: 240px !important;
+    min-width: 200px;
+    box-sizing: border-box !important;
+    margin: auto;
 }
 
 .modal-card h2 {
     margin-top: 0;
     color: #f1c40f;
-    font-size: 1.25rem;
+    font-size: 1.1rem;
 }
 
 .modal-card p {
     color: #ccc;
-    margin-bottom: 20px;
+    margin-bottom: 16px;
+    font-size: 0.85rem;
 }
 
 .modal-actions {
     display: flex;
-    gap: 12px;
+    gap: 10px;
     justify-content: center;
 }
 
-.modal-btn {
+.modal-btn,
+.select-btn {
     background: #e74c3c;
     color: white;
     border: none;
@@ -907,10 +1162,11 @@ canvas {
     border-radius: 4px;
     font-weight: bold;
     cursor: pointer;
-    transition: background 0.2s;
+    transition: background 0.2s, transform 0.1s;
 }
 
-.modal-btn.primary {
+.modal-btn.primary,
+.select-btn {
     background: #2ecc71;
 }
 
@@ -918,156 +1174,330 @@ canvas {
     background: #7f8c8d;
 }
 
-.modal-btn:hover {
+.modal-btn:hover,
+.select-btn:hover {
     opacity: 0.9;
 }
 
-/* Main Modal Container */
-.starters-wrapper {
-  display: flex;
-  flex-direction: column;
-  gap: 2rem;
-  padding: 1.5rem;
-  max-height: 80vh;
-  overflow-y: auto;
-  box-sizing: border-box;
+
+/* ==========================================================================
+   4. POKÉBOX SYSTEM (WIDE SPLIT & STORAGE)
+   ========================================================================== */
+/* Break out of narrow Modal constraints */
+:deep(.modal-overlay .modal-card),
+:deep(.box-modal-wide .modal-card) {
+    width: 85vw !important;
+    max-width: 1000px !important;
+    padding: 12px !important;
+    background: #181818 !important;
+    border: 2px solid #333 !important;
+    text-align: left !important;
 }
 
-/* Region Header Section */
+.box-layout-container {
+    display: flex;
+    gap: 12px;
+    width: 100%;
+    height: 520px;
+    background: #121212;
+    border-radius: 6px;
+    overflow: hidden;
+    color: #fff;
+}
+
+/* Left Panel: Party Column (280px Fixed Width) */
+.panel-left {
+    width: 280px;
+    flex-shrink: 0;
+    background: #1a1a1a;
+    border-right: 1px solid #2a2a2a;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+}
+
+.party-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.party-card-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #222;
+    border: 1px solid #333;
+    border-radius: 6px;
+    padding: 6px 10px;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s;
+}
+
+.party-card-row:hover {
+    background: #2a2a2a;
+    border-color: #2ecc71;
+}
+
+.party-sprite-icon {
+    width: 40px;
+    height: 40px;
+    image-rendering: pixelated;
+}
+
+.party-details {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.party-top {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.8rem;
+    font-weight: bold;
+}
+
+.poke-name {
+    text-transform: capitalize;
+    color: #fff;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 110px;
+}
+
+.poke-lvl {
+    color: #2ecc71;
+}
+
+.hp-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.hp-bar-track {
+    flex: 1;
+    height: 6px;
+    background: #333;
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.hp-bar-fill {
+    height: 100%;
+    transition: width 0.25s ease;
+}
+
+.hp-bar-fill.hp-green {
+    background-color: #2ecc71;
+}
+
+.hp-bar-fill.hp-yellow {
+    background-color: #f1c40f;
+}
+
+.hp-bar-fill.hp-red {
+    background-color: #e74c3c;
+}
+
+.hp-num {
+    font-size: 0.65rem;
+    color: #888;
+}
+
+/* Right Panel: Storage Box Column (Flexible Width) */
+.panel-right {
+    flex: 1;
+    background: #141414;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+.box-dataview-paginated {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    justify-content: space-between;
+}
+
+.box-grid-30 {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 8px;
+    padding: 4px;
+}
+
+.box-slot-card {
+    background: #202020;
+    border: 1px solid #333;
+    border-radius: 6px;
+    padding: 6px 4px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+    transition: border-color 0.15s, transform 0.15s;
+}
+
+.box-slot-card:hover {
+    border-color: #f1c40f;
+    transform: translateY(-2px);
+}
+
+.box-slot-card.in-party-outline {
+    border: 2px solid #3498db;
+    box-shadow: 0 0 8px rgba(52, 152, 219, 0.4);
+    background: #142230;
+}
+
+.box-sprite-icon {
+    width: 44px;
+    height: 44px;
+    image-rendering: pixelated;
+}
+
+.box-name-label {
+    font-size: 0.7rem;
+    font-weight: bold;
+    color: #fff;
+    text-transform: capitalize;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+}
+
+.box-lvl-label {
+    font-size: 0.65rem;
+    color: #666;
+}
+
+/* PrimeVue Paginator Custom Theme */
+:deep(.p-paginator) {
+    background: transparent !important;
+    border: none !important;
+    padding: 4px 0 !important;
+}
+
+:deep(.p-paginator .p-paginator-page),
+:deep(.p-paginator .p-paginator-first),
+:deep(.p-paginator .p-paginator-prev),
+:deep(.p-paginator .p-paginator-next),
+:deep(.p-paginator .p-paginator-last) {
+    color: #aaa !important;
+    background: #1e1e1e !important;
+    border: 1px solid #333 !important;
+    min-width: 2rem !important;
+    height: 2rem !important;
+    border-radius: 4px !important;
+    margin: 0 2px !important;
+}
+
+:deep(.p-paginator .p-paginator-page.p-highlight) {
+    background: #34495e !important;
+    color: #f1c40f !important;
+    border-color: #f1c40f !important;
+}
+
+/* ==========================================================================
+   5. STARTER SELECTION DISPLAY
+   ========================================================================== */
+.starters-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    padding: 1rem;
+    max-height: 80vh;
+    overflow-y: auto;
+    box-sizing: border-box;
+}
+
 .region-section {
-  background: #1e1e1e;
-  border: 1px solid #333;
-  border-radius: 12px;
-  padding: 1.25rem;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+    background: #1e1e1e;
+    border: 1px solid #333;
+    border-radius: 8px;
+    padding: 1rem;
 }
 
 .region-title {
-  color: #f1c40f;
-  font-size: 1.15rem;
-  font-weight: bold;
-  letter-spacing: 1px;
-  margin-top: 0;
-  margin-bottom: 1.25rem;
-  padding-bottom: 0.5rem;
-  border-bottom: 2px solid #333;
+    color: #f1c40f;
+    font-size: 1rem;
+    font-weight: bold;
+    letter-spacing: 1px;
+    margin: 0 0 1rem 0;
+    padding-bottom: 0.4rem;
+    border-bottom: 2px solid #333;
 }
 
-/* 3-Column Grid */
 .grid-container {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1.25rem;
-  width: 100%;
-  box-sizing: border-box;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    width: 100%;
 }
 
-/* Starter Card */
 .starter-card {
-  background: #282828;
-  border: 2px solid #444;
-  border-radius: 10px;
-  padding: 1rem;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  position: relative;
-  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+    background: #282828;
+    border: 2px solid #444;
+    border-radius: 8px;
+    padding: 0.75rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transition: transform 0.2s, border-color 0.2s;
 }
 
 .starter-card:hover {
-  transform: translateY(-4px);
-  border-color: #f1c40f;
-  box-shadow: 0 8px 20px rgba(241, 196, 15, 0.2);
+    transform: translateY(-3px);
+    border-color: #f1c40f;
 }
 
-/* Meta Info */
 .card-header {
-  display: flex;
-  justify-content: space-between;
-  width: 100%;
-  font-size: 0.8rem;
-  font-weight: bold;
-  color: #aaa;
-  margin-bottom: 0.5rem;
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    font-size: 0.75rem;
+    font-weight: bold;
 }
 
 .poke-id {
-  color: #888;
+    color: #888;
 }
 
-.poke-level {
-  background: #333;
-  padding: 2px 6px;
-  border-radius: 4px;
-  color: #2ecc71;
-}
-
-/* Sprite Image */
 .poke-sprite {
-  width: 96px;
-  height: 96px;
-  image-rendering: pixelated;
-  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.5));
-  margin: 0.5rem 0;
+    width: 80px;
+    height: 80px;
+    image-rendering: pixelated;
+    margin: 0.25rem 0;
 }
 
-/* Pokemon Name */
-.poke-name {
-  color: #fff;
-  font-size: 1.1rem;
-  font-weight: bold;
-  text-transform: capitalize;
-  margin: 0.25rem 0 0.75rem 0;
-}
-
-/* Type Badges */
 .type-badges {
-  display: flex;
-  gap: 0.4rem;
-  margin-bottom: 1.25rem;
+    display: flex;
+    gap: 0.3rem;
+    margin-bottom: 0.75rem;
 }
 
 .type-tag {
-  padding: 3px 10px;
-  border-radius: 4px;
-  font-size: 0.7rem;
-  font-weight: bold;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  color: #fff;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.2);
-}
-
-/* Selection Button */
-.select-btn {
-  width: 100%;
-  background: #2ecc71;
-  color: #fff;
-  border: none;
-  padding: 10px;
-  border-radius: 6px;
-  font-weight: bold;
-  font-size: 0.9rem;
-  cursor: pointer;
-  text-transform: capitalize;
-  transition: background 0.15s ease, transform 0.1s ease;
-}
-
-.select-btn:hover {
-  background: #27ae60;
-  transform: scale(1.02);
-}
-
-.select-btn:active {
-  transform: scale(0.98);
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.65rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    color: #fff;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
 }
 
 @media (max-width: 768px) {
-  .grid-container {
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  }
+    .grid-container {
+        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    }
 }
 </style>
 
