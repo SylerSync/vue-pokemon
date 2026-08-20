@@ -97,11 +97,11 @@
             <div class="moves">
               <button v-for="move in userPokemon.moves" :key="move.name" class="move"
                 :style="{ backgroundColor: pokemonStore.typeColors[move.type] }"
-                :disabled="isResolving || move.disabled
-                  || (userPokemon.charging && userPokemon.charging.move.name !== move.name) || (userPokemon.locked && userPokemon.locked.move.name !== move.name)
+                :disabled="isResolving || move.disabled || move.currentPP == 0
+                  || (userPokemon.charging && userPokemon.charging.move.name !== move.name) || (userPokemon.locked && userPokemon.locked.move.name !== move.name) || (userPokemon.bide && userPokemon.bide.move.name !== move.name)
                   || (userPokemon.minorStatus?.includes('torment') && userPokemon.lastUsedMove?.name == move.name) || isFainted(userPokemon)" @click="battleTurn(move)">
                 <span class="move-name">{{ move.name }}</span>
-                <span class="move-power">{{ move.power ?? '—' }}</span>
+                <span class="move-power">{{ move.currentPP }}/{{ move.maxPP }}</span>
               </button>
             </div>
             <!-- Mega Evolution Button -->
@@ -221,60 +221,10 @@
     </div>
   </Modal>
 
-  <Modal v-if="isSwapModalOpen" @close="closeReplaceMoveModal()">
-    <template #default>
-      <div class="move-swap-container">
-        <div class="modal-header">
-          <h3><strong>{{ userPokemon.name }}</strong> wants to learn <span class="highlight-move">{{ pendingMove.name
-          }}</span></h3>
-          <p>Select a move to forget, or skip learning {{ pendingMove.name }}.</p>
-        </div>
+  <SelectMove v-if="isSwapModalOpen" @close="closeReplaceMoveModal()" :userPokemon="userPokemon"
+    :pendingMove="pendingMove">
+  </SelectMove>
 
-        <!-- Current 4 Moves Grid -->
-        <div class="moves-section">
-          <span class="section-title">Current Moves</span>
-          <div class="current-moves">
-            <Card v-for="(move, index) in userPokemon.moves" :key="move.name + index" class="move-card select-card"
-              @click="replaceMove(index)">
-              <template #content>
-                <div class="card-top">
-                  <span class="move-title">{{ move.name }}</span>
-                  <span class="type-pill"
-                    :style="{ backgroundColor: pokemonStore.typeColors[move.type?.toLowerCase()] || '#777' }">
-                    {{ move.type }}
-                  </span>
-                </div>
-                <div class="card-details">
-                  <span><strong>PWR:</strong> {{ move.power || '—' }}</span>
-                </div>
-                <div class="hover-action">Forget Move</div>
-              </template>
-            </Card>
-          </div>
-        </div>
-
-        <!-- Cancel / Skip Learning Card -->
-        <div class="cancel-section">
-          <span class="section-title">New Move</span>
-          <Card class="move-card cancel-card" @click="closeReplaceMoveModal()">
-            <template #content>
-              <div class="card-top">
-                <span class="move-title">{{ pendingMove.name }}</span>
-                <span class="type-pill"
-                  :style="{ backgroundColor: pokemonStore.typeColors[pendingMove.type?.toLowerCase()] || '#777' }">
-                  {{ pendingMove.type }}
-                </span>
-              </div>
-              <div class="card-details">
-                <span><strong>PWR:</strong> {{ pendingMove.power || '—' }}</span>
-              </div>
-              <div class="hover-action cancel">Don't Learn</div>
-            </template>
-          </Card>
-        </div>
-      </div>
-    </template>
-  </Modal>
   <!-- Evolution Overlay -->
   <div v-if="evoOverlay.active" class="evo-modal-overlay">
     <div class="evo-stage">
@@ -286,6 +236,7 @@
       }" />
     </div>
   </div>
+
 </template>
 
 <script setup>
@@ -310,6 +261,7 @@ import burnIcon from '@/assets/statusIcons/burn.png';
 import poisonIcon from '@/assets/statusIcons/poison.png';
 import { getRandomWithExclusions } from '@/assets/helpers/numberHelper.js'
 import megaEvos from "@/assets/data/megaEvos.json"
+import SelectMove from './SelectMove.vue';
 
 /* ------------------------------------------------------------------ *
  * Status Icons
@@ -370,6 +322,9 @@ const logEl = ref(null);
 const anim = ref(null);
 const isSwapModalOpen = ref(false)
 const pendingMove = ref(null)
+const allyFaintedThisTurn = ref(false)
+const allyFaintedLastTurn = ref(false)
+const lastMoveInBattle = ref(null);   // Copycat
 let turnValue = 1
 const evoOverlay = ref({
   active: false,
@@ -411,6 +366,7 @@ const pokeballOptions = computed(() => {
 const foe = ref(null)
 
 const activeMegaPokemon = ref(null)
+const activeTransformPokemon = ref(null)
 
 const team = computed(() => {
   const sourceTeam = props.team ?? pokemonStore.caughtPokemon
@@ -457,6 +413,8 @@ const STAT_LABEL = {
   speed: 'Speed', accuracy: 'accuracy', evasion: 'evasiveness',
 };
 
+
+// Hardcoded moves that have special/unique effects that arn't listed in pokeapi
 const SELF_KO_MOVES = new Set([
   'self-destruct', 'explosion', 'misty-explosion',
   'memento', 'healing-wish', 'lunar-dance',
@@ -584,6 +542,16 @@ const VARIABLE_POWER_MOVES = {
     return Math.min(860, 20 + 20 * boosts);
   },
 
+  // --- Uses current turn data
+  counter: (u) => u.turn.lastPhysicalDamage > 0
+    ? u.turn.lastPhysicalDamage * 2 : null,
+  'mirror-coat': (u) => u.turn.lastSpecialDamage > 0
+    ? u.turn.lastSpecialDamage * 2 : null,
+  'metal-burst': (u) => u.turn.lastDamageTaken > 0
+    ? Math.floor(u.turn.lastDamageTaken * 1.5) : null,
+  'comeuppance': (u) => u.turn.lastDamageTaken > 0
+    ? Math.floor(u.turn.lastDamageTaken * 1.5) : null,
+
   // --- friendship: we have no happiness stat, so these are flat ---
   'return': () => 102,   // max-happiness value
   frustration: () => 102,   // min-happiness value
@@ -607,7 +575,33 @@ const CONDITIONAL_POWER = {
   brine: (u, t) => t.currentHp <= t.totalHp / 2 ? 2 : 1,
   'barb-barrage': (u, t) => ['poison', 'bad-poison'].includes(t.status) ? 2 : 1,
   'infernal-parade': (u, t) => t.status ? 2 : 1,
+  retaliate: () => allyFaintedLastTurn.value ? 2 : 1,
+
+  payback: (u, t) => t.turn?.hasMoved ? 2 : 1,
+  avalanche: (u) => u.turn?.damageTaken > 0 ? 2 : 1,
+  revenge: (u) => u.turn?.damageTaken > 0 ? 2 : 1,
+  assurance: (u, t) => t.turn?.wasHit ? 2 : 1,
+  'stomping-tantrum': (u) => u.turn?.moveFailedLastTurn ? 2 : 1,
 };
+
+// Hard coded moves for copy logic
+const COPY_MOVES = new Set([
+  'metronome', 'mirror-move', 'copycat', 'me-first', 'assist',
+  'nature-power', 'sleep-talk',
+]);
+
+// never selectable by a calling move
+const UNCOPYABLE = new Set([
+  ...COPY_MOVES,
+  'struggle', 'transform', 'counter', 'mirror-coat', 'metal-burst',
+  'bide', 'focus-punch', 'dynamic-punch', 'destiny-bond', 'detect',
+  'endure', 'protect', 'feint', 'follow-me', 'helping-hand', 'snatch',
+  'thief', 'covet', 'trick', 'switcheroo', 'bestow', 'chatter',
+  'sketch', 'mimic', 'quash', 'after-you', 'belch', 'shell-trap',
+  'beak-blast', 'baneful-bunker', 'spiky-shield', "king-s-shield",
+]);
+
+const NATURE_POWER_MOVE = 'tri-attack';  // no terrain system → default
 
 function weightPower(hg) {
   const w = hg ?? 0;
@@ -624,8 +618,6 @@ function flailPower(u) {
   return x < 1 ? 200 : x < 5 ? 150 : x < 13 ? 100 : x < 22 ? 80 : x < 43 ? 40 : 20;
 }
 
-
-
 function isSemiInvulnerable(pokemon) {
   return !!pokemon?.charging?.invulnerable;
 }
@@ -636,6 +628,28 @@ const freshStages = () => ({
   attack: 0, defense: 0, 'special-attack': 0,
   'special-defense': 0, speed: 0, accuracy: 0, evasion: 0,
 });
+
+function freshTurnMemory() {
+  return {
+    damageTaken: 0,
+    physicalDamage: 0,
+    specialDamage: 0,
+    lastDamageTaken: 0,        // Metal Burst
+    lastPhysicalDamage: 0,     // Counter
+    lastSpecialDamage: 0,      // Mirror Coat
+    hasMoved: false,
+    wasHit: false,
+    moveFailed: false,
+    moveFailedLastTurn: false, // Stomping Tantrum
+  };
+}
+
+function startTurn(pokemon) {
+  if (!pokemon) return;
+  const prev = pokemon.turn;
+  pokemon.turn = freshTurnMemory();
+  pokemon.turn.moveFailedLastTurn = prev?.moveFailed ?? false;
+}
 
 if (props.isWild) {
   foe.value = makeCombatant(props.opponent);
@@ -686,37 +700,40 @@ function checkMegaEvo() {
   }
 }
 
-function syncMegaPokemon() {
-  if (!activeMegaPokemon.value) return
+function syncBattleForm() {
+  const active = activeTransformPokemon.value?.trainer === 'ally'
+    ? activeTransformPokemon.value.pokemon
+    : activeMegaPokemon.value;
+  if (!active) return;
 
-  const mega = activeMegaPokemon.value
-
-  const base = pokemonStore.caughtPokemon.find(p => p.instanceId === mega.instanceId)
-
+  const base = pokemonStore.caughtPokemon.find(p => p.instanceId === active.instanceId);
   if (base) {
-    if (mega.currentHp <= 0) {
-      base.currentHp = 0
-      base.totalFaints = (base.totalFaints || 0) + 1
+    if (active.currentHp <= 0) {
+      base.currentHp = 0;
+      base.totalFaints = (base.totalFaints || 0) + 1;
     } else {
-      const hpRatio = mega.currentHp / mega.totalHp
-      base.currentHp = Math.max(1, Math.round(base.totalHp * hpRatio))
+      const hpRatio = active.currentHp / active.totalHp;
+      base.currentHp = Math.max(1, Math.round(base.totalHp * hpRatio));
     }
+    base.level = active.level;
+    base.currentExp = active.currentExp;
+    base.status = active.status || null;
+    if (active.totalKOs) base.totalKOs = active.totalKOs;
 
-    base.level = mega.level
-    base.currentExp = mega.currentExp
-    base.moves = mega.moves
-    base.status = mega.status || null
-    if (mega.totalKOs) base.totalKOs = mega.totalKOs
+    //Mega only logic
+    if (activeMegaPokemon.value) {
+      base.moves = active.moves
+    }
   }
 
-  activeMegaPokemon.value = null
+  activeMegaPokemon.value = null;
+  activeTransformPokemon.value = null;
 }
 
 const isMegaEvolving = ref(false)
 
 async function handleMegaEvo(pokemon) {
-  console.log(`Converting ${pokemon.name}.`)
-  
+
   // 1. Fetch data from helper script
   const megaData = await pokemonHelper.handleMegaEvo(pokemon)
 
@@ -832,13 +849,13 @@ function startBattle() {
   if (userPokemon.value.currentHp == null) {
     userPokemon.value.currentHp = userPokemon.value.totalHp;
   }
-  console.log(userPokemon.value)
   checkMegaEvo()
   userPokemon.value.stages = freshStages();
   userPokemon.value.flinched = false;
   userPokemon.value.charging = null;
   userPokemon.value.mustRecharge = false;
   userPokemon.value.locked = null
+  userPokemon.value.bide = null
   battleStarted.value = true;
   selectedTargetPokemon.value = userPokemon.value;
   log(`A wild ${foe.value.name} appeared!`);
@@ -846,8 +863,8 @@ function startBattle() {
 }
 
 function endBattle(outcome = 'ended') {
-  if (activeMegaPokemon.value) {
-    syncMegaPokemon()
+  if (activeMegaPokemon.value || activeTransformPokemon.value) {
+    syncBattleForm()
   }
   battleStarted.value = false;
   isResolving.value = false;
@@ -870,16 +887,22 @@ async function battleTurn(playerMove, item = null) {
   isResolving.value = true;
 
   try {
+    allyFaintedLastTurn.value = allyFaintedThisTurn.value;
+    allyFaintedThisTurn.value = false;
     log(`Battle Turn ${turnValue}`)
     turnValue++
-    const player = userPokemon.value;
-    const wild = foe.value;
+    let player = userPokemon.value;
+    startTurn(player);
+    player.turn.pendingMove = playerMove;
+    let wild = foe.value;
+    startTurn(wild);
     const wildMove = pickMove(wild);
+    wild.turn.pendingMove = wildMove;
 
     // --- item branch: using an item costs your turn ---
     if (item) {
       if (isPokeball(item)) {
-        const caught = await throwPokeball(wild, item);
+        const caught = await throwPokeball(item);
         if (caught) return endBattle('caught');
         if (!battleStarted.value) return; // it fled
       } else {
@@ -923,6 +946,9 @@ async function battleTurn(playerMove, item = null) {
     for (const [attacker, defender, move] of order) {
       if (!move || isFainted(attacker)) continue;
       await useMove(attacker, defender, move);
+      if (activeTransformPokemon.value) {
+        activeTransformPokemon.value.trainer == 'ally' ? player = activeTransformPokemon.value.pokemon : wild = activeTransformPokemon.value.pokemon
+      }
       const attackerDown = isFainted(attacker);
       if (await handleFaint(defender)) {
         if (attackerDown) await handleFaint(attacker);
@@ -964,8 +990,6 @@ async function battleTurn(playerMove, item = null) {
 }
 
 function statOf(pokemon, name) {
-  // console.log(name)
-  // console.log(pokemon.stages?.[name] ?? 0)
   const raw = pokemon.stats.find(s => s.name === name)?.stat ?? 1;
   let value = raw * stageMultiplier(pokemon.stages?.[name] ?? 0);
   if (name === 'attack' && pokemon.status === 'burn') value *= 0.5;
@@ -986,28 +1010,25 @@ function pickMove(pokemon) {
   //   statChance: 0,
   //   ailment: null,
   //   ailmentChance: 0,
-  //   drain: 0,                  // ⚠️ not -100 — the self-KO isn't here
+  //   drain: 0,                  // not -100 — the self-KO isn't here
   //   healing: 0,
   //   flinchChance: 0,
   //   critRate: 0,
   //   minTurns: 0,               // null in API
   //   maxTurns: 0,               // null in API
-  //   category: 'damage',        // ⚠️ not 'unique' or anything self-KO-ish
+  //   category: 'damage',        // not 'unique' or anything self-KO-ish
   // }
   // return move
   if (pokemon.charging) return pokemon.charging.move;
   if (pokemon.locked) return pokemon.locked.move;
+  if (pokemon.bide) return pokemon.bide.move;
   const moves = pokemon.moves ?? [];
   let disabledMoves = []
   if (pokemon.minorStatus?.includes("torment") && pokemon.lastUsedMove) {
     disabledMoves.push(moves.findIndex(m => m.name == pokemon.lastUsedMove.name))
-    // console.log(disabledMoves)
   }
   if (pokemon.minorStatus?.includes("disable") && pokemon.lastUsedMove) {
     disabledMoves.push(moves.findIndex(m => m.disabled))
-    // console.log(moves)
-    // console.log(pokemon.lastUsedMove.name)
-    console.log(disabledMoves)
   }
   let selectedMoveIndex = getRandomWithExclusions(0, moves.length - 1, disabledMoves);
   return moves[selectedMoveIndex];
@@ -1111,7 +1132,6 @@ function recalcStats(pokemon) {
     stat: Math.floor(((2 * s.base_stat * pokemon.level) / 100) + 5)
   }))
   let oldHp = pokemon.totalHp
-  console.log(oldHp)
   pokemon.totalHp = Math.floor(((2 * pokemon.stats.find(s => s.name == "hp")?.base_stat * pokemon.level) / 100) + pokemon.level + 10)
   pokemon.currentHp += pokemon.totalHp - oldHp
 }
@@ -1159,17 +1179,6 @@ function closeReplaceMoveModal() {
 
 }
 
-function replaceMove(index) {
-  if (userPokemon.value && pendingMove.value) {
-    // Overwrite the move in the selected card slot
-    userPokemon.value.moves[index] = pendingMove.value;
-    console.log(`${userPokemon.value.name} forgot a move and learned ${pendingMove.value.name}!`);
-  }
-
-  // Close modal and release the Promise
-  closeReplaceMoveModal();
-}
-
 
 /**
  * Handles a fainted combatant. Returns true if the turn should stop.
@@ -1179,6 +1188,12 @@ async function handleFaint(pokemon) {
   pokemon.charging = null;
   pokemon.mustRecharge = false;
   pokemon.locked = null;
+  pokemon.bide = null
+
+  if (activeTransformPokemon.value?.pokemon === pokemon) {
+    activeTransformPokemon.value = null;
+  }
+
   log(`${pokemon.name} fainted!`);
   canMegaEvolve.value = false
   await playAnim(pokemon === foe.value ? 'foe' : 'ally', 'faint', 700);
@@ -1211,6 +1226,7 @@ async function handleFaint(pokemon) {
       if (indexes.length > 0) {
         const randomIndex = indexes[Math.floor(Math.random() * indexes.length)]
         foe.value = props.oppTeam[randomIndex]
+        startTurn(foe.value)
         return true
       }
       else {
@@ -1223,6 +1239,8 @@ async function handleFaint(pokemon) {
 
   // Player's Pokémon fainted — switch if anyone is left standing.
   const next = team.value.find(p => !isFainted(p) && p.instanceId !== pokemon.instanceId);
+  allyFaintedThisTurn.value = true
+
   if (next) {
     log(`Go, ${next.name}!`);
     userPokemon.value = next;
@@ -1240,10 +1258,12 @@ async function handleFaint(pokemon) {
  * Moves
  * ------------------------------------------------------------------ */
 
-async function useMove(user, target, move) {
+async function useMove(user, target, move, opts = {}) {
   let actor = user === userPokemon.value ? 'ally' : 'foe';
   let victim = actor === 'ally' ? 'foe' : 'ally';
   let hitsSelf = false;
+
+  user.turn.hasMoved = true;
 
   // --- recharge: the turn is spent before anything else happens ---
   if (user.mustRecharge) {
@@ -1256,11 +1276,14 @@ async function useMove(user, target, move) {
   const releasing = !!user.charging;
   if (releasing) move = user.charging.move;
   else if (user.locked) move = user.locked.move;
+  else if (user.bide) move = user.bide.move;
+
+  const continuing = releasing || !!user.locked || !!user.bide;
 
   user.lastUsedMove = move;
 
   // --- pre-move status checks ---
-  if (!(await canAct(user))) {
+  if (!(await canAct(user, move))) {
     user.charging = null;
     return;
   }
@@ -1283,16 +1306,15 @@ async function useMove(user, target, move) {
     }
   }
   if (user.disabled && --user.disabled.turns <= 0) {
-    console.log(user.disabled.move)
-    console.log(user.moves)
     let move = user.moves.find(m => m.name === user.disabled.move)
-    console.log(move)
     move.disabled = false
     user.minorStatus = user.minorStatus.filter(s => s !== 'disable');
     log(`${user.name}'s move ${prettyName(user.disabled.move)} is no longer disabled.`);
     user.disabled = false
     await delay(800);
   }
+
+  if (!continuing && !opts.copied && move.currentPP != null) move.currentPP--;
 
   if (hitsSelf) {
     user.charging = null;
@@ -1313,6 +1335,20 @@ async function useMove(user, target, move) {
     await playAnim(actor, 'lunge', 300);
   }
 
+  // --- calling moves for coypying ---
+  if (COPY_MOVES.has(move.name) && !hitsSelf && !opts.copied) {
+    const called = await resolveCalledMove(user, target, move);
+    if (!called) {
+      log('But it failed!');
+      user.turn.moveFailed = true;
+      await delay(800);
+      return;
+    }
+    log(`${prettyName(move.name)} became ${prettyName(called.name)}!`);
+    await delay(700);
+    return await useMove(user, target, called, { copied: true });
+  }
+
   // --- two-turn moves ---
   const charge = TWO_TURN_MOVES[move.name];
   if (charge && !releasing && !hitsSelf) {
@@ -1331,6 +1367,7 @@ async function useMove(user, target, move) {
   // --- heal block: healing moves fail entirely ---
   if ((move.healing ?? 0) > 0 && isHealBlocked(user)) {
     log(`But ${user.name} can't use it due to Heal Block!`);
+    user.turn.moveFailed = true;
     await delay(800);
     return;
   }
@@ -1340,6 +1377,7 @@ async function useMove(user, target, move) {
     const through = HITS_THROUGH[target.charging.move.name] ?? [];
     if (!through.includes(move.name)) {
       log(`${target.name} avoided the attack!`);
+      user.turn.moveFailed = true;
       await delay(800);
       return;
     }
@@ -1350,6 +1388,7 @@ async function useMove(user, target, move) {
     if (move.category === 'ohko') {
       if (randInt(1, 100) > move.accuracy + (user.level - target.level)) {
         log(`${user.name}'s attack missed!`);
+        user.turn.moveFailed = true;
         await delay(800);
         return;
       }
@@ -1361,6 +1400,7 @@ async function useMove(user, target, move) {
         stageMultiplier(user.stages?.accuracy ?? 0, true) / stageMultiplier(evasion, true);
       if (randInt(1, 100) > move.accuracy * accMod) {
         log(`${user.name}'s attack missed!`);
+        user.turn.moveFailed = true;
         user.locked = null;
         await delay(800);
         return;
@@ -1378,11 +1418,13 @@ async function useMove(user, target, move) {
   if (move.category === 'ohko') {
     if (target.level > user.level) {
       log(`${target.name} is unaffected!`);
+      user.turn.moveFailed = true;
       await delay(800);
       return;
     }
     if (typeEffectiveness(move.type, target.types) === 0) {
       log(`It doesn't affect ${target.name}...`);
+      user.turn.moveFailed = true;
       await delay(800);
       return;
     }
@@ -1398,12 +1440,14 @@ async function useMove(user, target, move) {
   if (fixed) {
     if (isImmuneTo(move, target)) {
       log(`It doesn't affect ${target.name}...`);
+      user.turn.moveFailed = true;
       await delay(800);
       return;
     }
     const amount = fixed(user, target);
     if (amount == null) {
       log('But it failed!');
+      user.turn.moveFailed = true;
       await delay(800);
       return;
     }
@@ -1411,6 +1455,9 @@ async function useMove(user, target, move) {
     target.currentHp = Math.max(0, target.currentHp - amount);
     await playAnim(victim, 'hit', 400);
     log(`${user.name} dealt ${dealt} damage.`);
+
+    if (!hitsSelf && dealt > 0) recordDamage(target, move, dealt);
+
     await delay(600);
 
     if (move.name === 'final-gambit') {
@@ -1423,7 +1470,14 @@ async function useMove(user, target, move) {
   // --- variable power: compute before the damage block reads move.power ---
   const scaler = VARIABLE_POWER_MOVES[move.name];
   if (scaler && !hitsSelf) {
-    move = { ...move, power: Math.max(1, scaler(user, target)) };
+    const power = scaler(user, target);
+    if (power == null) {
+      log('But it failed!');
+      user.turn.moveFailed = true;
+      await delay(800);
+      return;
+    }
+    move = { ...move, power: move.name === 'present' ? power : Math.max(1, power) };
   }
   if (move.name === 'magnitude') {
     const tier = { 10: 4, 30: 5, 50: 6, 70: 7, 90: 8, 110: 9, 150: 10 }[move.power];
@@ -1433,6 +1487,7 @@ async function useMove(user, target, move) {
   if (move.name === 'present' && move.power === 0) {
     if (isHealBlocked(target)) {
       log(`${target.name}'s HP was not restored due to Heal Block!`);
+      user.turn.moveFailed = true;
     } else {
       const amount = Math.max(1, Math.floor(target.totalHp / 4));
       const before = target.currentHp;
@@ -1444,9 +1499,101 @@ async function useMove(user, target, move) {
   }
   const mult = CONDITIONAL_POWER[move.name];
   if (mult && !hitsSelf && move.power) {
-    console.log(mult(user, target))
     move = { ...move, power: move.power * mult(user, target) };
-    // console.log(move)
+  }
+
+  // --- Logic for the move Bide ---
+  if (move.name === 'bide') {
+    if (!user.bide) {
+      user.bide = { move: move, turns: 2, damage: 0 };
+      log(`${user.name} is storing energy!`);
+      await delay(800);
+      return;
+    }
+    if (--user.bide.turns > 0) {
+      log(`${user.name} is storing energy!`);
+      await delay(800);
+      return;
+    }
+    const stored = user.bide.damage * 2;
+    user.bide = null;
+    log(`${user.name} unleashed energy!`);
+    await delay(600);
+    if (stored <= 0) {
+      log('But it failed!');
+      user.turn.moveFailed = true;
+      await delay(800);
+      return;
+    }
+    dealt = Math.min(stored, target.currentHp);
+    target.currentHp = Math.max(0, target.currentHp - stored);
+    await playAnim(victim, 'hit', 400);
+    log(`${user.name} dealt ${dealt} damage.`);
+    recordDamage(target, { damageClass: null }, dealt);
+    await delay(600);
+  }
+
+  // --- Logic for the moves Momic and Sketch
+  if (move.name === 'mimic' || move.name === 'sketch') {
+    const copy = target.lastUsedMove;
+    if (!copy || UNCOPYABLE.has(copy.name) ||
+      user.moves.some(m => m.name === copy.name)) {
+      log('But it failed!');
+      user.turn.moveFailed = true;
+      await delay(800);
+      return;
+    }
+    const slot = user.moves.findIndex(m => m.name === move.name);
+    const learned = move.name === 'sketch'
+      ? { ...copy, currentPP: copy.maxPP }
+      : { ...copy, maxPP: 5, currentPP: 5, mimicked: true };
+    user.moves[slot] = learned;
+    log(`${user.name} learned ${prettyName(copy.name)}!`);
+    await delay(800);
+    return;
+  }
+
+  // --- Logic for the move Transform
+  if (move.name === 'transform') {
+    log(`${user.name} transformed into ${target.name}`)
+    if (actor === 'ally') {
+
+      userPokemon.value = makeCombatant(target);
+      userPokemon.value.name = user.name
+      userPokemon.value.id = user.id
+      userPokemon.value.level = user.level
+      userPokemon.value.totalHp = user.totalHp
+      userPokemon.value.currentHp = user.currentHp
+      userPokemon.value.baseExp = user.baseExp
+      userPokemon.value.currentExp = user.currentExp
+      userPokemon.value.captureRate = user.captureRate
+      userPokemon.value.instanceId = user.instanceId
+      userPokemon.value.evoDetails = user.evoDetails
+      userPokemon.value.totalKOs = user.totalKOs
+      userPokemon.value.totalFaints = user.totalFaints
+      userPokemon.value.heldItem = user.heldItem
+      userPokemon.value.moves = userPokemon.value.moves.map(m => ({ ...m, maxPP: 5, currentPP: 5, disabled: false }));
+      activeTransformPokemon.value = { pokemon: userPokemon.value, trainer: 'ally' }
+    }
+    else {
+      foe.value = makeCombatant(target);
+      foe.value.name = user.name
+      foe.value.id = user.id
+      foe.value.level = user.level
+      foe.value.totalHp = user.totalHp
+      foe.value.currentHp = user.currentHp
+      foe.value.baseExp = user.baseExp
+      foe.value.currentExp = user.currentExp
+      foe.value.captureRate = user.captureRate
+      foe.value.instanceId = user.instanceId
+      foe.value.evoDetails = user.evoDetails
+      foe.value.totalKOs = user.totalKOs
+      foe.value.totalFaints = user.totalFaints
+      foe.value.heldItem = user.heldItem
+      foe.value.moves = foe.value.moves.map(m => ({ ...m, maxPP: 5, currentPP: 5, disabled: false }));
+      activeTransformPokemon.value = { pokemon: foe.value, trainer: 'foe' }
+    }
+    return
   }
 
   // --- damage ---
@@ -1460,6 +1607,7 @@ async function useMove(user, target, move) {
       const results = calculateDamage(user, target, move);
       if (results.immune) {
         log(`It doesn't affect ${target.name}...`);
+        user.turn.moveFailed = true;
         user.locked = null;
         await delay(800);
         return;
@@ -1472,6 +1620,8 @@ async function useMove(user, target, move) {
       landed++;
       if (target.currentHp <= 0) break;
     }
+
+    if (!hitsSelf && dealt > 0) recordDamage(target, move, dealt);
 
     if (hits > 1) { log(`Hit ${landed} time${landed === 1 ? '' : 's'}!`); await delay(400); }
     log(`${user.name} dealt ${dealt} damage.`);
@@ -1498,11 +1648,9 @@ async function useMove(user, target, move) {
   // fainted — skip every secondary effect
   if (target.currentHp <= 0) return;
 
-  console.log(move.statChanges)
   // --- stat changes ---
   const statChanges = move.statChanges ?? [];
   if (statChanges.length) {
-    console.log(move.statChanges)
     const chance = move.statChance || 100;
     if (randInt(1, 100) <= chance) {
       const recipient = move.targetsSelf ? user : target;
@@ -1519,7 +1667,7 @@ async function useMove(user, target, move) {
     const chance = move.ailmentChance || 100;
     if (randInt(1, 100) <= chance) {
       const recipient = move.targetsSelf ? user : target;
-      await inflictStatus(recipient, move.ailment, move);
+      await inflictStatus(recipient, move.ailment, move, user);
     }
   }
 
@@ -1558,6 +1706,8 @@ async function useMove(user, target, move) {
     target.flinched = true;
   }
 
+
+  if (!hitsSelf && !COPY_MOVES.has(move.name)) lastMoveInBattle.value = move;
   await delay(400);
 }
 
@@ -1627,6 +1777,21 @@ function stageMultiplier(stage, isAccuracy = false) {
   return stage >= 0 ? (base + stage) / base : base / (base - stage);
 }
 
+function recordDamage(target, move, amount) {
+  if (!target.turn) startTurn(target);
+  target.turn.damageTaken += amount;
+  target.turn.wasHit = true;
+  target.turn.lastDamageTaken = amount;
+  if (move.damageClass === 'physical') {
+    target.turn.physicalDamage += amount;
+    target.turn.lastPhysicalDamage = amount;
+  } else if (move.damageClass === 'special') {
+    target.turn.specialDamage += amount;
+    target.turn.lastSpecialDamage = amount;
+  }
+  if (target.bide) target.bide.damage += amount;
+}
+
 function applyStatChange(target, statName, change) {
   if (!target.stages) target.stages = freshStages();
   const current = target.stages[statName] ?? 0;
@@ -1663,12 +1828,13 @@ const STATUS_MESSAGES = {
   ingrain: (n) => `${n} planted its roots!`,
 };
 
-async function inflictStatus(target, ailment, move) {
+async function inflictStatus(target, ailment, move, user) {
   if (!target.minorStatus) target.minorStatus = [];
   // Major status effects
   if (MAJOR_STATUSES.has(ailment)) {
     if (target.status) {
       log(`But ${target.name} is already ${target.status}!`);
+      user.turn.moveFailed = true;
       await delay(700);
       return;
     }
@@ -1695,6 +1861,7 @@ async function inflictStatus(target, ailment, move) {
   // Minor status effects
   if (target.minorStatus.includes(ailment)) {
     log(`But ${target.name} is already ${ailment}!`);
+    user.turn.moveFailed = true;
     await delay(700);
     return;
   }
@@ -1715,6 +1882,7 @@ async function inflictStatus(target, ailment, move) {
   } else if (ailment === 'nightmare') {
     if (target.status != 'sleep') {
       log(`${target.name} is not asleep, ${prettyName(move.name)} failed!`);
+      user.turn.moveFailed = true;
       await delay(800);
       return
     }
@@ -1723,10 +1891,12 @@ async function inflictStatus(target, ailment, move) {
   } else if (ailment === 'disable') {
     if (!target.lastUsedMove) {
       log(`${target.name} has not used a move, ${prettyName(move.name)} failed!`);
+      user.turn.moveFailed = true;
       await delay(800);
       return
     } else if (target.locked || target.charging) {
       log(`${prettyName(move.name)} failed!`);
+      user.turn.moveFailed = true;
       await delay(800);
       return
     }
@@ -1739,6 +1909,7 @@ async function inflictStatus(target, ailment, move) {
   } else if (ailment === 'yawn') {
     if (target.status === 'sleep') {
       log(`${target.name} is already asleep, ${prettyName(move.name)} failed!`);
+      user.turn.moveFailed = true;
       await delay(800);
       return
     }
@@ -1769,7 +1940,7 @@ async function inflictStatus(target, ailment, move) {
   await delay(800);
 }
 
-async function canAct(pokemon) {
+async function canAct(pokemon, move) {
   if (pokemon.flinched) {
     pokemon.flinched = false;
     log(`${pokemon.name} flinched and couldn't move!`);
@@ -1786,6 +1957,7 @@ async function canAct(pokemon) {
     }
     log(`${pokemon.name} is fast asleep.`);
     await delay(800);
+    if (move.name === 'sleep-talk') return true
     return false;
   }
   if (pokemon.status === 'freeze') {
@@ -1805,6 +1977,60 @@ async function canAct(pokemon) {
     return false;
   }
   return true;
+}
+
+async function resolveCalledMove(user, target, move) {
+  const usable = (m) => m && !UNCOPYABLE.has(m.name);
+
+  switch (move.name) {
+    case 'mirror-move':
+      return usable(target.lastUsedMove) ? target.lastUsedMove : null;
+
+    case 'copycat':
+      return usable(lastMoveInBattle.value) ? lastMoveInBattle.value : null;
+
+    case 'me-first': {
+      const theirs = target.turn?.pendingMove;
+      if (target.turn?.hasMoved) return null;          // must move first
+      if (!usable(theirs) || !theirs.power) return null; // damaging only
+      return { ...theirs, power: Math.floor(theirs.power * 1.5) };
+    }
+
+    case 'nature-power':
+      return await fetchMoveByName(NATURE_POWER_MOVE);
+
+    case 'sleep-talk':
+    case 'assist': {
+      const pool = move.name === 'sleep-talk'
+        ? (user.moves ?? []).filter(m => m.name !== 'sleep-talk')
+        : team.value
+          .filter(p => p.instanceId !== user.instanceId)
+          .flatMap(p => p.moves ?? []);
+      const valid = pool.filter(usable);
+      return valid.length ? valid[randInt(0, valid.length - 1)] : null;
+    }
+
+    case 'metronome': {
+      for (let i = 0; i < 6; i++) {
+        const picked = await fetchMoveById(randInt(1, 559));
+        if (usable(picked)) return picked;
+      }
+      return null;
+    }
+  }
+  return null;
+}
+
+async function fetchMoveById(id) {
+  try {
+    return await pokemonHelper.getMoveData(await pokeapi.getMove(id));
+  } catch { return null; }
+}
+
+async function fetchMoveByName(name) {
+  try {
+    return await pokemonHelper.getMoveData(await pokeapi.getMove(name));
+  } catch { return null; }
 }
 
 async function endOfTurn(target, reciver) {
@@ -2003,77 +2229,8 @@ async function handleUseRecoveryItem(item, targetPokemon) {
   }
 }
 
-async function applyItem(item, target) {
-  if (!target) return;
-  if (item.effect.type === 'heal' && isHealBlocked(target)) {
-    log(`${target.name} can't be healed right now!`);
-    sidePanel.value = 'log';
-    await delay(800);
-    return;
-  }
-
-  console.log(item)
-
-  const currentHp = target.currentHp ?? 0;
-  const isFainted = currentHp <= 0;
-  const isFullHp = currentHp >= target.totalHp;
-  // 1. Validate item effect against target state BEFORE consuming from store
-  if (item.effect.type === 'heal') {
-    if (isFainted) {
-      battleLog.value.push(`${target.name} is fainted! Use a Revive instead.`);
-      sidePanel.value = 'log';
-      await delay(800);
-      return;
-    }
-    if (isFullHp) {
-      battleLog.value.push(`${target.name} is already at full HP!`);
-      sidePanel.value = 'log';
-      await delay(800);
-      return;
-    }
-  } else if (item.effect.type === 'revive') {
-    if (!isFainted) {
-      battleLog.value.push(`${target.name} is not fainted!`);
-      sidePanel.value = 'log';
-      await delay(800);
-      return;
-    }
-  }
-
-  // 3. Consume item via Pinia store using return boolean validation
-  const itemUsed = inventoryStore.UseRecovery(item.id);
-  if (!itemUsed) {
-    battleLog.value.push(`Failed to use ${item.name}. None remaining!`);
-    return;
-  }
-
-  // 4. Apply exact recovery math directly
-  if (item.effect.type === 'heal') {
-    const healAmount = item.effect.amount;
-    const previousHp = target.currentHp;
-
-    target.currentHp = Math.min(
-      target.totalHp,
-      target.currentHp + healAmount
-    );
-
-    const actualHealed = target.currentHp - previousHp;
-    battleLog.value.push(`Used ${item.name}! Restored ${actualHealed} HP to ${target.name}.`);
-  }
-  else if (item.effect.type === 'revive') {
-    const revivedHp = Math.floor(target.totalHp * item.effect.percent);
-    target.currentHp = revivedHp;
-    battleLog.value.push(`Used ${item.name}! Revived ${target.name} with ${revivedHp} HP.`);
-  }
-
-  // Reset dropdown selection
-  selectedTargetPokemon.value = null;
-  sidePanel.value = 'log'; // Flip back to log view
-
-  await delay(800);
-}
-
-async function throwPokeball(target, pokeball) {
+async function throwPokeball(pokeball) {
+  let target = props.opponent
   if (!inventoryStore.UsePokeball(pokeball)) {
     log(`You have no ${pokeball.label} left.`);
     return false;
@@ -2155,9 +2312,15 @@ async function switchActivePokemon(pokemon) {
   userPokemon.value.disabled = false;
   userPokemon.value.mustRecharge = false;
   userPokemon.value.locked = null
+  userPokemon.value.bide = null
+
+  if (activeTransformPokemon.value) syncBattleForm()
+  activeTransformPokemon.value = null
 
   isResolving.value = true;
   try {
+    startTurn(pokemon)
+    startTurn(foe.value)
     log(`${userPokemon.value.name}, come back!`);
     await delay(600);
     userPokemon.value = pokemon;
@@ -2814,7 +2977,7 @@ onMounted(() => {
   margin-top: auto;
 }
 
-.move-swap-container {
+/* .move-swap-container {
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
@@ -2849,7 +3012,7 @@ onMounted(() => {
   display: block;
 }
 
-/* Grids & Cards */
+
 .current-moves {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -2920,7 +3083,7 @@ onMounted(() => {
 
 .hover-action.cancel {
   color: #dc2626;
-}
+} */
 
 .status-icon {
   flex: none;
@@ -3062,23 +3225,26 @@ onMounted(() => {
 }
 
 @keyframes megaBurst {
-  0% { 
+  0% {
     filter: brightness(1) drop-shadow(0 0 0px transparent);
     transform: scale(1);
   }
-  40% { 
+
+  40% {
     /* Energy buildup: Magenta/Purple glow */
-    filter: brightness(1.8) saturate(2) drop-shadow(0 0 18px #e056fd); 
-    transform: scale(1.1) rotate(-2deg); 
+    filter: brightness(1.8) saturate(2) drop-shadow(0 0 18px #e056fd);
+    transform: scale(1.1) rotate(-2deg);
   }
-  50% { 
+
+  50% {
     /* Cyan white-hot energy flash right at the sprite swap */
-    filter: brightness(4) drop-shadow(0 0 35px #00d2d3); 
-    transform: scale(1.25) rotate(2deg); 
+    filter: brightness(4) drop-shadow(0 0 35px #00d2d3);
+    transform: scale(1.25) rotate(2deg);
   }
-  100% { 
-    filter: brightness(1) drop-shadow(0 0 0px transparent); 
-    transform: scale(1); 
+
+  100% {
+    filter: brightness(1) drop-shadow(0 0 0px transparent);
+    transform: scale(1);
   }
 }
 

@@ -17,6 +17,7 @@ import expChart from "@/assets/data/levelThresholds.json"
 import evolutionItems from "@/assets//data/evolutionItems.json"
 import SelectButton from "primevue/selectbutton"
 import * as pokemonHelper from "@/assets/helpers/pokemonHelper"
+import SelectMove from "@/components/SelectMove.vue";
 
 const pokemonStore = usePokemonStore()
 const inventoryStore = useInventoryStore()
@@ -28,9 +29,11 @@ const sortField = ref(null)
 const isTmModalOpen = ref(false)
 const isReplaceModalOpen = ref(false);
 const isEvoItemModalOpen = ref(false)
+const isRefillPPModalOpen = ref(false)
 const pendingNewMove = ref(null);
 const pendingTmId = ref(null);
 const inventoryTab = ref("recovery")
+const ppRecoveryItem = ref(null)
 
 const inventoryTabs = [
     { label: "Recovery Items", value: "recovery" },
@@ -44,23 +47,16 @@ function openReplaceMoveModal(newMove, tmId) {
 }
 
 function closeReplaceMoveModal() {
-    isReplaceModalOpen.value = false;
-    pendingNewMove.value = null;
-    pendingTmId.value = null;
-}
-
-function confirmReplaceMove(indexToReplace) {
     const target = selectedPokemon.value;
     if (!target || !pendingNewMove.value || pendingTmId.value === null) return;
 
     // Use TM from store
     if (inventoryStore.UseTM(pendingTmId.value)) {
-        // Overwrite selected move slot
-        target.moves[indexToReplace] = pendingNewMove.value;
-
-        closeReplaceMoveModal();
         closeTmModal();
     }
+    isReplaceModalOpen.value = false;
+    pendingNewMove.value = null;
+    pendingTmId.value = null;
 }
 
 const openTmModal = () => {
@@ -114,13 +110,7 @@ async function handleUseTM(tmItem) {
         const mResp = await fetch(`https://pokeapi.co/api/v2/move/${tmItem.move}`);
         const mData = await mResp.json();
 
-        const newMove = {
-            name: tmItem.moveName,
-            type: tmItem.type,
-            class: mData.damage_class?.name || 'status',
-            power: mData.power || 0,
-            accuracy: mData.accuracy || 100
-        };
+        const newMove = await pokemonHelper.getMoveData(mData)
 
         // 4. Handle Moveset Capacity (Max 4 Moves)
         if (target.moves.length < 4) {
@@ -272,15 +262,29 @@ function handleUseRecoveryItem(item) {
                 }
             }
         case "status-heal":
-            if(target.status !== "" && target.status){
-                if(target.status === item.effect.status)
-                target.status = ""
-            inventoryStore.UseRecovery(item.id)
-            return
+            if (target.status !== "" && target.status) {
+                if (target.status === item.effect.status)
+                    target.status = ""
+                inventoryStore.UseRecovery(item.id)
+                return
             }
-            else{
+            else {
                 console.log(`${target.name} is not effected by ${item.effect.status}. Can't use this item.`)
             }
+        case "pp-heal":
+            if (item.effect.scope === "single") {
+                ppRecoveryItem.value = item
+                isRefillPPModalOpen.value = true
+            } else if (item.effect.scope === "all") {
+                if (inventoryStore.UseRecovery(item.id)) {
+                    for (let move of selectedPokemon.value.moves) {
+                        move.currentPP = Math.min(move.maxPP, move.currentPP + item.effect.amount)
+                    }
+                }
+            }
+        case "pp-max-raise":
+            ppRecoveryItem.value = item
+            isRefillPPModalOpen.value = true
     }
 }
 
@@ -395,6 +399,10 @@ function closeEvoItemModal() {
     isEvoItemModalOpen.value = false
 }
 
+function closeRefillPPModalOpen() {
+    isRefillPPModalOpen.value = false
+}
+
 </script>
 
 <template>
@@ -491,8 +499,9 @@ function closeEvoItemModal() {
                             </span>
                         </div>
                         <div class="move-stats">
-                            <span class="move-class-badge" :class="move.class">{{ move.class }}</span>
+                            <span class="move-class-badge" :class="move.class">{{ move.damageClass }}</span>
                             <span class="move-power">PWR: {{ move.power || '—' }}</span>
+                            <span class="move-power">PP: {{ move.currentPP }}/{{ move.maxPP }}</span>
                         </div>
                     </div>
 
@@ -637,30 +646,14 @@ function closeEvoItemModal() {
     </Modal>
 
     <!-- REPLACE MOVE SELECTION MODAL -->
-    <Modal v-if="isReplaceModalOpen" @close="closeReplaceMoveModal">
-        <div class="itemModal-container" v-if="pendingNewMove">
-            <h3 class="section-title mb-2">
-                Select a move for {{ selectedPokemon.name }} to forget for {{ pendingNewMove.name }}:
-            </h3>
+    <SelectMove v-if="isReplaceModalOpen" @close="closeReplaceMoveModal()" :userPokemon="selectedPokemon"
+        :pendingMove="pendingNewMove">
+    </SelectMove>
 
-            <div class="replace-grid">
-                <div v-for="(move, index) in selectedPokemon.moves" :key="move.name" class="move-card replace-card"
-                    @click="confirmReplaceMove(index)">
-                    <div class="move-main">
-                        <span class="move-name">{{ move.name }}</span>
-                        <span class="move-type" :style="{ color: pokemonStore.typeColors[move.type] || 'inherit' }">
-                            {{ move.type }}
-                        </span>
-                    </div>
-                    <div class="move-stats">
-                        <span class="move-class-badge" :class="move.class">{{ move.class }}</span>
-                        <span class="move-power">PWR: {{ move.power || '—' }}</span>
-                    </div>
-                    <Button label="Forget This Move" severity="danger" size="small" class="mt-2 w-full" />
-                </div>
-            </div>
-        </div>
-    </Modal>
+    <!-- Refill PP Move SELECTION MODAL -->
+    <SelectMove v-if="isRefillPPModalOpen" @close="closeRefillPPModalOpen()" :userPokemon="selectedPokemon"
+        :item="ppRecoveryItem">
+    </SelectMove>
 </template>
 
 <style scoped>

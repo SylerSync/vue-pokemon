@@ -27,28 +27,31 @@ const testGodPokemon = {
             class: "special",
             power: 300,
             accuracy: 100,
-            pp: 99
+            currentPP: 99,
+            maxPP: 99
         },
         {
-            name: 'hex',
+            name: 'me-first',
             type: 'normal',
-            power: 70,
-            accuracy: 100,
-            priority: 0,
+            power: null,
+            maxPP: 10,
+            currentPP: 10,
+            accuracy: null,          // never misses
+            priority: 1,             // ⚠️ +1
             damageClass: 'physical',
-            targetsSelf: false,      // target is 'selected-pokemon'
+            targetsSelf: true,       // ⚠️ target is 'user'
             statChanges: [],
             statChance: 0,
-            ailment: null,           // meta.ailment.name is 'none'
+            ailment: null,
             ailmentChance: 0,
             drain: 0,
             healing: 0,
             flinchChance: 0,
             critRate: 0,
-            minTurns: 0,             // null in API
-            maxTurns: 0,             // null in API
-            minHits: 0,
-            maxHits: 0,
+            minTurns: 2,
+            maxTurns: 3,
+            minHits: null,
+            maxHits: null,
             category: 'damage',
         },
         {
@@ -57,12 +60,15 @@ const testGodPokemon = {
             class: "special",
             power: 0,
             accuracy: 100,
-            pp: 99
+            currentPP: 99,
+            maxPP: 99,
         },
         {
             name: 'status-test',
             type: 'electric',
             power: null,
+            currentPP: 99,
+            maxPP: 99,
             accuracy: 100,
             priority: 0,
             damageClass: 'status',
@@ -93,9 +99,9 @@ const testBulbasaur = {
     "captureRate": 18,
     "totalHp": 22,
     "currentHp": 22,
-    "level": 15,
+    "level": 16,
     "baseExp": 64,
-    "currentExp": 720,
+    "currentExp": 817,
     "totalKOs": 0,
     "totalFaints": 0,
     "instanceId": "test-bulbasaur-lvl6",
@@ -112,6 +118,8 @@ const testBulbasaur = {
             "name": "tackle",
             "type": "normal",
             "power": 40,
+            "currentPP": 35,
+            "maxPP": 35,
             "accuracy": 100,
             "priority": 0,
             "damageClass": "physical",
@@ -132,6 +140,8 @@ const testBulbasaur = {
             "name": "growl",
             "type": "normal",
             "power": null,
+            "currentPP": 40,
+            "maxPP": 40,
             "accuracy": 100,
             "priority": 0,
             "damageClass": "status",
@@ -152,6 +162,8 @@ const testBulbasaur = {
             "name": "scratch",
             "type": "normal",
             "power": 40,
+            "currentPP": 35,
+            "maxPP": 35,
             "accuracy": 100,
             "priority": 0,
             "damageClass": "physical",
@@ -172,13 +184,15 @@ const testBulbasaur = {
             "name": "leech-seed",
             "type": "grass",
             "power": null,
+            "currentPP": 10,
+            "maxPP": 10,
             "accuracy": 90,
             "priority": 0,
             "damageClass": "status",
             "targetsSelf": false,
             "statChanges": [],
             "statChance": 0,
-            "ailment": null,
+            "ailment": "leech-seed",
             "ailmentChance": 0,
             "drain": 0,
             "healing": 0,
@@ -235,6 +249,8 @@ const testCharizard = {
             "name": "flamethrower",
             "type": "fire",
             "power": 90,
+            "currentPP": 15,
+            "maxPP": 15,
             "accuracy": 100,
             "priority": 0,
             "damageClass": "special",
@@ -255,6 +271,8 @@ const testCharizard = {
             "name": "dragon-claw",
             "type": "dragon",
             "power": 80,
+            "currentPP": 15,
+            "maxPP": 15,
             "accuracy": 100,
             "priority": 0,
             "damageClass": "physical",
@@ -275,6 +293,8 @@ const testCharizard = {
             "name": "air-slash",
             "type": "flying",
             "power": 75,
+            "currentPP": 15,
+            "maxPP": 15,
             "accuracy": 95,
             "priority": 0,
             "damageClass": "special",
@@ -295,6 +315,8 @@ const testCharizard = {
             "name": "slash",
             "type": "normal",
             "power": 70,
+            "currentPP": 20,
+            "maxPP": 20,
             "accuracy": 100,
             "priority": 0,
             "damageClass": "physical",
@@ -350,8 +372,8 @@ const testRayquaza = {
             power: 120,
             accuracy: 100,
             damageClass: "physical",
-            pp: 5,
-            maxPp: 5
+            currentPP: 5,
+            maxPP: 5
         },
         {
             name: "dragon-claw",
@@ -359,8 +381,8 @@ const testRayquaza = {
             power: 80,
             accuracy: 100,
             damageClass: "physical",
-            pp: 15,
-            maxPp: 15
+            currentPP: 15,
+            maxPP: 15
         },
         {
             name: "extreme-speed",
@@ -368,8 +390,8 @@ const testRayquaza = {
             power: 80,
             accuracy: 100,
             damageClass: "physical",
-            pp: 5,
-            maxPp: 5
+            currentPP: 5,
+            maxPP: 5
         },
         {
             name: "dragon-dance",
@@ -377,8 +399,8 @@ const testRayquaza = {
             power: null,
             accuracy: null,
             damageClass: "status",
-            pp: 20,
-            maxPp: 20
+            currentPP: 20,
+            maxPP: 20
         }
     ]
 };
@@ -415,6 +437,8 @@ const testGligar = {
             "name": "poison-sting",
             "type": "poison",
             "power": 15,
+            "currentPP": 35,
+            "maxPP": 35,
             "accuracy": 100,
             "priority": 0,
             "damageClass": "physical",
@@ -435,6 +459,8 @@ const testGligar = {
             "name": "sand-attack",
             "type": "ground",
             "power": null,
+            "currentPP": 15,
+            "maxPP": 15,
             "accuracy": 100,
             "priority": 0,
             "damageClass": "status",
@@ -455,6 +481,8 @@ const testGligar = {
             "name": "harden",
             "type": "normal",
             "power": null,
+            "currentPP": 30,
+            "maxPP": 30,
             "accuracy": null,
             "priority": 0,
             "damageClass": "status",
@@ -475,6 +503,8 @@ const testGligar = {
             "name": "knock-off",
             "type": "dark",
             "power": 65,
+            "currentPP": 20,
+            "maxPP": 20,
             "accuracy": 100,
             "priority": 0,
             "damageClass": "physical",
@@ -536,10 +566,10 @@ const testEevee = {
 
     // Sample starting moveset
     moves: [
-        { name: "tackle", type: "normal", class: "physical", power: 40 },
-        { name: "quick-attack", type: "normal", class: "physical", power: 40 },
-        { name: "bite", type: "dark", class: "physical", power: 60 },
-        { name: "swift", type: "normal", class: "special", power: 60 }
+        { name: "tackle", type: "normal", class: "physical", power: 40, currentPP: 35, maxPP: 35 },
+        { name: "quick-attack", type: "normal", class: "physical", power: 40, currentPP: 30, maxPP: 30 },
+        { name: "bite", type: "dark", class: "physical", power: 60, currentPP: 25, maxPP: 25 },
+        { name: "swift", type: "normal", class: "special", power: 60, currentPP: 20, maxPP: 20 }
     ],
 
     // Evolution details array testing multiple "use-item" stones
