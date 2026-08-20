@@ -566,9 +566,8 @@ export const usePokemonStore = defineStore("pokemonStore", {
 
 
     state: () => ({
-        caughtPokemon: [
-            testEevee, testGodPokemon, testBulbasaur, testGligar, testCharizard, testRayquaza
-        ],
+        caughtPokemon: [],
+        pokemonParty: [],
         wishlistPokemon: [],
         typeColors: {
             normal: '#A8A878',
@@ -654,6 +653,6 @@ export const usePokemonStore = defineStore("pokemonStore", {
     },
     persist:{
         key: "pokemon-store-save",
-        pick:['caughtPokemon','wishlistPokemon']
+        pick:['caughtPokemon','wishlistPokemon','pokemonParty']
     }
 })
