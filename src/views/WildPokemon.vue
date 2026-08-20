@@ -390,7 +390,7 @@ async function getWildPokemonData(region) {
     const randInt = Math.floor(Math.random() * 101);
 
     const pokemonIdentifier = target.name;
-    // const pokemonIdentifier = "deoxys"
+    // const pokemonIdentifier = "ditto"
     return await getPokemonData(pokemonIdentifier, selectedRegion)
   });
 
