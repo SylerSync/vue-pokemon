@@ -324,6 +324,7 @@ const isSwapModalOpen = ref(false)
 const pendingMove = ref(null)
 const allyFaintedThisTurn = ref(false)
 const allyFaintedLastTurn = ref(false)
+const lastMoveInBattle = ref(null);   // Copycat
 let turnValue = 1
 const evoOverlay = ref({
   active: false,
@@ -365,6 +366,7 @@ const pokeballOptions = computed(() => {
 const foe = ref(null)
 
 const activeMegaPokemon = ref(null)
+const activeTransformPokemon = ref(null)
 
 const team = computed(() => {
   const sourceTeam = props.team ?? pokemonStore.caughtPokemon
@@ -582,6 +584,25 @@ const CONDITIONAL_POWER = {
   'stomping-tantrum': (u) => u.turn?.moveFailedLastTurn ? 2 : 1,
 };
 
+// Hard coded moves for copy logic
+const COPY_MOVES = new Set([
+  'metronome', 'mirror-move', 'copycat', 'me-first', 'assist',
+  'nature-power', 'sleep-talk',
+]);
+
+// never selectable by a calling move
+const UNCOPYABLE = new Set([
+  ...COPY_MOVES,
+  'struggle', 'transform', 'counter', 'mirror-coat', 'metal-burst',
+  'bide', 'focus-punch', 'dynamic-punch', 'destiny-bond', 'detect',
+  'endure', 'protect', 'feint', 'follow-me', 'helping-hand', 'snatch',
+  'thief', 'covet', 'trick', 'switcheroo', 'bestow', 'chatter',
+  'sketch', 'mimic', 'quash', 'after-you', 'belch', 'shell-trap',
+  'beak-blast', 'baneful-bunker', 'spiky-shield', "king-s-shield",
+]);
+
+const NATURE_POWER_MOVE = 'tri-attack';  // no terrain system → default
+
 function weightPower(hg) {
   const w = hg ?? 0;
   return w < 100 ? 20 : w < 250 ? 40 : w < 500 ? 60 : w < 1000 ? 80 : w < 2000 ? 100 : 120;
@@ -679,36 +700,39 @@ function checkMegaEvo() {
   }
 }
 
-function syncMegaPokemon() {
-  if (!activeMegaPokemon.value) return
+function syncBattleForm() {
+  const active = activeTransformPokemon.value?.trainer === 'ally'
+    ? activeTransformPokemon.value.pokemon
+    : activeMegaPokemon.value;
+  if (!active) return;
 
-  const mega = activeMegaPokemon.value
-
-  const base = pokemonStore.caughtPokemon.find(p => p.instanceId === mega.instanceId)
-
+  const base = pokemonStore.caughtPokemon.find(p => p.instanceId === active.instanceId);
   if (base) {
-    if (mega.currentHp <= 0) {
-      base.currentHp = 0
-      base.totalFaints = (base.totalFaints || 0) + 1
+    if (active.currentHp <= 0) {
+      base.currentHp = 0;
+      base.totalFaints = (base.totalFaints || 0) + 1;
     } else {
-      const hpRatio = mega.currentHp / mega.totalHp
-      base.currentHp = Math.max(1, Math.round(base.totalHp * hpRatio))
+      const hpRatio = active.currentHp / active.totalHp;
+      base.currentHp = Math.max(1, Math.round(base.totalHp * hpRatio));
     }
+    base.level = active.level;
+    base.currentExp = active.currentExp;
+    base.status = active.status || null;
+    if (active.totalKOs) base.totalKOs = active.totalKOs;
 
-    base.level = mega.level
-    base.currentExp = mega.currentExp
-    base.moves = mega.moves
-    base.status = mega.status || null
-    if (mega.totalKOs) base.totalKOs = mega.totalKOs
+    //Mega only logic
+    if (activeMegaPokemon.value) {
+      base.moves = active.moves
+    }
   }
 
-  activeMegaPokemon.value = null
+  activeMegaPokemon.value = null;
+  activeTransformPokemon.value = null;
 }
 
 const isMegaEvolving = ref(false)
 
 async function handleMegaEvo(pokemon) {
-  console.log(`Converting ${pokemon.name}.`)
 
   // 1. Fetch data from helper script
   const megaData = await pokemonHelper.handleMegaEvo(pokemon)
@@ -825,7 +849,6 @@ function startBattle() {
   if (userPokemon.value.currentHp == null) {
     userPokemon.value.currentHp = userPokemon.value.totalHp;
   }
-  console.log(userPokemon.value)
   checkMegaEvo()
   userPokemon.value.stages = freshStages();
   userPokemon.value.flinched = false;
@@ -840,8 +863,8 @@ function startBattle() {
 }
 
 function endBattle(outcome = 'ended') {
-  if (activeMegaPokemon.value) {
-    syncMegaPokemon()
+  if (activeMegaPokemon.value || activeTransformPokemon.value) {
+    syncBattleForm()
   }
   battleStarted.value = false;
   isResolving.value = false;
@@ -870,14 +893,16 @@ async function battleTurn(playerMove, item = null) {
     turnValue++
     let player = userPokemon.value;
     startTurn(player);
+    player.turn.pendingMove = playerMove;
     let wild = foe.value;
     startTurn(wild);
     const wildMove = pickMove(wild);
+    wild.turn.pendingMove = wildMove;
 
     // --- item branch: using an item costs your turn ---
     if (item) {
       if (isPokeball(item)) {
-        const caught = await throwPokeball(wild, item);
+        const caught = await throwPokeball(item);
         if (caught) return endBattle('caught');
         if (!battleStarted.value) return; // it fled
       } else {
@@ -921,6 +946,9 @@ async function battleTurn(playerMove, item = null) {
     for (const [attacker, defender, move] of order) {
       if (!move || isFainted(attacker)) continue;
       await useMove(attacker, defender, move);
+      if (activeTransformPokemon.value) {
+        activeTransformPokemon.value.trainer == 'ally' ? player = activeTransformPokemon.value.pokemon : wild = activeTransformPokemon.value.pokemon
+      }
       const attackerDown = isFainted(attacker);
       if (await handleFaint(defender)) {
         if (attackerDown) await handleFaint(attacker);
@@ -962,8 +990,6 @@ async function battleTurn(playerMove, item = null) {
 }
 
 function statOf(pokemon, name) {
-  // console.log(name)
-  // console.log(pokemon.stages?.[name] ?? 0)
   const raw = pokemon.stats.find(s => s.name === name)?.stat ?? 1;
   let value = raw * stageMultiplier(pokemon.stages?.[name] ?? 0);
   if (name === 'attack' && pokemon.status === 'burn') value *= 0.5;
@@ -984,13 +1010,13 @@ function pickMove(pokemon) {
   //   statChance: 0,
   //   ailment: null,
   //   ailmentChance: 0,
-  //   drain: 0,                  // ⚠️ not -100 — the self-KO isn't here
+  //   drain: 0,                  // not -100 — the self-KO isn't here
   //   healing: 0,
   //   flinchChance: 0,
   //   critRate: 0,
   //   minTurns: 0,               // null in API
   //   maxTurns: 0,               // null in API
-  //   category: 'damage',        // ⚠️ not 'unique' or anything self-KO-ish
+  //   category: 'damage',        // not 'unique' or anything self-KO-ish
   // }
   // return move
   if (pokemon.charging) return pokemon.charging.move;
@@ -1000,13 +1026,9 @@ function pickMove(pokemon) {
   let disabledMoves = []
   if (pokemon.minorStatus?.includes("torment") && pokemon.lastUsedMove) {
     disabledMoves.push(moves.findIndex(m => m.name == pokemon.lastUsedMove.name))
-    // console.log(disabledMoves)
   }
   if (pokemon.minorStatus?.includes("disable") && pokemon.lastUsedMove) {
     disabledMoves.push(moves.findIndex(m => m.disabled))
-    // console.log(moves)
-    // console.log(pokemon.lastUsedMove.name)
-    console.log(disabledMoves)
   }
   let selectedMoveIndex = getRandomWithExclusions(0, moves.length - 1, disabledMoves);
   return moves[selectedMoveIndex];
@@ -1110,7 +1132,6 @@ function recalcStats(pokemon) {
     stat: Math.floor(((2 * s.base_stat * pokemon.level) / 100) + 5)
   }))
   let oldHp = pokemon.totalHp
-  console.log(oldHp)
   pokemon.totalHp = Math.floor(((2 * pokemon.stats.find(s => s.name == "hp")?.base_stat * pokemon.level) / 100) + pokemon.level + 10)
   pokemon.currentHp += pokemon.totalHp - oldHp
 }
@@ -1158,17 +1179,6 @@ function closeReplaceMoveModal() {
 
 }
 
-function replaceMove(index) {
-  if (userPokemon.value && pendingMove.value) {
-    // Overwrite the move in the selected card slot
-    userPokemon.value.moves[index] = pendingMove.value;
-    console.log(`${userPokemon.value.name} forgot a move and learned ${pendingMove.value.name}!`);
-  }
-
-  // Close modal and release the Promise
-  closeReplaceMoveModal();
-}
-
 
 /**
  * Handles a fainted combatant. Returns true if the turn should stop.
@@ -1179,6 +1189,11 @@ async function handleFaint(pokemon) {
   pokemon.mustRecharge = false;
   pokemon.locked = null;
   pokemon.bide = null
+
+  if (activeTransformPokemon.value?.pokemon === pokemon) {
+    activeTransformPokemon.value = null;
+  }
+
   log(`${pokemon.name} fainted!`);
   canMegaEvolve.value = false
   await playAnim(pokemon === foe.value ? 'foe' : 'ally', 'faint', 700);
@@ -1225,8 +1240,6 @@ async function handleFaint(pokemon) {
   // Player's Pokémon fainted — switch if anyone is left standing.
   const next = team.value.find(p => !isFainted(p) && p.instanceId !== pokemon.instanceId);
   allyFaintedThisTurn.value = true
-  userPokemon.value = null;
-  sidePanel.value = 'team';
 
   if (next) {
     log(`Go, ${next.name}!`);
@@ -1245,7 +1258,7 @@ async function handleFaint(pokemon) {
  * Moves
  * ------------------------------------------------------------------ */
 
-async function useMove(user, target, move) {
+async function useMove(user, target, move, opts = {}) {
   let actor = user === userPokemon.value ? 'ally' : 'foe';
   let victim = actor === 'ally' ? 'foe' : 'ally';
   let hitsSelf = false;
@@ -1270,7 +1283,7 @@ async function useMove(user, target, move) {
   user.lastUsedMove = move;
 
   // --- pre-move status checks ---
-  if (!(await canAct(user))) {
+  if (!(await canAct(user, move))) {
     user.charging = null;
     return;
   }
@@ -1293,10 +1306,7 @@ async function useMove(user, target, move) {
     }
   }
   if (user.disabled && --user.disabled.turns <= 0) {
-    console.log(user.disabled.move)
-    console.log(user.moves)
     let move = user.moves.find(m => m.name === user.disabled.move)
-    console.log(move)
     move.disabled = false
     user.minorStatus = user.minorStatus.filter(s => s !== 'disable');
     log(`${user.name}'s move ${prettyName(user.disabled.move)} is no longer disabled.`);
@@ -1304,7 +1314,7 @@ async function useMove(user, target, move) {
     await delay(800);
   }
 
-  if (!continuing && move.currentPP != null) move.currentPP--;
+  if (!continuing && !opts.copied && move.currentPP != null) move.currentPP--;
 
   if (hitsSelf) {
     user.charging = null;
@@ -1323,6 +1333,20 @@ async function useMove(user, target, move) {
   } else {
     log(`${user.name} used ${prettyName(move.name)}!`);
     await playAnim(actor, 'lunge', 300);
+  }
+
+  // --- calling moves for coypying ---
+  if (COPY_MOVES.has(move.name) && !hitsSelf && !opts.copied) {
+    const called = await resolveCalledMove(user, target, move);
+    if (!called) {
+      log('But it failed!');
+      user.turn.moveFailed = true;
+      await delay(800);
+      return;
+    }
+    log(`${prettyName(move.name)} became ${prettyName(called.name)}!`);
+    await delay(700);
+    return await useMove(user, target, called, { copied: true });
   }
 
   // --- two-turn moves ---
@@ -1509,6 +1533,69 @@ async function useMove(user, target, move) {
     await delay(600);
   }
 
+  // --- Logic for the moves Momic and Sketch
+  if (move.name === 'mimic' || move.name === 'sketch') {
+    const copy = target.lastUsedMove;
+    if (!copy || UNCOPYABLE.has(copy.name) ||
+      user.moves.some(m => m.name === copy.name)) {
+      log('But it failed!');
+      user.turn.moveFailed = true;
+      await delay(800);
+      return;
+    }
+    const slot = user.moves.findIndex(m => m.name === move.name);
+    const learned = move.name === 'sketch'
+      ? { ...copy, currentPP: copy.maxPP }
+      : { ...copy, maxPP: 5, currentPP: 5, mimicked: true };
+    user.moves[slot] = learned;
+    log(`${user.name} learned ${prettyName(copy.name)}!`);
+    await delay(800);
+    return;
+  }
+
+  // --- Logic for the move Transform
+  if (move.name === 'transform') {
+    log(`${user.name} transformed into ${target.name}`)
+    if (actor === 'ally') {
+
+      userPokemon.value = makeCombatant(target);
+      userPokemon.value.name = user.name
+      userPokemon.value.id = user.id
+      userPokemon.value.level = user.level
+      userPokemon.value.totalHp = user.totalHp
+      userPokemon.value.currentHp = user.currentHp
+      userPokemon.value.baseExp = user.baseExp
+      userPokemon.value.currentExp = user.currentExp
+      userPokemon.value.captureRate = user.captureRate
+      userPokemon.value.instanceId = user.instanceId
+      userPokemon.value.evoDetails = user.evoDetails
+      userPokemon.value.totalKOs = user.totalKOs
+      userPokemon.value.totalFaints = user.totalFaints
+      userPokemon.value.heldItem = user.heldItem
+      userPokemon.value.moves = userPokemon.value.moves.map(m => ({ ...m, maxPP: 5, currentPP: 5, disabled: false }));
+      activeTransformPokemon.value = { pokemon: userPokemon.value, trainer: 'ally' }
+    }
+    else {
+      foe.value = makeCombatant(target);
+      foe.value.name = user.name
+      foe.value.id = user.id
+      foe.value.level = user.level
+      foe.value.totalHp = user.totalHp
+      foe.value.currentHp = user.currentHp
+      foe.value.baseExp = user.baseExp
+      foe.value.currentExp = user.currentExp
+      foe.value.captureRate = user.captureRate
+      foe.value.instanceId = user.instanceId
+      foe.value.evoDetails = user.evoDetails
+      foe.value.totalKOs = user.totalKOs
+      foe.value.totalFaints = user.totalFaints
+      foe.value.heldItem = user.heldItem
+      foe.value.moves = foe.value.moves.map(m => ({ ...m, maxPP: 5, currentPP: 5, disabled: false }));
+      activeTransformPokemon.value = { pokemon: foe.value, trainer: 'foe' }
+    }
+    return
+  }
+
   // --- damage ---
   if (move.power) {
     const hits = rollHitCount(move);
@@ -1561,11 +1648,9 @@ async function useMove(user, target, move) {
   // fainted — skip every secondary effect
   if (target.currentHp <= 0) return;
 
-  console.log(move.statChanges)
   // --- stat changes ---
   const statChanges = move.statChanges ?? [];
   if (statChanges.length) {
-    console.log(move.statChanges)
     const chance = move.statChance || 100;
     if (randInt(1, 100) <= chance) {
       const recipient = move.targetsSelf ? user : target;
@@ -1621,6 +1706,8 @@ async function useMove(user, target, move) {
     target.flinched = true;
   }
 
+
+  if (!hitsSelf && !COPY_MOVES.has(move.name)) lastMoveInBattle.value = move;
   await delay(400);
 }
 
@@ -1853,7 +1940,7 @@ async function inflictStatus(target, ailment, move, user) {
   await delay(800);
 }
 
-async function canAct(pokemon) {
+async function canAct(pokemon, move) {
   if (pokemon.flinched) {
     pokemon.flinched = false;
     log(`${pokemon.name} flinched and couldn't move!`);
@@ -1870,6 +1957,7 @@ async function canAct(pokemon) {
     }
     log(`${pokemon.name} is fast asleep.`);
     await delay(800);
+    if (move.name === 'sleep-talk') return true
     return false;
   }
   if (pokemon.status === 'freeze') {
@@ -1889,6 +1977,60 @@ async function canAct(pokemon) {
     return false;
   }
   return true;
+}
+
+async function resolveCalledMove(user, target, move) {
+  const usable = (m) => m && !UNCOPYABLE.has(m.name);
+
+  switch (move.name) {
+    case 'mirror-move':
+      return usable(target.lastUsedMove) ? target.lastUsedMove : null;
+
+    case 'copycat':
+      return usable(lastMoveInBattle.value) ? lastMoveInBattle.value : null;
+
+    case 'me-first': {
+      const theirs = target.turn?.pendingMove;
+      if (target.turn?.hasMoved) return null;          // must move first
+      if (!usable(theirs) || !theirs.power) return null; // damaging only
+      return { ...theirs, power: Math.floor(theirs.power * 1.5) };
+    }
+
+    case 'nature-power':
+      return await fetchMoveByName(NATURE_POWER_MOVE);
+
+    case 'sleep-talk':
+    case 'assist': {
+      const pool = move.name === 'sleep-talk'
+        ? (user.moves ?? []).filter(m => m.name !== 'sleep-talk')
+        : team.value
+          .filter(p => p.instanceId !== user.instanceId)
+          .flatMap(p => p.moves ?? []);
+      const valid = pool.filter(usable);
+      return valid.length ? valid[randInt(0, valid.length - 1)] : null;
+    }
+
+    case 'metronome': {
+      for (let i = 0; i < 6; i++) {
+        const picked = await fetchMoveById(randInt(1, 559));
+        if (usable(picked)) return picked;
+      }
+      return null;
+    }
+  }
+  return null;
+}
+
+async function fetchMoveById(id) {
+  try {
+    return await pokemonHelper.getMoveData(await pokeapi.getMove(id));
+  } catch { return null; }
+}
+
+async function fetchMoveByName(name) {
+  try {
+    return await pokemonHelper.getMoveData(await pokeapi.getMove(name));
+  } catch { return null; }
 }
 
 async function endOfTurn(target, reciver) {
@@ -2087,77 +2229,8 @@ async function handleUseRecoveryItem(item, targetPokemon) {
   }
 }
 
-async function applyItem(item, target) {
-  if (!target) return;
-  if (item.effect.type === 'heal' && isHealBlocked(target)) {
-    log(`${target.name} can't be healed right now!`);
-    sidePanel.value = 'log';
-    await delay(800);
-    return;
-  }
-
-  console.log(item)
-
-  const currentHp = target.currentHp ?? 0;
-  const isFainted = currentHp <= 0;
-  const isFullHp = currentHp >= target.totalHp;
-  // 1. Validate item effect against target state BEFORE consuming from store
-  if (item.effect.type === 'heal') {
-    if (isFainted) {
-      battleLog.value.push(`${target.name} is fainted! Use a Revive instead.`);
-      sidePanel.value = 'log';
-      await delay(800);
-      return;
-    }
-    if (isFullHp) {
-      battleLog.value.push(`${target.name} is already at full HP!`);
-      sidePanel.value = 'log';
-      await delay(800);
-      return;
-    }
-  } else if (item.effect.type === 'revive') {
-    if (!isFainted) {
-      battleLog.value.push(`${target.name} is not fainted!`);
-      sidePanel.value = 'log';
-      await delay(800);
-      return;
-    }
-  }
-
-  // 3. Consume item via Pinia store using return boolean validation
-  const itemUsed = inventoryStore.UseRecovery(item.id);
-  if (!itemUsed) {
-    battleLog.value.push(`Failed to use ${item.name}. None remaining!`);
-    return;
-  }
-
-  // 4. Apply exact recovery math directly
-  if (item.effect.type === 'heal') {
-    const healAmount = item.effect.amount;
-    const previousHp = target.currentHp;
-
-    target.currentHp = Math.min(
-      target.totalHp,
-      target.currentHp + healAmount
-    );
-
-    const actualHealed = target.currentHp - previousHp;
-    battleLog.value.push(`Used ${item.name}! Restored ${actualHealed} HP to ${target.name}.`);
-  }
-  else if (item.effect.type === 'revive') {
-    const revivedHp = Math.floor(target.totalHp * item.effect.percent);
-    target.currentHp = revivedHp;
-    battleLog.value.push(`Used ${item.name}! Revived ${target.name} with ${revivedHp} HP.`);
-  }
-
-  // Reset dropdown selection
-  selectedTargetPokemon.value = null;
-  sidePanel.value = 'log'; // Flip back to log view
-
-  await delay(800);
-}
-
-async function throwPokeball(target, pokeball) {
+async function throwPokeball(pokeball) {
+  let target = props.opponent
   if (!inventoryStore.UsePokeball(pokeball)) {
     log(`You have no ${pokeball.label} left.`);
     return false;
@@ -2240,6 +2313,9 @@ async function switchActivePokemon(pokemon) {
   userPokemon.value.mustRecharge = false;
   userPokemon.value.locked = null
   userPokemon.value.bide = null
+
+  if (activeTransformPokemon.value) syncBattleForm()
+  activeTransformPokemon.value = null
 
   isResolving.value = true;
   try {

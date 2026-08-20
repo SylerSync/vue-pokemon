@@ -31,7 +31,7 @@ const testGodPokemon = {
             maxPP: 99
         },
         {
-            name: 'bide',
+            name: 'me-first',
             type: 'normal',
             power: null,
             maxPP: 10,
