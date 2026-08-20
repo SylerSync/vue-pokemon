@@ -4,6 +4,9 @@
         <div class="viewport-wrapper">
             <canvas ref="canvasRef"></canvas>
 
+            <!-- ENCOUNTER FLASH OVERLAY (Layered over canvas during wild encounters) -->
+            <div v-if="isEncounterAnimating" class="encounter-flash-overlay"></div>
+
             <!-- HUD Menu Button -->
             <button class="hud-menu-btn" @click="toggleMenu">
                 ☰ Menu
@@ -145,8 +148,8 @@
         </div>
     </Modal>
 
-    <PokemonBattle v-if="isBattleModalOpen" :team="pokemonStore.pokemonParty" :opponent="wildPokemon" :isWild="true"
-        @end="onBattleEnd" @close="wildPokemon = null" />
+    <PokemonBattle v-if="isBattleModalOpen" :auto-start="true" :team="pokemonStore.pokemonParty" :opponent="wildPokemon"
+        :isWild="true" @end="onBattleEnd" @close="wildPokemon = null" />
 </template>
 
 <script setup>
@@ -162,6 +165,7 @@ import Modal from "@/components/Modal.vue"
 import DataView from "primevue/dataview"
 import wildJson from "@/assets/data/wildPokemon.json"
 import PokemonBattle from "@/components/PokemonBattle.vue"
+import { useSettingsStore } from '@/stores/settingsStore';
 
 // Import Maps
 import overworldMap from '@/assets/data/mapData/map1.json';
@@ -172,15 +176,17 @@ import pokeCenterMap from '@/assets/data/mapData/PokeCenter.json';
 const pokemonStore = usePokemonStore()
 const inventoryStore = useInventoryStore()
 const errorStore = useErrorStore()
-
+const settingsStore = useSettingsStore()
 
 // modal values
 const isStarterModalOpen = ref(false)
 const isPokeBoxModalOpen = ref(false)
 
+// Ref values
 const starters = ref({})
 const wildPokemon = ref(null)
 const isEncounterLoading = ref(false);
+const isEncounterAnimating = ref(false);
 
 // Control Functions
 // #region CONTROLS
@@ -345,20 +351,28 @@ async function generateWildPokemon() {
 }
 
 async function startWildEncounter() {
+    enableBattleMusic()
     clearInputs()
     isEncounterLoading.value = true
-    let didGen = await generateWildPokemon()
+    const [didGen] = await Promise.all([
+        generateWildPokemon(),
+        triggerEncounterAnimation()
+    ]);
+
+    // 3. Open battle or handle failure
     if (didGen) {
-        openBattleModal()
+        openBattleModal();
+    } else {
+        disableBattleMusic();
+        errorStore.SetErrorDetails("Generation Issue", "There was an issue generating the Wild Pokemon.");
     }
-    else {
-        errorStore.SetErrorDetails("Generation Issue", "There was an issue generating the Wild Pokemon.")
-    }
-    isEncounterLoading.value = false
+
+    isEncounterLoading.value = false;
 }
 
 function onBattleEnd() {
     let canContinue = false
+    disableBattleMusic()
     for (let poke of pokemonStore.pokemonParty) {
         if (poke.currentHp > 0) {
             canContinue = true
@@ -387,9 +401,38 @@ function healParty(partyFainted) {
         poke.status = null
         poke.minorStatus = []
     }
-    if(!partyFainted){
+    if (!partyFainted) {
         errorStore.SetErrorDetails("PokeCenter", "Your party has been fully healed.")
     }
+}
+
+// Pre-load battle music
+const BATTLE_MUSIC_URL = "https://play.pokemonshowdown.com/audio/dpp-trainer.mp3";
+let bgmTrack = new Audio(BATTLE_MUSIC_URL);
+bgmTrack.loop = true;
+bgmTrack.preload = "auto";
+
+function enableBattleMusic() {
+    bgmTrack.currentTime = 0;
+    bgmTrack.muted = Boolean(settingsStore.muteAudio);
+    bgmTrack.play().catch((err) => {
+        console.warn("Autoplay prevented or failed: ", err);
+    });
+}
+
+function disableBattleMusic() {
+    bgmTrack.pause();
+    bgmTrack.currentTime = 0;
+}
+
+function triggerEncounterAnimation() {
+    return new Promise((resolve) => {
+        isEncounterAnimating.value = true;
+        setTimeout(() => {
+            isEncounterAnimating.value = false;
+            resolve();
+        }, 2000);
+    });
 }
 
 // #endregion
@@ -1492,6 +1535,33 @@ canvas {
     text-transform: uppercase;
     color: #fff;
     text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+.encounter-flash-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 10;
+  pointer-events: none;
+  /* Updated to match the 2-second timeout (2s) */
+  animation: pokemonEncounterFlash 2s ease-in-out forwards; 
+}
+
+@keyframes pokemonEncounterFlash {
+  /* Spread the rapid white flashes out over 0% - 75% */
+  0%   { background-color: rgba(255, 255, 255, 0); }
+  15%  { background-color: rgba(255, 255, 255, 0.95); }
+  25%  { background-color: rgba(255, 255, 255, 0.1); }
+  40%  { background-color: rgba(255, 255, 255, 0.95); }
+  50%  { background-color: rgba(0, 0, 0, 0.2); }
+  65%  { background-color: rgba(255, 255, 255, 0.95); }
+  75%  { background-color: rgba(255, 255, 255, 0.1); }
+
+  /* Smooth fade to black for the final 25% */
+  90%  { background-color: rgba(0, 0, 0, 1); }
+  100% { background-color: rgba(0, 0, 0, 1); }
 }
 
 @media (max-width: 768px) {
