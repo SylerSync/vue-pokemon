@@ -98,7 +98,7 @@
               <button v-for="move in userPokemon.moves" :key="move.name" class="move"
                 :style="{ backgroundColor: pokemonStore.typeColors[move.type] }"
                 :disabled="isResolving || move.disabled || move.currentPP == 0
-                  || (userPokemon.charging && userPokemon.charging.move.name !== move.name) || (userPokemon.locked && userPokemon.locked.move.name !== move.name)
+                  || (userPokemon.charging && userPokemon.charging.move.name !== move.name) || (userPokemon.locked && userPokemon.locked.move.name !== move.name) || (userPokemon.bide && userPokemon.bide.move.name !== move.name)
                   || (userPokemon.minorStatus?.includes('torment') && userPokemon.lastUsedMove?.name == move.name) || isFainted(userPokemon)" @click="battleTurn(move)">
                 <span class="move-name">{{ move.name }}</span>
                 <span class="move-power">{{ move.currentPP }}/{{ move.maxPP }}</span>
@@ -221,10 +221,8 @@
     </div>
   </Modal>
 
-  <SelectMove  v-if="isSwapModalOpen" @close="closeReplaceMoveModal()"
-    :userPokemon="userPokemon"
-    :pendingMove="pendingMove"
-  >
+  <SelectMove v-if="isSwapModalOpen" @close="closeReplaceMoveModal()" :userPokemon="userPokemon"
+    :pendingMove="pendingMove">
   </SelectMove>
 
   <!-- Evolution Overlay -->
@@ -238,7 +236,7 @@
       }" />
     </div>
   </div>
-  
+
 </template>
 
 <script setup>
@@ -324,6 +322,8 @@ const logEl = ref(null);
 const anim = ref(null);
 const isSwapModalOpen = ref(false)
 const pendingMove = ref(null)
+const allyFaintedThisTurn = ref(false)
+const allyFaintedLastTurn = ref(false)
 let turnValue = 1
 const evoOverlay = ref({
   active: false,
@@ -411,6 +411,8 @@ const STAT_LABEL = {
   speed: 'Speed', accuracy: 'accuracy', evasion: 'evasiveness',
 };
 
+
+// Hardcoded moves that have special/unique effects that arn't listed in pokeapi
 const SELF_KO_MOVES = new Set([
   'self-destruct', 'explosion', 'misty-explosion',
   'memento', 'healing-wish', 'lunar-dance',
@@ -538,6 +540,16 @@ const VARIABLE_POWER_MOVES = {
     return Math.min(860, 20 + 20 * boosts);
   },
 
+  // --- Uses current turn data
+  counter: (u) => u.turn.lastPhysicalDamage > 0
+    ? u.turn.lastPhysicalDamage * 2 : null,
+  'mirror-coat': (u) => u.turn.lastSpecialDamage > 0
+    ? u.turn.lastSpecialDamage * 2 : null,
+  'metal-burst': (u) => u.turn.lastDamageTaken > 0
+    ? Math.floor(u.turn.lastDamageTaken * 1.5) : null,
+  'comeuppance': (u) => u.turn.lastDamageTaken > 0
+    ? Math.floor(u.turn.lastDamageTaken * 1.5) : null,
+
   // --- friendship: we have no happiness stat, so these are flat ---
   'return': () => 102,   // max-happiness value
   frustration: () => 102,   // min-happiness value
@@ -561,6 +573,13 @@ const CONDITIONAL_POWER = {
   brine: (u, t) => t.currentHp <= t.totalHp / 2 ? 2 : 1,
   'barb-barrage': (u, t) => ['poison', 'bad-poison'].includes(t.status) ? 2 : 1,
   'infernal-parade': (u, t) => t.status ? 2 : 1,
+  retaliate: () => allyFaintedLastTurn.value ? 2 : 1,
+
+  payback: (u, t) => t.turn?.hasMoved ? 2 : 1,
+  avalanche: (u) => u.turn?.damageTaken > 0 ? 2 : 1,
+  revenge: (u) => u.turn?.damageTaken > 0 ? 2 : 1,
+  assurance: (u, t) => t.turn?.wasHit ? 2 : 1,
+  'stomping-tantrum': (u) => u.turn?.moveFailedLastTurn ? 2 : 1,
 };
 
 function weightPower(hg) {
@@ -578,8 +597,6 @@ function flailPower(u) {
   return x < 1 ? 200 : x < 5 ? 150 : x < 13 ? 100 : x < 22 ? 80 : x < 43 ? 40 : 20;
 }
 
-
-
 function isSemiInvulnerable(pokemon) {
   return !!pokemon?.charging?.invulnerable;
 }
@@ -590,6 +607,28 @@ const freshStages = () => ({
   attack: 0, defense: 0, 'special-attack': 0,
   'special-defense': 0, speed: 0, accuracy: 0, evasion: 0,
 });
+
+function freshTurnMemory() {
+  return {
+    damageTaken: 0,
+    physicalDamage: 0,
+    specialDamage: 0,
+    lastDamageTaken: 0,        // Metal Burst
+    lastPhysicalDamage: 0,     // Counter
+    lastSpecialDamage: 0,      // Mirror Coat
+    hasMoved: false,
+    wasHit: false,
+    moveFailed: false,
+    moveFailedLastTurn: false, // Stomping Tantrum
+  };
+}
+
+function startTurn(pokemon) {
+  if (!pokemon) return;
+  const prev = pokemon.turn;
+  pokemon.turn = freshTurnMemory();
+  pokemon.turn.moveFailedLastTurn = prev?.moveFailed ?? false;
+}
 
 if (props.isWild) {
   foe.value = makeCombatant(props.opponent);
@@ -670,7 +709,7 @@ const isMegaEvolving = ref(false)
 
 async function handleMegaEvo(pokemon) {
   console.log(`Converting ${pokemon.name}.`)
-  
+
   // 1. Fetch data from helper script
   const megaData = await pokemonHelper.handleMegaEvo(pokemon)
 
@@ -793,6 +832,7 @@ function startBattle() {
   userPokemon.value.charging = null;
   userPokemon.value.mustRecharge = false;
   userPokemon.value.locked = null
+  userPokemon.value.bide = null
   battleStarted.value = true;
   selectedTargetPokemon.value = userPokemon.value;
   log(`A wild ${foe.value.name} appeared!`);
@@ -824,10 +864,14 @@ async function battleTurn(playerMove, item = null) {
   isResolving.value = true;
 
   try {
+    allyFaintedLastTurn.value = allyFaintedThisTurn.value;
+    allyFaintedThisTurn.value = false;
     log(`Battle Turn ${turnValue}`)
     turnValue++
-    const player = userPokemon.value;
-    const wild = foe.value;
+    let player = userPokemon.value;
+    startTurn(player);
+    let wild = foe.value;
+    startTurn(wild);
     const wildMove = pickMove(wild);
 
     // --- item branch: using an item costs your turn ---
@@ -951,6 +995,7 @@ function pickMove(pokemon) {
   // return move
   if (pokemon.charging) return pokemon.charging.move;
   if (pokemon.locked) return pokemon.locked.move;
+  if (pokemon.bide) return pokemon.bide.move;
   const moves = pokemon.moves ?? [];
   let disabledMoves = []
   if (pokemon.minorStatus?.includes("torment") && pokemon.lastUsedMove) {
@@ -1133,6 +1178,7 @@ async function handleFaint(pokemon) {
   pokemon.charging = null;
   pokemon.mustRecharge = false;
   pokemon.locked = null;
+  pokemon.bide = null
   log(`${pokemon.name} fainted!`);
   canMegaEvolve.value = false
   await playAnim(pokemon === foe.value ? 'foe' : 'ally', 'faint', 700);
@@ -1165,6 +1211,7 @@ async function handleFaint(pokemon) {
       if (indexes.length > 0) {
         const randomIndex = indexes[Math.floor(Math.random() * indexes.length)]
         foe.value = props.oppTeam[randomIndex]
+        startTurn(foe.value)
         return true
       }
       else {
@@ -1177,6 +1224,10 @@ async function handleFaint(pokemon) {
 
   // Player's Pokémon fainted — switch if anyone is left standing.
   const next = team.value.find(p => !isFainted(p) && p.instanceId !== pokemon.instanceId);
+  allyFaintedThisTurn.value = true
+  userPokemon.value = null;
+  sidePanel.value = 'team';
+
   if (next) {
     log(`Go, ${next.name}!`);
     userPokemon.value = next;
@@ -1199,6 +1250,8 @@ async function useMove(user, target, move) {
   let victim = actor === 'ally' ? 'foe' : 'ally';
   let hitsSelf = false;
 
+  user.turn.hasMoved = true;
+
   // --- recharge: the turn is spent before anything else happens ---
   if (user.mustRecharge) {
     user.mustRecharge = false;
@@ -1210,6 +1263,9 @@ async function useMove(user, target, move) {
   const releasing = !!user.charging;
   if (releasing) move = user.charging.move;
   else if (user.locked) move = user.locked.move;
+  else if (user.bide) move = user.bide.move;
+
+  const continuing = releasing || !!user.locked || !!user.bide;
 
   user.lastUsedMove = move;
 
@@ -1248,7 +1304,7 @@ async function useMove(user, target, move) {
     await delay(800);
   }
 
-  move.currentPP--
+  if (!continuing && move.currentPP != null) move.currentPP--;
 
   if (hitsSelf) {
     user.charging = null;
@@ -1287,6 +1343,7 @@ async function useMove(user, target, move) {
   // --- heal block: healing moves fail entirely ---
   if ((move.healing ?? 0) > 0 && isHealBlocked(user)) {
     log(`But ${user.name} can't use it due to Heal Block!`);
+    user.turn.moveFailed = true;
     await delay(800);
     return;
   }
@@ -1296,6 +1353,7 @@ async function useMove(user, target, move) {
     const through = HITS_THROUGH[target.charging.move.name] ?? [];
     if (!through.includes(move.name)) {
       log(`${target.name} avoided the attack!`);
+      user.turn.moveFailed = true;
       await delay(800);
       return;
     }
@@ -1306,6 +1364,7 @@ async function useMove(user, target, move) {
     if (move.category === 'ohko') {
       if (randInt(1, 100) > move.accuracy + (user.level - target.level)) {
         log(`${user.name}'s attack missed!`);
+        user.turn.moveFailed = true;
         await delay(800);
         return;
       }
@@ -1317,6 +1376,7 @@ async function useMove(user, target, move) {
         stageMultiplier(user.stages?.accuracy ?? 0, true) / stageMultiplier(evasion, true);
       if (randInt(1, 100) > move.accuracy * accMod) {
         log(`${user.name}'s attack missed!`);
+        user.turn.moveFailed = true;
         user.locked = null;
         await delay(800);
         return;
@@ -1334,11 +1394,13 @@ async function useMove(user, target, move) {
   if (move.category === 'ohko') {
     if (target.level > user.level) {
       log(`${target.name} is unaffected!`);
+      user.turn.moveFailed = true;
       await delay(800);
       return;
     }
     if (typeEffectiveness(move.type, target.types) === 0) {
       log(`It doesn't affect ${target.name}...`);
+      user.turn.moveFailed = true;
       await delay(800);
       return;
     }
@@ -1354,12 +1416,14 @@ async function useMove(user, target, move) {
   if (fixed) {
     if (isImmuneTo(move, target)) {
       log(`It doesn't affect ${target.name}...`);
+      user.turn.moveFailed = true;
       await delay(800);
       return;
     }
     const amount = fixed(user, target);
     if (amount == null) {
       log('But it failed!');
+      user.turn.moveFailed = true;
       await delay(800);
       return;
     }
@@ -1367,6 +1431,9 @@ async function useMove(user, target, move) {
     target.currentHp = Math.max(0, target.currentHp - amount);
     await playAnim(victim, 'hit', 400);
     log(`${user.name} dealt ${dealt} damage.`);
+
+    if (!hitsSelf && dealt > 0) recordDamage(target, move, dealt);
+
     await delay(600);
 
     if (move.name === 'final-gambit') {
@@ -1379,7 +1446,14 @@ async function useMove(user, target, move) {
   // --- variable power: compute before the damage block reads move.power ---
   const scaler = VARIABLE_POWER_MOVES[move.name];
   if (scaler && !hitsSelf) {
-    move = { ...move, power: Math.max(1, scaler(user, target)) };
+    const power = scaler(user, target);
+    if (power == null) {
+      log('But it failed!');
+      user.turn.moveFailed = true;
+      await delay(800);
+      return;
+    }
+    move = { ...move, power: move.name === 'present' ? power : Math.max(1, power) };
   }
   if (move.name === 'magnitude') {
     const tier = { 10: 4, 30: 5, 50: 6, 70: 7, 90: 8, 110: 9, 150: 10 }[move.power];
@@ -1389,6 +1463,7 @@ async function useMove(user, target, move) {
   if (move.name === 'present' && move.power === 0) {
     if (isHealBlocked(target)) {
       log(`${target.name}'s HP was not restored due to Heal Block!`);
+      user.turn.moveFailed = true;
     } else {
       const amount = Math.max(1, Math.floor(target.totalHp / 4));
       const before = target.currentHp;
@@ -1400,9 +1475,38 @@ async function useMove(user, target, move) {
   }
   const mult = CONDITIONAL_POWER[move.name];
   if (mult && !hitsSelf && move.power) {
-    console.log(mult(user, target))
     move = { ...move, power: move.power * mult(user, target) };
-    // console.log(move)
+  }
+
+  // --- Logic for the move Bide ---
+  if (move.name === 'bide') {
+    if (!user.bide) {
+      user.bide = { move: move, turns: 2, damage: 0 };
+      log(`${user.name} is storing energy!`);
+      await delay(800);
+      return;
+    }
+    if (--user.bide.turns > 0) {
+      log(`${user.name} is storing energy!`);
+      await delay(800);
+      return;
+    }
+    const stored = user.bide.damage * 2;
+    user.bide = null;
+    log(`${user.name} unleashed energy!`);
+    await delay(600);
+    if (stored <= 0) {
+      log('But it failed!');
+      user.turn.moveFailed = true;
+      await delay(800);
+      return;
+    }
+    dealt = Math.min(stored, target.currentHp);
+    target.currentHp = Math.max(0, target.currentHp - stored);
+    await playAnim(victim, 'hit', 400);
+    log(`${user.name} dealt ${dealt} damage.`);
+    recordDamage(target, { damageClass: null }, dealt);
+    await delay(600);
   }
 
   // --- damage ---
@@ -1416,6 +1520,7 @@ async function useMove(user, target, move) {
       const results = calculateDamage(user, target, move);
       if (results.immune) {
         log(`It doesn't affect ${target.name}...`);
+        user.turn.moveFailed = true;
         user.locked = null;
         await delay(800);
         return;
@@ -1428,6 +1533,8 @@ async function useMove(user, target, move) {
       landed++;
       if (target.currentHp <= 0) break;
     }
+
+    if (!hitsSelf && dealt > 0) recordDamage(target, move, dealt);
 
     if (hits > 1) { log(`Hit ${landed} time${landed === 1 ? '' : 's'}!`); await delay(400); }
     log(`${user.name} dealt ${dealt} damage.`);
@@ -1475,7 +1582,7 @@ async function useMove(user, target, move) {
     const chance = move.ailmentChance || 100;
     if (randInt(1, 100) <= chance) {
       const recipient = move.targetsSelf ? user : target;
-      await inflictStatus(recipient, move.ailment, move);
+      await inflictStatus(recipient, move.ailment, move, user);
     }
   }
 
@@ -1583,6 +1690,21 @@ function stageMultiplier(stage, isAccuracy = false) {
   return stage >= 0 ? (base + stage) / base : base / (base - stage);
 }
 
+function recordDamage(target, move, amount) {
+  if (!target.turn) startTurn(target);
+  target.turn.damageTaken += amount;
+  target.turn.wasHit = true;
+  target.turn.lastDamageTaken = amount;
+  if (move.damageClass === 'physical') {
+    target.turn.physicalDamage += amount;
+    target.turn.lastPhysicalDamage = amount;
+  } else if (move.damageClass === 'special') {
+    target.turn.specialDamage += amount;
+    target.turn.lastSpecialDamage = amount;
+  }
+  if (target.bide) target.bide.damage += amount;
+}
+
 function applyStatChange(target, statName, change) {
   if (!target.stages) target.stages = freshStages();
   const current = target.stages[statName] ?? 0;
@@ -1619,12 +1741,13 @@ const STATUS_MESSAGES = {
   ingrain: (n) => `${n} planted its roots!`,
 };
 
-async function inflictStatus(target, ailment, move) {
+async function inflictStatus(target, ailment, move, user) {
   if (!target.minorStatus) target.minorStatus = [];
   // Major status effects
   if (MAJOR_STATUSES.has(ailment)) {
     if (target.status) {
       log(`But ${target.name} is already ${target.status}!`);
+      user.turn.moveFailed = true;
       await delay(700);
       return;
     }
@@ -1651,6 +1774,7 @@ async function inflictStatus(target, ailment, move) {
   // Minor status effects
   if (target.minorStatus.includes(ailment)) {
     log(`But ${target.name} is already ${ailment}!`);
+    user.turn.moveFailed = true;
     await delay(700);
     return;
   }
@@ -1671,6 +1795,7 @@ async function inflictStatus(target, ailment, move) {
   } else if (ailment === 'nightmare') {
     if (target.status != 'sleep') {
       log(`${target.name} is not asleep, ${prettyName(move.name)} failed!`);
+      user.turn.moveFailed = true;
       await delay(800);
       return
     }
@@ -1679,10 +1804,12 @@ async function inflictStatus(target, ailment, move) {
   } else if (ailment === 'disable') {
     if (!target.lastUsedMove) {
       log(`${target.name} has not used a move, ${prettyName(move.name)} failed!`);
+      user.turn.moveFailed = true;
       await delay(800);
       return
     } else if (target.locked || target.charging) {
       log(`${prettyName(move.name)} failed!`);
+      user.turn.moveFailed = true;
       await delay(800);
       return
     }
@@ -1695,6 +1822,7 @@ async function inflictStatus(target, ailment, move) {
   } else if (ailment === 'yawn') {
     if (target.status === 'sleep') {
       log(`${target.name} is already asleep, ${prettyName(move.name)} failed!`);
+      user.turn.moveFailed = true;
       await delay(800);
       return
     }
@@ -2111,9 +2239,12 @@ async function switchActivePokemon(pokemon) {
   userPokemon.value.disabled = false;
   userPokemon.value.mustRecharge = false;
   userPokemon.value.locked = null
+  userPokemon.value.bide = null
 
   isResolving.value = true;
   try {
+    startTurn(pokemon)
+    startTurn(foe.value)
     log(`${userPokemon.value.name}, come back!`);
     await delay(600);
     userPokemon.value = pokemon;
@@ -3018,23 +3149,26 @@ onMounted(() => {
 }
 
 @keyframes megaBurst {
-  0% { 
+  0% {
     filter: brightness(1) drop-shadow(0 0 0px transparent);
     transform: scale(1);
   }
-  40% { 
+
+  40% {
     /* Energy buildup: Magenta/Purple glow */
-    filter: brightness(1.8) saturate(2) drop-shadow(0 0 18px #e056fd); 
-    transform: scale(1.1) rotate(-2deg); 
+    filter: brightness(1.8) saturate(2) drop-shadow(0 0 18px #e056fd);
+    transform: scale(1.1) rotate(-2deg);
   }
-  50% { 
+
+  50% {
     /* Cyan white-hot energy flash right at the sprite swap */
-    filter: brightness(4) drop-shadow(0 0 35px #00d2d3); 
-    transform: scale(1.25) rotate(2deg); 
+    filter: brightness(4) drop-shadow(0 0 35px #00d2d3);
+    transform: scale(1.25) rotate(2deg);
   }
-  100% { 
-    filter: brightness(1) drop-shadow(0 0 0px transparent); 
-    transform: scale(1); 
+
+  100% {
+    filter: brightness(1) drop-shadow(0 0 0px transparent);
+    transform: scale(1);
   }
 }
 
