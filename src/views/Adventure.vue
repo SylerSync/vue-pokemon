@@ -29,10 +29,6 @@
                             <span class="icon">🎒</span>
                             <span>Bag</span>
                         </li>
-                        <li @click="selectMenuOption('Save')">
-                            <span class="icon">💾</span>
-                            <span>Save</span>
-                        </li>
                         <li @click="toggleMenu">
                             <span class="icon">❌</span>
                             <span>Close</span>
@@ -286,6 +282,65 @@
         </div>
     </Modal>
 
+    <Modal v-if="isPartyModalOpen" @close="closePartyModal">
+        <div class="party-list-container">
+            <div class="party-header-title">
+                <span>POKÉMON PARTY</span>
+                <span class="count-badge">{{ pokemonStore.pokemonParty?.length || 0 }}/6</span>
+            </div>
+
+            <div class="party-slots-wrapper">
+                <div v-for="(poke, index) in paddedParty" :key="poke?.instanceId || poke?.id || 'empty-' + index"
+                    class="pkmn-slot-card" :class="{
+                        'is-empty': !poke,
+                        'is-lead': index === 0 && poke,
+                        'is-fainted': poke && (poke.currentHp <= 0)
+                    }">
+                    <!-- FILLED SLOT -->
+                    <template v-if="poke">
+                        <div class="sprite-circle">
+                            <img :src="poke.sprite" :alt="poke.name" class="pkmn-sprite" />
+                            <span v-if="index === 0" class="lead-badge">LEAD</span>
+                        </div>
+
+                        <div class="pkmn-info-section">
+                            <div class="pkmn-top-row">
+                                <span class="pkmn-name">{{ poke.name }}</span>
+                                <span class="pkmn-level">Lv. {{ poke.level }}</span>
+                                <img v-if="STATUS_ICONS[poke.status]" :src="STATUS_ICONS[poke.status]"
+                                    :alt="poke.status" class="status-pill" />
+                            </div>
+
+                            <!-- HP BAR SECTION -->
+                            <div class="hp-gauge-container">
+                                <span class="hp-label">HP</span>
+                                <div class="hp-bar-track">
+                                    <div class="hp-bar-fill" :class="getHpBarSeverity(poke)"
+                                        :style="{ width: getHpPercentage(poke) + '%' }"></div>
+                                </div>
+                            </div>
+
+                            <div class="hp-numeric-row">
+                                <span class="hp-num">
+                                    {{ Math.max(0, poke?.currentHp ?? poke?.totalHp ?? 0) }} / {{ poke?.totalHp ??
+                                    poke?.maxHp ?? 0 }}
+                                </span>
+                            </div>
+                        </div>
+                    </template>
+
+                    <!-- EMPTY SLOT -->
+                    <template v-else>
+                        <div class="empty-slot-bar">
+                            <span class="pokeball-icon">⚪</span>
+                            <span class="empty-text">SLOT {{ index + 1 }} - EMPTY</span>
+                        </div>
+                    </template>
+                </div>
+            </div>
+        </div>
+    </Modal>
+
     <PokemonBattle v-if="isBattleModalOpen" :auto-start="true" :team="pokemonStore.pokemonParty" :opponent="wildPokemon"
         :isWild="true" @end="onBattleEnd" @close="wildPokemon = null" />
 </template>
@@ -297,6 +352,12 @@ import { useInventoryStore } from '@/stores/inventoryStore';
 import { useErrorStore } from '@/stores/errorStore'
 import * as pokemonHelper from "@/assets/helpers/pokemonHelper.js"
 import SelectButton from 'primevue/selectbutton';
+import paralysisIcon from '@/assets/statusIcons/paralysis.png';
+import sleepIcon from '@/assets/statusIcons/sleep.png';
+import frozenIcon from '@/assets/statusIcons/frozen.png';
+import burnIcon from '@/assets/statusIcons/burn.png';
+import poisonIcon from '@/assets/statusIcons/poison.png';
+import Card from "primevue/card"
 import Tag from 'primevue/tag'
 import Column from 'primevue/column'
 import Button from 'primevue/button'
@@ -325,12 +386,23 @@ const settingsStore = useSettingsStore()
 const isStarterModalOpen = ref(false)
 const isPokeBoxModalOpen = ref(false)
 const isShopModalOpen = ref(false)
+const isPartyModalOpen = ref(false)
 
 // Ref values
 const starters = ref({})
 const wildPokemon = ref(null)
 const isEncounterLoading = ref(false);
 const isEncounterAnimating = ref(false);
+
+// static values
+const STATUS_ICONS = {
+    paralysis: paralysisIcon,
+    sleep: sleepIcon,
+    freeze: frozenIcon,
+    burn: burnIcon,
+    poison: poisonIcon
+};
+
 
 // Control Functions
 // #region CONTROLS
@@ -339,7 +411,7 @@ async function checkForStarter() {
         await generateStarterList()
         isStarterModalOpen.value = true
     }
-    if(pokemonStore.caughtPokemon.length > 0 && pokemonStore.pokemonParty.length === 0){
+    if (pokemonStore.caughtPokemon.length > 0 && pokemonStore.pokemonParty.length === 0) {
         pokemonStore.pokemonParty.push(pokemonStore.caughtPokemon[0])
     }
 }
@@ -712,6 +784,27 @@ function buyMega(stoneId) {
     }
 }
 
+const paddedParty = computed(() => {
+    const party = pokemonStore.pokemonParty || [];
+    const slots = [...party];
+    while (slots.length < 6) {
+        slots.push(null);
+    }
+    return slots;
+});
+
+function openPartyModal() {
+    clearInputs()
+    isEncounterLoading.value = true
+    isPartyModalOpen.value = true
+}
+
+function closePartyModal() {
+    isEncounterLoading.value = false
+    isPartyModalOpen.value = false
+}
+
+
 // #endregion
 
 /* 
@@ -806,6 +899,16 @@ function toggleMenu() {
 
 function selectMenuOption(option) {
     console.log(`[Menu Selected]: ${option}`);
+    switch (option) {
+        case "Party":
+            openPartyModal()
+            break
+        case "Bag":
+            //openBagModal()
+            break
+        default:
+            errorStore.SetErrorDetails("Menu Issue", "There was an issue opening the selected option.")
+    }
 }
 
 function openBattleModal() {
@@ -1865,6 +1968,205 @@ canvas {
     }
 
 
+}
+
+.party-list-container {
+    width: 100%;
+    max-width: 26rem;
+    background: #1e293b;
+    border: 3px solid #0f172a;
+    border-radius: 12px;
+    padding: 1rem;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+    color: #ffffff;
+    font-family: monospace, sans-serif;
+}
+
+.party-header-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: 800;
+    font-size: 1rem;
+    letter-spacing: 0.05em;
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid #334155;
+    margin-bottom: 0.75rem;
+    color: #cbd5e1;
+}
+
+.count-badge {
+    background: #334155;
+    padding: 0.2rem 0.5rem;
+    border-radius: 6px;
+    font-size: 0.8rem;
+}
+
+.party-slots-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+/* Individual Slot Card */
+.pkmn-slot-card {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.5rem 0.75rem;
+    background: #334155;
+    border: 2px solid #475569;
+    border-radius: 10px;
+    position: relative;
+    box-sizing: border-box;
+    transition: all 0.15s ease;
+}
+
+/* Lead Pokemon Highlight */
+.pkmn-slot-card.is-lead {
+    background: #1e3a8a;
+    border-color: #3b82f6;
+}
+
+/* Fainted State */
+.pkmn-slot-card.is-fainted {
+    opacity: 0.6;
+    background: #451a1a;
+    border-color: #991b1b;
+}
+
+/* Sprite Container */
+.sprite-circle {
+    width: 52px;
+    height: 52px;
+    background: rgba(0, 0, 0, 0.25);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    flex-shrink: 0;
+}
+
+.pkmn-sprite {
+    width: 56px;
+    height: 56px;
+    image-rendering: pixelated;
+}
+
+.lead-badge {
+    position: absolute;
+    bottom: -4px;
+    background: #ef4444;
+    color: #fff;
+    font-size: 0.55rem;
+    font-weight: 800;
+    padding: 1px 4px;
+    border-radius: 4px;
+    letter-spacing: 0.05em;
+}
+
+/* Info Section */
+.pkmn-info-section {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+}
+
+.pkmn-top-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.pkmn-name {
+    font-weight: 700;
+    font-size: 0.95rem;
+    text-transform: capitalize;
+    letter-spacing: 0.02em;
+}
+
+.pkmn-level {
+    font-size: 0.8rem;
+    color: #94a3b8;
+    font-weight: 600;
+}
+
+/* Health Gauge Bar */
+.hp-gauge-container {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    margin-top: 0.2rem;
+}
+
+.hp-label {
+    font-size: 0.65rem;
+    font-weight: 800;
+    color: #f59e0b;
+}
+
+.hp-bar-track {
+    flex: 1;
+    height: 10px;
+    background: #0f172a;
+    border: 1px solid #64748b;
+    border-radius: 5px;
+    padding: 1px;
+    box-sizing: border-box;
+}
+
+.hp-bar-fill {
+    height: 100%;
+    border-radius: 3px;
+    transition: width 0.3s ease;
+}
+
+.hp-bar-fill.ok { background: #22c55e; }
+.hp-bar-fill.warn { background: #eab308; }
+.hp-bar-fill.crit { background: #ef4444; }
+
+.hp-numeric-row {
+    text-align: right;
+}
+
+.hp-num {
+    font-size: 0.75rem;
+    color: #cbd5e1;
+    font-variant-numeric: tabular-nums;
+}
+
+/* Empty Slot Bar */
+.pkmn-slot-card.is-empty {
+    background: rgba(15, 23, 42, 0.4);
+    border: 2px dashed #475569;
+    justify-content: center;
+    min-height: 56px;
+}
+
+.empty-slot-bar {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #64748b;
+    font-size: 0.8rem;
+    font-weight: 700;
+}
+
+.status-pill,
+.status-icon {
+    width: 50px;
+    height: 12px;
+    object-fit: contain;
+    image-rendering: pixelated;
+    vertical-align: middle;
+    border-radius: 3px;
+}
+
+.pokeball-icon {
+    font-size: 0.9rem;
+    opacity: 0.5;
 }
 
 .shop-container {
