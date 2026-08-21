@@ -932,6 +932,7 @@ const randInt = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
 const hasMegaEvo = ref(false)
 
 function checkMegaEvo() {
+  canMegaEvolve.value = false
   const rawItem = userPokemon.value?.heldItem
   if (userPokemon.value.name.toLowerCase() === "rayquaza" && userPokemon.value.moves.some(m => m.name.toLowerCase() === "dragon-ascent")) {
     canMegaEvolve.value = true
@@ -3202,6 +3203,8 @@ async function switchActivePokemon(pokemon) {
 
     // Applying all stage Hazards to the newly switched in pokemon
     await applyHazards(pokemon)
+
+    checkMegaEvo()
 
     // switching costs your turn
     const wildMove = await pickMove(foe.value);
