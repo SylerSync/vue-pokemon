@@ -15,7 +15,7 @@ const testGodPokemon = {
     minorStatus: [],
     stats: [
         { name: "hp", stat: 999 },
-        { name: "attack", stat: 100 },
+        { name: "attack", stat: 10 },
         { name: "defense", stat: 999 },
         { name: "special-attack", stat: 999 },
         { name: "special-defense", stat: 999 },
@@ -32,14 +32,14 @@ const testGodPokemon = {
             maxPP: 99,
         },
         {
-            name: 'swords-dance', type: 'normal', power: null,
+            name: 'rollout', type: 'normal', power: 30,
             maxPP: 20, currentPP: 20, accuracy: null, priority: 0,
-            damageClass: 'status', targetsSelf: true,
-            statChanges: [{ stat: 'attack', change: 2 }], statChance: 0,
+            damageClass: 'physical', targetsSelf: false,
+            statChanges: [], statChance: 0,
             ailment: null, ailmentChance: 0,
             drain: 0, healing: 0, flinchChance: 0, critRate: 0,
             minTurns: 0, maxTurns: 0, minHits: null, maxHits: null,
-            category: 'net-good-stats'
+            category: 'damage'
         },
         {
             name: 'substitute', type: 'normal', power: null,
@@ -52,14 +52,14 @@ const testGodPokemon = {
             category: 'unique'
         },
         {
-            name: 'baton-pass', type: 'normal', power: null,
+            name: 'defense-curl', type: 'normal', power: null,
             maxPP: 40, currentPP: 40, accuracy: null, priority: 0,
             damageClass: 'status', targetsSelf: true,
-            statChanges: [], statChance: 0,
+            statChanges: [{ stat: 'defense', change: 1 }], statChance: 0,
             ailment: null, ailmentChance: 0,
             drain: 0, healing: 0, flinchChance: 0, critRate: 0,
             minTurns: 0, maxTurns: 0, minHits: null, maxHits: null,
-            category: 'unique'
+            category: 'net-good-stats'
         },
     ]
 }

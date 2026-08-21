@@ -480,7 +480,7 @@ function volatileTooltip(p) {
   if (p.bide) rows.push(tipRow('Bide', `${p.bide.turns} turns`, '#93c5fd'));
   if (p.mustRecharge) rows.push(tipRow('Recharging', '', '#93c5fd'));
 
-   const sideTitle = sideKey(p) === 'ally' ? 'Your Side' : "Foe's Side";
+  const sideTitle = sideKey(p) === 'ally' ? 'Your Side' : "Foe's Side";
 
   return `<div class="mon-info" style="min-width:11rem">
     ${tipSection('Stat Changes', boosts)}
@@ -643,6 +643,17 @@ const LOCKING_MOVES = {
   uproar: { confusionAfter: false },
 };
 
+const CHAIN_MOVES = {
+  // doubling, per-user. Rollout/Ice Ball also lock the user in.
+  rollout: { base: 30, mode: 'double', maxSteps: 5, lock: true, defenseCurl: true },
+  'ice-ball': { base: 30, mode: 'double', maxSteps: 5, lock: true, defenseCurl: true },
+  'fury-cutter': { base: 40, mode: 'double', maxSteps: 3 },   // Gen 6+: caps at 160
+  // additive, shared across the field
+  'echoed-voice': { base: 40, mode: 'add', max: 200, shared: true },
+};
+
+const echoedVoice = ref({ count: 0, lastTurn: -1 });
+
 const FIXED_DAMAGE_MOVES = {
   'seismic-toss': (user) => user.level,
   'night-shade': (user) => user.level,
@@ -734,6 +745,12 @@ const VARIABLE_POWER_MOVES = {
   present: () => {
     const r = randInt(1, 100);
     return r <= 40 ? 40 : r <= 70 ? 80 : r <= 80 ? 120 : 0;  // 0 = heal branch
+  },
+
+  'trump-card': (u) => {
+    const slot = u.moves?.find(m => m.name === 'trump-card');
+    const pp = slot?.currentPP ?? 0;
+    return [200, 80, 60, 50][pp] ?? 40;
   },
 };
 
@@ -1141,6 +1158,9 @@ function resetVolatiles(p) {
   p.protecting = null;
   p.protectStreak = 0;
   p.yawnTurn = 0;
+  p.chain = null;
+  p.raging = false;
+  p.defenseCurled = false;
 }
 
 /* ------------------------------------------------------------------ *
@@ -1163,6 +1183,7 @@ function startBattle() {
   sides.value.foe = freshSide()
   weather.value = { type: null, turns: 0 };
   terrain.value = { type: null, turns: 0 };
+  echoedVoice.value = { count: 0, lastTurn: -1 };
   battleStarted.value = true;
   selectedTargetPokemon.value = userPokemon.value;
   log(`A wild ${foe.value.name} appeared!`);
@@ -1324,7 +1345,7 @@ function statOf(pokemon, name) {
 }
 
 async function pickMove(pokemon) {
-  // const move = await getMove('dragon-tail')
+  // const move = await getMove('rollout')
   // let moveInfo = await getMoveData(move)
   // return moveInfo
   if (pokemon.charging) return pokemon.charging.move;
@@ -1643,6 +1664,13 @@ async function useMove(user, target, move, opts = {}) {
     await playAnim(actor, 'lunge', 300);
   }
 
+  // --- escalating chains: any different move breaks the streak ---
+  if (!hitsSelf) {
+    if (user.chain && user.chain.move !== move.name) user.chain = null;
+    if (user.raging && move.name !== 'rage') user.raging = false;
+    if (move.name === 'defense-curl') user.defenseCurled = true;
+  }
+
   // --- calling moves for coypying ---
   if (COPY_MOVES.has(move.name) && !hitsSelf && !opts.copied) {
     const called = await resolveCalledMove(user, target, move);
@@ -1740,6 +1768,7 @@ async function useMove(user, target, move, opts = {}) {
         log(`${user.name}'s attack missed!`);
         user.turn.moveFailed = true;
         user.locked = null;
+        user.chain = null;
         await delay(800);
         return;
       }
@@ -2101,6 +2130,37 @@ async function useMove(user, target, move, opts = {}) {
     move = { ...move, type: t, power: 100 };
   }
 
+  // --- escalating chain moves (Rollout, Fury Cutter, Echoed Voice) ---
+  const chain = CHAIN_MOVES[move.name];
+  let chainStep = 0;
+  if (chain && !hitsSelf) {
+    if (chain.shared) {
+      const c = echoedVoice.value;
+      c.count = c.lastTurn >= turnValue - 1 ? Math.min(c.count + 1, 5) : 1;
+      c.lastTurn = turnValue;
+      chainStep = c.count;
+    } else {
+      chainStep = Math.min((user.chain?.count ?? 0) + 1, chain.maxSteps);
+      user.chain = { move: move.name, count: chainStep };
+    }
+
+    if (chain.lock && !user.locked) {
+      user.locked = { move, turns: chain.maxSteps };   // store the ORIGINAL move object
+    }
+
+    let power = chain.mode === 'double'
+      ? chain.base * Math.pow(2, chainStep - 1)
+      : Math.min(chain.max, chain.base * chainStep);
+
+    if (chain.defenseCurl && user.defenseCurled) power *= 2;
+    move = { ...move, power };
+
+    if (chainStep > 1) {
+      log(`${prettyName(move.name)} is building momentum! (${power} power)`);
+      await delay(400);
+    }
+  }
+
   // --- damage ---
   if (move.power) {
     const hits = rollHitCount(move);
@@ -2114,6 +2174,7 @@ async function useMove(user, target, move, opts = {}) {
         log(`It doesn't affect ${target.name}...`);
         user.turn.moveFailed = true;
         user.locked = null;
+        user.chain = null;
         await delay(800);
         return;
       }
@@ -2161,6 +2222,14 @@ async function useMove(user, target, move, opts = {}) {
     if (--user.locked.turns <= 0) {
       user.locked = null;
       if (lock.confusionAfter) await inflictStatus(user, 'confusion');
+    }
+  }
+
+  // --- chain lock countdown (Rollout / Ice Ball) ---
+  if (chain?.lock && user.locked) {
+    if (--user.locked.turns <= 0 || chainStep >= chain.maxSteps) {
+      user.locked = null;
+      user.chain = null;
     }
   }
 
@@ -2275,6 +2344,7 @@ async function useMove(user, target, move, opts = {}) {
     }
   }
 
+  if (!hitsSelf && move.name === 'rage') user.raging = true;
 
   if (!hitsSelf && !COPY_MOVES.has(move.name)) lastMoveInBattle.value = move;
   await delay(400);
@@ -2391,6 +2461,10 @@ function stageMultiplier(stage, isAccuracy = false) {
 
 function recordDamage(target, move, amount) {
   if (!target.turn) startTurn(target);
+  if (target.raging && amount > 0) {
+    const applied = applyStatChange(target, 'attack', 1);
+    if (applied) log(`${target.name}'s rage is building!`);
+  }
   target.turn.damageTaken += amount;
   target.turn.wasHit = true;
   target.turn.lastDamageTaken = amount;
