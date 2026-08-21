@@ -279,6 +279,7 @@ function handleUseRecoveryItem(item) {
             break
         case "pp-heal":
             if (item.effect.scope === "single") {
+                console.log(item)
                 ppRecoveryItem.value = item
                 isRefillPPModalOpen.value = true
             } else if (item.effect.scope === "all") {
