@@ -1,0 +1,10778 @@
+[
+  {
+    "pokedexId": 1,
+    "name": "bulbasaur",
+    "stageMin": 1,
+    "stageMax": 15,
+    "types": [
+      "grass",
+      "poison"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 2,
+    "name": "ivysaur",
+    "stageMin": 16,
+    "stageMax": 31,
+    "types": [
+      "grass",
+      "poison"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 3,
+    "name": "venusaur",
+    "stageMin": 32,
+    "stageMax": 100,
+    "types": [
+      "grass",
+      "poison"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 4,
+    "name": "charmander",
+    "stageMin": 1,
+    "stageMax": 15,
+    "types": [
+      "fire"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 5,
+    "name": "charmeleon",
+    "stageMin": 16,
+    "stageMax": 35,
+    "types": [
+      "fire"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 6,
+    "name": "charizard",
+    "stageMin": 36,
+    "stageMax": 100,
+    "types": [
+      "fire",
+      "flying"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 7,
+    "name": "squirtle",
+    "stageMin": 1,
+    "stageMax": 15,
+    "types": [
+      "water"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 8,
+    "name": "wartortle",
+    "stageMin": 16,
+    "stageMax": 35,
+    "types": [
+      "water"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 9,
+    "name": "blastoise",
+    "stageMin": 36,
+    "stageMax": 100,
+    "types": [
+      "water"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 10,
+    "name": "caterpie",
+    "stageMin": 1,
+    "stageMax": 6,
+    "types": [
+      "bug"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 11,
+    "name": "metapod",
+    "stageMin": 7,
+    "stageMax": 9,
+    "types": [
+      "bug"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 12,
+    "name": "butterfree",
+    "stageMin": 10,
+    "stageMax": 100,
+    "types": [
+      "bug",
+      "flying"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 13,
+    "name": "weedle",
+    "stageMin": 1,
+    "stageMax": 6,
+    "types": [
+      "bug",
+      "poison"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 14,
+    "name": "kakuna",
+    "stageMin": 7,
+    "stageMax": 9,
+    "types": [
+      "bug",
+      "poison"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 15,
+    "name": "beedrill",
+    "stageMin": 10,
+    "stageMax": 100,
+    "types": [
+      "bug",
+      "poison"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 16,
+    "name": "pidgey",
+    "stageMin": 1,
+    "stageMax": 17,
+    "types": [
+      "normal",
+      "flying"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 17,
+    "name": "pidgeotto",
+    "stageMin": 18,
+    "stageMax": 35,
+    "types": [
+      "normal",
+      "flying"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 18,
+    "name": "pidgeot",
+    "stageMin": 36,
+    "stageMax": 100,
+    "types": [
+      "normal",
+      "flying"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 19,
+    "name": "rattata",
+    "stageMin": 1,
+    "stageMax": 19,
+    "types": [
+      "normal"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 20,
+    "name": "raticate",
+    "stageMin": 20,
+    "stageMax": 100,
+    "types": [
+      "normal"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 21,
+    "name": "spearow",
+    "stageMin": 1,
+    "stageMax": 19,
+    "types": [
+      "normal",
+      "flying"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 22,
+    "name": "fearow",
+    "stageMin": 20,
+    "stageMax": 100,
+    "types": [
+      "normal",
+      "flying"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 23,
+    "name": "ekans",
+    "stageMin": 1,
+    "stageMax": 21,
+    "types": [
+      "poison"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 24,
+    "name": "arbok",
+    "stageMin": 22,
+    "stageMax": 100,
+    "types": [
+      "poison"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 25,
+    "name": "pikachu",
+    "stageMin": 1,
+    "stageMax": 19,
+    "types": [
+      "electric"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 26,
+    "name": "raichu",
+    "stageMin": 20,
+    "stageMax": 100,
+    "types": [
+      "electric"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 27,
+    "name": "sandshrew",
+    "stageMin": 1,
+    "stageMax": 21,
+    "types": [
+      "ground"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 28,
+    "name": "sandslash",
+    "stageMin": 22,
+    "stageMax": 100,
+    "types": [
+      "ground"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 29,
+    "name": "nidoran-f",
+    "stageMin": 1,
+    "stageMax": 15,
+    "types": [
+      "poison"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 30,
+    "name": "nidorina",
+    "stageMin": 16,
+    "stageMax": 19,
+    "types": [
+      "poison"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 31,
+    "name": "nidoqueen",
+    "stageMin": 20,
+    "stageMax": 100,
+    "types": [
+      "poison",
+      "ground"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 32,
+    "name": "nidoran-m",
+    "stageMin": 1,
+    "stageMax": 15,
+    "types": [
+      "poison"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 33,
+    "name": "nidorino",
+    "stageMin": 16,
+    "stageMax": 19,
+    "types": [
+      "poison"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 34,
+    "name": "nidoking",
+    "stageMin": 20,
+    "stageMax": 100,
+    "types": [
+      "poison",
+      "ground"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 35,
+    "name": "clefairy",
+    "stageMin": 1,
+    "stageMax": 19,
+    "types": [
+      "fairy"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 36,
+    "name": "clefable",
+    "stageMin": 20,
+    "stageMax": 100,
+    "types": [
+      "fairy"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 37,
+    "name": "vulpix",
+    "stageMin": 1,
+    "stageMax": 19,
+    "types": [
+      "fire"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 38,
+    "name": "ninetales",
+    "stageMin": 20,
+    "stageMax": 100,
+    "types": [
+      "fire"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 39,
+    "name": "jigglypuff",
+    "stageMin": 1,
+    "stageMax": 19,
+    "types": [
+      "normal",
+      "fairy"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 40,
+    "name": "wigglytuff",
+    "stageMin": 20,
+    "stageMax": 100,
+    "types": [
+      "normal",
+      "fairy"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 41,
+    "name": "zubat",
+    "stageMin": 1,
+    "stageMax": 21,
+    "types": [
+      "poison",
+      "flying"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 42,
+    "name": "golbat",
+    "stageMin": 22,
+    "stageMax": 22,
+    "types": [
+      "poison",
+      "flying"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 43,
+    "name": "oddish",
+    "stageMin": 1,
+    "stageMax": 20,
+    "types": [
+      "grass",
+      "poison"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 44,
+    "name": "gloom",
+    "stageMin": 21,
+    "stageMax": 21,
+    "types": [
+      "grass",
+      "poison"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 45,
+    "name": "vileplume",
+    "stageMin": 21,
+    "stageMax": 100,
+    "types": [
+      "grass",
+      "poison"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 46,
+    "name": "paras",
+    "stageMin": 1,
+    "stageMax": 23,
+    "types": [
+      "bug",
+      "grass"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 47,
+    "name": "parasect",
+    "stageMin": 24,
+    "stageMax": 100,
+    "types": [
+      "bug",
+      "grass"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 48,
+    "name": "venonat",
+    "stageMin": 1,
+    "stageMax": 30,
+    "types": [
+      "bug",
+      "poison"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 49,
+    "name": "venomoth",
+    "stageMin": 31,
+    "stageMax": 100,
+    "types": [
+      "bug",
+      "poison"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 50,
+    "name": "diglett",
+    "stageMin": 1,
+    "stageMax": 25,
+    "types": [
+      "ground"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 51,
+    "name": "dugtrio",
+    "stageMin": 26,
+    "stageMax": 100,
+    "types": [
+      "ground"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 52,
+    "name": "meowth",
+    "stageMin": 1,
+    "stageMax": 1,
+    "types": [
+      "normal"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 53,
+    "name": "persian",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "normal"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 54,
+    "name": "psyduck",
+    "stageMin": 1,
+    "stageMax": 32,
+    "types": [
+      "water"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 55,
+    "name": "golduck",
+    "stageMin": 33,
+    "stageMax": 100,
+    "types": [
+      "water"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 56,
+    "name": "mankey",
+    "stageMin": 1,
+    "stageMax": 27,
+    "types": [
+      "fighting"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 57,
+    "name": "primeape",
+    "stageMin": 28,
+    "stageMax": 28,
+    "types": [
+      "fighting"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 58,
+    "name": "growlithe",
+    "stageMin": 1,
+    "stageMax": 19,
+    "types": [
+      "fire"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 59,
+    "name": "arcanine",
+    "stageMin": 20,
+    "stageMax": 100,
+    "types": [
+      "fire"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 60,
+    "name": "poliwag",
+    "stageMin": 1,
+    "stageMax": 24,
+    "types": [
+      "water"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 61,
+    "name": "poliwhirl",
+    "stageMin": 25,
+    "stageMax": 25,
+    "types": [
+      "water"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 62,
+    "name": "poliwrath",
+    "stageMin": 25,
+    "stageMax": 100,
+    "types": [
+      "water",
+      "fighting"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 63,
+    "name": "abra",
+    "stageMin": 1,
+    "stageMax": 15,
+    "types": [
+      "psychic"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 64,
+    "name": "kadabra",
+    "stageMin": 16,
+    "stageMax": 19,
+    "types": [
+      "psychic"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 65,
+    "name": "alakazam",
+    "stageMin": 20,
+    "stageMax": 100,
+    "types": [
+      "psychic"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 66,
+    "name": "machop",
+    "stageMin": 1,
+    "stageMax": 27,
+    "types": [
+      "fighting"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 67,
+    "name": "machoke",
+    "stageMin": 28,
+    "stageMax": 28,
+    "types": [
+      "fighting"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 68,
+    "name": "machamp",
+    "stageMin": 28,
+    "stageMax": 100,
+    "types": [
+      "fighting"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 69,
+    "name": "bellsprout",
+    "stageMin": 1,
+    "stageMax": 20,
+    "types": [
+      "grass",
+      "poison"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 70,
+    "name": "weepinbell",
+    "stageMin": 21,
+    "stageMax": 21,
+    "types": [
+      "grass",
+      "poison"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 71,
+    "name": "victreebel",
+    "stageMin": 21,
+    "stageMax": 100,
+    "types": [
+      "grass",
+      "poison"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 72,
+    "name": "tentacool",
+    "stageMin": 1,
+    "stageMax": 29,
+    "types": [
+      "water",
+      "poison"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 73,
+    "name": "tentacruel",
+    "stageMin": 30,
+    "stageMax": 100,
+    "types": [
+      "water",
+      "poison"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 74,
+    "name": "geodude",
+    "stageMin": 1,
+    "stageMax": 24,
+    "types": [
+      "rock",
+      "ground"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 75,
+    "name": "graveler",
+    "stageMin": 25,
+    "stageMax": 25,
+    "types": [
+      "rock",
+      "ground"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 76,
+    "name": "golem",
+    "stageMin": 25,
+    "stageMax": 100,
+    "types": [
+      "rock",
+      "ground"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 77,
+    "name": "ponyta",
+    "stageMin": 1,
+    "stageMax": 39,
+    "types": [
+      "fire"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 78,
+    "name": "rapidash",
+    "stageMin": 40,
+    "stageMax": 100,
+    "types": [
+      "fire"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 79,
+    "name": "slowpoke",
+    "stageMin": 1,
+    "stageMax": 19,
+    "types": [
+      "water",
+      "psychic"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 80,
+    "name": "slowbro",
+    "stageMin": 20,
+    "stageMax": 100,
+    "types": [
+      "water",
+      "psychic"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 81,
+    "name": "magnemite",
+    "stageMin": 1,
+    "stageMax": 29,
+    "types": [
+      "electric",
+      "steel"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 82,
+    "name": "magneton",
+    "stageMin": 30,
+    "stageMax": 30,
+    "types": [
+      "electric",
+      "steel"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 83,
+    "name": "farfetchd",
+    "stageMin": 1,
+    "stageMax": 1,
+    "types": [
+      "normal",
+      "flying"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 84,
+    "name": "doduo",
+    "stageMin": 1,
+    "stageMax": 30,
+    "types": [
+      "normal",
+      "flying"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 85,
+    "name": "dodrio",
+    "stageMin": 31,
+    "stageMax": 100,
+    "types": [
+      "normal",
+      "flying"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 86,
+    "name": "seel",
+    "stageMin": 1,
+    "stageMax": 33,
+    "types": [
+      "water"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 87,
+    "name": "dewgong",
+    "stageMin": 34,
+    "stageMax": 100,
+    "types": [
+      "water",
+      "ice"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 88,
+    "name": "grimer",
+    "stageMin": 1,
+    "stageMax": 37,
+    "types": [
+      "poison"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 89,
+    "name": "muk",
+    "stageMin": 38,
+    "stageMax": 100,
+    "types": [
+      "poison"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 90,
+    "name": "shellder",
+    "stageMin": 1,
+    "stageMax": 19,
+    "types": [
+      "water"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 91,
+    "name": "cloyster",
+    "stageMin": 20,
+    "stageMax": 100,
+    "types": [
+      "water",
+      "ice"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 92,
+    "name": "gastly",
+    "stageMin": 1,
+    "stageMax": 24,
+    "types": [
+      "ghost",
+      "poison"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 93,
+    "name": "haunter",
+    "stageMin": 25,
+    "stageMax": 25,
+    "types": [
+      "ghost",
+      "poison"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 94,
+    "name": "gengar",
+    "stageMin": 25,
+    "stageMax": 100,
+    "types": [
+      "ghost",
+      "poison"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 95,
+    "name": "onix",
+    "stageMin": 1,
+    "stageMax": 19,
+    "types": [
+      "rock",
+      "ground"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 96,
+    "name": "drowzee",
+    "stageMin": 1,
+    "stageMax": 25,
+    "types": [
+      "psychic"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 97,
+    "name": "hypno",
+    "stageMin": 26,
+    "stageMax": 100,
+    "types": [
+      "psychic"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 98,
+    "name": "krabby",
+    "stageMin": 1,
+    "stageMax": 27,
+    "types": [
+      "water"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 99,
+    "name": "kingler",
+    "stageMin": 28,
+    "stageMax": 100,
+    "types": [
+      "water"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 100,
+    "name": "voltorb",
+    "stageMin": 1,
+    "stageMax": 29,
+    "types": [
+      "electric"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 101,
+    "name": "electrode",
+    "stageMin": 30,
+    "stageMax": 100,
+    "types": [
+      "electric"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 102,
+    "name": "exeggcute",
+    "stageMin": 1,
+    "stageMax": 19,
+    "types": [
+      "grass",
+      "psychic"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 103,
+    "name": "exeggutor",
+    "stageMin": 20,
+    "stageMax": 100,
+    "types": [
+      "grass",
+      "psychic"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 104,
+    "name": "cubone",
+    "stageMin": 1,
+    "stageMax": 27,
+    "types": [
+      "ground"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 105,
+    "name": "marowak",
+    "stageMin": 28,
+    "stageMax": 100,
+    "types": [
+      "ground"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 106,
+    "name": "hitmonlee",
+    "stageMin": 20,
+    "stageMax": 100,
+    "types": [
+      "fighting"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 107,
+    "name": "hitmonchan",
+    "stageMin": 20,
+    "stageMax": 100,
+    "types": [
+      "fighting"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 108,
+    "name": "lickitung",
+    "stageMin": 1,
+    "stageMax": 1,
+    "types": [
+      "normal"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 109,
+    "name": "koffing",
+    "stageMin": 1,
+    "stageMax": 34,
+    "types": [
+      "poison"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 110,
+    "name": "weezing",
+    "stageMin": 35,
+    "stageMax": 100,
+    "types": [
+      "poison"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 111,
+    "name": "rhyhorn",
+    "stageMin": 1,
+    "stageMax": 41,
+    "types": [
+      "ground",
+      "rock"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 112,
+    "name": "rhydon",
+    "stageMin": 42,
+    "stageMax": 42,
+    "types": [
+      "ground",
+      "rock"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 113,
+    "name": "chansey",
+    "stageMin": 1,
+    "stageMax": 1,
+    "types": [
+      "normal"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 114,
+    "name": "tangela",
+    "stageMin": 1,
+    "stageMax": 1,
+    "types": [
+      "grass"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 115,
+    "name": "kangaskhan",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "normal"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 116,
+    "name": "horsea",
+    "stageMin": 1,
+    "stageMax": 31,
+    "types": [
+      "water"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 117,
+    "name": "seadra",
+    "stageMin": 32,
+    "stageMax": 32,
+    "types": [
+      "water"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 118,
+    "name": "goldeen",
+    "stageMin": 1,
+    "stageMax": 32,
+    "types": [
+      "water"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 119,
+    "name": "seaking",
+    "stageMin": 33,
+    "stageMax": 100,
+    "types": [
+      "water"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 120,
+    "name": "staryu",
+    "stageMin": 1,
+    "stageMax": 19,
+    "types": [
+      "water"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 121,
+    "name": "starmie",
+    "stageMin": 20,
+    "stageMax": 100,
+    "types": [
+      "water",
+      "psychic"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 122,
+    "name": "mr-mime",
+    "stageMin": 1,
+    "stageMax": 41,
+    "types": [
+      "psychic",
+      "fairy"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 123,
+    "name": "scyther",
+    "stageMin": 1,
+    "stageMax": 19,
+    "types": [
+      "bug",
+      "flying"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 124,
+    "name": "jynx",
+    "stageMin": 30,
+    "stageMax": 100,
+    "types": [
+      "ice",
+      "psychic"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 125,
+    "name": "electabuzz",
+    "stageMin": 30,
+    "stageMax": 30,
+    "types": [
+      "electric"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 126,
+    "name": "magmar",
+    "stageMin": 30,
+    "stageMax": 30,
+    "types": [
+      "fire"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 127,
+    "name": "pinsir",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "bug"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 128,
+    "name": "tauros",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "normal"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 129,
+    "name": "magikarp",
+    "stageMin": 1,
+    "stageMax": 19,
+    "types": [
+      "water"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 130,
+    "name": "gyarados",
+    "stageMin": 20,
+    "stageMax": 100,
+    "types": [
+      "water",
+      "flying"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 131,
+    "name": "lapras",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "water",
+      "ice"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 132,
+    "name": "ditto",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "normal"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 133,
+    "name": "eevee",
+    "stageMin": 1,
+    "stageMax": 1,
+    "types": [
+      "normal"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 134,
+    "name": "vaporeon",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "water"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 135,
+    "name": "jolteon",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "electric"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 136,
+    "name": "flareon",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "fire"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 137,
+    "name": "porygon",
+    "stageMin": 1,
+    "stageMax": 19,
+    "types": [
+      "normal"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 138,
+    "name": "omanyte",
+    "stageMin": 1,
+    "stageMax": 39,
+    "types": [
+      "rock",
+      "water"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 139,
+    "name": "omastar",
+    "stageMin": 40,
+    "stageMax": 100,
+    "types": [
+      "rock",
+      "water"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 140,
+    "name": "kabuto",
+    "stageMin": 1,
+    "stageMax": 39,
+    "types": [
+      "rock",
+      "water"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 141,
+    "name": "kabutops",
+    "stageMin": 40,
+    "stageMax": 100,
+    "types": [
+      "rock",
+      "water"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 142,
+    "name": "aerodactyl",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "rock",
+      "flying"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 143,
+    "name": "snorlax",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "normal"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 144,
+    "name": "articuno",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "ice",
+      "flying"
+    ],
+    "isLegendary": true
+  },
+  {
+    "pokedexId": 145,
+    "name": "zapdos",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "electric",
+      "flying"
+    ],
+    "isLegendary": true
+  },
+  {
+    "pokedexId": 146,
+    "name": "moltres",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "fire",
+      "flying"
+    ],
+    "isLegendary": true
+  },
+  {
+    "pokedexId": 147,
+    "name": "dratini",
+    "stageMin": 1,
+    "stageMax": 29,
+    "types": [
+      "dragon"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 148,
+    "name": "dragonair",
+    "stageMin": 30,
+    "stageMax": 54,
+    "types": [
+      "dragon"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 149,
+    "name": "dragonite",
+    "stageMin": 55,
+    "stageMax": 100,
+    "types": [
+      "dragon",
+      "flying"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 150,
+    "name": "mewtwo",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "psychic"
+    ],
+    "isLegendary": true
+  },
+  {
+    "pokedexId": 151,
+    "name": "mew",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "psychic"
+    ],
+    "isLegendary": true
+  },
+  {
+    "pokedexId": 152,
+    "name": "chikorita",
+    "stageMin": 1,
+    "stageMax": 15,
+    "types": [
+      "grass"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 153,
+    "name": "bayleef",
+    "stageMin": 16,
+    "stageMax": 31,
+    "types": [
+      "grass"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 154,
+    "name": "meganium",
+    "stageMin": 32,
+    "stageMax": 100,
+    "types": [
+      "grass"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 155,
+    "name": "cyndaquil",
+    "stageMin": 1,
+    "stageMax": 16,
+    "types": [
+      "fire"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 156,
+    "name": "quilava",
+    "stageMin": 17,
+    "stageMax": 35,
+    "types": [
+      "fire"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 157,
+    "name": "typhlosion",
+    "stageMin": 36,
+    "stageMax": 100,
+    "types": [
+      "fire"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 158,
+    "name": "totodile",
+    "stageMin": 1,
+    "stageMax": 17,
+    "types": [
+      "water"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 159,
+    "name": "croconaw",
+    "stageMin": 18,
+    "stageMax": 29,
+    "types": [
+      "water"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 160,
+    "name": "feraligatr",
+    "stageMin": 30,
+    "stageMax": 100,
+    "types": [
+      "water"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 161,
+    "name": "sentret",
+    "stageMin": 1,
+    "stageMax": 14,
+    "types": [
+      "normal"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 162,
+    "name": "furret",
+    "stageMin": 15,
+    "stageMax": 100,
+    "types": [
+      "normal"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 163,
+    "name": "hoothoot",
+    "stageMin": 1,
+    "stageMax": 19,
+    "types": [
+      "normal",
+      "flying"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 164,
+    "name": "noctowl",
+    "stageMin": 20,
+    "stageMax": 100,
+    "types": [
+      "normal",
+      "flying"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 165,
+    "name": "ledyba",
+    "stageMin": 1,
+    "stageMax": 17,
+    "types": [
+      "bug",
+      "flying"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 166,
+    "name": "ledian",
+    "stageMin": 18,
+    "stageMax": 100,
+    "types": [
+      "bug",
+      "flying"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 167,
+    "name": "spinarak",
+    "stageMin": 1,
+    "stageMax": 21,
+    "types": [
+      "bug",
+      "poison"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 168,
+    "name": "ariados",
+    "stageMin": 22,
+    "stageMax": 100,
+    "types": [
+      "bug",
+      "poison"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 169,
+    "name": "crobat",
+    "stageMin": 22,
+    "stageMax": 100,
+    "types": [
+      "poison",
+      "flying"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 170,
+    "name": "chinchou",
+    "stageMin": 1,
+    "stageMax": 26,
+    "types": [
+      "water",
+      "electric"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 171,
+    "name": "lanturn",
+    "stageMin": 27,
+    "stageMax": 100,
+    "types": [
+      "water",
+      "electric"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 172,
+    "name": "pichu",
+    "stageMin": 1,
+    "stageMax": 1,
+    "types": [
+      "electric"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 173,
+    "name": "cleffa",
+    "stageMin": 1,
+    "stageMax": 1,
+    "types": [
+      "fairy"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 174,
+    "name": "igglybuff",
+    "stageMin": 1,
+    "stageMax": 1,
+    "types": [
+      "normal",
+      "fairy"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 175,
+    "name": "togepi",
+    "stageMin": 1,
+    "stageMax": 1,
+    "types": [
+      "fairy"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 176,
+    "name": "togetic",
+    "stageMin": 1,
+    "stageMax": 19,
+    "types": [
+      "fairy",
+      "flying"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 177,
+    "name": "natu",
+    "stageMin": 1,
+    "stageMax": 24,
+    "types": [
+      "psychic",
+      "flying"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 178,
+    "name": "xatu",
+    "stageMin": 25,
+    "stageMax": 100,
+    "types": [
+      "psychic",
+      "flying"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 179,
+    "name": "mareep",
+    "stageMin": 1,
+    "stageMax": 14,
+    "types": [
+      "electric"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 180,
+    "name": "flaaffy",
+    "stageMin": 15,
+    "stageMax": 29,
+    "types": [
+      "electric"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 181,
+    "name": "ampharos",
+    "stageMin": 30,
+    "stageMax": 100,
+    "types": [
+      "electric"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 182,
+    "name": "bellossom",
+    "stageMin": 21,
+    "stageMax": 100,
+    "types": [
+      "grass"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 183,
+    "name": "marill",
+    "stageMin": 1,
+    "stageMax": 17,
+    "types": [
+      "water",
+      "fairy"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 184,
+    "name": "azumarill",
+    "stageMin": 18,
+    "stageMax": 100,
+    "types": [
+      "water",
+      "fairy"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 185,
+    "name": "sudowoodo",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "rock"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 186,
+    "name": "politoed",
+    "stageMin": 25,
+    "stageMax": 100,
+    "types": [
+      "water"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 187,
+    "name": "hoppip",
+    "stageMin": 1,
+    "stageMax": 17,
+    "types": [
+      "grass",
+      "flying"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 188,
+    "name": "skiploom",
+    "stageMin": 18,
+    "stageMax": 26,
+    "types": [
+      "grass",
+      "flying"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 189,
+    "name": "jumpluff",
+    "stageMin": 27,
+    "stageMax": 100,
+    "types": [
+      "grass",
+      "flying"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 190,
+    "name": "aipom",
+    "stageMin": 1,
+    "stageMax": 1,
+    "types": [
+      "normal"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 191,
+    "name": "sunkern",
+    "stageMin": 1,
+    "stageMax": 19,
+    "types": [
+      "grass"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 192,
+    "name": "sunflora",
+    "stageMin": 20,
+    "stageMax": 100,
+    "types": [
+      "grass"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 193,
+    "name": "yanma",
+    "stageMin": 1,
+    "stageMax": 1,
+    "types": [
+      "bug",
+      "flying"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 194,
+    "name": "wooper",
+    "stageMin": 1,
+    "stageMax": 19,
+    "types": [
+      "water",
+      "ground"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 195,
+    "name": "quagsire",
+    "stageMin": 20,
+    "stageMax": 100,
+    "types": [
+      "water",
+      "ground"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 196,
+    "name": "espeon",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "psychic"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 197,
+    "name": "umbreon",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "dark"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 198,
+    "name": "murkrow",
+    "stageMin": 1,
+    "stageMax": 19,
+    "types": [
+      "dark",
+      "flying"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 199,
+    "name": "slowking",
+    "stageMin": 20,
+    "stageMax": 100,
+    "types": [
+      "water",
+      "psychic"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 200,
+    "name": "misdreavus",
+    "stageMin": 1,
+    "stageMax": 19,
+    "types": [
+      "ghost"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 201,
+    "name": "unown",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "psychic"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 202,
+    "name": "wobbuffet",
+    "stageMin": 15,
+    "stageMax": 100,
+    "types": [
+      "psychic"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 203,
+    "name": "girafarig",
+    "stageMin": 1,
+    "stageMax": 1,
+    "types": [
+      "normal",
+      "psychic"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 204,
+    "name": "pineco",
+    "stageMin": 1,
+    "stageMax": 30,
+    "types": [
+      "bug"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 205,
+    "name": "forretress",
+    "stageMin": 31,
+    "stageMax": 100,
+    "types": [
+      "bug",
+      "steel"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 206,
+    "name": "dunsparce",
+    "stageMin": 1,
+    "stageMax": 1,
+    "types": [
+      "normal"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 207,
+    "name": "gligar",
+    "stageMin": 1,
+    "stageMax": 1,
+    "types": [
+      "ground",
+      "flying"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 208,
+    "name": "steelix",
+    "stageMin": 20,
+    "stageMax": 100,
+    "types": [
+      "steel",
+      "ground"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 209,
+    "name": "snubbull",
+    "stageMin": 1,
+    "stageMax": 22,
+    "types": [
+      "fairy"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 210,
+    "name": "granbull",
+    "stageMin": 23,
+    "stageMax": 100,
+    "types": [
+      "fairy"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 211,
+    "name": "qwilfish",
+    "stageMin": 1,
+    "stageMax": 1,
+    "types": [
+      "water",
+      "poison"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 212,
+    "name": "scizor",
+    "stageMin": 20,
+    "stageMax": 100,
+    "types": [
+      "bug",
+      "steel"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 213,
+    "name": "shuckle",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "bug",
+      "rock"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 214,
+    "name": "heracross",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "bug",
+      "fighting"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 215,
+    "name": "sneasel",
+    "stageMin": 1,
+    "stageMax": 1,
+    "types": [
+      "dark",
+      "ice"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 216,
+    "name": "teddiursa",
+    "stageMin": 1,
+    "stageMax": 29,
+    "types": [
+      "normal"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 217,
+    "name": "ursaring",
+    "stageMin": 30,
+    "stageMax": 30,
+    "types": [
+      "normal"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 218,
+    "name": "slugma",
+    "stageMin": 1,
+    "stageMax": 37,
+    "types": [
+      "fire"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 219,
+    "name": "magcargo",
+    "stageMin": 38,
+    "stageMax": 100,
+    "types": [
+      "fire",
+      "rock"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 220,
+    "name": "swinub",
+    "stageMin": 1,
+    "stageMax": 32,
+    "types": [
+      "ice",
+      "ground"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 221,
+    "name": "piloswine",
+    "stageMin": 33,
+    "stageMax": 33,
+    "types": [
+      "ice",
+      "ground"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 222,
+    "name": "corsola",
+    "stageMin": 1,
+    "stageMax": 37,
+    "types": [
+      "water",
+      "rock"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 223,
+    "name": "remoraid",
+    "stageMin": 1,
+    "stageMax": 24,
+    "types": [
+      "water"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 224,
+    "name": "octillery",
+    "stageMin": 25,
+    "stageMax": 100,
+    "types": [
+      "water"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 225,
+    "name": "delibird",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "ice",
+      "flying"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 226,
+    "name": "mantine",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "water",
+      "flying"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 227,
+    "name": "skarmory",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "steel",
+      "flying"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 228,
+    "name": "houndour",
+    "stageMin": 1,
+    "stageMax": 23,
+    "types": [
+      "dark",
+      "fire"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 229,
+    "name": "houndoom",
+    "stageMin": 24,
+    "stageMax": 100,
+    "types": [
+      "dark",
+      "fire"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 230,
+    "name": "kingdra",
+    "stageMin": 32,
+    "stageMax": 100,
+    "types": [
+      "water",
+      "dragon"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 231,
+    "name": "phanpy",
+    "stageMin": 1,
+    "stageMax": 24,
+    "types": [
+      "ground"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 232,
+    "name": "donphan",
+    "stageMin": 25,
+    "stageMax": 100,
+    "types": [
+      "ground"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 233,
+    "name": "porygon2",
+    "stageMin": 20,
+    "stageMax": 20,
+    "types": [
+      "normal"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 234,
+    "name": "stantler",
+    "stageMin": 1,
+    "stageMax": 1,
+    "types": [
+      "normal"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 235,
+    "name": "smeargle",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "normal"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 236,
+    "name": "tyrogue",
+    "stageMin": 1,
+    "stageMax": 19,
+    "types": [
+      "fighting"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 237,
+    "name": "hitmontop",
+    "stageMin": 20,
+    "stageMax": 100,
+    "types": [
+      "fighting"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 238,
+    "name": "smoochum",
+    "stageMin": 1,
+    "stageMax": 29,
+    "types": [
+      "ice",
+      "psychic"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 239,
+    "name": "elekid",
+    "stageMin": 1,
+    "stageMax": 29,
+    "types": [
+      "electric"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 240,
+    "name": "magby",
+    "stageMin": 1,
+    "stageMax": 29,
+    "types": [
+      "fire"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 241,
+    "name": "miltank",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "normal"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 242,
+    "name": "blissey",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "normal"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 243,
+    "name": "raikou",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "electric"
+    ],
+    "isLegendary": true
+  },
+  {
+    "pokedexId": 244,
+    "name": "entei",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "fire"
+    ],
+    "isLegendary": true
+  },
+  {
+    "pokedexId": 245,
+    "name": "suicune",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "water"
+    ],
+    "isLegendary": true
+  },
+  {
+    "pokedexId": 246,
+    "name": "larvitar",
+    "stageMin": 1,
+    "stageMax": 29,
+    "types": [
+      "rock",
+      "ground"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 247,
+    "name": "pupitar",
+    "stageMin": 30,
+    "stageMax": 54,
+    "types": [
+      "rock",
+      "ground"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 248,
+    "name": "tyranitar",
+    "stageMin": 55,
+    "stageMax": 100,
+    "types": [
+      "rock",
+      "dark"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 249,
+    "name": "lugia",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "psychic",
+      "flying"
+    ],
+    "isLegendary": true
+  },
+  {
+    "pokedexId": 250,
+    "name": "ho-oh",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "fire",
+      "flying"
+    ],
+    "isLegendary": true
+  },
+  {
+    "pokedexId": 251,
+    "name": "celebi",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "psychic",
+      "grass"
+    ],
+    "isLegendary": true
+  },
+  {
+    "pokedexId": 252,
+    "name": "treecko",
+    "stageMin": 1,
+    "stageMax": 15,
+    "types": [
+      "grass"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 253,
+    "name": "grovyle",
+    "stageMin": 16,
+    "stageMax": 35,
+    "types": [
+      "grass"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 254,
+    "name": "sceptile",
+    "stageMin": 36,
+    "stageMax": 100,
+    "types": [
+      "grass"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 255,
+    "name": "torchic",
+    "stageMin": 1,
+    "stageMax": 15,
+    "types": [
+      "fire"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 256,
+    "name": "combusken",
+    "stageMin": 16,
+    "stageMax": 35,
+    "types": [
+      "fire",
+      "fighting"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 257,
+    "name": "blaziken",
+    "stageMin": 36,
+    "stageMax": 100,
+    "types": [
+      "fire",
+      "fighting"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 258,
+    "name": "mudkip",
+    "stageMin": 1,
+    "stageMax": 15,
+    "types": [
+      "water"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 259,
+    "name": "marshtomp",
+    "stageMin": 16,
+    "stageMax": 35,
+    "types": [
+      "water",
+      "ground"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 260,
+    "name": "swampert",
+    "stageMin": 36,
+    "stageMax": 100,
+    "types": [
+      "water",
+      "ground"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 261,
+    "name": "poochyena",
+    "stageMin": 1,
+    "stageMax": 17,
+    "types": [
+      "dark"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 262,
+    "name": "mightyena",
+    "stageMin": 18,
+    "stageMax": 100,
+    "types": [
+      "dark"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 263,
+    "name": "zigzagoon",
+    "stageMin": 1,
+    "stageMax": 19,
+    "types": [
+      "normal"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 264,
+    "name": "linoone",
+    "stageMin": 20,
+    "stageMax": 34,
+    "types": [
+      "normal"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 265,
+    "name": "wurmple",
+    "stageMin": 1,
+    "stageMax": 6,
+    "types": [
+      "bug"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 266,
+    "name": "silcoon",
+    "stageMin": 7,
+    "stageMax": 9,
+    "types": [
+      "bug"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 267,
+    "name": "beautifly",
+    "stageMin": 10,
+    "stageMax": 100,
+    "types": [
+      "bug",
+      "flying"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 268,
+    "name": "cascoon",
+    "stageMin": 7,
+    "stageMax": 9,
+    "types": [
+      "bug"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 269,
+    "name": "dustox",
+    "stageMin": 10,
+    "stageMax": 100,
+    "types": [
+      "bug",
+      "poison"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 270,
+    "name": "lotad",
+    "stageMin": 1,
+    "stageMax": 13,
+    "types": [
+      "water",
+      "grass"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 271,
+    "name": "lombre",
+    "stageMin": 14,
+    "stageMax": 19,
+    "types": [
+      "water",
+      "grass"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 272,
+    "name": "ludicolo",
+    "stageMin": 20,
+    "stageMax": 100,
+    "types": [
+      "water",
+      "grass"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 273,
+    "name": "seedot",
+    "stageMin": 1,
+    "stageMax": 13,
+    "types": [
+      "grass"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 274,
+    "name": "nuzleaf",
+    "stageMin": 14,
+    "stageMax": 19,
+    "types": [
+      "grass",
+      "dark"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 275,
+    "name": "shiftry",
+    "stageMin": 20,
+    "stageMax": 100,
+    "types": [
+      "grass",
+      "dark"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 276,
+    "name": "taillow",
+    "stageMin": 1,
+    "stageMax": 21,
+    "types": [
+      "normal",
+      "flying"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 277,
+    "name": "swellow",
+    "stageMin": 22,
+    "stageMax": 100,
+    "types": [
+      "normal",
+      "flying"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 278,
+    "name": "wingull",
+    "stageMin": 1,
+    "stageMax": 24,
+    "types": [
+      "water",
+      "flying"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 279,
+    "name": "pelipper",
+    "stageMin": 25,
+    "stageMax": 100,
+    "types": [
+      "water",
+      "flying"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 280,
+    "name": "ralts",
+    "stageMin": 1,
+    "stageMax": 19,
+    "types": [
+      "psychic",
+      "fairy"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 281,
+    "name": "kirlia",
+    "stageMin": 20,
+    "stageMax": 20,
+    "types": [
+      "psychic",
+      "fairy"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 282,
+    "name": "gardevoir",
+    "stageMin": 20,
+    "stageMax": 100,
+    "types": [
+      "psychic",
+      "fairy"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 283,
+    "name": "surskit",
+    "stageMin": 1,
+    "stageMax": 21,
+    "types": [
+      "bug",
+      "water"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 284,
+    "name": "masquerain",
+    "stageMin": 22,
+    "stageMax": 100,
+    "types": [
+      "bug",
+      "flying"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 285,
+    "name": "shroomish",
+    "stageMin": 1,
+    "stageMax": 22,
+    "types": [
+      "grass"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 286,
+    "name": "breloom",
+    "stageMin": 23,
+    "stageMax": 100,
+    "types": [
+      "grass",
+      "fighting"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 287,
+    "name": "slakoth",
+    "stageMin": 1,
+    "stageMax": 17,
+    "types": [
+      "normal"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 288,
+    "name": "vigoroth",
+    "stageMin": 18,
+    "stageMax": 35,
+    "types": [
+      "normal"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 289,
+    "name": "slaking",
+    "stageMin": 36,
+    "stageMax": 100,
+    "types": [
+      "normal"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 290,
+    "name": "nincada",
+    "stageMin": 1,
+    "stageMax": 19,
+    "types": [
+      "bug",
+      "ground"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 291,
+    "name": "ninjask",
+    "stageMin": 20,
+    "stageMax": 100,
+    "types": [
+      "bug",
+      "flying"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 292,
+    "name": "shedinja",
+    "stageMin": 20,
+    "stageMax": 100,
+    "types": [
+      "bug",
+      "ghost"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 293,
+    "name": "whismur",
+    "stageMin": 1,
+    "stageMax": 19,
+    "types": [
+      "normal"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 294,
+    "name": "loudred",
+    "stageMin": 20,
+    "stageMax": 39,
+    "types": [
+      "normal"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 295,
+    "name": "exploud",
+    "stageMin": 40,
+    "stageMax": 100,
+    "types": [
+      "normal"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 296,
+    "name": "makuhita",
+    "stageMin": 1,
+    "stageMax": 23,
+    "types": [
+      "fighting"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 297,
+    "name": "hariyama",
+    "stageMin": 24,
+    "stageMax": 100,
+    "types": [
+      "fighting"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 298,
+    "name": "azurill",
+    "stageMin": 1,
+    "stageMax": 1,
+    "types": [
+      "normal",
+      "fairy"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 299,
+    "name": "nosepass",
+    "stageMin": 1,
+    "stageMax": 19,
+    "types": [
+      "rock"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 300,
+    "name": "skitty",
+    "stageMin": 1,
+    "stageMax": 19,
+    "types": [
+      "normal"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 301,
+    "name": "delcatty",
+    "stageMin": 20,
+    "stageMax": 100,
+    "types": [
+      "normal"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 302,
+    "name": "sableye",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "dark",
+      "ghost"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 303,
+    "name": "mawile",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "steel",
+      "fairy"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 304,
+    "name": "aron",
+    "stageMin": 1,
+    "stageMax": 31,
+    "types": [
+      "steel",
+      "rock"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 305,
+    "name": "lairon",
+    "stageMin": 32,
+    "stageMax": 41,
+    "types": [
+      "steel",
+      "rock"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 306,
+    "name": "aggron",
+    "stageMin": 42,
+    "stageMax": 100,
+    "types": [
+      "steel",
+      "rock"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 307,
+    "name": "meditite",
+    "stageMin": 1,
+    "stageMax": 36,
+    "types": [
+      "fighting",
+      "psychic"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 308,
+    "name": "medicham",
+    "stageMin": 37,
+    "stageMax": 100,
+    "types": [
+      "fighting",
+      "psychic"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 309,
+    "name": "electrike",
+    "stageMin": 1,
+    "stageMax": 25,
+    "types": [
+      "electric"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 310,
+    "name": "manectric",
+    "stageMin": 26,
+    "stageMax": 100,
+    "types": [
+      "electric"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 311,
+    "name": "plusle",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "electric"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 312,
+    "name": "minun",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "electric"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 313,
+    "name": "volbeat",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "bug"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 314,
+    "name": "illumise",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "bug"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 315,
+    "name": "roselia",
+    "stageMin": 1,
+    "stageMax": 19,
+    "types": [
+      "grass",
+      "poison"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 316,
+    "name": "gulpin",
+    "stageMin": 1,
+    "stageMax": 25,
+    "types": [
+      "poison"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 317,
+    "name": "swalot",
+    "stageMin": 26,
+    "stageMax": 100,
+    "types": [
+      "poison"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 318,
+    "name": "carvanha",
+    "stageMin": 1,
+    "stageMax": 29,
+    "types": [
+      "water",
+      "dark"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 319,
+    "name": "sharpedo",
+    "stageMin": 30,
+    "stageMax": 100,
+    "types": [
+      "water",
+      "dark"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 320,
+    "name": "wailmer",
+    "stageMin": 1,
+    "stageMax": 39,
+    "types": [
+      "water"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 321,
+    "name": "wailord",
+    "stageMin": 40,
+    "stageMax": 100,
+    "types": [
+      "water"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 322,
+    "name": "numel",
+    "stageMin": 1,
+    "stageMax": 32,
+    "types": [
+      "fire",
+      "ground"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 323,
+    "name": "camerupt",
+    "stageMin": 33,
+    "stageMax": 100,
+    "types": [
+      "fire",
+      "ground"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 324,
+    "name": "torkoal",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "fire"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 325,
+    "name": "spoink",
+    "stageMin": 1,
+    "stageMax": 31,
+    "types": [
+      "psychic"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 326,
+    "name": "grumpig",
+    "stageMin": 32,
+    "stageMax": 100,
+    "types": [
+      "psychic"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 327,
+    "name": "spinda",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "normal"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 328,
+    "name": "trapinch",
+    "stageMin": 1,
+    "stageMax": 34,
+    "types": [
+      "ground"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 329,
+    "name": "vibrava",
+    "stageMin": 35,
+    "stageMax": 44,
+    "types": [
+      "ground",
+      "dragon"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 330,
+    "name": "flygon",
+    "stageMin": 45,
+    "stageMax": 100,
+    "types": [
+      "ground",
+      "dragon"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 331,
+    "name": "cacnea",
+    "stageMin": 1,
+    "stageMax": 31,
+    "types": [
+      "grass"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 332,
+    "name": "cacturne",
+    "stageMin": 32,
+    "stageMax": 100,
+    "types": [
+      "grass",
+      "dark"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 333,
+    "name": "swablu",
+    "stageMin": 1,
+    "stageMax": 34,
+    "types": [
+      "normal",
+      "flying"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 334,
+    "name": "altaria",
+    "stageMin": 35,
+    "stageMax": 100,
+    "types": [
+      "dragon",
+      "flying"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 335,
+    "name": "zangoose",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "normal"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 336,
+    "name": "seviper",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "poison"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 337,
+    "name": "lunatone",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "rock",
+      "psychic"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 338,
+    "name": "solrock",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "rock",
+      "psychic"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 339,
+    "name": "barboach",
+    "stageMin": 1,
+    "stageMax": 29,
+    "types": [
+      "water",
+      "ground"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 340,
+    "name": "whiscash",
+    "stageMin": 30,
+    "stageMax": 100,
+    "types": [
+      "water",
+      "ground"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 341,
+    "name": "corphish",
+    "stageMin": 1,
+    "stageMax": 29,
+    "types": [
+      "water"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 342,
+    "name": "crawdaunt",
+    "stageMin": 30,
+    "stageMax": 100,
+    "types": [
+      "water",
+      "dark"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 343,
+    "name": "baltoy",
+    "stageMin": 1,
+    "stageMax": 35,
+    "types": [
+      "ground",
+      "psychic"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 344,
+    "name": "claydol",
+    "stageMin": 36,
+    "stageMax": 100,
+    "types": [
+      "ground",
+      "psychic"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 345,
+    "name": "lileep",
+    "stageMin": 1,
+    "stageMax": 39,
+    "types": [
+      "rock",
+      "grass"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 346,
+    "name": "cradily",
+    "stageMin": 40,
+    "stageMax": 100,
+    "types": [
+      "rock",
+      "grass"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 347,
+    "name": "anorith",
+    "stageMin": 1,
+    "stageMax": 39,
+    "types": [
+      "rock",
+      "bug"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 348,
+    "name": "armaldo",
+    "stageMin": 40,
+    "stageMax": 100,
+    "types": [
+      "rock",
+      "bug"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 349,
+    "name": "feebas",
+    "stageMin": 1,
+    "stageMax": 1,
+    "types": [
+      "water"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 350,
+    "name": "milotic",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "water"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 351,
+    "name": "castform",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "normal"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 352,
+    "name": "kecleon",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "normal"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 353,
+    "name": "shuppet",
+    "stageMin": 1,
+    "stageMax": 36,
+    "types": [
+      "ghost"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 354,
+    "name": "banette",
+    "stageMin": 37,
+    "stageMax": 100,
+    "types": [
+      "ghost"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 355,
+    "name": "duskull",
+    "stageMin": 1,
+    "stageMax": 36,
+    "types": [
+      "ghost"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 356,
+    "name": "dusclops",
+    "stageMin": 37,
+    "stageMax": 37,
+    "types": [
+      "ghost"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 357,
+    "name": "tropius",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "grass",
+      "flying"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 358,
+    "name": "chimecho",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "psychic"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 359,
+    "name": "absol",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "dark"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 360,
+    "name": "wynaut",
+    "stageMin": 1,
+    "stageMax": 14,
+    "types": [
+      "psychic"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 361,
+    "name": "snorunt",
+    "stageMin": 1,
+    "stageMax": 19,
+    "types": [
+      "ice"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 362,
+    "name": "glalie",
+    "stageMin": 20,
+    "stageMax": 100,
+    "types": [
+      "ice"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 363,
+    "name": "spheal",
+    "stageMin": 1,
+    "stageMax": 31,
+    "types": [
+      "ice",
+      "water"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 364,
+    "name": "sealeo",
+    "stageMin": 32,
+    "stageMax": 43,
+    "types": [
+      "ice",
+      "water"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 365,
+    "name": "walrein",
+    "stageMin": 44,
+    "stageMax": 100,
+    "types": [
+      "ice",
+      "water"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 366,
+    "name": "clamperl",
+    "stageMin": 1,
+    "stageMax": 19,
+    "types": [
+      "water"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 367,
+    "name": "huntail",
+    "stageMin": 20,
+    "stageMax": 100,
+    "types": [
+      "water"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 368,
+    "name": "gorebyss",
+    "stageMin": 20,
+    "stageMax": 100,
+    "types": [
+      "water"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 369,
+    "name": "relicanth",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "water",
+      "rock"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 370,
+    "name": "luvdisc",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "water"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 371,
+    "name": "bagon",
+    "stageMin": 1,
+    "stageMax": 29,
+    "types": [
+      "dragon"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 372,
+    "name": "shelgon",
+    "stageMin": 30,
+    "stageMax": 49,
+    "types": [
+      "dragon"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 373,
+    "name": "salamence",
+    "stageMin": 50,
+    "stageMax": 100,
+    "types": [
+      "dragon",
+      "flying"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 374,
+    "name": "beldum",
+    "stageMin": 1,
+    "stageMax": 19,
+    "types": [
+      "steel",
+      "psychic"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 375,
+    "name": "metang",
+    "stageMin": 20,
+    "stageMax": 44,
+    "types": [
+      "steel",
+      "psychic"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 376,
+    "name": "metagross",
+    "stageMin": 45,
+    "stageMax": 100,
+    "types": [
+      "steel",
+      "psychic"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 377,
+    "name": "regirock",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "rock"
+    ],
+    "isLegendary": true
+  },
+  {
+    "pokedexId": 378,
+    "name": "regice",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "ice"
+    ],
+    "isLegendary": true
+  },
+  {
+    "pokedexId": 379,
+    "name": "registeel",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "steel"
+    ],
+    "isLegendary": true
+  },
+  {
+    "pokedexId": 380,
+    "name": "latias",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "dragon",
+      "psychic"
+    ],
+    "isLegendary": true
+  },
+  {
+    "pokedexId": 381,
+    "name": "latios",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "dragon",
+      "psychic"
+    ],
+    "isLegendary": true
+  },
+  {
+    "pokedexId": 382,
+    "name": "kyogre",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "water"
+    ],
+    "isLegendary": true
+  },
+  {
+    "pokedexId": 383,
+    "name": "groudon",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "ground"
+    ],
+    "isLegendary": true
+  },
+  {
+    "pokedexId": 384,
+    "name": "rayquaza",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "dragon",
+      "flying"
+    ],
+    "isLegendary": true
+  },
+  {
+    "pokedexId": 385,
+    "name": "jirachi",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "steel",
+      "psychic"
+    ],
+    "isLegendary": true
+  },
+  {
+    "pokedexId": 386,
+    "name": "deoxys",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "psychic"
+    ],
+    "isLegendary": true
+  },
+  {
+    "pokedexId": 387,
+    "name": "turtwig",
+    "stageMin": 1,
+    "stageMax": 17,
+    "types": [
+      "grass"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 388,
+    "name": "grotle",
+    "stageMin": 18,
+    "stageMax": 31,
+    "types": [
+      "grass"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 389,
+    "name": "torterra",
+    "stageMin": 32,
+    "stageMax": 100,
+    "types": [
+      "grass",
+      "ground"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 390,
+    "name": "chimchar",
+    "stageMin": 1,
+    "stageMax": 13,
+    "types": [
+      "fire"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 391,
+    "name": "monferno",
+    "stageMin": 14,
+    "stageMax": 35,
+    "types": [
+      "fire",
+      "fighting"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 392,
+    "name": "infernape",
+    "stageMin": 36,
+    "stageMax": 100,
+    "types": [
+      "fire",
+      "fighting"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 393,
+    "name": "piplup",
+    "stageMin": 1,
+    "stageMax": 15,
+    "types": [
+      "water"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 394,
+    "name": "prinplup",
+    "stageMin": 16,
+    "stageMax": 35,
+    "types": [
+      "water"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 395,
+    "name": "empoleon",
+    "stageMin": 36,
+    "stageMax": 100,
+    "types": [
+      "water",
+      "steel"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 396,
+    "name": "starly",
+    "stageMin": 1,
+    "stageMax": 13,
+    "types": [
+      "normal",
+      "flying"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 397,
+    "name": "staravia",
+    "stageMin": 14,
+    "stageMax": 33,
+    "types": [
+      "normal",
+      "flying"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 398,
+    "name": "staraptor",
+    "stageMin": 34,
+    "stageMax": 100,
+    "types": [
+      "normal",
+      "flying"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 399,
+    "name": "bidoof",
+    "stageMin": 1,
+    "stageMax": 14,
+    "types": [
+      "normal"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 400,
+    "name": "bibarel",
+    "stageMin": 15,
+    "stageMax": 100,
+    "types": [
+      "normal",
+      "water"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 401,
+    "name": "kricketot",
+    "stageMin": 1,
+    "stageMax": 9,
+    "types": [
+      "bug"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 402,
+    "name": "kricketune",
+    "stageMin": 10,
+    "stageMax": 100,
+    "types": [
+      "bug"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 403,
+    "name": "shinx",
+    "stageMin": 1,
+    "stageMax": 14,
+    "types": [
+      "electric"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 404,
+    "name": "luxio",
+    "stageMin": 15,
+    "stageMax": 29,
+    "types": [
+      "electric"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 405,
+    "name": "luxray",
+    "stageMin": 30,
+    "stageMax": 100,
+    "types": [
+      "electric"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 406,
+    "name": "budew",
+    "stageMin": 1,
+    "stageMax": 1,
+    "types": [
+      "grass",
+      "poison"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 407,
+    "name": "roserade",
+    "stageMin": 20,
+    "stageMax": 100,
+    "types": [
+      "grass",
+      "poison"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 408,
+    "name": "cranidos",
+    "stageMin": 1,
+    "stageMax": 29,
+    "types": [
+      "rock"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 409,
+    "name": "rampardos",
+    "stageMin": 30,
+    "stageMax": 100,
+    "types": [
+      "rock"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 410,
+    "name": "shieldon",
+    "stageMin": 1,
+    "stageMax": 29,
+    "types": [
+      "rock",
+      "steel"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 411,
+    "name": "bastiodon",
+    "stageMin": 30,
+    "stageMax": 100,
+    "types": [
+      "rock",
+      "steel"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 412,
+    "name": "burmy",
+    "stageMin": 1,
+    "stageMax": 19,
+    "types": [
+      "bug"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 413,
+    "name": "wormadam",
+    "stageMin": 20,
+    "stageMax": 100,
+    "types": [
+      "bug",
+      "grass"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 414,
+    "name": "mothim",
+    "stageMin": 20,
+    "stageMax": 100,
+    "types": [
+      "bug",
+      "flying"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 415,
+    "name": "combee",
+    "stageMin": 1,
+    "stageMax": 20,
+    "types": [
+      "bug",
+      "flying"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 416,
+    "name": "vespiquen",
+    "stageMin": 21,
+    "stageMax": 100,
+    "types": [
+      "bug",
+      "flying"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 417,
+    "name": "pachirisu",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "electric"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 418,
+    "name": "buizel",
+    "stageMin": 1,
+    "stageMax": 25,
+    "types": [
+      "water"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 419,
+    "name": "floatzel",
+    "stageMin": 26,
+    "stageMax": 100,
+    "types": [
+      "water"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 420,
+    "name": "cherubi",
+    "stageMin": 1,
+    "stageMax": 24,
+    "types": [
+      "grass"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 421,
+    "name": "cherrim",
+    "stageMin": 25,
+    "stageMax": 100,
+    "types": [
+      "grass"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 422,
+    "name": "shellos",
+    "stageMin": 1,
+    "stageMax": 29,
+    "types": [
+      "water"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 423,
+    "name": "gastrodon",
+    "stageMin": 30,
+    "stageMax": 100,
+    "types": [
+      "water",
+      "ground"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 424,
+    "name": "ambipom",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "normal"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 425,
+    "name": "drifloon",
+    "stageMin": 1,
+    "stageMax": 27,
+    "types": [
+      "ghost",
+      "flying"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 426,
+    "name": "drifblim",
+    "stageMin": 28,
+    "stageMax": 100,
+    "types": [
+      "ghost",
+      "flying"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 427,
+    "name": "buneary",
+    "stageMin": 1,
+    "stageMax": 1,
+    "types": [
+      "normal"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 428,
+    "name": "lopunny",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "normal"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 429,
+    "name": "mismagius",
+    "stageMin": 20,
+    "stageMax": 100,
+    "types": [
+      "ghost"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 430,
+    "name": "honchkrow",
+    "stageMin": 20,
+    "stageMax": 100,
+    "types": [
+      "dark",
+      "flying"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 431,
+    "name": "glameow",
+    "stageMin": 1,
+    "stageMax": 37,
+    "types": [
+      "normal"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 432,
+    "name": "purugly",
+    "stageMin": 38,
+    "stageMax": 100,
+    "types": [
+      "normal"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 433,
+    "name": "chingling",
+    "stageMin": 1,
+    "stageMax": 1,
+    "types": [
+      "psychic"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 434,
+    "name": "stunky",
+    "stageMin": 1,
+    "stageMax": 33,
+    "types": [
+      "poison",
+      "dark"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 435,
+    "name": "skuntank",
+    "stageMin": 34,
+    "stageMax": 100,
+    "types": [
+      "poison",
+      "dark"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 436,
+    "name": "bronzor",
+    "stageMin": 1,
+    "stageMax": 32,
+    "types": [
+      "steel",
+      "psychic"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 437,
+    "name": "bronzong",
+    "stageMin": 33,
+    "stageMax": 100,
+    "types": [
+      "steel",
+      "psychic"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 438,
+    "name": "bonsly",
+    "stageMin": 1,
+    "stageMax": 1,
+    "types": [
+      "rock"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 439,
+    "name": "mime-jr",
+    "stageMin": 1,
+    "stageMax": 1,
+    "types": [
+      "psychic",
+      "fairy"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 440,
+    "name": "happiny",
+    "stageMin": 1,
+    "stageMax": 1,
+    "types": [
+      "normal"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 441,
+    "name": "chatot",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "normal",
+      "flying"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 442,
+    "name": "spiritomb",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "ghost",
+      "dark"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 443,
+    "name": "gible",
+    "stageMin": 1,
+    "stageMax": 23,
+    "types": [
+      "dragon",
+      "ground"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 444,
+    "name": "gabite",
+    "stageMin": 24,
+    "stageMax": 47,
+    "types": [
+      "dragon",
+      "ground"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 445,
+    "name": "garchomp",
+    "stageMin": 48,
+    "stageMax": 100,
+    "types": [
+      "dragon",
+      "ground"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 446,
+    "name": "munchlax",
+    "stageMin": 1,
+    "stageMax": 1,
+    "types": [
+      "normal"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 447,
+    "name": "riolu",
+    "stageMin": 1,
+    "stageMax": 1,
+    "types": [
+      "fighting"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 448,
+    "name": "lucario",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "fighting",
+      "steel"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 449,
+    "name": "hippopotas",
+    "stageMin": 1,
+    "stageMax": 33,
+    "types": [
+      "ground"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 450,
+    "name": "hippowdon",
+    "stageMin": 34,
+    "stageMax": 100,
+    "types": [
+      "ground"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 451,
+    "name": "skorupi",
+    "stageMin": 1,
+    "stageMax": 39,
+    "types": [
+      "poison",
+      "bug"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 452,
+    "name": "drapion",
+    "stageMin": 40,
+    "stageMax": 100,
+    "types": [
+      "poison",
+      "dark"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 453,
+    "name": "croagunk",
+    "stageMin": 1,
+    "stageMax": 36,
+    "types": [
+      "poison",
+      "fighting"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 454,
+    "name": "toxicroak",
+    "stageMin": 37,
+    "stageMax": 100,
+    "types": [
+      "poison",
+      "fighting"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 455,
+    "name": "carnivine",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "grass"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 456,
+    "name": "finneon",
+    "stageMin": 1,
+    "stageMax": 30,
+    "types": [
+      "water"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 457,
+    "name": "lumineon",
+    "stageMin": 31,
+    "stageMax": 100,
+    "types": [
+      "water"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 458,
+    "name": "mantyke",
+    "stageMin": 1,
+    "stageMax": 1,
+    "types": [
+      "water",
+      "flying"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 459,
+    "name": "snover",
+    "stageMin": 1,
+    "stageMax": 39,
+    "types": [
+      "grass",
+      "ice"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 460,
+    "name": "abomasnow",
+    "stageMin": 40,
+    "stageMax": 100,
+    "types": [
+      "grass",
+      "ice"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 461,
+    "name": "weavile",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "dark",
+      "ice"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 462,
+    "name": "magnezone",
+    "stageMin": 30,
+    "stageMax": 100,
+    "types": [
+      "electric",
+      "steel"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 463,
+    "name": "lickilicky",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "normal"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 464,
+    "name": "rhyperior",
+    "stageMin": 42,
+    "stageMax": 100,
+    "types": [
+      "ground",
+      "rock"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 465,
+    "name": "tangrowth",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "grass"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 466,
+    "name": "electivire",
+    "stageMin": 30,
+    "stageMax": 100,
+    "types": [
+      "electric"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 467,
+    "name": "magmortar",
+    "stageMin": 30,
+    "stageMax": 100,
+    "types": [
+      "fire"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 468,
+    "name": "togekiss",
+    "stageMin": 20,
+    "stageMax": 100,
+    "types": [
+      "fairy",
+      "flying"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 469,
+    "name": "yanmega",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "bug",
+      "flying"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 470,
+    "name": "leafeon",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "grass"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 471,
+    "name": "glaceon",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "ice"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 472,
+    "name": "gliscor",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "ground",
+      "flying"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 473,
+    "name": "mamoswine",
+    "stageMin": 33,
+    "stageMax": 100,
+    "types": [
+      "ice",
+      "ground"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 474,
+    "name": "porygon-z",
+    "stageMin": 20,
+    "stageMax": 100,
+    "types": [
+      "normal"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 475,
+    "name": "gallade",
+    "stageMin": 20,
+    "stageMax": 100,
+    "types": [
+      "psychic",
+      "fighting"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 476,
+    "name": "probopass",
+    "stageMin": 20,
+    "stageMax": 100,
+    "types": [
+      "rock",
+      "steel"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 477,
+    "name": "dusknoir",
+    "stageMin": 37,
+    "stageMax": 100,
+    "types": [
+      "ghost"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 478,
+    "name": "froslass",
+    "stageMin": 20,
+    "stageMax": 100,
+    "types": [
+      "ice",
+      "ghost"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 479,
+    "name": "rotom",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "electric",
+      "ghost"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 480,
+    "name": "uxie",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "psychic"
+    ],
+    "isLegendary": true
+  },
+  {
+    "pokedexId": 481,
+    "name": "mesprit",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "psychic"
+    ],
+    "isLegendary": true
+  },
+  {
+    "pokedexId": 482,
+    "name": "azelf",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "psychic"
+    ],
+    "isLegendary": true
+  },
+  {
+    "pokedexId": 483,
+    "name": "dialga",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "steel",
+      "dragon"
+    ],
+    "isLegendary": true
+  },
+  {
+    "pokedexId": 484,
+    "name": "palkia",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "water",
+      "dragon"
+    ],
+    "isLegendary": true
+  },
+  {
+    "pokedexId": 485,
+    "name": "heatran",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "fire",
+      "steel"
+    ],
+    "isLegendary": true
+  },
+  {
+    "pokedexId": 486,
+    "name": "regigigas",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "normal"
+    ],
+    "isLegendary": true
+  },
+  {
+    "pokedexId": 487,
+    "name": "giratina",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "ghost",
+      "dragon"
+    ],
+    "isLegendary": true
+  },
+  {
+    "pokedexId": 488,
+    "name": "cresselia",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "psychic"
+    ],
+    "isLegendary": true
+  },
+  {
+    "pokedexId": 489,
+    "name": "phione",
+    "stageMin": 1,
+    "stageMax": 19,
+    "types": [
+      "water"
+    ],
+    "isLegendary": true
+  },
+  {
+    "pokedexId": 490,
+    "name": "manaphy",
+    "stageMin": 20,
+    "stageMax": 100,
+    "types": [
+      "water"
+    ],
+    "isLegendary": true
+  },
+  {
+    "pokedexId": 491,
+    "name": "darkrai",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "dark"
+    ],
+    "isLegendary": true
+  },
+  {
+    "pokedexId": 492,
+    "name": "shaymin",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "grass"
+    ],
+    "isLegendary": true
+  },
+  {
+    "pokedexId": 493,
+    "name": "arceus",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "normal"
+    ],
+    "isLegendary": true
+  },
+  {
+    "pokedexId": 494,
+    "name": "victini",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "psychic",
+      "fire"
+    ],
+    "isLegendary": true
+  },
+  {
+    "pokedexId": 495,
+    "name": "snivy",
+    "stageMin": 1,
+    "stageMax": 16,
+    "types": [
+      "grass"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 496,
+    "name": "servine",
+    "stageMin": 17,
+    "stageMax": 35,
+    "types": [
+      "grass"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 497,
+    "name": "serperior",
+    "stageMin": 36,
+    "stageMax": 100,
+    "types": [
+      "grass"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 498,
+    "name": "tepig",
+    "stageMin": 1,
+    "stageMax": 16,
+    "types": [
+      "fire"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 499,
+    "name": "pignite",
+    "stageMin": 17,
+    "stageMax": 35,
+    "types": [
+      "fire",
+      "fighting"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 500,
+    "name": "emboar",
+    "stageMin": 36,
+    "stageMax": 100,
+    "types": [
+      "fire",
+      "fighting"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 501,
+    "name": "oshawott",
+    "stageMin": 1,
+    "stageMax": 16,
+    "types": [
+      "water"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 502,
+    "name": "dewott",
+    "stageMin": 17,
+    "stageMax": 35,
+    "types": [
+      "water"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 503,
+    "name": "samurott",
+    "stageMin": 36,
+    "stageMax": 100,
+    "types": [
+      "water"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 504,
+    "name": "patrat",
+    "stageMin": 1,
+    "stageMax": 19,
+    "types": [
+      "normal"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 505,
+    "name": "watchog",
+    "stageMin": 20,
+    "stageMax": 100,
+    "types": [
+      "normal"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 506,
+    "name": "lillipup",
+    "stageMin": 1,
+    "stageMax": 15,
+    "types": [
+      "normal"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 507,
+    "name": "herdier",
+    "stageMin": 16,
+    "stageMax": 31,
+    "types": [
+      "normal"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 508,
+    "name": "stoutland",
+    "stageMin": 32,
+    "stageMax": 100,
+    "types": [
+      "normal"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 509,
+    "name": "purrloin",
+    "stageMin": 1,
+    "stageMax": 19,
+    "types": [
+      "dark"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 510,
+    "name": "liepard",
+    "stageMin": 20,
+    "stageMax": 100,
+    "types": [
+      "dark"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 511,
+    "name": "pansage",
+    "stageMin": 1,
+    "stageMax": 19,
+    "types": [
+      "grass"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 512,
+    "name": "simisage",
+    "stageMin": 20,
+    "stageMax": 100,
+    "types": [
+      "grass"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 513,
+    "name": "pansear",
+    "stageMin": 1,
+    "stageMax": 19,
+    "types": [
+      "fire"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 514,
+    "name": "simisear",
+    "stageMin": 20,
+    "stageMax": 100,
+    "types": [
+      "fire"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 515,
+    "name": "panpour",
+    "stageMin": 1,
+    "stageMax": 19,
+    "types": [
+      "water"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 516,
+    "name": "simipour",
+    "stageMin": 20,
+    "stageMax": 100,
+    "types": [
+      "water"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 517,
+    "name": "munna",
+    "stageMin": 1,
+    "stageMax": 19,
+    "types": [
+      "psychic"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 518,
+    "name": "musharna",
+    "stageMin": 20,
+    "stageMax": 100,
+    "types": [
+      "psychic"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 519,
+    "name": "pidove",
+    "stageMin": 1,
+    "stageMax": 20,
+    "types": [
+      "normal",
+      "flying"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 520,
+    "name": "tranquill",
+    "stageMin": 21,
+    "stageMax": 31,
+    "types": [
+      "normal",
+      "flying"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 521,
+    "name": "unfezant",
+    "stageMin": 32,
+    "stageMax": 100,
+    "types": [
+      "normal",
+      "flying"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 522,
+    "name": "blitzle",
+    "stageMin": 1,
+    "stageMax": 26,
+    "types": [
+      "electric"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 523,
+    "name": "zebstrika",
+    "stageMin": 27,
+    "stageMax": 100,
+    "types": [
+      "electric"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 524,
+    "name": "roggenrola",
+    "stageMin": 1,
+    "stageMax": 24,
+    "types": [
+      "rock"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 525,
+    "name": "boldore",
+    "stageMin": 25,
+    "stageMax": 25,
+    "types": [
+      "rock"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 526,
+    "name": "gigalith",
+    "stageMin": 25,
+    "stageMax": 100,
+    "types": [
+      "rock"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 527,
+    "name": "woobat",
+    "stageMin": 1,
+    "stageMax": 1,
+    "types": [
+      "psychic",
+      "flying"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 528,
+    "name": "swoobat",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "psychic",
+      "flying"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 529,
+    "name": "drilbur",
+    "stageMin": 1,
+    "stageMax": 30,
+    "types": [
+      "ground"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 530,
+    "name": "excadrill",
+    "stageMin": 31,
+    "stageMax": 100,
+    "types": [
+      "ground",
+      "steel"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 531,
+    "name": "audino",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "normal"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 532,
+    "name": "timburr",
+    "stageMin": 1,
+    "stageMax": 24,
+    "types": [
+      "fighting"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 533,
+    "name": "gurdurr",
+    "stageMin": 25,
+    "stageMax": 25,
+    "types": [
+      "fighting"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 534,
+    "name": "conkeldurr",
+    "stageMin": 25,
+    "stageMax": 100,
+    "types": [
+      "fighting"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 535,
+    "name": "tympole",
+    "stageMin": 1,
+    "stageMax": 24,
+    "types": [
+      "water"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 536,
+    "name": "palpitoad",
+    "stageMin": 25,
+    "stageMax": 35,
+    "types": [
+      "water",
+      "ground"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 537,
+    "name": "seismitoad",
+    "stageMin": 36,
+    "stageMax": 100,
+    "types": [
+      "water",
+      "ground"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 538,
+    "name": "throh",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "fighting"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 539,
+    "name": "sawk",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "fighting"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 540,
+    "name": "sewaddle",
+    "stageMin": 1,
+    "stageMax": 19,
+    "types": [
+      "bug",
+      "grass"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 541,
+    "name": "swadloon",
+    "stageMin": 20,
+    "stageMax": 20,
+    "types": [
+      "bug",
+      "grass"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 542,
+    "name": "leavanny",
+    "stageMin": 20,
+    "stageMax": 100,
+    "types": [
+      "bug",
+      "grass"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 543,
+    "name": "venipede",
+    "stageMin": 1,
+    "stageMax": 21,
+    "types": [
+      "bug",
+      "poison"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 544,
+    "name": "whirlipede",
+    "stageMin": 22,
+    "stageMax": 29,
+    "types": [
+      "bug",
+      "poison"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 545,
+    "name": "scolipede",
+    "stageMin": 30,
+    "stageMax": 100,
+    "types": [
+      "bug",
+      "poison"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 546,
+    "name": "cottonee",
+    "stageMin": 1,
+    "stageMax": 19,
+    "types": [
+      "grass",
+      "fairy"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 547,
+    "name": "whimsicott",
+    "stageMin": 20,
+    "stageMax": 100,
+    "types": [
+      "grass",
+      "fairy"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 548,
+    "name": "petilil",
+    "stageMin": 1,
+    "stageMax": 19,
+    "types": [
+      "grass"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 549,
+    "name": "lilligant",
+    "stageMin": 20,
+    "stageMax": 100,
+    "types": [
+      "grass"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 550,
+    "name": "basculin",
+    "stageMin": 1,
+    "stageMax": 1,
+    "types": [
+      "water"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 551,
+    "name": "sandile",
+    "stageMin": 1,
+    "stageMax": 28,
+    "types": [
+      "ground",
+      "dark"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 552,
+    "name": "krokorok",
+    "stageMin": 29,
+    "stageMax": 39,
+    "types": [
+      "ground",
+      "dark"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 553,
+    "name": "krookodile",
+    "stageMin": 40,
+    "stageMax": 100,
+    "types": [
+      "ground",
+      "dark"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 554,
+    "name": "darumaka",
+    "stageMin": 1,
+    "stageMax": 34,
+    "types": [
+      "fire"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 555,
+    "name": "darmanitan",
+    "stageMin": 35,
+    "stageMax": 100,
+    "types": [
+      "fire"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 556,
+    "name": "maractus",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "grass"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 557,
+    "name": "dwebble",
+    "stageMin": 1,
+    "stageMax": 33,
+    "types": [
+      "bug",
+      "rock"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 558,
+    "name": "crustle",
+    "stageMin": 34,
+    "stageMax": 100,
+    "types": [
+      "bug",
+      "rock"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 559,
+    "name": "scraggy",
+    "stageMin": 1,
+    "stageMax": 38,
+    "types": [
+      "dark",
+      "fighting"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 560,
+    "name": "scrafty",
+    "stageMin": 39,
+    "stageMax": 100,
+    "types": [
+      "dark",
+      "fighting"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 561,
+    "name": "sigilyph",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "psychic",
+      "flying"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 562,
+    "name": "yamask",
+    "stageMin": 1,
+    "stageMax": 1,
+    "types": [
+      "ghost"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 563,
+    "name": "cofagrigus",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "ghost"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 564,
+    "name": "tirtouga",
+    "stageMin": 1,
+    "stageMax": 36,
+    "types": [
+      "water",
+      "rock"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 565,
+    "name": "carracosta",
+    "stageMin": 37,
+    "stageMax": 100,
+    "types": [
+      "water",
+      "rock"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 566,
+    "name": "archen",
+    "stageMin": 1,
+    "stageMax": 36,
+    "types": [
+      "rock",
+      "flying"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 567,
+    "name": "archeops",
+    "stageMin": 37,
+    "stageMax": 100,
+    "types": [
+      "rock",
+      "flying"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 568,
+    "name": "trubbish",
+    "stageMin": 1,
+    "stageMax": 35,
+    "types": [
+      "poison"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 569,
+    "name": "garbodor",
+    "stageMin": 36,
+    "stageMax": 100,
+    "types": [
+      "poison"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 570,
+    "name": "zorua",
+    "stageMin": 1,
+    "stageMax": 29,
+    "types": [
+      "dark"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 571,
+    "name": "zoroark",
+    "stageMin": 30,
+    "stageMax": 100,
+    "types": [
+      "dark"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 572,
+    "name": "minccino",
+    "stageMin": 1,
+    "stageMax": 19,
+    "types": [
+      "normal"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 573,
+    "name": "cinccino",
+    "stageMin": 20,
+    "stageMax": 100,
+    "types": [
+      "normal"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 574,
+    "name": "gothita",
+    "stageMin": 1,
+    "stageMax": 31,
+    "types": [
+      "psychic"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 575,
+    "name": "gothorita",
+    "stageMin": 32,
+    "stageMax": 40,
+    "types": [
+      "psychic"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 576,
+    "name": "gothitelle",
+    "stageMin": 41,
+    "stageMax": 100,
+    "types": [
+      "psychic"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 577,
+    "name": "solosis",
+    "stageMin": 1,
+    "stageMax": 31,
+    "types": [
+      "psychic"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 578,
+    "name": "duosion",
+    "stageMin": 32,
+    "stageMax": 40,
+    "types": [
+      "psychic"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 579,
+    "name": "reuniclus",
+    "stageMin": 41,
+    "stageMax": 100,
+    "types": [
+      "psychic"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 580,
+    "name": "ducklett",
+    "stageMin": 1,
+    "stageMax": 34,
+    "types": [
+      "water",
+      "flying"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 581,
+    "name": "swanna",
+    "stageMin": 35,
+    "stageMax": 100,
+    "types": [
+      "water",
+      "flying"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 582,
+    "name": "vanillite",
+    "stageMin": 1,
+    "stageMax": 34,
+    "types": [
+      "ice"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 583,
+    "name": "vanillish",
+    "stageMin": 35,
+    "stageMax": 46,
+    "types": [
+      "ice"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 584,
+    "name": "vanilluxe",
+    "stageMin": 47,
+    "stageMax": 100,
+    "types": [
+      "ice"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 585,
+    "name": "deerling",
+    "stageMin": 1,
+    "stageMax": 33,
+    "types": [
+      "normal",
+      "grass"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 586,
+    "name": "sawsbuck",
+    "stageMin": 34,
+    "stageMax": 100,
+    "types": [
+      "normal",
+      "grass"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 587,
+    "name": "emolga",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "electric",
+      "flying"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 588,
+    "name": "karrablast",
+    "stageMin": 1,
+    "stageMax": 19,
+    "types": [
+      "bug"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 589,
+    "name": "escavalier",
+    "stageMin": 20,
+    "stageMax": 100,
+    "types": [
+      "bug",
+      "steel"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 590,
+    "name": "foongus",
+    "stageMin": 1,
+    "stageMax": 38,
+    "types": [
+      "grass",
+      "poison"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 591,
+    "name": "amoonguss",
+    "stageMin": 39,
+    "stageMax": 100,
+    "types": [
+      "grass",
+      "poison"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 592,
+    "name": "frillish",
+    "stageMin": 1,
+    "stageMax": 39,
+    "types": [
+      "water",
+      "ghost"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 593,
+    "name": "jellicent",
+    "stageMin": 40,
+    "stageMax": 100,
+    "types": [
+      "water",
+      "ghost"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 594,
+    "name": "alomomola",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "water"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 595,
+    "name": "joltik",
+    "stageMin": 1,
+    "stageMax": 35,
+    "types": [
+      "bug",
+      "electric"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 596,
+    "name": "galvantula",
+    "stageMin": 36,
+    "stageMax": 100,
+    "types": [
+      "bug",
+      "electric"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 597,
+    "name": "ferroseed",
+    "stageMin": 1,
+    "stageMax": 39,
+    "types": [
+      "grass",
+      "steel"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 598,
+    "name": "ferrothorn",
+    "stageMin": 40,
+    "stageMax": 100,
+    "types": [
+      "grass",
+      "steel"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 599,
+    "name": "klink",
+    "stageMin": 1,
+    "stageMax": 37,
+    "types": [
+      "steel"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 600,
+    "name": "klang",
+    "stageMin": 38,
+    "stageMax": 48,
+    "types": [
+      "steel"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 601,
+    "name": "klinklang",
+    "stageMin": 49,
+    "stageMax": 100,
+    "types": [
+      "steel"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 602,
+    "name": "tynamo",
+    "stageMin": 1,
+    "stageMax": 38,
+    "types": [
+      "electric"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 603,
+    "name": "eelektrik",
+    "stageMin": 39,
+    "stageMax": 39,
+    "types": [
+      "electric"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 604,
+    "name": "eelektross",
+    "stageMin": 39,
+    "stageMax": 100,
+    "types": [
+      "electric"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 605,
+    "name": "elgyem",
+    "stageMin": 1,
+    "stageMax": 41,
+    "types": [
+      "psychic"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 606,
+    "name": "beheeyem",
+    "stageMin": 42,
+    "stageMax": 100,
+    "types": [
+      "psychic"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 607,
+    "name": "litwick",
+    "stageMin": 1,
+    "stageMax": 40,
+    "types": [
+      "ghost",
+      "fire"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 608,
+    "name": "lampent",
+    "stageMin": 41,
+    "stageMax": 41,
+    "types": [
+      "ghost",
+      "fire"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 609,
+    "name": "chandelure",
+    "stageMin": 41,
+    "stageMax": 100,
+    "types": [
+      "ghost",
+      "fire"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 610,
+    "name": "axew",
+    "stageMin": 1,
+    "stageMax": 37,
+    "types": [
+      "dragon"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 611,
+    "name": "fraxure",
+    "stageMin": 38,
+    "stageMax": 47,
+    "types": [
+      "dragon"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 612,
+    "name": "haxorus",
+    "stageMin": 48,
+    "stageMax": 100,
+    "types": [
+      "dragon"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 613,
+    "name": "cubchoo",
+    "stageMin": 1,
+    "stageMax": 36,
+    "types": [
+      "ice"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 614,
+    "name": "beartic",
+    "stageMin": 37,
+    "stageMax": 100,
+    "types": [
+      "ice"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 615,
+    "name": "cryogonal",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "ice"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 616,
+    "name": "shelmet",
+    "stageMin": 1,
+    "stageMax": 19,
+    "types": [
+      "bug"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 617,
+    "name": "accelgor",
+    "stageMin": 20,
+    "stageMax": 100,
+    "types": [
+      "bug"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 618,
+    "name": "stunfisk",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "ground",
+      "electric"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 619,
+    "name": "mienfoo",
+    "stageMin": 1,
+    "stageMax": 49,
+    "types": [
+      "fighting"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 620,
+    "name": "mienshao",
+    "stageMin": 50,
+    "stageMax": 100,
+    "types": [
+      "fighting"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 621,
+    "name": "druddigon",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "dragon"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 622,
+    "name": "golett",
+    "stageMin": 1,
+    "stageMax": 42,
+    "types": [
+      "ground",
+      "ghost"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 623,
+    "name": "golurk",
+    "stageMin": 43,
+    "stageMax": 100,
+    "types": [
+      "ground",
+      "ghost"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 624,
+    "name": "pawniard",
+    "stageMin": 1,
+    "stageMax": 51,
+    "types": [
+      "dark",
+      "steel"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 625,
+    "name": "bisharp",
+    "stageMin": 52,
+    "stageMax": 52,
+    "types": [
+      "dark",
+      "steel"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 626,
+    "name": "bouffalant",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "normal"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 627,
+    "name": "rufflet",
+    "stageMin": 1,
+    "stageMax": 53,
+    "types": [
+      "normal",
+      "flying"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 628,
+    "name": "braviary",
+    "stageMin": 54,
+    "stageMax": 100,
+    "types": [
+      "normal",
+      "flying"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 629,
+    "name": "vullaby",
+    "stageMin": 1,
+    "stageMax": 53,
+    "types": [
+      "dark",
+      "flying"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 630,
+    "name": "mandibuzz",
+    "stageMin": 54,
+    "stageMax": 100,
+    "types": [
+      "dark",
+      "flying"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 631,
+    "name": "heatmor",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "fire"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 632,
+    "name": "durant",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "bug",
+      "steel"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 633,
+    "name": "deino",
+    "stageMin": 1,
+    "stageMax": 49,
+    "types": [
+      "dark",
+      "dragon"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 634,
+    "name": "zweilous",
+    "stageMin": 50,
+    "stageMax": 63,
+    "types": [
+      "dark",
+      "dragon"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 635,
+    "name": "hydreigon",
+    "stageMin": 64,
+    "stageMax": 100,
+    "types": [
+      "dark",
+      "dragon"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 636,
+    "name": "larvesta",
+    "stageMin": 1,
+    "stageMax": 58,
+    "types": [
+      "bug",
+      "fire"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 637,
+    "name": "volcarona",
+    "stageMin": 59,
+    "stageMax": 100,
+    "types": [
+      "bug",
+      "fire"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 638,
+    "name": "cobalion",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "steel",
+      "fighting"
+    ],
+    "isLegendary": true
+  },
+  {
+    "pokedexId": 639,
+    "name": "terrakion",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "rock",
+      "fighting"
+    ],
+    "isLegendary": true
+  },
+  {
+    "pokedexId": 640,
+    "name": "virizion",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "grass",
+      "fighting"
+    ],
+    "isLegendary": true
+  },
+  {
+    "pokedexId": 641,
+    "name": "tornadus",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "flying"
+    ],
+    "isLegendary": true
+  },
+  {
+    "pokedexId": 642,
+    "name": "thundurus",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "electric",
+      "flying"
+    ],
+    "isLegendary": true
+  },
+  {
+    "pokedexId": 643,
+    "name": "reshiram",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "dragon",
+      "fire"
+    ],
+    "isLegendary": true
+  },
+  {
+    "pokedexId": 644,
+    "name": "zekrom",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "dragon",
+      "electric"
+    ],
+    "isLegendary": true
+  },
+  {
+    "pokedexId": 645,
+    "name": "landorus",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "ground",
+      "flying"
+    ],
+    "isLegendary": true
+  },
+  {
+    "pokedexId": 646,
+    "name": "kyurem",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "dragon",
+      "ice"
+    ],
+    "isLegendary": true
+  },
+  {
+    "pokedexId": 647,
+    "name": "keldeo",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "water",
+      "fighting"
+    ],
+    "isLegendary": true
+  },
+  {
+    "pokedexId": 648,
+    "name": "meloetta",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "normal",
+      "psychic"
+    ],
+    "isLegendary": true
+  },
+  {
+    "pokedexId": 649,
+    "name": "genesect",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "bug",
+      "steel"
+    ],
+    "isLegendary": true
+  },
+  {
+    "pokedexId": 650,
+    "name": "chespin",
+    "stageMin": 1,
+    "stageMax": 15,
+    "types": [
+      "grass"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 651,
+    "name": "quilladin",
+    "stageMin": 16,
+    "stageMax": 35,
+    "types": [
+      "grass"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 652,
+    "name": "chesnaught",
+    "stageMin": 36,
+    "stageMax": 100,
+    "types": [
+      "grass",
+      "fighting"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 653,
+    "name": "fennekin",
+    "stageMin": 1,
+    "stageMax": 15,
+    "types": [
+      "fire"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 654,
+    "name": "braixen",
+    "stageMin": 16,
+    "stageMax": 35,
+    "types": [
+      "fire"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 655,
+    "name": "delphox",
+    "stageMin": 36,
+    "stageMax": 100,
+    "types": [
+      "fire",
+      "psychic"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 656,
+    "name": "froakie",
+    "stageMin": 1,
+    "stageMax": 15,
+    "types": [
+      "water"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 657,
+    "name": "frogadier",
+    "stageMin": 16,
+    "stageMax": 35,
+    "types": [
+      "water"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 658,
+    "name": "greninja",
+    "stageMin": 36,
+    "stageMax": 100,
+    "types": [
+      "water",
+      "dark"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 659,
+    "name": "bunnelby",
+    "stageMin": 1,
+    "stageMax": 19,
+    "types": [
+      "normal"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 660,
+    "name": "diggersby",
+    "stageMin": 20,
+    "stageMax": 100,
+    "types": [
+      "normal",
+      "ground"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 661,
+    "name": "fletchling",
+    "stageMin": 1,
+    "stageMax": 16,
+    "types": [
+      "normal",
+      "flying"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 662,
+    "name": "fletchinder",
+    "stageMin": 17,
+    "stageMax": 34,
+    "types": [
+      "fire",
+      "flying"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 663,
+    "name": "talonflame",
+    "stageMin": 35,
+    "stageMax": 100,
+    "types": [
+      "fire",
+      "flying"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 664,
+    "name": "scatterbug",
+    "stageMin": 1,
+    "stageMax": 8,
+    "types": [
+      "bug"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 665,
+    "name": "spewpa",
+    "stageMin": 9,
+    "stageMax": 11,
+    "types": [
+      "bug"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 666,
+    "name": "vivillon",
+    "stageMin": 12,
+    "stageMax": 100,
+    "types": [
+      "bug",
+      "flying"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 667,
+    "name": "litleo",
+    "stageMin": 1,
+    "stageMax": 34,
+    "types": [
+      "fire",
+      "normal"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 668,
+    "name": "pyroar",
+    "stageMin": 35,
+    "stageMax": 100,
+    "types": [
+      "fire",
+      "normal"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 669,
+    "name": "flabebe",
+    "stageMin": 1,
+    "stageMax": 18,
+    "types": [
+      "fairy"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 670,
+    "name": "floette",
+    "stageMin": 19,
+    "stageMax": 19,
+    "types": [
+      "fairy"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 671,
+    "name": "florges",
+    "stageMin": 20,
+    "stageMax": 100,
+    "types": [
+      "fairy"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 672,
+    "name": "skiddo",
+    "stageMin": 1,
+    "stageMax": 31,
+    "types": [
+      "grass"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 673,
+    "name": "gogoat",
+    "stageMin": 32,
+    "stageMax": 100,
+    "types": [
+      "grass"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 674,
+    "name": "pancham",
+    "stageMin": 1,
+    "stageMax": 31,
+    "types": [
+      "fighting"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 675,
+    "name": "pangoro",
+    "stageMin": 32,
+    "stageMax": 100,
+    "types": [
+      "fighting",
+      "dark"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 676,
+    "name": "furfrou",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "normal"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 677,
+    "name": "espurr",
+    "stageMin": 1,
+    "stageMax": 24,
+    "types": [
+      "psychic"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 678,
+    "name": "meowstic",
+    "stageMin": 25,
+    "stageMax": 100,
+    "types": [
+      "psychic"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 679,
+    "name": "honedge",
+    "stageMin": 1,
+    "stageMax": 34,
+    "types": [
+      "steel",
+      "ghost"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 680,
+    "name": "doublade",
+    "stageMin": 35,
+    "stageMax": 35,
+    "types": [
+      "steel",
+      "ghost"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 681,
+    "name": "aegislash",
+    "stageMin": 35,
+    "stageMax": 100,
+    "types": [
+      "steel",
+      "ghost"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 682,
+    "name": "spritzee",
+    "stageMin": 1,
+    "stageMax": 19,
+    "types": [
+      "fairy"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 683,
+    "name": "aromatisse",
+    "stageMin": 20,
+    "stageMax": 100,
+    "types": [
+      "fairy"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 684,
+    "name": "swirlix",
+    "stageMin": 1,
+    "stageMax": 19,
+    "types": [
+      "fairy"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 685,
+    "name": "slurpuff",
+    "stageMin": 20,
+    "stageMax": 100,
+    "types": [
+      "fairy"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 686,
+    "name": "inkay",
+    "stageMin": 1,
+    "stageMax": 29,
+    "types": [
+      "dark",
+      "psychic"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 687,
+    "name": "malamar",
+    "stageMin": 30,
+    "stageMax": 100,
+    "types": [
+      "dark",
+      "psychic"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 688,
+    "name": "binacle",
+    "stageMin": 1,
+    "stageMax": 38,
+    "types": [
+      "rock",
+      "water"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 689,
+    "name": "barbaracle",
+    "stageMin": 39,
+    "stageMax": 100,
+    "types": [
+      "rock",
+      "water"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 690,
+    "name": "skrelp",
+    "stageMin": 1,
+    "stageMax": 47,
+    "types": [
+      "poison",
+      "water"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 691,
+    "name": "dragalge",
+    "stageMin": 48,
+    "stageMax": 100,
+    "types": [
+      "poison",
+      "dragon"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 692,
+    "name": "clauncher",
+    "stageMin": 1,
+    "stageMax": 36,
+    "types": [
+      "water"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 693,
+    "name": "clawitzer",
+    "stageMin": 37,
+    "stageMax": 100,
+    "types": [
+      "water"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 694,
+    "name": "helioptile",
+    "stageMin": 1,
+    "stageMax": 19,
+    "types": [
+      "electric",
+      "normal"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 695,
+    "name": "heliolisk",
+    "stageMin": 20,
+    "stageMax": 100,
+    "types": [
+      "electric",
+      "normal"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 696,
+    "name": "tyrunt",
+    "stageMin": 1,
+    "stageMax": 38,
+    "types": [
+      "rock",
+      "dragon"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 697,
+    "name": "tyrantrum",
+    "stageMin": 39,
+    "stageMax": 100,
+    "types": [
+      "rock",
+      "dragon"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 698,
+    "name": "amaura",
+    "stageMin": 1,
+    "stageMax": 38,
+    "types": [
+      "rock",
+      "ice"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 699,
+    "name": "aurorus",
+    "stageMin": 39,
+    "stageMax": 100,
+    "types": [
+      "rock",
+      "ice"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 700,
+    "name": "sylveon",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "fairy"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 701,
+    "name": "hawlucha",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "fighting",
+      "flying"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 702,
+    "name": "dedenne",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "electric",
+      "fairy"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 703,
+    "name": "carbink",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "rock",
+      "fairy"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 704,
+    "name": "goomy",
+    "stageMin": 1,
+    "stageMax": 39,
+    "types": [
+      "dragon"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 705,
+    "name": "sliggoo",
+    "stageMin": 40,
+    "stageMax": 49,
+    "types": [
+      "dragon"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 706,
+    "name": "goodra",
+    "stageMin": 50,
+    "stageMax": 100,
+    "types": [
+      "dragon"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 707,
+    "name": "klefki",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "steel",
+      "fairy"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 708,
+    "name": "phantump",
+    "stageMin": 1,
+    "stageMax": 19,
+    "types": [
+      "ghost",
+      "grass"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 709,
+    "name": "trevenant",
+    "stageMin": 20,
+    "stageMax": 100,
+    "types": [
+      "ghost",
+      "grass"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 710,
+    "name": "pumpkaboo",
+    "stageMin": 1,
+    "stageMax": 19,
+    "types": [
+      "ghost",
+      "grass"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 711,
+    "name": "gourgeist",
+    "stageMin": 20,
+    "stageMax": 100,
+    "types": [
+      "ghost",
+      "grass"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 712,
+    "name": "bergmite",
+    "stageMin": 1,
+    "stageMax": 36,
+    "types": [
+      "ice"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 713,
+    "name": "avalugg",
+    "stageMin": 37,
+    "stageMax": 100,
+    "types": [
+      "ice"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 714,
+    "name": "noibat",
+    "stageMin": 1,
+    "stageMax": 47,
+    "types": [
+      "flying",
+      "dragon"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 715,
+    "name": "noivern",
+    "stageMin": 48,
+    "stageMax": 100,
+    "types": [
+      "flying",
+      "dragon"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 716,
+    "name": "xerneas",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "fairy"
+    ],
+    "isLegendary": true
+  },
+  {
+    "pokedexId": 717,
+    "name": "yveltal",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "dark",
+      "flying"
+    ],
+    "isLegendary": true
+  },
+  {
+    "pokedexId": 718,
+    "name": "zygarde",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "dragon",
+      "ground"
+    ],
+    "isLegendary": true
+  },
+  {
+    "pokedexId": 719,
+    "name": "diancie",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "rock",
+      "fairy"
+    ],
+    "isLegendary": true
+  },
+  {
+    "pokedexId": 720,
+    "name": "hoopa",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "psychic",
+      "ghost"
+    ],
+    "isLegendary": true
+  },
+  {
+    "pokedexId": 721,
+    "name": "volcanion",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "fire",
+      "water"
+    ],
+    "isLegendary": true
+  },
+  {
+    "pokedexId": 722,
+    "name": "rowlet",
+    "stageMin": 1,
+    "stageMax": 16,
+    "types": [
+      "grass",
+      "flying"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 723,
+    "name": "dartrix",
+    "stageMin": 17,
+    "stageMax": 33,
+    "types": [
+      "grass",
+      "flying"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 724,
+    "name": "decidueye",
+    "stageMin": 34,
+    "stageMax": 100,
+    "types": [
+      "grass",
+      "ghost"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 725,
+    "name": "litten",
+    "stageMin": 1,
+    "stageMax": 16,
+    "types": [
+      "fire"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 726,
+    "name": "torracat",
+    "stageMin": 17,
+    "stageMax": 33,
+    "types": [
+      "fire"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 727,
+    "name": "incineroar",
+    "stageMin": 34,
+    "stageMax": 100,
+    "types": [
+      "fire",
+      "dark"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 728,
+    "name": "popplio",
+    "stageMin": 1,
+    "stageMax": 16,
+    "types": [
+      "water"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 729,
+    "name": "brionne",
+    "stageMin": 17,
+    "stageMax": 33,
+    "types": [
+      "water"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 730,
+    "name": "primarina",
+    "stageMin": 34,
+    "stageMax": 100,
+    "types": [
+      "water",
+      "fairy"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 731,
+    "name": "pikipek",
+    "stageMin": 1,
+    "stageMax": 13,
+    "types": [
+      "normal",
+      "flying"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 732,
+    "name": "trumbeak",
+    "stageMin": 14,
+    "stageMax": 27,
+    "types": [
+      "normal",
+      "flying"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 733,
+    "name": "toucannon",
+    "stageMin": 28,
+    "stageMax": 100,
+    "types": [
+      "normal",
+      "flying"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 734,
+    "name": "yungoos",
+    "stageMin": 1,
+    "stageMax": 19,
+    "types": [
+      "normal"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 735,
+    "name": "gumshoos",
+    "stageMin": 20,
+    "stageMax": 100,
+    "types": [
+      "normal"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 736,
+    "name": "grubbin",
+    "stageMin": 1,
+    "stageMax": 19,
+    "types": [
+      "bug"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 737,
+    "name": "charjabug",
+    "stageMin": 20,
+    "stageMax": 20,
+    "types": [
+      "bug",
+      "electric"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 738,
+    "name": "vikavolt",
+    "stageMin": 20,
+    "stageMax": 100,
+    "types": [
+      "bug",
+      "electric"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 739,
+    "name": "crabrawler",
+    "stageMin": 1,
+    "stageMax": 1,
+    "types": [
+      "fighting"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 740,
+    "name": "crabominable",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "fighting",
+      "ice"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 741,
+    "name": "oricorio",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "fire",
+      "flying"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 742,
+    "name": "cutiefly",
+    "stageMin": 1,
+    "stageMax": 24,
+    "types": [
+      "bug",
+      "fairy"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 743,
+    "name": "ribombee",
+    "stageMin": 25,
+    "stageMax": 100,
+    "types": [
+      "bug",
+      "fairy"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 744,
+    "name": "rockruff",
+    "stageMin": 1,
+    "stageMax": 24,
+    "types": [
+      "rock"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 745,
+    "name": "lycanroc",
+    "stageMin": 25,
+    "stageMax": 100,
+    "types": [
+      "rock"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 746,
+    "name": "wishiwashi",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "water"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 747,
+    "name": "mareanie",
+    "stageMin": 1,
+    "stageMax": 37,
+    "types": [
+      "poison",
+      "water"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 748,
+    "name": "toxapex",
+    "stageMin": 38,
+    "stageMax": 100,
+    "types": [
+      "poison",
+      "water"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 749,
+    "name": "mudbray",
+    "stageMin": 1,
+    "stageMax": 29,
+    "types": [
+      "ground"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 750,
+    "name": "mudsdale",
+    "stageMin": 30,
+    "stageMax": 100,
+    "types": [
+      "ground"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 751,
+    "name": "dewpider",
+    "stageMin": 1,
+    "stageMax": 21,
+    "types": [
+      "water",
+      "bug"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 752,
+    "name": "araquanid",
+    "stageMin": 22,
+    "stageMax": 100,
+    "types": [
+      "water",
+      "bug"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 753,
+    "name": "fomantis",
+    "stageMin": 1,
+    "stageMax": 33,
+    "types": [
+      "grass"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 754,
+    "name": "lurantis",
+    "stageMin": 34,
+    "stageMax": 100,
+    "types": [
+      "grass"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 755,
+    "name": "morelull",
+    "stageMin": 1,
+    "stageMax": 23,
+    "types": [
+      "grass",
+      "fairy"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 756,
+    "name": "shiinotic",
+    "stageMin": 24,
+    "stageMax": 100,
+    "types": [
+      "grass",
+      "fairy"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 757,
+    "name": "salandit",
+    "stageMin": 1,
+    "stageMax": 32,
+    "types": [
+      "poison",
+      "fire"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 758,
+    "name": "salazzle",
+    "stageMin": 33,
+    "stageMax": 100,
+    "types": [
+      "poison",
+      "fire"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 759,
+    "name": "stufful",
+    "stageMin": 1,
+    "stageMax": 26,
+    "types": [
+      "normal",
+      "fighting"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 760,
+    "name": "bewear",
+    "stageMin": 27,
+    "stageMax": 100,
+    "types": [
+      "normal",
+      "fighting"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 761,
+    "name": "bounsweet",
+    "stageMin": 1,
+    "stageMax": 17,
+    "types": [
+      "grass"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 762,
+    "name": "steenee",
+    "stageMin": 18,
+    "stageMax": 18,
+    "types": [
+      "grass"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 763,
+    "name": "tsareena",
+    "stageMin": 18,
+    "stageMax": 100,
+    "types": [
+      "grass"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 764,
+    "name": "comfey",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "fairy"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 765,
+    "name": "oranguru",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "normal",
+      "psychic"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 766,
+    "name": "passimian",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "fighting"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 767,
+    "name": "wimpod",
+    "stageMin": 1,
+    "stageMax": 29,
+    "types": [
+      "bug",
+      "water"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 768,
+    "name": "golisopod",
+    "stageMin": 30,
+    "stageMax": 100,
+    "types": [
+      "bug",
+      "water"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 769,
+    "name": "sandygast",
+    "stageMin": 1,
+    "stageMax": 41,
+    "types": [
+      "ghost",
+      "ground"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 770,
+    "name": "palossand",
+    "stageMin": 42,
+    "stageMax": 100,
+    "types": [
+      "ghost",
+      "ground"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 771,
+    "name": "pyukumuku",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "water"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 772,
+    "name": "type-null",
+    "stageMin": 1,
+    "stageMax": 1,
+    "types": [
+      "normal"
+    ],
+    "isLegendary": true
+  },
+  {
+    "pokedexId": 773,
+    "name": "silvally",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "normal"
+    ],
+    "isLegendary": true
+  },
+  {
+    "pokedexId": 774,
+    "name": "minior",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "rock",
+      "flying"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 775,
+    "name": "komala",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "normal"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 776,
+    "name": "turtonator",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "fire",
+      "dragon"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 777,
+    "name": "togedemaru",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "electric",
+      "steel"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 778,
+    "name": "mimikyu",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "ghost",
+      "fairy"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 779,
+    "name": "bruxish",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "water",
+      "psychic"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 780,
+    "name": "drampa",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "normal",
+      "dragon"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 781,
+    "name": "dhelmise",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "ghost",
+      "grass"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 782,
+    "name": "jangmo-o",
+    "stageMin": 1,
+    "stageMax": 34,
+    "types": [
+      "dragon"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 783,
+    "name": "hakamo-o",
+    "stageMin": 35,
+    "stageMax": 44,
+    "types": [
+      "dragon",
+      "fighting"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 784,
+    "name": "kommo-o",
+    "stageMin": 45,
+    "stageMax": 100,
+    "types": [
+      "dragon",
+      "fighting"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 785,
+    "name": "tapu-koko",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "electric",
+      "fairy"
+    ],
+    "isLegendary": true
+  },
+  {
+    "pokedexId": 786,
+    "name": "tapu-lele",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "psychic",
+      "fairy"
+    ],
+    "isLegendary": true
+  },
+  {
+    "pokedexId": 787,
+    "name": "tapu-bulu",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "grass",
+      "fairy"
+    ],
+    "isLegendary": true
+  },
+  {
+    "pokedexId": 788,
+    "name": "tapu-fini",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "water",
+      "fairy"
+    ],
+    "isLegendary": true
+  },
+  {
+    "pokedexId": 789,
+    "name": "cosmog",
+    "stageMin": 1,
+    "stageMax": 42,
+    "types": [
+      "psychic"
+    ],
+    "isLegendary": true
+  },
+  {
+    "pokedexId": 790,
+    "name": "cosmoem",
+    "stageMin": 43,
+    "stageMax": 52,
+    "types": [
+      "psychic"
+    ],
+    "isLegendary": true
+  },
+  {
+    "pokedexId": 791,
+    "name": "solgaleo",
+    "stageMin": 53,
+    "stageMax": 100,
+    "types": [
+      "psychic",
+      "steel"
+    ],
+    "isLegendary": true
+  },
+  {
+    "pokedexId": 792,
+    "name": "lunala",
+    "stageMin": 53,
+    "stageMax": 100,
+    "types": [
+      "psychic",
+      "ghost"
+    ],
+    "isLegendary": true
+  },
+  {
+    "pokedexId": 793,
+    "name": "nihilego",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "rock",
+      "poison"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 794,
+    "name": "buzzwole",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "bug",
+      "fighting"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 795,
+    "name": "pheromosa",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "bug",
+      "fighting"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 796,
+    "name": "xurkitree",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "electric"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 797,
+    "name": "celesteela",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "steel",
+      "flying"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 798,
+    "name": "kartana",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "grass",
+      "steel"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 799,
+    "name": "guzzlord",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "dark",
+      "dragon"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 800,
+    "name": "necrozma",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "psychic"
+    ],
+    "isLegendary": true
+  },
+  {
+    "pokedexId": 801,
+    "name": "magearna",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "steel",
+      "fairy"
+    ],
+    "isLegendary": true
+  },
+  {
+    "pokedexId": 802,
+    "name": "marshadow",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "fighting",
+      "ghost"
+    ],
+    "isLegendary": true
+  },
+  {
+    "pokedexId": 803,
+    "name": "poipole",
+    "stageMin": 1,
+    "stageMax": 1,
+    "types": [
+      "poison"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 804,
+    "name": "naganadel",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "poison",
+      "dragon"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 805,
+    "name": "stakataka",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "rock",
+      "steel"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 806,
+    "name": "blacephalon",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "fire",
+      "ghost"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 807,
+    "name": "zeraora",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "electric"
+    ],
+    "isLegendary": true
+  },
+  {
+    "pokedexId": 808,
+    "name": "meltan",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "steel"
+    ],
+    "isLegendary": true
+  },
+  {
+    "pokedexId": 809,
+    "name": "melmetal",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "steel"
+    ],
+    "isLegendary": true
+  },
+  {
+    "pokedexId": 810,
+    "name": "grookey",
+    "stageMin": 1,
+    "stageMax": 15,
+    "types": [
+      "grass"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 811,
+    "name": "thwackey",
+    "stageMin": 16,
+    "stageMax": 34,
+    "types": [
+      "grass"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 812,
+    "name": "rillaboom",
+    "stageMin": 35,
+    "stageMax": 100,
+    "types": [
+      "grass"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 813,
+    "name": "scorbunny",
+    "stageMin": 1,
+    "stageMax": 15,
+    "types": [
+      "fire"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 814,
+    "name": "raboot",
+    "stageMin": 16,
+    "stageMax": 34,
+    "types": [
+      "fire"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 815,
+    "name": "cinderace",
+    "stageMin": 35,
+    "stageMax": 100,
+    "types": [
+      "fire"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 816,
+    "name": "sobble",
+    "stageMin": 1,
+    "stageMax": 15,
+    "types": [
+      "water"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 817,
+    "name": "drizzile",
+    "stageMin": 16,
+    "stageMax": 34,
+    "types": [
+      "water"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 818,
+    "name": "inteleon",
+    "stageMin": 35,
+    "stageMax": 100,
+    "types": [
+      "water"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 819,
+    "name": "skwovet",
+    "stageMin": 1,
+    "stageMax": 23,
+    "types": [
+      "normal"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 820,
+    "name": "greedent",
+    "stageMin": 24,
+    "stageMax": 100,
+    "types": [
+      "normal"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 821,
+    "name": "rookidee",
+    "stageMin": 1,
+    "stageMax": 17,
+    "types": [
+      "flying"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 822,
+    "name": "corvisquire",
+    "stageMin": 18,
+    "stageMax": 37,
+    "types": [
+      "flying"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 823,
+    "name": "corviknight",
+    "stageMin": 38,
+    "stageMax": 100,
+    "types": [
+      "flying",
+      "steel"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 824,
+    "name": "blipbug",
+    "stageMin": 1,
+    "stageMax": 9,
+    "types": [
+      "bug"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 825,
+    "name": "dottler",
+    "stageMin": 10,
+    "stageMax": 29,
+    "types": [
+      "bug",
+      "psychic"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 826,
+    "name": "orbeetle",
+    "stageMin": 30,
+    "stageMax": 100,
+    "types": [
+      "bug",
+      "psychic"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 827,
+    "name": "nickit",
+    "stageMin": 1,
+    "stageMax": 17,
+    "types": [
+      "dark"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 828,
+    "name": "thievul",
+    "stageMin": 18,
+    "stageMax": 100,
+    "types": [
+      "dark"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 829,
+    "name": "gossifleur",
+    "stageMin": 1,
+    "stageMax": 19,
+    "types": [
+      "grass"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 830,
+    "name": "eldegoss",
+    "stageMin": 20,
+    "stageMax": 100,
+    "types": [
+      "grass"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 831,
+    "name": "wooloo",
+    "stageMin": 1,
+    "stageMax": 23,
+    "types": [
+      "normal"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 832,
+    "name": "dubwool",
+    "stageMin": 24,
+    "stageMax": 100,
+    "types": [
+      "normal"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 833,
+    "name": "chewtle",
+    "stageMin": 1,
+    "stageMax": 21,
+    "types": [
+      "water"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 834,
+    "name": "drednaw",
+    "stageMin": 22,
+    "stageMax": 100,
+    "types": [
+      "water",
+      "rock"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 835,
+    "name": "yamper",
+    "stageMin": 1,
+    "stageMax": 24,
+    "types": [
+      "electric"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 836,
+    "name": "boltund",
+    "stageMin": 25,
+    "stageMax": 100,
+    "types": [
+      "electric"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 837,
+    "name": "rolycoly",
+    "stageMin": 1,
+    "stageMax": 17,
+    "types": [
+      "rock"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 838,
+    "name": "carkol",
+    "stageMin": 18,
+    "stageMax": 33,
+    "types": [
+      "rock",
+      "fire"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 839,
+    "name": "coalossal",
+    "stageMin": 34,
+    "stageMax": 100,
+    "types": [
+      "rock",
+      "fire"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 840,
+    "name": "applin",
+    "stageMin": 1,
+    "stageMax": 19,
+    "types": [
+      "grass",
+      "dragon"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 841,
+    "name": "flapple",
+    "stageMin": 20,
+    "stageMax": 100,
+    "types": [
+      "grass",
+      "dragon"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 842,
+    "name": "appletun",
+    "stageMin": 20,
+    "stageMax": 100,
+    "types": [
+      "grass",
+      "dragon"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 843,
+    "name": "silicobra",
+    "stageMin": 1,
+    "stageMax": 35,
+    "types": [
+      "ground"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 844,
+    "name": "sandaconda",
+    "stageMin": 36,
+    "stageMax": 100,
+    "types": [
+      "ground"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 845,
+    "name": "cramorant",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "flying",
+      "water"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 846,
+    "name": "arrokuda",
+    "stageMin": 1,
+    "stageMax": 25,
+    "types": [
+      "water"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 847,
+    "name": "barraskewda",
+    "stageMin": 26,
+    "stageMax": 100,
+    "types": [
+      "water"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 848,
+    "name": "toxel",
+    "stageMin": 1,
+    "stageMax": 29,
+    "types": [
+      "electric",
+      "poison"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 849,
+    "name": "toxtricity",
+    "stageMin": 30,
+    "stageMax": 100,
+    "types": [
+      "electric",
+      "poison"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 850,
+    "name": "sizzlipede",
+    "stageMin": 1,
+    "stageMax": 27,
+    "types": [
+      "fire",
+      "bug"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 851,
+    "name": "centiskorch",
+    "stageMin": 28,
+    "stageMax": 100,
+    "types": [
+      "fire",
+      "bug"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 852,
+    "name": "clobbopus",
+    "stageMin": 1,
+    "stageMax": 1,
+    "types": [
+      "fighting"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 853,
+    "name": "grapploct",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "fighting"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 854,
+    "name": "sinistea",
+    "stageMin": 1,
+    "stageMax": 19,
+    "types": [
+      "ghost"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 855,
+    "name": "polteageist",
+    "stageMin": 20,
+    "stageMax": 100,
+    "types": [
+      "ghost"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 856,
+    "name": "hatenna",
+    "stageMin": 1,
+    "stageMax": 31,
+    "types": [
+      "psychic"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 857,
+    "name": "hattrem",
+    "stageMin": 32,
+    "stageMax": 41,
+    "types": [
+      "psychic"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 858,
+    "name": "hatterene",
+    "stageMin": 42,
+    "stageMax": 100,
+    "types": [
+      "psychic",
+      "fairy"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 859,
+    "name": "impidimp",
+    "stageMin": 1,
+    "stageMax": 31,
+    "types": [
+      "dark",
+      "fairy"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 860,
+    "name": "morgrem",
+    "stageMin": 32,
+    "stageMax": 41,
+    "types": [
+      "dark",
+      "fairy"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 861,
+    "name": "grimmsnarl",
+    "stageMin": 42,
+    "stageMax": 100,
+    "types": [
+      "dark",
+      "fairy"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 862,
+    "name": "obstagoon",
+    "stageMin": 35,
+    "stageMax": 100,
+    "types": [
+      "dark",
+      "normal"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 863,
+    "name": "perrserker",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "steel"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 864,
+    "name": "cursola",
+    "stageMin": 38,
+    "stageMax": 100,
+    "types": [
+      "ghost"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 865,
+    "name": "sirfetchd",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "fighting"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 866,
+    "name": "mr-rime",
+    "stageMin": 42,
+    "stageMax": 100,
+    "types": [
+      "ice",
+      "psychic"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 867,
+    "name": "runerigus",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "ground",
+      "ghost"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 868,
+    "name": "milcery",
+    "stageMin": 1,
+    "stageMax": 1,
+    "types": [
+      "fairy"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 869,
+    "name": "alcremie",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "fairy"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 870,
+    "name": "falinks",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "fighting"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 871,
+    "name": "pincurchin",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "electric"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 872,
+    "name": "snom",
+    "stageMin": 1,
+    "stageMax": 1,
+    "types": [
+      "ice",
+      "bug"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 873,
+    "name": "frosmoth",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "ice",
+      "bug"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 874,
+    "name": "stonjourner",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "rock"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 875,
+    "name": "eiscue",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "ice"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 876,
+    "name": "indeedee",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "psychic",
+      "normal"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 877,
+    "name": "morpeko",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "electric",
+      "dark"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 878,
+    "name": "cufant",
+    "stageMin": 1,
+    "stageMax": 33,
+    "types": [
+      "steel"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 879,
+    "name": "copperajah",
+    "stageMin": 34,
+    "stageMax": 100,
+    "types": [
+      "steel"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 880,
+    "name": "dracozolt",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "electric",
+      "dragon"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 881,
+    "name": "arctozolt",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "electric",
+      "ice"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 882,
+    "name": "dracovish",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "water",
+      "dragon"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 883,
+    "name": "arctovish",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "water",
+      "ice"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 884,
+    "name": "duraludon",
+    "stageMin": 1,
+    "stageMax": 19,
+    "types": [
+      "steel",
+      "dragon"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 885,
+    "name": "dreepy",
+    "stageMin": 1,
+    "stageMax": 49,
+    "types": [
+      "dragon",
+      "ghost"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 886,
+    "name": "drakloak",
+    "stageMin": 50,
+    "stageMax": 59,
+    "types": [
+      "dragon",
+      "ghost"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 887,
+    "name": "dragapult",
+    "stageMin": 60,
+    "stageMax": 100,
+    "types": [
+      "dragon",
+      "ghost"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 888,
+    "name": "zacian",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "fairy"
+    ],
+    "isLegendary": true
+  },
+  {
+    "pokedexId": 889,
+    "name": "zamazenta",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "fighting"
+    ],
+    "isLegendary": true
+  },
+  {
+    "pokedexId": 890,
+    "name": "eternatus",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "poison",
+      "dragon"
+    ],
+    "isLegendary": true
+  },
+  {
+    "pokedexId": 891,
+    "name": "kubfu",
+    "stageMin": 1,
+    "stageMax": 1,
+    "types": [
+      "fighting"
+    ],
+    "isLegendary": true
+  },
+  {
+    "pokedexId": 892,
+    "name": "urshifu",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "fighting",
+      "dark"
+    ],
+    "isLegendary": true
+  },
+  {
+    "pokedexId": 893,
+    "name": "zarude",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "dark",
+      "grass"
+    ],
+    "isLegendary": true
+  },
+  {
+    "pokedexId": 894,
+    "name": "regieleki",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "electric"
+    ],
+    "isLegendary": true
+  },
+  {
+    "pokedexId": 895,
+    "name": "regidrago",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "dragon"
+    ],
+    "isLegendary": true
+  },
+  {
+    "pokedexId": 896,
+    "name": "glastrier",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "ice"
+    ],
+    "isLegendary": true
+  },
+  {
+    "pokedexId": 897,
+    "name": "spectrier",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "ghost"
+    ],
+    "isLegendary": true
+  },
+  {
+    "pokedexId": 898,
+    "name": "calyrex",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "psychic",
+      "grass"
+    ],
+    "isLegendary": true
+  },
+  {
+    "pokedexId": 899,
+    "name": "wyrdeer",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "normal",
+      "psychic"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 900,
+    "name": "kleavor",
+    "stageMin": 20,
+    "stageMax": 100,
+    "types": [
+      "bug",
+      "rock"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 901,
+    "name": "ursaluna",
+    "stageMin": 30,
+    "stageMax": 100,
+    "types": [
+      "ground",
+      "normal"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 902,
+    "name": "basculegion",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "water",
+      "ghost"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 903,
+    "name": "sneasler",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "fighting",
+      "poison"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 904,
+    "name": "overqwil",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "dark",
+      "poison"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 905,
+    "name": "enamorus",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "fairy",
+      "flying"
+    ],
+    "isLegendary": true
+  },
+  {
+    "pokedexId": 906,
+    "name": "sprigatito",
+    "stageMin": 1,
+    "stageMax": 15,
+    "types": [
+      "grass"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 907,
+    "name": "floragato",
+    "stageMin": 16,
+    "stageMax": 35,
+    "types": [
+      "grass"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 908,
+    "name": "meowscarada",
+    "stageMin": 36,
+    "stageMax": 100,
+    "types": [
+      "grass",
+      "dark"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 909,
+    "name": "fuecoco",
+    "stageMin": 1,
+    "stageMax": 15,
+    "types": [
+      "fire"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 910,
+    "name": "crocalor",
+    "stageMin": 16,
+    "stageMax": 35,
+    "types": [
+      "fire"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 911,
+    "name": "skeledirge",
+    "stageMin": 36,
+    "stageMax": 100,
+    "types": [
+      "fire",
+      "ghost"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 912,
+    "name": "quaxly",
+    "stageMin": 1,
+    "stageMax": 15,
+    "types": [
+      "water"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 913,
+    "name": "quaxwell",
+    "stageMin": 16,
+    "stageMax": 35,
+    "types": [
+      "water"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 914,
+    "name": "quaquaval",
+    "stageMin": 36,
+    "stageMax": 100,
+    "types": [
+      "water",
+      "fighting"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 915,
+    "name": "lechonk",
+    "stageMin": 1,
+    "stageMax": 17,
+    "types": [
+      "normal"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 916,
+    "name": "oinkologne",
+    "stageMin": 18,
+    "stageMax": 100,
+    "types": [
+      "normal"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 917,
+    "name": "tarountula",
+    "stageMin": 1,
+    "stageMax": 14,
+    "types": [
+      "bug"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 918,
+    "name": "spidops",
+    "stageMin": 15,
+    "stageMax": 100,
+    "types": [
+      "bug"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 919,
+    "name": "nymble",
+    "stageMin": 1,
+    "stageMax": 23,
+    "types": [
+      "bug"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 920,
+    "name": "lokix",
+    "stageMin": 24,
+    "stageMax": 100,
+    "types": [
+      "bug",
+      "dark"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 921,
+    "name": "pawmi",
+    "stageMin": 1,
+    "stageMax": 17,
+    "types": [
+      "electric"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 922,
+    "name": "pawmo",
+    "stageMin": 18,
+    "stageMax": 18,
+    "types": [
+      "electric",
+      "fighting"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 923,
+    "name": "pawmot",
+    "stageMin": 18,
+    "stageMax": 100,
+    "types": [
+      "electric",
+      "fighting"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 924,
+    "name": "tandemaus",
+    "stageMin": 1,
+    "stageMax": 24,
+    "types": [
+      "normal"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 925,
+    "name": "maushold",
+    "stageMin": 25,
+    "stageMax": 100,
+    "types": [
+      "normal"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 926,
+    "name": "fidough",
+    "stageMin": 1,
+    "stageMax": 25,
+    "types": [
+      "fairy"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 927,
+    "name": "dachsbun",
+    "stageMin": 26,
+    "stageMax": 100,
+    "types": [
+      "fairy"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 928,
+    "name": "smoliv",
+    "stageMin": 1,
+    "stageMax": 24,
+    "types": [
+      "grass",
+      "normal"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 929,
+    "name": "dolliv",
+    "stageMin": 25,
+    "stageMax": 34,
+    "types": [
+      "grass",
+      "normal"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 930,
+    "name": "arboliva",
+    "stageMin": 35,
+    "stageMax": 100,
+    "types": [
+      "grass",
+      "normal"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 931,
+    "name": "squawkabilly",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "normal",
+      "flying"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 932,
+    "name": "nacli",
+    "stageMin": 1,
+    "stageMax": 23,
+    "types": [
+      "rock"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 933,
+    "name": "naclstack",
+    "stageMin": 24,
+    "stageMax": 37,
+    "types": [
+      "rock"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 934,
+    "name": "garganacl",
+    "stageMin": 38,
+    "stageMax": 100,
+    "types": [
+      "rock"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 935,
+    "name": "charcadet",
+    "stageMin": 1,
+    "stageMax": 19,
+    "types": [
+      "fire"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 936,
+    "name": "armarouge",
+    "stageMin": 20,
+    "stageMax": 100,
+    "types": [
+      "fire",
+      "psychic"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 937,
+    "name": "ceruledge",
+    "stageMin": 20,
+    "stageMax": 100,
+    "types": [
+      "fire",
+      "ghost"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 938,
+    "name": "tadbulb",
+    "stageMin": 1,
+    "stageMax": 19,
+    "types": [
+      "electric"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 939,
+    "name": "bellibolt",
+    "stageMin": 20,
+    "stageMax": 100,
+    "types": [
+      "electric"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 940,
+    "name": "wattrel",
+    "stageMin": 1,
+    "stageMax": 24,
+    "types": [
+      "electric",
+      "flying"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 941,
+    "name": "kilowattrel",
+    "stageMin": 25,
+    "stageMax": 100,
+    "types": [
+      "electric",
+      "flying"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 942,
+    "name": "maschiff",
+    "stageMin": 1,
+    "stageMax": 29,
+    "types": [
+      "dark"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 943,
+    "name": "mabosstiff",
+    "stageMin": 30,
+    "stageMax": 100,
+    "types": [
+      "dark"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 944,
+    "name": "shroodle",
+    "stageMin": 1,
+    "stageMax": 27,
+    "types": [
+      "poison",
+      "normal"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 945,
+    "name": "grafaiai",
+    "stageMin": 28,
+    "stageMax": 100,
+    "types": [
+      "poison",
+      "normal"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 946,
+    "name": "bramblin",
+    "stageMin": 1,
+    "stageMax": 1,
+    "types": [
+      "grass",
+      "ghost"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 947,
+    "name": "brambleghast",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "grass",
+      "ghost"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 948,
+    "name": "toedscool",
+    "stageMin": 1,
+    "stageMax": 29,
+    "types": [
+      "ground",
+      "grass"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 949,
+    "name": "toedscruel",
+    "stageMin": 30,
+    "stageMax": 100,
+    "types": [
+      "ground",
+      "grass"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 950,
+    "name": "klawf",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "rock"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 951,
+    "name": "capsakid",
+    "stageMin": 1,
+    "stageMax": 19,
+    "types": [
+      "grass"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 952,
+    "name": "scovillain",
+    "stageMin": 20,
+    "stageMax": 100,
+    "types": [
+      "grass",
+      "fire"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 953,
+    "name": "rellor",
+    "stageMin": 1,
+    "stageMax": 1,
+    "types": [
+      "bug"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 954,
+    "name": "rabsca",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "bug",
+      "psychic"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 955,
+    "name": "flittle",
+    "stageMin": 1,
+    "stageMax": 34,
+    "types": [
+      "psychic"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 956,
+    "name": "espathra",
+    "stageMin": 35,
+    "stageMax": 100,
+    "types": [
+      "psychic"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 957,
+    "name": "tinkatink",
+    "stageMin": 1,
+    "stageMax": 23,
+    "types": [
+      "fairy",
+      "steel"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 958,
+    "name": "tinkatuff",
+    "stageMin": 24,
+    "stageMax": 37,
+    "types": [
+      "fairy",
+      "steel"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 959,
+    "name": "tinkaton",
+    "stageMin": 38,
+    "stageMax": 100,
+    "types": [
+      "fairy",
+      "steel"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 960,
+    "name": "wiglett",
+    "stageMin": 1,
+    "stageMax": 25,
+    "types": [
+      "water"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 961,
+    "name": "wugtrio",
+    "stageMin": 26,
+    "stageMax": 100,
+    "types": [
+      "water"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 962,
+    "name": "bombirdier",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "flying",
+      "dark"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 963,
+    "name": "finizen",
+    "stageMin": 1,
+    "stageMax": 37,
+    "types": [
+      "water"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 964,
+    "name": "palafin",
+    "stageMin": 38,
+    "stageMax": 100,
+    "types": [
+      "water"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 965,
+    "name": "varoom",
+    "stageMin": 1,
+    "stageMax": 39,
+    "types": [
+      "steel",
+      "poison"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 966,
+    "name": "revavroom",
+    "stageMin": 40,
+    "stageMax": 100,
+    "types": [
+      "steel",
+      "poison"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 967,
+    "name": "cyclizar",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "dragon",
+      "normal"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 968,
+    "name": "orthworm",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "steel"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 969,
+    "name": "glimmet",
+    "stageMin": 1,
+    "stageMax": 34,
+    "types": [
+      "rock",
+      "poison"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 970,
+    "name": "glimmora",
+    "stageMin": 35,
+    "stageMax": 100,
+    "types": [
+      "rock",
+      "poison"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 971,
+    "name": "greavard",
+    "stageMin": 1,
+    "stageMax": 29,
+    "types": [
+      "ghost"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 972,
+    "name": "houndstone",
+    "stageMin": 30,
+    "stageMax": 100,
+    "types": [
+      "ghost"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 973,
+    "name": "flamigo",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "flying",
+      "fighting"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 974,
+    "name": "cetoddle",
+    "stageMin": 1,
+    "stageMax": 19,
+    "types": [
+      "ice"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 975,
+    "name": "cetitan",
+    "stageMin": 20,
+    "stageMax": 100,
+    "types": [
+      "ice"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 976,
+    "name": "veluza",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "water",
+      "psychic"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 977,
+    "name": "dondozo",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "water"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 978,
+    "name": "tatsugiri",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "dragon",
+      "water"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 979,
+    "name": "annihilape",
+    "stageMin": 28,
+    "stageMax": 100,
+    "types": [
+      "fighting",
+      "ghost"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 980,
+    "name": "clodsire",
+    "stageMin": 20,
+    "stageMax": 100,
+    "types": [
+      "poison",
+      "ground"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 981,
+    "name": "farigiraf",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "normal",
+      "psychic"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 982,
+    "name": "dudunsparce",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "normal"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 983,
+    "name": "kingambit",
+    "stageMin": 52,
+    "stageMax": 100,
+    "types": [
+      "dark",
+      "steel"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 984,
+    "name": "great-tusk",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "ground",
+      "fighting"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 985,
+    "name": "scream-tail",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "fairy",
+      "psychic"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 986,
+    "name": "brute-bonnet",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "grass",
+      "dark"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 987,
+    "name": "flutter-mane",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "ghost",
+      "fairy"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 988,
+    "name": "slither-wing",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "bug",
+      "fighting"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 989,
+    "name": "sandy-shocks",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "electric",
+      "ground"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 990,
+    "name": "iron-treads",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "ground",
+      "steel"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 991,
+    "name": "iron-bundle",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "ice",
+      "water"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 992,
+    "name": "iron-hands",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "fighting",
+      "electric"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 993,
+    "name": "iron-jugulis",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "dark",
+      "flying"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 994,
+    "name": "iron-moth",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "fire",
+      "poison"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 995,
+    "name": "iron-thorns",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "rock",
+      "electric"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 996,
+    "name": "frigibax",
+    "stageMin": 1,
+    "stageMax": 34,
+    "types": [
+      "dragon",
+      "ice"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 997,
+    "name": "arctibax",
+    "stageMin": 35,
+    "stageMax": 53,
+    "types": [
+      "dragon",
+      "ice"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 998,
+    "name": "baxcalibur",
+    "stageMin": 54,
+    "stageMax": 100,
+    "types": [
+      "dragon",
+      "ice"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 999,
+    "name": "gimmighoul",
+    "stageMin": 1,
+    "stageMax": 1,
+    "types": [
+      "ghost"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 1000,
+    "name": "gholdengo",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "steel",
+      "ghost"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 1001,
+    "name": "wo-chien",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "dark",
+      "grass"
+    ],
+    "isLegendary": true
+  },
+  {
+    "pokedexId": 1002,
+    "name": "chien-pao",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "dark",
+      "ice"
+    ],
+    "isLegendary": true
+  },
+  {
+    "pokedexId": 1003,
+    "name": "ting-lu",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "dark",
+      "ground"
+    ],
+    "isLegendary": true
+  },
+  {
+    "pokedexId": 1004,
+    "name": "chi-yu",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "dark",
+      "fire"
+    ],
+    "isLegendary": true
+  },
+  {
+    "pokedexId": 1005,
+    "name": "roaring-moon",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "dragon",
+      "dark"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 1006,
+    "name": "iron-valiant",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "fairy",
+      "fighting"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 1007,
+    "name": "koraidon",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "fighting",
+      "dragon"
+    ],
+    "isLegendary": true
+  },
+  {
+    "pokedexId": 1008,
+    "name": "miraidon",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "electric",
+      "dragon"
+    ],
+    "isLegendary": true
+  },
+  {
+    "pokedexId": 1009,
+    "name": "walking-wake",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "water",
+      "dragon"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 1010,
+    "name": "iron-leaves",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "grass",
+      "psychic"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 1011,
+    "name": "dipplin",
+    "stageMin": 20,
+    "stageMax": 20,
+    "types": [
+      "grass",
+      "dragon"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 1012,
+    "name": "poltchageist",
+    "stageMin": 1,
+    "stageMax": 19,
+    "types": [
+      "grass",
+      "ghost"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 1013,
+    "name": "sinistcha",
+    "stageMin": 20,
+    "stageMax": 100,
+    "types": [
+      "grass",
+      "ghost"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 1014,
+    "name": "okidogi",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "poison",
+      "fighting"
+    ],
+    "isLegendary": true
+  },
+  {
+    "pokedexId": 1015,
+    "name": "munkidori",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "poison",
+      "psychic"
+    ],
+    "isLegendary": true
+  },
+  {
+    "pokedexId": 1016,
+    "name": "fezandipiti",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "poison",
+      "fairy"
+    ],
+    "isLegendary": true
+  },
+  {
+    "pokedexId": 1017,
+    "name": "ogerpon",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "grass"
+    ],
+    "isLegendary": true
+  },
+  {
+    "pokedexId": 1018,
+    "name": "archaludon",
+    "stageMin": 20,
+    "stageMax": 100,
+    "types": [
+      "steel",
+      "dragon"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 1019,
+    "name": "hydrapple",
+    "stageMin": 20,
+    "stageMax": 100,
+    "types": [
+      "grass",
+      "dragon"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 1020,
+    "name": "gouging-fire",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "fire",
+      "dragon"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 1021,
+    "name": "raging-bolt",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "electric",
+      "dragon"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 1022,
+    "name": "iron-boulder",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "rock",
+      "psychic"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 1023,
+    "name": "iron-crown",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "steel",
+      "psychic"
+    ],
+    "isLegendary": false
+  },
+  {
+    "pokedexId": 1024,
+    "name": "terapagos",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "normal"
+    ],
+    "isLegendary": true
+  },
+  {
+    "pokedexId": 1025,
+    "name": "pecharunt",
+    "stageMin": 1,
+    "stageMax": 100,
+    "types": [
+      "poison",
+      "ghost"
+    ],
+    "isLegendary": true
+  }
+]

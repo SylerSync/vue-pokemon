@@ -597,9 +597,8 @@ export const usePokemonStore = defineStore("pokemonStore", {
 
 
     state: () => ({
-        caughtPokemon: [
-            testEevee, testGodPokemon, testBulbasaur, testGligar, testCharizard, testRayquaza
-        ],
+        caughtPokemon: [testBulbasaur,testCharizard,testEevee,testGligar],
+        pokemonParty: [],
         wishlistPokemon: [],
         typeColors: {
             normal: '#A8A878',
@@ -666,25 +665,61 @@ export const usePokemonStore = defineStore("pokemonStore", {
         }
     },
     actions: {
+        // Caught Pokemon controls
         addPokemon(pokemon) {
-            this.caughtPokemon.push({
+            let instanceId = crypto.randomUUID()
+            let newPokemon = {
                 ...pokemon,
-                instanceId: crypto.randomUUID()
-            })
-        },
-        addWishlistPokemon(pokemon) {
-            this.wishlistPokemon.push(pokemon)
+                instanceId: instanceId
+            }
+            this.caughtPokemon.push(newPokemon)
+            if (this.pokemonParty.length < 6) {
+                this.pokemonParty.push(newPokemon)
+            }
         },
         releasePokemon(index) {
             this.caughtPokemon.splice(index, 1)
         },
-        // removes from wishlist by name instead of index number
+        // Wishlist Controls
+        addWishlistPokemon(pokemon) {
+            this.wishlistPokemon.push(pokemon)
+        },
         removeWishlistPokemon(pokemon) {
             this.wishlistPokemon = this.wishlistPokemon.filter(pok => pok.name !== pokemon)
+        },
+        // Pokemon Party controls
+        addPokemonParty(pokemon) {
+            if (this.pokemonParty.length >= 6) {
+                console.log("Party is full (max 6)");
+                return false;
+            }
+
+            // Check if this exact Pokemon is already in the active party
+            const alreadyInParty = this.pokemonParty.some(p => p.instanceId === pokemon.instanceId);
+
+            if (!alreadyInParty) {
+                // Push the direct reference from caughtPokemon (no copying/spreading)
+                this.pokemonParty.push(pokemon);
+                return true;
+            }
+            return false;
+        },
+
+        removePokemonParty(pokemon) {
+            if (!pokemon) return;
+
+            // Prevent leaving the party completely empty if needed
+            if (this.pokemonParty.length <= 1) {
+                console.log("Cannot remove the last Pokemon from party.");
+                return false;
+            }
+
+            this.pokemonParty = this.pokemonParty.filter(p => p.instanceId !== pokemon.instanceId);
+            return true;
         }
     },
     persist: {
         key: "pokemon-store-save",
-        pick: ['caughtPokemon', 'wishlistPokemon']
+        pick: ['caughtPokemon', 'wishlistPokemon', 'pokemonParty']
     }
 })
