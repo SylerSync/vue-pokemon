@@ -392,7 +392,7 @@
                 </template>
             </Column>
             <Column header="Give Item">
-                <template #body="{data}">
+                <template #body="{ data }">
                     <Button @click="giveHeldItem(data)">Give</Button>
                 </template>
             </Column>
@@ -400,7 +400,47 @@
     </Modal>
 
     <Modal v-if="isUseItemModalOpen" @close="closeUseItemModal">
-
+        <SelectButton v-model="itemTab" :options="itemTabs" optionLabel="label" optionValue="value" />
+        <div v-if="itemTab === 'recovery'">
+            <h3>Recovery Items</h3>
+            <DataTable :value="shopRecovery.filter(item => item.count > 0)" paginator :rows="5">
+                <Column field="name" header="Item">
+                    <template #body="{ data }">
+                        <span>{{ data.name }}</span>
+                    </template>
+                </Column>
+                <Column header="Count" field="count">
+                    <template #body="{ data }">
+                        {{ data.count }}
+                    </template>
+                </Column>
+                <Column>
+                    <template #body="{ data }">
+                        <Button @click="useRecoveryItem(data)">Use</Button>
+                    </template>
+                </Column>
+            </DataTable>
+        </div>
+        <div v-if="itemTab === 'evoItems'">
+            <h3>Evolution Items</h3>
+            <DataTable :value="heldItems.filter(item => item.type === 'evo')" paginator :rows="5">
+                <Column field="name" header="Item">
+                    <template #body="{ data }">
+                        <span>{{ data.name }}</span>
+                    </template>
+                </Column>
+                <Column field="count" header="Count">
+                    <template #body="{ data }">
+                        <span>{{ data.quantity }}</span>
+                    </template>
+                </Column>
+                <Column>
+                    <template #body="{ data }">
+                        <Button @click="useEvoItem(data.name)">Use</Button>
+                    </template>
+                </Column>
+            </DataTable>
+        </div>
     </Modal>
 
     <PokemonBattle v-if="isBattleModalOpen" :auto-start="true" :team="pokemonStore.pokemonParty" :opponent="wildPokemon"
@@ -460,6 +500,7 @@ const isGameplayPause = ref(false);
 const isEncounterAnimating = ref(false);
 const selectedPokemon = ref(null)
 const selectedIndex = ref(null)
+const itemTab = ref("recovery")
 
 // static values
 const STATUS_ICONS = {
@@ -469,6 +510,11 @@ const STATUS_ICONS = {
     burn: burnIcon,
     poison: poisonIcon
 };
+
+const itemTabs = [
+    { label: "Recovery Items", value: "recovery" },
+    { label: "Evolution Items", value: "evoItems" }
+]
 
 const heldItems = computed(() => {
     const allHeld = [];
@@ -790,16 +836,20 @@ const shopPokeball = computed(() => {
 
 // --- 2. RECOVERY ITEMS COMPUTED ---
 const shopRecovery = computed(() => {
+    if (!inventoryStore.recoveryItems) return [];
+
     return Object.keys(inventoryStore.recoveryItems).map((key) => {
-        const item = inventoryStore.recoveryItems[key]
+        const item = inventoryStore.recoveryItems[key] || {};
         return {
             id: key,
             name: key === 'maxrevive' ? 'Max Revive' : key.charAt(0).toUpperCase() + key.slice(1),
-            cost: item.cost,
-            count: item.count
-        }
-    })
-})
+            cost: item.cost || 0,
+            count: item.count || 0,
+            type: item.effect?.type || 'recovery', // Reads type from effect sub-object
+            effect: item.effect || null
+        };
+    });
+});
 
 // --- 3. TMs COMPUTED ---
 const shopTMs = computed(() => {
@@ -956,32 +1006,139 @@ function closeUseItemModal() {
     isUseItemModalOpen.value = false
 }
 
-function giveHeldItem(item){
+function giveHeldItem(item) {
     let itemName = item.id
-    if(evolutionItems[itemName]){
-        if(inventoryStore.UseEvoItem(itemName)){
+    if (evolutionItems[itemName]) {
+        if (inventoryStore.UseEvoItem(itemName)) {
             selectedPokemon.value.heldItem = itemName
             closeHeldItemModal()
             return
         }
-        else{
+        else {
             errorStore.SetErrorDetails("Inventory Issue", `we could not give the pokemon a(n) ${itemName} at this time.`)
             return
         }
     }
-    if(megaEvoStones[itemName]){
-        if(inventoryStore.UseMegaStone(itemName)){
+    if (megaEvoStones[itemName]) {
+        if (inventoryStore.UseMegaStone(itemName)) {
             selectedPokemon.value.heldItem = itemName
             closeHeldItemModal()
             return
         }
-        else{
+        else {
             errorStore.SetErrorDetails("Inventory Issue", `we could not give the pokemon a(n) ${itemName} at this time.`)
             return
         }
     }
     errorStore.SetErrorDetails("Collection Issue", `Unable to find item ${itemName} at this time.`)
 }
+
+async function useEvoItem(itemId) {
+    const pokemon = selectedPokemon.value;
+    if (!pokemon?.evoDetails || !Array.isArray(pokemon.evoDetails)) {
+        errorStore.SetErrorDetails("Item Issue", `You can't evolve ${pokemon.name} using a(n) ${itemId}.`)
+        console.log(`You can't evolve ${pokemon?.name} using a ${itemId}`);
+        return;
+    }
+
+    // Search the array directly for a matching trigger + item
+    const matchingEvo = pokemon.evoDetails.find(
+        evo => evo.trigger === "use-item" && evo.item === itemId
+    );
+
+    if (matchingEvo) {
+        const evoName = matchingEvo.nextEvo.name;
+
+        // Run evolution helper
+        const success = await pokemonHelper.handleEvolution(pokemon, evoName);
+
+        if (success) {
+            // Deduct stone from inventory
+            inventoryStore.UseEvoItem(itemId, 1);
+
+            // Re-sync active modal reference to newly evolved species
+            selectedPokemon.value = pokemonStore.caughtPokemon.find(
+                p => p.instanceId === pokemon.instanceId
+            );
+            closeItemModal()
+            closeDetailModal();
+        }
+    } else {
+        errorStore.SetErrorDetails("Item Issue", `You can't evolve ${pokemon.name} using a(n) ${itemId}.`)
+        console.log(`You can't evolve ${pokemon.name} using a ${itemId}`);
+    }
+}
+
+function useRecoveryItem(item) {
+    if (!inventoryStore.recoveryItems[item.id]) {
+        console.warn(`Can not find item ${item.id} in the inventory.`)
+        return
+    }
+
+    const target = selectedPokemon.value;
+    if (!target) return;
+
+    switch (item.effect.type) {
+        case "revive":
+            if (target.currentHp <= 0) {
+                if (inventoryStore.UseRecovery(item.id)) {
+                    target.currentHp = Math.trunc(target.totalHp * item.effect.percent)
+                }
+            }
+            else {
+                errorStore.SetErrorDetails("Item Issue", `${target.name} has not fainted. you can't use a revive now.`)
+                console.warn(`${target.name} has not fainted, a revive item cant be used.`)
+            }
+            break
+        case "heal":
+            if (target.currentHp <= 0) {
+                console.warn(`${target.name} has fainted, you must use a revive item to fix this injury!`)
+                return
+            }
+            else {
+                if (target.currentHp == target.totalHp) {
+                    errorStore.SetErrorDetails("Item Issue", `${target.name} is already at full health!.`)
+                    console.warn(`${target.name} is already at full health!`)
+                    return
+                }
+                if (inventoryStore.UseRecovery(item.id)) {
+                    target.currentHp = Math.min(target.totalHp, target.currentHp + item.effect.amount);
+                    return
+                }
+            }
+            break
+        case "status-heal":
+            if (target.status !== "" && target.status) {
+                if (target.status === item.effect.status)
+                    target.status = ""
+                inventoryStore.UseRecovery(item.id)
+                return
+            }
+            else {
+                console.log(`${target.name} is not effected by ${item.effect.status}. Can't use this item.`)
+            }
+            break
+        case "pp-heal":
+            if (item.effect.scope === "single") {
+                console.log(item)
+                ppRecoveryItem.value = item
+                isRefillPPModalOpen.value = true
+            } else if (item.effect.scope === "all") {
+                if (inventoryStore.UseRecovery(item.id)) {
+                    for (let move of selectedPokemon.value.moves) {
+                        move.currentPP = Math.min(move.maxPP, move.currentPP + item.effect.amount)
+                    }
+                }
+            }
+            break
+        case "pp-max-raise":
+            ppRecoveryItem.value = item
+            isRefillPPModalOpen.value = true
+            break
+    }
+}
+
+
 
 
 // #endregion
