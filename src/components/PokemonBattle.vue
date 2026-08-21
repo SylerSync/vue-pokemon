@@ -107,7 +107,7 @@
             <!-- Mega Evolution Button -->
             <div class="megaEvo">
               <button class="mega-btn"
-                :disabled="isResolving || isFainted(userPokemon) || userPokemon?.minorStatus?.includes('embargo')"
+                :disabled="isResolving || isFainted(userPokemon) || userPokemon?.minorStatus?.includes('embargo') || field.magicRoom > 0"
                 v-if="canMegaEvolve && !hasMegaEvo" @click="handleMegaEvo(userPokemon)">
                 Mega Evolve
               </button>
@@ -413,6 +413,22 @@ const STAT_LABEL = {
   speed: 'Speed', accuracy: 'accuracy', evasion: 'evasiveness',
 };
 
+const freshSide = () => ({
+  reflect: 0, lightScreen: 0, auroraVeil: 0,
+  safeguard: 0, mist: 0, tailwind: 0,
+  spikes: 0, toxicSpikes: 0, stealthRock: false, stickyWeb: false,
+});
+
+const sides = ref({ ally: freshSide(), foe: freshSide() });
+const field = ref({ trickRoom: 0, gravity: 0, magicRoom: 0, wonderRoom: 0 });
+
+function sideKey(pokemon) {
+  return pokemon === userPokemon.value ? 'ally' : 'foe';
+}
+function sideOf(pokemon) { return sides.value[sideKey(pokemon)]; }
+function foeSideOf(pokemon) {
+  return sides.value[sideKey(pokemon) === 'ally' ? 'foe' : 'ally'];
+}
 
 // Hardcoded moves that have special/unique effects that arn't listed in pokeapi
 const SELF_KO_MOVES = new Set([
@@ -602,6 +618,49 @@ const UNCOPYABLE = new Set([
 ]);
 
 const NATURE_POWER_MOVE = 'tri-attack';  // no terrain system → default
+
+// Protection Moves
+const PROTECT_MOVES = {
+  protect: 'protect', detect: 'protect',
+  'spiky-shield': 'protect', 'baneful-bunker': 'protect',
+  "king-s-shield": 'protect', 'wide-guard': 'protect',
+  endure: 'endure',
+};
+const SCREEN_MOVES = {
+  reflect: 'reflect', 'light-screen': 'lightScreen', 'aurora-veil': 'auroraVeil',
+  safeguard: 'safeguard', mist: 'mist', tailwind: 'tailwind',
+};
+
+// Hazard Moves
+const HAZARD_MOVES = {
+  spikes: 'spikes', 'toxic-spikes': 'toxicSpikes',
+  'stealth-rock': 'stealthRock', 'sticky-web': 'stickyWeb',
+};
+
+const HAZARD_KEYS = ['spikes', 'toxicSpikes', 'stealthRock', 'stickyWeb'];
+
+function clearHazards(side) {
+  let cleared = false;
+  for (const k of HAZARD_KEYS) {
+    const empty = typeof side[k] === 'boolean' ? false : 0;
+    if (side[k] !== empty) { side[k] = empty; cleared = true; }
+  }
+  return cleared;
+}
+
+// Field Moves
+const FIELD_MOVES = {
+  'trick-room': 'trickRoom',
+  gravity: 'gravity',
+  'magic-room': 'magicRoom',
+  'wonder-room': 'wonderRoom',
+};
+const FIELD_LABEL = {
+  reflect: 'Reflect', lightScreen: 'Light Screen', auroraVeil: 'Aurora Veil',
+  safeguard: 'Safeguard', mist: 'Mist', tailwind: 'Tailwind',
+  trickRoom: 'Trick Room', gravity: 'Gravity',
+  magicRoom: 'Magic Room', wonderRoom: 'Wonder Room',
+};
 
 function weightPower(hg) {
   const w = hg ?? 0;
@@ -835,9 +894,43 @@ function isImmuneTo(move, target) {
   if (!move.type) return false;
   let eff = typeEffectiveness(move.type, target.types);
   const grounded = target.minorStatus?.includes('no-type-immunity') ||
-    (move.type === 'ground' && target.minorStatus?.includes('ingrain'));
+    (move.type === 'ground' && target.minorStatus?.includes('ingrain')) ||
+    (field.value.gravity > 0 && (move.type === 'ground' && target.types.includes('flying')));
   if (grounded && eff === 0) eff = 1;
   return eff === 0;
+}
+
+async function applyHazards(pokemon) {
+  const side = sideOf(pokemon);
+  const grounded = !pokemon.types.includes('flying') || field.value.gravity > 0;
+
+  if (side.stealthRock) {
+    const eff = typeEffectiveness('rock', pokemon.types);
+    const dmg = Math.max(1, Math.floor(pokemon.totalHp * (eff / 8)));
+    pokemon.currentHp = Math.max(0, pokemon.currentHp - dmg);
+    log(`Pointed stones dug into ${pokemon.name}!`);
+    await delay(800);
+  }
+  if (side.spikes > 0 && grounded) {
+    const frac = [0, 1 / 8, 1 / 6, 1 / 4][side.spikes];
+    pokemon.currentHp = Math.max(0, pokemon.currentHp - Math.max(1, Math.floor(pokemon.totalHp * frac)));
+    log(`${pokemon.name} was hurt by spikes!`);
+    await delay(800);
+  }
+  if (side.toxicSpikes > 0 && grounded) {
+    if (pokemon.types.includes('poison')) {
+      side.toxicSpikes = 0;
+      log(`${pokemon.name} absorbed the poison spikes!`);
+    } else if (!pokemon.status) {
+      await inflictStatus(pokemon, side.toxicSpikes >= 2 ? 'bad-poison' : 'poison', null, pokemon);
+    }
+    await delay(800);
+  }
+  if (side.stickyWeb && grounded) {
+    applyStatChange(pokemon, 'speed', -1);
+    log(`${pokemon.name} was caught in a sticky web!`);
+    await delay(800);
+  }
 }
 
 /* ------------------------------------------------------------------ *
@@ -856,6 +949,8 @@ function startBattle() {
   userPokemon.value.mustRecharge = false;
   userPokemon.value.locked = null
   userPokemon.value.bide = null
+  sides.value.ally = freshSide()
+  sides.value.foe = freshSide()
   battleStarted.value = true;
   selectedTargetPokemon.value = userPokemon.value;
   log(`A wild ${foe.value.name} appeared!`);
@@ -923,6 +1018,10 @@ async function battleTurn(playerMove, item = null) {
       await endOfTurnPerish(player);
       if (await endOfTurn(wild, player)) return;
       if (await endOfTurn(player, wild)) return;
+      await endOfTurnField();
+
+      player.protecting = null;
+      wild.protecting = null;
 
       return;
     }
@@ -932,10 +1031,11 @@ async function battleTurn(playerMove, item = null) {
     const wildSpeed = statOf(wild, 'speed');
     const playerPriority = playerMove?.priority ?? 0;
     const wildPriority = wildMove?.priority ?? 0;
+    const slower = field.value.trickRoom > 0;
     const playerFirst =
       playerPriority !== wildPriority
         ? playerPriority > wildPriority
-        : playerSpeed > wildSpeed ||
+        : (slower ? playerSpeed < wildSpeed : playerSpeed > wildSpeed) ||
         (playerSpeed === wildSpeed && Math.random() < 0.5);
 
     const order = playerFirst
@@ -960,6 +1060,10 @@ async function battleTurn(playerMove, item = null) {
     await endOfTurnPerish(player);
     if (await endOfTurn(wild, player)) return;
     if (await endOfTurn(player, wild)) return;
+    await endOfTurnField();
+
+    player.protecting = null;
+    wild.protecting = null;
 
     // drowsy logic
     if (player.minorStatus?.includes('yawn')) {
@@ -994,31 +1098,11 @@ function statOf(pokemon, name) {
   let value = raw * stageMultiplier(pokemon.stages?.[name] ?? 0);
   if (name === 'attack' && pokemon.status === 'burn') value *= 0.5;
   if (name === 'speed' && pokemon.status === 'paralysis') value *= 0.5;
+  if (name === 'speed' && sideOf(pokemon).tailwind > 0) value *= 2;
   return Math.floor(value);
 }
 
 function pickMove(pokemon) {
-  // let move = {
-  //   name: 'self-destruct',
-  //   type: 'normal',
-  //   power: 200,
-  //   accuracy: 100,
-  //   priority: 0,
-  //   damageClass: 'physical',
-  //   targetsSelf: false,        // target is 'all-other-pokemon'
-  //   statChanges: [],
-  //   statChance: 0,
-  //   ailment: null,
-  //   ailmentChance: 0,
-  //   drain: 0,                  // not -100 — the self-KO isn't here
-  //   healing: 0,
-  //   flinchChance: 0,
-  //   critRate: 0,
-  //   minTurns: 0,               // null in API
-  //   maxTurns: 0,               // null in API
-  //   category: 'damage',        // not 'unique' or anything self-KO-ish
-  // }
-  // return move
   if (pokemon.charging) return pokemon.charging.move;
   if (pokemon.locked) return pokemon.locked.move;
   if (pokemon.bide) return pokemon.bide.move;
@@ -1244,6 +1328,7 @@ async function handleFaint(pokemon) {
   if (next) {
     log(`Go, ${next.name}!`);
     userPokemon.value = next;
+    await applyHazards(next)
     sidePanel.value = 'team';
     return true;
   }
@@ -1264,6 +1349,7 @@ async function useMove(user, target, move, opts = {}) {
   let hitsSelf = false;
 
   user.turn.hasMoved = true;
+  if (!PROTECT_MOVES[move?.name]) user.protectStreak = 0;
 
   // --- recharge: the turn is spent before anything else happens ---
   if (user.mustRecharge) {
@@ -1352,6 +1438,12 @@ async function useMove(user, target, move, opts = {}) {
   // --- two-turn moves ---
   const charge = TWO_TURN_MOVES[move.name];
   if (charge && !releasing && !hitsSelf) {
+    if (field.value.gravity > 0 && ['fly', 'bounce', 'sky-attack'].includes(move.name)) {
+      log(`${user.name} can't fly under intense gravity!`);
+      user.turn.moveFailed = true;
+      await delay(800);
+      return;
+    }
     user.charging = { move, invulnerable: !!charge.invulnerable };
     log(charge.message(user.name));
     await delay(800);
@@ -1367,6 +1459,14 @@ async function useMove(user, target, move, opts = {}) {
   // --- heal block: healing moves fail entirely ---
   if ((move.healing ?? 0) > 0 && isHealBlocked(user)) {
     log(`But ${user.name} can't use it due to Heal Block!`);
+    user.turn.moveFailed = true;
+    await delay(800);
+    return;
+  }
+
+  // --- target used protection move
+  if (target.protecting === 'protect' && target !== user && !move.targetsSelf) {
+    log(`${target.name} protected itself!`);
     user.turn.moveFailed = true;
     await delay(800);
     return;
@@ -1502,6 +1602,99 @@ async function useMove(user, target, move, opts = {}) {
     move = { ...move, power: move.power * mult(user, target) };
   }
 
+  // --- Logic for protection moves
+  const screen = SCREEN_MOVES[move.name];
+  if (screen) {
+    const side = sideOf(user);
+    if (side[screen] > 0) {
+      log('But it failed!');
+      user.turn.moveFailed = true;
+    } else {
+      side[screen] = screen === 'tailwind' ? 4 : 5;
+      log(`${prettyName(move.name)} went up on ${user.name}'s side!`);
+    }
+    await delay(800);
+    return;
+  }
+  if (PROTECT_MOVES[move.name]) {
+    const streak = user.protectStreak ?? 0;
+    if (streak > 0 && randInt(1, 100) > Math.floor(100 / Math.pow(3, streak))) {
+      log('But it failed!');
+      user.protectStreak = 0;
+      user.turn.moveFailed = true;
+      await delay(800);
+      return;
+    }
+    user.protecting = PROTECT_MOVES[move.name];
+    user.protectStreak = streak + 1;
+    log(`${user.name} protected itself!`);
+    await delay(800);
+    return;
+  }
+
+  // --- Logic for Field Moves
+  const fieldMove = FIELD_MOVES[move.name];
+  if (fieldMove) {
+    if (field.value[fieldMove] > 0) {
+      field.value[fieldMove] = 0;
+      log(`The ${FIELD_LABEL[fieldMove]} wore off!`);
+    } else {
+      field.value[fieldMove] = 5;
+      log(`${user.name} twisted the dimensions!`);
+    }
+    await delay(800);
+    return;
+  }
+
+  // --- Logic for Hazard Moves
+  const hazard = HAZARD_MOVES[move.name];
+  if (hazard) {
+    const side = foeSideOf(user);
+    const cap = hazard === 'spikes' ? 3 : hazard === 'toxicSpikes' ? 2 : 1;
+    const current = hazard === 'spikes' || hazard === 'toxicSpikes' ? side[hazard] : (side[hazard] ? 1 : 0);
+
+    if (current >= cap) {
+      log('But it failed!');
+      user.turn.moveFailed = true;
+    } else {
+      if (cap === 1) side[hazard] = true;
+      else side[hazard] += 1;
+      log(`${prettyName(move.name)} was scattered around ${target.name}'s feet!`);
+    }
+    await delay(800);
+    return;
+  }
+
+  // --- Logic for Rapid Spin
+  if (move.name === 'rapid-spin') {
+    if (clearHazards(sideOf(user))) {
+      log(`${user.name} blew away the hazards!`);
+      await delay(700);
+    }
+    if (user.trapped) {
+      log(`${user.name} broke free from ${user.trapped.move}!`);
+      user.trapped = null;
+      user.minorStatus = user.minorStatus.filter(s => s !== 'trap');
+      await delay(700);
+    }
+    user.minorStatus = user.minorStatus.filter(s => s !== 'leech-seed');
+    // no return — Rapid Spin still deals damage
+  }
+
+  // --- Logic for Defog
+  if (move.name === 'defog') {
+    clearHazards(sideOf(user));
+    clearHazards(foeSideOf(user));
+    const theirs = foeSideOf(user);
+    for (const k of ['reflect', 'lightScreen', 'auroraVeil', 'safeguard', 'mist']) {
+      theirs[k] = 0;
+    }
+    applyStatChange(target, 'evasion', -1);
+    log(`${user.name} blew away the barriers and hazards!`);
+    await delay(800);
+    return;
+  }
+
   // --- Logic for the move Bide ---
   if (move.name === 'bide') {
     if (!user.bide) {
@@ -1596,6 +1789,21 @@ async function useMove(user, target, move, opts = {}) {
     return
   }
 
+  // --- Logic for the move Substitute
+  if (move.name === 'substitute') {
+    const cost = Math.floor(user.totalHp / 4);
+    if (user.currentHp <= cost || user.substitute) {
+      log('But it failed!');
+      user.turn.moveFailed = true;
+    } else {
+      user.currentHp -= cost;
+      user.substitute = cost;
+      log(`${user.name} put in a substitute!`);
+    }
+    await delay(800);
+    return;
+  }
+
   // --- damage ---
   if (move.power) {
     const hits = rollHitCount(move);
@@ -1614,8 +1822,22 @@ async function useMove(user, target, move, opts = {}) {
       }
       effectiveness = results.effectiveness;
       anyCrit ||= results.critical;
+      const surviving = target.protecting === 'endure' && target.currentHp > 0;
+      // Checks for substitute to give tamage to instead
+      if (target.substitute > 0 && !move.targetsSelf) {
+        target.substitute -= results.damage;
+        if (target.substitute <= 0) {
+          target.substitute = 0;
+          log(`${target.name}'s substitute faded!`);
+        }
+        continue;  // no HP loss, no recordDamage
+      }
+
       dealt += Math.min(results.damage, target.currentHp);
-      target.currentHp = Math.max(0, target.currentHp - results.damage);
+
+      target.currentHp = surviving
+        ? Math.max(1, target.currentHp - results.damage)
+        : Math.max(0, target.currentHp - results.damage);
       await playAnim(victim, 'hit', 250);
       landed++;
       if (target.currentHp <= 0) break;
@@ -1655,6 +1877,17 @@ async function useMove(user, target, move, opts = {}) {
     if (randInt(1, 100) <= chance) {
       const recipient = move.targetsSelf ? user : target;
       for (const { stat, change } of statChanges) {
+        const blocked = change < 0
+          && recipient !== user
+          && sideOf(recipient).mist > 0;
+
+        if (blocked) {
+          log(`${recipient.name} is protected by Mist!`);
+          user.turn.moveFailed = true;
+          await delay(700);
+          continue;
+        }
+
         const applied = applyStatChange(recipient, stat, change);
         log(statChangeMessage(recipient.name, stat, applied, change));
         await delay(700);
@@ -1727,7 +1960,8 @@ function calculateDamage(attacker, defender, move, opts = {}) {
   }
 
   let effectiveness = typeEffectiveness(move.type, defender.types);
-  const grounded = defender.minorStatus?.includes('no-type-immunity') || (move.type === 'ground' && defender.minorStatus?.includes('ingrain'));
+  const grounded = defender.minorStatus?.includes('no-type-immunity') || (move.type === 'ground' && defender.minorStatus?.includes('ingrain'))
+    || (field.value.gravity > 0 && (move.type === 'ground' && defender.types.includes('flying')));
   if (grounded && effectiveness == 0) effectiveness = 1
   if (effectiveness === 0) {
     return { damage: 0, effectiveness: 0, critical: false, immune: true };
@@ -1736,9 +1970,12 @@ function calculateDamage(attacker, defender, move, opts = {}) {
   const physical = move.damageClass === 'physical';
   const atkStat = physical ? 'attack' : 'special-attack'
   const defStat = physical ? 'defense' : 'special-defense'
+  const realDefStat = field.value.wonderRoom > 0
+    ? (defStat === 'defense' ? 'special-defense' : 'defense')
+    : defStat;
 
   const atk = critical ? Math.max(statOf(attacker, atkStat), rawStat(attacker, atkStat)) : statOf(attacker, atkStat);
-  const def = critical ? Math.min(statOf(defender, defStat), rawStat(defender, defStat)) : statOf(defender, defStat);
+  const def = critical ? Math.min(statOf(defender, realDefStat), rawStat(defender, realDefStat)) : statOf(defender, realDefStat);
 
   const base =
     Math.floor(
@@ -1750,9 +1987,15 @@ function calculateDamage(attacker, defender, move, opts = {}) {
   const stab = attacker.types.includes(move.type) ? 1.5 : 1;
   const critMod = critical ? 1.5 : 1;
 
+  const screens = sides.value[defender === userPokemon.value ? 'ally' : 'foe'];
+  const screened =
+    (physical && (screens.reflect > 0 || screens.auroraVeil > 0)) ||
+    (!physical && (screens.lightScreen > 0 || screens.auroraVeil > 0));
+  const screenMod = screened && !critical ? 0.5 : 1;
+
   const damage = Math.max(
     1,
-    Math.floor(base * weatherMod * critMod * randomFactor * stab * effectiveness * otherMod)
+    Math.floor(base * weatherMod * critMod * randomFactor * stab * effectiveness * otherMod * screenMod)
   );
 
   return { damage, effectiveness, critical, immune: false };
@@ -1830,6 +2073,15 @@ const STATUS_MESSAGES = {
 
 async function inflictStatus(target, ailment, move, user) {
   if (!target.minorStatus) target.minorStatus = [];
+
+  if (user && sideOf(target) !== sideOf(user) && sideOf(target).safeguard > 0
+    && MAJOR_STATUSES.has(ailment)) {
+    log(`${target.name} is protected by Safeguard!`);
+    user.turn.moveFailed = true;
+    await delay(800);
+    return;
+  }
+
   // Major status effects
   if (MAJOR_STATUSES.has(ailment)) {
     if (target.status) {
@@ -1846,8 +2098,8 @@ async function inflictStatus(target, ailment, move, user) {
   }
 
   if (ailment === 'perish-song') {
-    const field = [userPokemon.value, foe.value].filter(Boolean);
-    const affected = field.filter(applyPerishSong).length;
+    const combatants = [userPokemon.value, foe.value].filter(Boolean);
+    const affected = combatants.filter(applyPerishSong).length;
     if (!affected) {
       log('But it failed!');
       await delay(700);
@@ -2116,7 +2368,7 @@ async function endOfTurnPerish(pokemon) {
   if (!pokemon.minorStatus?.includes('perish-song')) return;
   if (pokemon.currentHp <= 0) return;
 
-  pokemon.perishTurns = (pokemon.perishTurns ?? PERISH_TURNS) - 1;
+  pokemon.perishTurns = (pokemon.perishTurns) - 1;
   log(`${pokemon.name}'s perish count fell to ${pokemon.perishTurns}!`);
   await delay(800);
 
@@ -2143,6 +2395,18 @@ async function endOfTurnIngrain(pokemon) {
   pokemon.currentHp = Math.min(pokemon.totalHp, pokemon.currentHp + amount);
   log(`${pokemon.name} absorbed nutrients with its roots! (+${pokemon.currentHp - before} HP)`);
   await delay(800);
+}
+
+async function endOfTurnField() {
+  for (const key of ['ally', 'foe']) {
+    const s = sides.value[key];
+    for (const k of ['reflect', 'lightScreen', 'auroraVeil', 'safeguard', 'mist', 'tailwind']) {
+      if (s[k] > 0 && --s[k] === 0) log(`${key === 'ally' ? 'Your' : "The foe's"} ${k} wore off!`);
+    }
+  }
+  for (const k of Object.keys(field.value)) {
+    if (field.value[k] > 0 && --field.value[k] === 0) log(`The ${k} wore off!`);
+  }
 }
 
 /* ------------------------------------------------------------------ *
@@ -2328,6 +2592,9 @@ async function switchActivePokemon(pokemon) {
     log(`Go, ${pokemon.name}!`);
     sidePanel.value = 'log';
     await delay(600);
+
+    // Applying all stage Hazards to the newly switched in pokemon
+    await applyHazards(pokemon)
 
     // switching costs your turn
     const wildMove = pickMove(foe.value);

@@ -12,6 +12,7 @@ const testGodPokemon = {
     backSprite: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/150.png",
     cry: "https://raw.githubusercontent.com/PokeAPI/cries/main/cries/pokemon/latest/150.ogg",
     instanceId: "test-god-mewtwo-uuid",
+    minorStatus: [],
     stats: [
         { name: "hp", stat: 999 },
         { name: "attack", stat: 100 },
@@ -28,31 +29,31 @@ const testGodPokemon = {
             power: 300,
             accuracy: 100,
             currentPP: 99,
-            maxPP: 99
+            maxPP: 99,
         },
         {
-            name: 'me-first',
+            name: 'rapid-spin',
             type: 'normal',
-            power: null,
-            maxPP: 10,
-            currentPP: 10,
-            accuracy: null,          // never misses
-            priority: 1,             // ⚠️ +1
+            power: 50,
+            maxPP: 40,
+            currentPP: 40,
+            accuracy: 100,
+            priority: 0,
             damageClass: 'physical',
-            targetsSelf: true,       // ⚠️ target is 'user'
-            statChanges: [],
-            statChance: 0,
+            targetsSelf: false,      // target is 'selected-pokemon'
+            statChanges: [{ stat: 'speed', change: 1 }],
+            statChance: 100,
             ailment: null,
             ailmentChance: 0,
             drain: 0,
             healing: 0,
             flinchChance: 0,
             critRate: 0,
-            minTurns: 2,
-            maxTurns: 3,
+            minTurns: 0,
+            maxTurns: 0,
             minHits: null,
             maxHits: null,
-            category: 'damage',
+            category: 'damage-raise',
         },
         {
             name: "pass-turn",
@@ -137,7 +138,7 @@ const testBulbasaur = {
             "maxTurns": 0
         },
         {
-            "name": "growl",
+            "name": "reflect",
             "type": "normal",
             "power": null,
             "currentPP": 40,
