@@ -148,6 +148,144 @@
         </div>
     </Modal>
 
+    <Modal v-if="isShopModalOpen" @close="closeShopModal">
+        <div class="shop-container">
+
+            <!-- HEADER -->
+            <div class="shop-header">
+                <h2>PokeMart</h2>
+                <Tag severity="success" class="funds-tag">
+                    Funds: ${{ inventoryStore.funds.toLocaleString() }}
+                </Tag>
+            </div>
+
+            <SelectButton v-model="shopTab" :options="shopCats" optionLabel="label" optionValue="value"
+                aria-labelledby="basic" class="shopSelection" />
+
+            <!-- TABLE 1: POKEBALLS -->
+            <template v-if="shopTab === 'pokeballs'">
+                <h3 class="shopTab">Pokeballs</h3>
+                <DataTable :value="shopPokeball" paginator :rows="5" responsiveLayout="scroll"
+                    class="p-datatable-sm dataTable">
+                    <Column field="name" header="Item" style="width: 40%"></Column>
+                    <Column field="cost" header="Cost" style="width: 20%">
+                        <template #body="slotProps">
+                            ${{ slotProps.data.cost.toLocaleString() }}
+                        </template>
+                    </Column>
+                    <Column field="count" header="In Bag" style="width: 20%"></Column>
+                    <Column header="Action" style="width: 20%">
+                        <template #body="slotProps">
+                            <Button label="Buy" icon="pi pi-shopping-cart" severity="primary" size="small"
+                                class="shop-btn" :disabled="inventoryStore.funds < slotProps.data.cost"
+                                @click="buyPokeball(slotProps.data.id)" />
+                        </template>
+                    </Column>
+                </DataTable>
+            </template>
+
+            <!-- TABLE 2: RECOVERY ITEMS -->
+            <template v-if="shopTab === 'recovery'">
+                <h3 class="shopTab">Recovery Items</h3>
+                <DataTable :value="shopRecovery" paginator :rows="5" responsiveLayout="scroll"
+                    class="p-datatable-sm dataTable">
+                    <Column field="name" header="Item" style="width: 40%"></Column>
+                    <Column field="cost" header="Cost" style="width: 20%">
+                        <template #body="slotProps">
+                            ${{ slotProps.data.cost.toLocaleString() }}
+                        </template>
+                    </Column>
+                    <Column field="count" header="In Bag" style="width: 20%"></Column>
+                    <Column header="Action" style="width: 20%">
+                        <template #body="slotProps">
+                            <Button label="Buy" icon="pi pi-shopping-cart" severity="primary" size="small"
+                                class="shop-btn" :disabled="inventoryStore.funds < slotProps.data.cost"
+                                @click="buyRecovery(slotProps.data.id)" />
+                        </template>
+                    </Column>
+                </DataTable>
+            </template>
+
+            <!-- TABLE 3: TMs -->
+            <template v-if="shopTab === 'tms'">
+                <h3 class="shopTab">Technical Machines (TMs)</h3>
+                <DataTable :value="shopTMs" paginator :rows="5" responsiveLayout="scroll"
+                    class="p-datatable-sm dataTable">
+                    <!-- CUSTOM TYPE-COLORED ITEM COLUMN -->
+                    <Column field="name" header="Item" style="width: 40%">
+                        <template #body="slotProps">
+                            <div class="tm-item-cell">
+                                <span class="tm-type-badge"
+                                    :style="{ backgroundColor: pokemonStore.typeColors[slotProps.data.type] || '#777' }">
+                                    {{ slotProps.data.type }}
+                                </span>
+                                <span class="tm-name-text">{{ slotProps.data.name }}</span>
+                            </div>
+                        </template>
+                    </Column>
+
+                    <Column field="cost" header="Cost" style="width: 20%">
+                        <template #body="slotProps">
+                            ${{ slotProps.data.cost.toLocaleString() }}
+                        </template>
+                    </Column>
+                    <Column field="count" header="In Bag" style="width: 20%"></Column>
+                    <Column header="Action" style="width: 20%">
+                        <template #body="slotProps">
+                            <Button label="Buy" icon="pi pi-shopping-cart" severity="primary" size="small"
+                                class="shop-btn" :disabled="inventoryStore.funds < slotProps.data.cost"
+                                @click="buyTM(slotProps.data.id)" />
+                        </template>
+                    </Column>
+                </DataTable>
+            </template>
+
+            <!-- Table 4: Evolution Items -->
+            <template v-if="shopTab === 'evolution'">
+                <h3 class="shopTab">Evolution Items</h3>
+                <DataTable :value="evoItems" paginator :rows="5" responsiveLayout="scroll"
+                    class="p-datatable-sm dataTable">
+                    <Column field="name" header="Item" style="width: 40%"></Column>
+                    <Column field="cost" header="Cost" style="width: 20%">
+                        <template #body="slotProps">
+                            ${{ slotProps.data.cost.toLocaleString() }}
+                        </template>
+                    </Column>
+                    <Column field="count" header="In Bag" style="width: 20%"></Column>
+                    <Column header="Action" style="width: 20%">
+                        <template #body="slotProps">
+                            <Button label="Buy" icon="pi pi-shopping-cart" severity="primary" size="small"
+                                class="shop-btn" :disabled="inventoryStore.funds < slotProps.data.cost"
+                                @click="buyEvo(slotProps.data.id)" />
+                        </template>
+                    </Column>
+                </DataTable>
+            </template>
+
+            <!-- Table 5: Mega Evolution Items -->
+            <template v-if="shopTab === 'megaEvo'">
+                <h3 class="shopTab">Mega Evolution Items</h3>
+                <DataTable :value="megaStones" paginator :rows="5" responsiveLayout="scroll"
+                    class="p-datatable-sm dataTable">
+                    <Column field="name" header="Item" style="width: 40%"></Column>
+                    <Column field="cost" header="Cost" style="width: 20%">
+                        <template #body="slotProps">
+                            ${{ slotProps.data.cost.toLocaleString() }}
+                        </template>
+                    </Column>
+                    <Column field="count" header="In Bag" style="width: 20%"></Column>
+                    <Column header="Action" style="width: 20%">
+                        <template #body="slotProps">
+                            <Button label="Buy" icon="pi pi-shopping-cart" severity="primary" size="small"
+                                class="shop-btn" @click="buyMega(slotProps.data.id)" />
+                        </template>
+                    </Column>
+                </DataTable>
+            </template>
+
+        </div>
+    </Modal>
+
     <PokemonBattle v-if="isBattleModalOpen" :auto-start="true" :team="pokemonStore.pokemonParty" :opponent="wildPokemon"
         :isWild="true" @end="onBattleEnd" @close="wildPokemon = null" />
 </template>
@@ -158,14 +296,19 @@ import { usePokemonStore } from '@/stores/pokemonStore';
 import { useInventoryStore } from '@/stores/inventoryStore';
 import { useErrorStore } from '@/stores/errorStore'
 import * as pokemonHelper from "@/assets/helpers/pokemonHelper.js"
-import Splitter from 'primevue/splitter';
-import SplitterPanel from 'primevue/splitterpanel';
-import ProgressBar from 'primevue/progressbar';
+import SelectButton from 'primevue/selectbutton';
+import Tag from 'primevue/tag'
+import Column from 'primevue/column'
+import Button from 'primevue/button'
+import DataTable from 'primevue/datatable'
 import Modal from "@/components/Modal.vue"
 import DataView from "primevue/dataview"
 import wildJson from "@/assets/data/wildPokemon.json"
 import PokemonBattle from "@/components/PokemonBattle.vue"
 import { useSettingsStore } from '@/stores/settingsStore';
+import tms from '@/assets/data/tms.json'
+import evolutionItems from "@/assets/data/evolutionItems.json"
+import megaEvoStones from "@/assets/data/megaEvos.json"
 
 // Import Maps
 import overworldMap from '@/assets/data/mapData/map1.json';
@@ -181,6 +324,7 @@ const settingsStore = useSettingsStore()
 // modal values
 const isStarterModalOpen = ref(false)
 const isPokeBoxModalOpen = ref(false)
+const isShopModalOpen = ref(false)
 
 // Ref values
 const starters = ref({})
@@ -194,6 +338,9 @@ async function checkForStarter() {
     if (pokemonStore.caughtPokemon.length == 0) {
         await generateStarterList()
         isStarterModalOpen.value = true
+    }
+    if(pokemonStore.caughtPokemon.length > 0 && pokemonStore.pokemonParty.length === 0){
+        pokemonStore.pokemonParty.push(pokemonStore.caughtPokemon[0])
     }
 }
 
@@ -435,6 +582,136 @@ function triggerEncounterAnimation() {
     });
 }
 
+function openShopModal() {
+    clearInputs()
+    isEncounterLoading.value = true
+    isShopModalOpen.value = true
+}
+
+function closeShopModal() {
+    isEncounterLoading.value = false
+    isShopModalOpen.value = false
+}
+
+const shopCats = ref([
+    { label: "Pokeballs", value: "pokeballs" },
+    { label: "Recovery Items", value: "recovery" },
+    { label: "TM Shop", value: "tms" },
+    { label: "Evolution Items", value: "evolution" },
+    { label: "Mega Evolution", value: "megaEvo" }
+])
+
+const shopTab = ref("pokeballs")
+
+// --- 1. POKEBALLS COMPUTED ---
+const shopPokeball = computed(() => {
+    return Object.keys(inventoryStore.pokeballs).map((key) => {
+        const item = inventoryStore.pokeballs[key]
+        return {
+            id: key,
+            name: key.charAt(0).toUpperCase() + key.slice(1) + ' Ball',
+            cost: item.cost,
+            count: item.count
+        }
+    })
+})
+
+// --- 2. RECOVERY ITEMS COMPUTED ---
+const shopRecovery = computed(() => {
+    return Object.keys(inventoryStore.recoveryItems).map((key) => {
+        const item = inventoryStore.recoveryItems[key]
+        return {
+            id: key,
+            name: key === 'maxrevive' ? 'Max Revive' : key.charAt(0).toUpperCase() + key.slice(1),
+            cost: item.cost,
+            count: item.count
+        }
+    })
+})
+
+// --- 3. TMs COMPUTED ---
+const shopTMs = computed(() => {
+    return Object.entries(tms).map(([id, tm]) => {
+        return {
+            id: id,                                      // 'tm01'
+            code: tm.code,                               // 'TM01'
+            name: `${tm.code}: ${tm.moveName}`,          // 'TM01: Mega Punch'
+            type: tm.type,                               // 'normal'
+            cost: tm.cost,
+            count: inventoryStore.tms?.[id] || 0          // Reads dynamic bag count
+        }
+    })
+})
+
+// --- Evo Items COMPUTED ---
+const evoItems = computed(() => {
+    return Object.entries(evolutionItems).map(([id, item]) => {
+        return {
+            id: id,
+            name: item.name,
+            category: item.category,
+            description: item.description,
+            cost: item.cost,
+            count: inventoryStore.evoItems?.[id] || 0
+        }
+    })
+})
+
+// --- Mega Evo Items COMPUTED ---
+const megaStones = computed(() => {
+    return Object.entries(megaEvoStones).map(([id, item]) => {
+        return {
+            id: id,
+            name: item.name,
+            category: item.category,
+            cost: item.cost,
+            pokemon: item.pokemon,
+            description: item.description
+        }
+    })
+})
+
+// --- PURCHASE FUNCTIONS ---
+function buyPokeball(itemType) {
+    console.log(`Attempting to purchase pokeball: ${itemType}`)
+    const success = inventoryStore.BuyPokeball(itemType, 1)
+    if (!success) {
+        errorStore.SetErrorDetails("Low funds", `Unable to buy a(n) ${itemType} due to lack of funds.`)
+    }
+}
+
+function buyRecovery(itemType) {
+    console.log(`Attempting to purchase recovery item: ${itemType}`)
+    const success = inventoryStore.BuyRecovery(itemType, 1)
+    if (!success) {
+        errorStore.SetErrorDetails("Low funds", `Unable to buy a(n) ${itemType} due to lack of funds.`)
+    }
+}
+
+function buyTM(tmId) {
+    console.log(`Attempting to purchase TM: ${tmId}`)
+    const success = inventoryStore.BuyTM(tmId)
+    if (!success) {
+        errorStore.SetErrorDetails("Low funds", `Unable to buy a(n) ${tmId} due to lack of funds.`)
+    }
+}
+
+function buyEvo(evoId) {
+    console.log(`Attempting to purchase Evo Item: ${evoId}`)
+    const success = inventoryStore.BuyEvoItem(evoId)
+    if (!success) {
+        errorStore.SetErrorDetails("Low funds", `Unable to buy a(n) ${evoId} due to lack of funds.`)
+    }
+}
+
+function buyMega(stoneId) {
+    console.log(`Attempting to puchase Mega Item: ${stoneId}`)
+    const success = inventoryStore.BuyMegaStone(stoneId)
+    if (!success) {
+        errorStore.SetErrorDetails("Low funds", `Unable to buy a(n) ${stoneId} due to lack of funds.`)
+    }
+}
+
 // #endregion
 
 /* 
@@ -505,8 +782,7 @@ const ENCOUNTER_CHANCE = 0.10;
 
 // Placeholder Interaction Callbacks
 function onPokeMartCounterContact() {
-    console.log('🛍️ [INTERACTION EVENT] Contacted PokéMart Counter!');
-    // TODO: Trigger Shop UI
+    openShopModal()
 }
 
 function onPokeCenterCounterContact() {
@@ -514,7 +790,6 @@ function onPokeCenterCounterContact() {
 }
 
 function onPokeBoxPcContact() {
-    console.log('💻 [INTERACTION EVENT] Contacted Pokémon Box PC!');
     openPokeBox()
 }
 
@@ -1538,30 +1813,121 @@ canvas {
 }
 
 .encounter-flash-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 10;
-  pointer-events: none;
-  /* Updated to match the 2-second timeout (2s) */
-  animation: pokemonEncounterFlash 2s ease-in-out forwards; 
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 10;
+    pointer-events: none;
+    /* Updated to match the 2-second timeout (2s) */
+    animation: pokemonEncounterFlash 2s ease-in-out forwards;
 }
 
 @keyframes pokemonEncounterFlash {
-  /* Spread the rapid white flashes out over 0% - 75% */
-  0%   { background-color: rgba(255, 255, 255, 0); }
-  15%  { background-color: rgba(255, 255, 255, 0.95); }
-  25%  { background-color: rgba(255, 255, 255, 0.1); }
-  40%  { background-color: rgba(255, 255, 255, 0.95); }
-  50%  { background-color: rgba(0, 0, 0, 0.2); }
-  65%  { background-color: rgba(255, 255, 255, 0.95); }
-  75%  { background-color: rgba(255, 255, 255, 0.1); }
 
-  /* Smooth fade to black for the final 25% */
-  90%  { background-color: rgba(0, 0, 0, 1); }
-  100% { background-color: rgba(0, 0, 0, 1); }
+    /* Spread the rapid white flashes out over 0% - 75% */
+    0% {
+        background-color: rgba(255, 255, 255, 0);
+    }
+
+    15% {
+        background-color: rgba(255, 255, 255, 0.95);
+    }
+
+    25% {
+        background-color: rgba(255, 255, 255, 0.1);
+    }
+
+    40% {
+        background-color: rgba(255, 255, 255, 0.95);
+    }
+
+    50% {
+        background-color: rgba(0, 0, 0, 0.2);
+    }
+
+    65% {
+        background-color: rgba(255, 255, 255, 0.95);
+    }
+
+    75% {
+        background-color: rgba(255, 255, 255, 0.1);
+    }
+
+    /* Smooth fade to black for the final 25% */
+    90% {
+        background-color: rgba(0, 0, 0, 1);
+    }
+
+    100% {
+        background-color: rgba(0, 0, 0, 1);
+    }
+
+
+}
+
+.shop-container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 1rem;
+}
+
+.shop-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.funds-tag {
+    font-size: 1.1rem;
+    padding: 0.5rem 1rem;
+}
+
+.shop-btn:hover {
+    cursor: pointer;
+}
+
+.dataTable {
+    border: 5px solid CanvasText;
+    border-radius: 5px;
+    padding: 5px;
+    margin-bottom: 1.5rem;
+}
+
+.shopTab {
+    border-bottom: 1px solid CanvasText;
+    margin-top: 1.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.tm-item-cell {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.tm-type-badge {
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #ffffff;
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    letter-spacing: 0.05em;
+    min-width: 4.5rem;
+    text-align: center;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.tm-name-text {
+    font-weight: 600;
+}
+
+.shopSelection {
+    display: flex;
+    justify-content: center;
 }
 
 @media (max-width: 768px) {
