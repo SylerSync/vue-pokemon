@@ -36,7 +36,7 @@
             <div class="battlefield">
               <div v-if="weather.type || terrain.type" class="field-chips">
                 <span v-if="weather.type" class="field-chip">{{ WEATHER_LABEL[weather.type] }} · {{ weather.turns
-                  }}</span>
+                }}</span>
                 <span v-if="terrain.type" class="field-chip">{{ terrain.type }} terrain · {{ terrain.turns }}</span>
               </div>
               <!-- opponent: info left, sprite right -->
@@ -53,6 +53,9 @@
                         {{ STATUS_ABBR[foe.status] ?? foe.status }}
                       </span>
                     </template>
+                    <!-- Status info tooltip -->
+                    <span class="info-dot" tabindex="0" role="img" :aria-label="`${foe.name} field effects`"
+                      v-tooltip.bottom="{ value: volatileTooltip(foe), escape: false }">i</span>
                   </div>
                   <div class="hp">
                     <div class="hp-track">
@@ -80,6 +83,9 @@
                         {{ STATUS_ABBR[userPokemon.status] ?? userPokemon.status }}
                       </span>
                     </template>
+                    <!-- Status info tooltip -->
+                    <span class="info-dot" tabindex="0" role="img" :aria-label="`${userPokemon.name} field effects`"
+                      v-tooltip.top="{ value: volatileTooltip(userPokemon), escape: false }">i</span>
                   </div>
                   <div class="hp">
                     <div class="hp-track">
@@ -267,6 +273,9 @@ import poisonIcon from '@/assets/statusIcons/poison.png';
 import { getRandomWithExclusions } from '@/assets/helpers/numberHelper.js'
 import megaEvos from "@/assets/data/megaEvos.json"
 import SelectMove from './SelectMove.vue';
+import { getMove } from '@/api/pokeapi';
+import { getMoveData } from '@/assets/helpers/pokemonHelper.js';
+import Tooltip from 'primevue/tooltip';
 
 /* ------------------------------------------------------------------ *
  * Status Icons
@@ -319,6 +328,8 @@ const TABS = [
   { id: 'inventory', label: 'ITEMS' }
 ];
 
+
+const vTooltip = Tooltip;
 const battleStarted = ref(false);
 const isResolving = ref(false);
 const battleLog = ref([]);
@@ -417,6 +428,103 @@ const STAT_LABEL = {
   'special-attack': 'Sp. Atk', 'special-defense': 'Sp. Def',
   speed: 'Speed', accuracy: 'accuracy', evasion: 'evasiveness',
 };
+const MINOR_LABEL = {
+  confusion: 'Confused', 'leech-seed': 'Leech Seed', 'perish-song': 'Perish Song',
+  ingrain: 'Ingrained', embargo: 'Embargo', 'heal-block': 'Heal Block',
+  nightmare: 'Nightmare', torment: 'Torment', infatuation: 'Infatuated',
+  disable: 'Disabled', yawn: 'Drowsy', trap: 'Trapped',
+  'no-type-immunity': 'Grounded',
+};
+
+function minorDetail(p, s) {
+  switch (s) {
+    case 'confusion': return p.confusionTurns ? `${p.confusionTurns} turns` : '';
+    case 'perish-song': return `faints in ${p.perishTurns}`;
+    case 'heal-block': return `${p.healBlockTurns} turns`;
+    case 'embargo': return `${p.embargoTurns} turns`;
+    case 'trap': return p.trapped ? `${p.trapped.move} · ${p.trapped.turns}` : '';
+    case 'disable': return p.disabled ? `${prettyName(p.disabled.move)} · ${p.disabled.turns}` : '';
+    default: return '';
+  }
+}
+
+const tipRow = (label, value, color) =>
+  `<div style="display:flex;justify-content:space-between;gap:.75rem;font-size:.6875rem;line-height:1.55">
+     <span>${label}</span><span style="color:${color};font-variant-numeric:tabular-nums">${value}</span>
+   </div>`;
+
+const tipSection = (title, rows) =>
+  `<div style="margin-bottom:.4rem">
+     <div style="font-size:.5625rem;letter-spacing:.06em;text-transform:uppercase;opacity:.6;margin-bottom:.15rem">${title}</div>
+     ${rows.length ? rows.join('') : `<div style="font-size:.6875rem;opacity:.5">None</div>`}
+   </div>`;
+
+function volatileTooltip(p) {
+  if (!p) return '';
+
+  const boosts = Object.entries(p.stages ?? {})
+    .filter(([, v]) => v !== 0)
+    .sort((a, b) => b[1] - a[1])
+    .map(([stat, v]) => tipRow(
+      STAT_LABEL[stat] ?? stat,
+      `${v > 0 ? '+' : ''}${v}`,
+      v > 0 ? '#4ade80' : '#f87171'
+    ));
+
+  const rows = (p.minorStatus ?? [])
+    .map(s => tipRow(MINOR_LABEL[s] ?? prettyName(s), minorDetail(p, s), '#fbbf24'));
+
+  if (p.substitute > 0) rows.push(tipRow('Substitute', `${p.substitute} HP`, '#93c5fd'));
+  if (p.charging) rows.push(tipRow('Charging', prettyName(p.charging.move.name), '#93c5fd'));
+  if (p.locked) rows.push(tipRow('Locked in', prettyName(p.locked.move.name), '#93c5fd'));
+  if (p.bide) rows.push(tipRow('Bide', `${p.bide.turns} turns`, '#93c5fd'));
+  if (p.mustRecharge) rows.push(tipRow('Recharging', '', '#93c5fd'));
+
+   const sideTitle = sideKey(p) === 'ally' ? 'Your Side' : "Foe's Side";
+
+  return `<div class="mon-info" style="min-width:11rem">
+    ${tipSection('Stat Changes', boosts)}
+    ${tipSection('Volatile Effects', rows)}
+    ${tipSection(sideTitle, sideRows(p))}
+    ${tipSection('Field', fieldRows())}
+  </div>`;
+}
+
+function sideRows(p) {
+  const side = sideOf(p);
+  const rows = [];
+
+  for (const k of SCREEN_KEYS) {
+    if (side[k] > 0) rows.push(tipRow(FIELD_LABEL[k], `${side[k]} turns`, '#93c5fd'));
+  }
+  for (const k of HAZARD_KEYS) {
+    const v = side[k];
+    if (!v) continue;
+    rows.push(tipRow(
+      HAZARD_LABEL[k],
+      typeof v === 'number' ? `${v} layer${v === 1 ? '' : 's'}` : '',
+      '#f87171'
+    ));
+  }
+  return rows;
+}
+
+function fieldRows() {
+  const rows = [];
+  for (const [k, v] of Object.entries(field.value)) {
+    if (v > 0) rows.push(tipRow(FIELD_LABEL[k], `${v} turns`, '#c4b5fd'));
+  }
+  if (weather.value.type) {
+    rows.push(tipRow(WEATHER_LABEL[weather.value.type], `${weather.value.turns} turns`, '#c4b5fd'));
+  }
+  if (terrain.value.type) {
+    rows.push(tipRow(
+      `${terrain.value.type[0].toUpperCase()}${terrain.value.type.slice(1)} Terrain`,
+      `${terrain.value.turns} turns`, '#c4b5fd'
+    ));
+  }
+  return rows;
+}
 
 const freshSide = () => ({
   reflect: 0, lightScreen: 0, auroraVeil: 0,
@@ -683,6 +791,8 @@ const SCREEN_MOVES = {
   safeguard: 'safeguard', mist: 'mist', tailwind: 'tailwind',
 };
 
+const SCREEN_KEYS = ['reflect', 'lightScreen', 'auroraVeil', 'safeguard', 'mist', 'tailwind'];
+
 // Hazard Moves
 const HAZARD_MOVES = {
   spikes: 'spikes', 'toxic-spikes': 'toxicSpikes',
@@ -690,6 +800,11 @@ const HAZARD_MOVES = {
 };
 
 const HAZARD_KEYS = ['spikes', 'toxicSpikes', 'stealthRock', 'stickyWeb'];
+
+const HAZARD_LABEL = {
+  spikes: 'Spikes', toxicSpikes: 'Toxic Spikes',
+  stealthRock: 'Stealth Rock', stickyWeb: 'Sticky Web',
+};
 
 function clearHazards(side) {
   let cleared = false;
@@ -713,6 +828,28 @@ const FIELD_LABEL = {
   trickRoom: 'Trick Room', gravity: 'Gravity',
   magicRoom: 'Magic Room', wonderRoom: 'Wonder Room',
 };
+
+// PokeAPI only labels Roar/Whirlwind (meta.category "force-switch").
+// The damaging phazers and all self-switch moves are invisible to metadata.
+const DAMAGE_PHAZE_MOVES = new Set(['dragon-tail', 'circle-throw']);
+
+const SELF_SWITCH_MOVES = {
+  'u-turn': {},
+  'volt-switch': {},
+  'flip-turn': {},
+  'parting-shot': {},
+  teleport: { escapesWild: true },        // wild battle: Teleport = escape
+  'baton-pass': { baton: true },
+  'shed-tail': { shedTail: true },
+  'chilly-reception': { weather: 'snow' }, // pairs with the weather system you just built
+};
+
+// volatiles Baton Pass hands to the recipient
+const PASSED_VOLATILES = ['confusion', 'leech-seed', 'perish-song', 'ingrain', 'embargo', 'heal-block'];
+
+const pendingSwitch = ref(null);   // { side, mode: 'phaze' | 'self', baton, shedSub, escapesWild }
+const awaitingSwitchPick = ref(false);
+let resolveSwitchPick = null;
 
 function weightPower(hg) {
   const w = hg ?? 0;
@@ -985,6 +1122,27 @@ async function applyHazards(pokemon) {
   }
 }
 
+function resetVolatiles(p) {
+  p.stages = freshStages();
+  p.flinched = false;
+  p.charging = null;
+  p.minorStatus = [];
+  p.healBlockTurns = 0;
+  p.confusionTurns = 0;
+  p.perishTurns = 0;
+  p.embargoTurns = 0;
+  p.trapped = null;
+  p.disabled = false;
+  p.moves?.forEach(m => { if (m.disabled) m.disabled = false; });
+  p.mustRecharge = false;
+  p.locked = null;
+  p.bide = null;
+  p.substitute = 0;
+  p.protecting = null;
+  p.protectStreak = 0;
+  p.yawnTurn = 0;
+}
+
 /* ------------------------------------------------------------------ *
  * Battle lifecycle
  * ------------------------------------------------------------------ */
@@ -1045,7 +1203,7 @@ async function battleTurn(playerMove, item = null) {
     player.turn.pendingMove = playerMove;
     let wild = foe.value;
     startTurn(wild);
-    const wildMove = pickMove(wild);
+    const wildMove = await pickMove(wild);
     wild.turn.pendingMove = wildMove;
 
     // --- item branch: using an item costs your turn ---
@@ -1066,6 +1224,9 @@ async function battleTurn(playerMove, item = null) {
 
       if (wildMove) {
         await useMove(wild, player, wildMove);
+        if (await resolvePendingSwitch()) return;
+        player = userPokemon.value;
+        wild = foe.value;
         if (await handleFaint(player)) return;
       }
       await endOfTurnPerish(wild);
@@ -1093,16 +1254,20 @@ async function battleTurn(playerMove, item = null) {
         (playerSpeed === wildSpeed && Math.random() < 0.5);
 
     const order = playerFirst
-      ? [[player, wild, playerMove], [wild, player, wildMove]]
-      : [[wild, player, wildMove], [player, wild, playerMove]];
+      ? [['ally', playerMove], ['foe', wildMove]]
+      : [['foe', wildMove], ['ally', playerMove]];
 
+    const skipTurn = { ally: false, foe: false };
 
-    for (const [attacker, defender, move] of order) {
+    for (const [role, move] of order) {
+      if (skipTurn[role]) continue;
+      const attacker = role === 'ally' ? userPokemon.value : foe.value;
+      const defender = role === 'ally' ? foe.value : userPokemon.value;
       if (!move || isFainted(attacker)) continue;
       await useMove(attacker, defender, move);
-      if (activeTransformPokemon.value) {
-        activeTransformPokemon.value.trainer == 'ally' ? player = activeTransformPokemon.value.pokemon : wild = activeTransformPokemon.value.pokemon
-      }
+      if (await resolvePendingSwitch(skipTurn)) return;
+      player = userPokemon.value;   // re-sync locals: covers switches AND Transform
+      wild = foe.value;             // (replaces the activeTransformPokemon ternary)
       const attackerDown = isFainted(attacker);
       if (await handleFaint(defender)) {
         if (attackerDown) await handleFaint(attacker);
@@ -1158,7 +1323,10 @@ function statOf(pokemon, name) {
   return Math.floor(value);
 }
 
-function pickMove(pokemon) {
+async function pickMove(pokemon) {
+  // const move = await getMove('dragon-tail')
+  // let moveInfo = await getMoveData(move)
+  // return moveInfo
   if (pokemon.charging) return pokemon.charging.move;
   if (pokemon.locked) return pokemon.locked.move;
   if (pokemon.bide) return pokemon.bide.move;
@@ -1382,10 +1550,8 @@ async function handleFaint(pokemon) {
   allyFaintedThisTurn.value = true
 
   if (next) {
-    log(`Go, ${next.name}!`);
-    userPokemon.value = next;
-    await applyHazards(next)
     sidePanel.value = 'team';
+    await resolvePendingSwitch()
     return true;
   }
 
@@ -1752,6 +1918,19 @@ async function useMove(user, target, move, opts = {}) {
     return;
   }
 
+  // --- Logic for Roar / Whirlwind (PokeAPI meta.category "force-switch") ---
+  if (move.category === 'force-switch') {
+    if (target.substitute > 0 || target.minorStatus?.includes('ingrain')) {
+      log('But it failed!');
+      user.turn.moveFailed = true;
+      await delay(800);
+      return;
+    }
+    pendingSwitch.value = { side: victim, mode: 'phaze' };
+    await delay(400);
+    return;
+  }
+
   // --- Logic for Hazard Moves
   const hazard = HAZARD_MOVES[move.name];
   if (hazard) {
@@ -2060,6 +2239,40 @@ async function useMove(user, target, move, opts = {}) {
   // --- flinch ---
   if ((move.flinchChance ?? 0) > 0 && randInt(1, 100) <= move.flinchChance) {
     target.flinched = true;
+  }
+
+  // --- forced / self switching (after all other effects) ---
+  if (!hitsSelf) {
+    if (DAMAGE_PHAZE_MOVES.has(move.name) && dealt > 0
+      && !target.minorStatus?.includes('ingrain')) {
+      pendingSwitch.value = { side: victim, mode: 'phaze' };
+    }
+    const selfSwitch = SELF_SWITCH_MOVES[move.name];
+    if (selfSwitch) {
+      if (selfSwitch.weather && weather.value.type !== selfSwitch.weather) {
+        weather.value = { type: selfSwitch.weather, turns: 5 };
+        log(WEATHER_START_MSG[selfSwitch.weather]);
+        await delay(700);
+      }
+      if (selfSwitch.shedTail) {
+        const cost = Math.floor(user.totalHp / 2);
+        if (user.currentHp <= cost) {
+          log('But it failed!');
+          user.turn.moveFailed = true;
+          await delay(800);
+          return;
+        }
+        user.currentHp -= cost;
+        log(`${user.name} shed its tail to create a decoy!`);
+        await delay(700);
+      }
+      pendingSwitch.value = {
+        side: actor, mode: 'self',
+        baton: !!selfSwitch.baton,
+        shedSub: selfSwitch.shedTail ? Math.floor(user.totalHp / 4) : 0,
+        escapesWild: !!selfSwitch.escapesWild,
+      };
+    }
   }
 
 
@@ -2455,6 +2668,126 @@ async function fetchMoveByName(name) {
   } catch { return null; }
 }
 
+function captureBatonPayload(p) {
+  return {
+    stages: { ...p.stages },
+    substitute: p.substitute ?? 0,
+    minorStatus: (p.minorStatus ?? []).filter(s => PASSED_VOLATILES.includes(s)),
+    confusionTurns: p.confusionTurns ?? 0,
+    perishTurns: p.perishTurns ?? 0,
+    embargoTurns: p.embargoTurns ?? 0,
+    healBlockTurns: p.healBlockTurns ?? 0,
+  };
+}
+
+function applyBatonPayload(p, payload) {
+  p.stages = payload.stages;
+  p.substitute = payload.substitute;
+  if (!p.minorStatus) p.minorStatus = [];
+  for (const s of payload.minorStatus) {
+    if (!p.minorStatus.includes(s)) p.minorStatus.push(s);
+  }
+  if (payload.minorStatus.includes('confusion')) p.confusionTurns = payload.confusionTurns;
+  if (payload.minorStatus.includes('perish-song')) p.perishTurns = payload.perishTurns;
+  if (payload.minorStatus.includes('embargo')) p.embargoTurns = payload.embargoTurns;
+  if (payload.minorStatus.includes('heal-block')) p.healBlockTurns = payload.healBlockTurns;
+}
+
+// same promise pattern as your openReplaceMoveModal
+function requestSwitchPick() {
+  awaitingSwitchPick.value = true;
+  sidePanel.value = 'team';
+  return new Promise((resolve) => {
+    resolveSwitchPick = (pokemon) => {
+      awaitingSwitchPick.value = false;
+      resolveSwitchPick = null;
+      resolve(pokemon);
+    };
+  });
+}
+
+/** Resolves any queued switch. Returns true if the battle ended / turn should stop. */
+async function resolvePendingSwitch(skipTurn = null) {
+  const req = pendingSwitch.value;
+  if (!req) return false;
+  pendingSwitch.value = null;
+
+  // ---------- foe side ----------
+  if (req.side === 'foe') {
+    if (isFainted(foe.value)) return false;
+
+    if (props.isWild) {
+      if (req.mode === 'phaze' || req.escapesWild) {
+        log(req.mode === 'phaze'
+          ? `${foe.value.name} was blown away!`
+          : `${foe.value.name} teleported away!`);
+        await delay(800);
+        emit('fled', foe.value);
+        endBattle('fled');
+        return true;
+      }
+      return false; // wild mons have no bench — U-turn etc. is just damage
+    }
+
+    const options = props.oppTeam?.filter(p => p !== foe.value && p.currentHp > 0) ?? [];
+    if (!options.length) {
+      if (req.mode === 'phaze') { log('But it failed!'); await delay(700); }
+      return false;
+    }
+    if (req.mode === 'phaze' && skipTurn) skipTurn.foe = true;
+
+    const incoming = options[Math.floor(Math.random() * options.length)];
+    const payload = req.baton ? captureBatonPayload(foe.value) : null;
+    resetVolatiles(foe.value);
+    log(req.mode === 'phaze'
+      ? `${foe.value.name} was dragged out!`
+      : `${foe.value.name} went back! Go, ${incoming.name}!`);
+    foe.value = incoming;
+    startTurn(foe.value);
+    if (payload) applyBatonPayload(foe.value, payload);
+    if (req.shedSub) foe.value.substitute = req.shedSub;
+    await delay(700);
+    await applyHazards(foe.value);
+    if (await handleFaint(foe.value)) return true;
+    return false;
+  }
+
+  // ---------- ally side ----------
+  if (isFainted(userPokemon.value)) return false;
+  const options = team.value.filter(
+    p => !isFainted(p) && p.instanceId !== userPokemon.value.instanceId
+  );
+  if (!options.length) {
+    if (req.mode === 'phaze') { log('But it failed!'); await delay(700); }
+    return false;
+  }
+  if (req.mode === 'phaze' && skipTurn) skipTurn.ally = true;
+
+  let incoming;
+  if (req.mode === 'phaze') {
+    incoming = options[Math.floor(Math.random() * options.length)];
+  } else {
+    log('Choose a Pokémon to switch in!');
+    incoming = await requestSwitchPick();
+  }
+
+  const payload = req.baton ? captureBatonPayload(userPokemon.value) : null;
+  resetVolatiles(userPokemon.value);
+  log(req.mode === 'phaze'
+    ? `${incoming.name} was dragged out!`
+    : `${userPokemon.value.name}, come back! Go, ${incoming.name}!`);
+  userPokemon.value = incoming;
+  if (incoming.currentHp == null) incoming.currentHp = incoming.totalHp;
+  startTurn(incoming);
+  if (payload) applyBatonPayload(incoming, payload);
+  if (req.shedSub) incoming.substitute = req.shedSub;
+  sidePanel.value = 'log';
+  await delay(700);
+  await applyHazards(incoming);       // must run AFTER userPokemon.value is reassigned — sideOf() depends on it
+  if (await handleFaint(incoming)) return true;
+  return false;
+}
+
 async function endOfTurn(target, reciver) {
   await endOfTurnIngrain(target)
   await endOfTurnGrassy(target)
@@ -2750,6 +3083,13 @@ function checkPokemonFlees(pokemon) {
  * ------------------------------------------------------------------ */
 
 async function switchActivePokemon(pokemon) {
+  // mid-turn pick for U-turn / Baton Pass / etc.
+  if (awaitingSwitchPick.value) {
+    if (isFainted(pokemon)) return;
+    if (pokemon.instanceId === userPokemon.value?.instanceId) return;
+    resolveSwitchPick?.(pokemon);
+    return;
+  }
   if (isResolving.value) return;
   if (isFainted(pokemon)) return;
   if (pokemon.instanceId === userPokemon.value?.instanceId) return;
@@ -2769,19 +3109,7 @@ async function switchActivePokemon(pokemon) {
     return;
   }
 
-  userPokemon.value.stages = freshStages();
-  userPokemon.value.flinched = false;
-  userPokemon.value.charging = null;
-  userPokemon.value.minorStatus = [];
-  userPokemon.value.healBlockTurns = 0;
-  userPokemon.value.confusionTurns = 0;
-  userPokemon.value.perishTurns = 0;
-  userPokemon.value.embargoTurns = 0;
-  userPokemon.value.trapped = null;
-  userPokemon.value.disabled = false;
-  userPokemon.value.mustRecharge = false;
-  userPokemon.value.locked = null
-  userPokemon.value.bide = null
+  resetVolatiles(userPokemon.value)
 
   if (activeTransformPokemon.value) syncBattleForm()
   activeTransformPokemon.value = null
@@ -2802,9 +3130,10 @@ async function switchActivePokemon(pokemon) {
     await applyHazards(pokemon)
 
     // switching costs your turn
-    const wildMove = pickMove(foe.value);
+    const wildMove = await pickMove(foe.value);
     if (wildMove) {
       await useMove(foe.value, userPokemon.value, wildMove);
+      if (await resolvePendingSwitch()) return;
       await handleFaint(userPokemon.value);
     }
     await endOfTurnPerish(foe.value);
@@ -3633,5 +3962,37 @@ onMounted(() => {
   text-transform: capitalize;
   background: var(--p-surface-200);
   background-color: black;
+}
+
+.info-dot {
+  flex: none;
+  align-self: center;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 0.9rem;
+  height: 0.9rem;
+  border-radius: 50%;
+  border: 1px solid black;
+  font-size: 0.5625rem;
+  font-weight: 700;
+  font-style: italic;
+  color: black;
+  line-height: 1;
+  opacity: 0.65;
+  cursor: help;
+}
+
+.info-dot:hover,
+.info-dot:focus-visible {
+  opacity: 1;
+}
+</style>
+
+<style>
+/* not scoped: PrimeVue teleports tooltips to <body> */
+.p-tooltip .p-tooltip-text:has(.mon-info) {
+  max-width: none;
+  padding: 0.5rem 0.625rem;
 }
 </style>
