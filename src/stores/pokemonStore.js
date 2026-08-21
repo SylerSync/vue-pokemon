@@ -596,7 +596,7 @@ export const usePokemonStore = defineStore("pokemonStore", {
 
 
     state: () => ({
-        caughtPokemon: [],
+        caughtPokemon: [testBulbasaur,testCharizard,testEevee,testGligar],
         pokemonParty: [],
         wishlistPokemon: [],
         typeColors: {

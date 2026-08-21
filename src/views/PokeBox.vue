@@ -18,9 +18,11 @@ import evolutionItems from "@/assets//data/evolutionItems.json"
 import SelectButton from "primevue/selectbutton"
 import * as pokemonHelper from "@/assets/helpers/pokemonHelper"
 import SelectMove from "@/components/SelectMove.vue";
+import { useErrorStore } from "@/stores/errorStore";
 
 const pokemonStore = usePokemonStore()
 const inventoryStore = useInventoryStore()
+const errorStore = useErrorStore()
 
 const searchQuery = ref('')
 const sortKey = ref(null)
@@ -244,8 +246,10 @@ function handleUseRecoveryItem(item) {
                 }
             }
             else {
+                errorStore.SetErrorDetails("Item Issue", `${target.name} has not fainted. you can't use a revive now.`)
                 console.warn(`${target.name} has not fainted, a revive item cant be used.`)
             }
+            break
         case "heal":
             if (target.currentHp <= 0) {
                 console.warn(`${target.name} has fainted, you must use a revive item to fix this injury!`)
@@ -261,6 +265,7 @@ function handleUseRecoveryItem(item) {
                     return
                 }
             }
+            break
         case "status-heal":
             if (target.status !== "" && target.status) {
                 if (target.status === item.effect.status)
@@ -271,6 +276,7 @@ function handleUseRecoveryItem(item) {
             else {
                 console.log(`${target.name} is not effected by ${item.effect.status}. Can't use this item.`)
             }
+            break
         case "pp-heal":
             if (item.effect.scope === "single") {
                 ppRecoveryItem.value = item
@@ -282,9 +288,11 @@ function handleUseRecoveryItem(item) {
                     }
                 }
             }
+            break
         case "pp-max-raise":
             ppRecoveryItem.value = item
             isRefillPPModalOpen.value = true
+            break
     }
 }
 
