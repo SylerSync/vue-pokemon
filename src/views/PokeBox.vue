@@ -318,36 +318,61 @@ function expPercent(pokemon) {
 }
 
 const heldInventory = computed(() => {
-    if (!inventoryStore.evoItems) return [];
+    const items = [];
 
-    return Object.entries(inventoryStore.evoItems)
-        .filter(([_, count]) => count > 0) // Only list items the player currently owns
-        .map(([evoId, count]) => {
-            // Lookup static details from JSON catalog
-            const itemData = evolutionItems[evoId] || {};
+    // 1. Process Evolution Items
+    if (inventoryStore.evoItems) {
+        for (const [id, count] of Object.entries(inventoryStore.evoItems)) {
+            if (count > 0) {
+                const itemData = evolutionItems[id] || {};
+                const formattedName = itemData.name || id
+                    .replace(/([A-Z])/g, ' $1')
+                    .replace(/^./, (str) => str.toUpperCase())
+                    .trim();
 
-            // Fallback string formatter if JSON name is missing
-            const formattedName = itemData.name || evoId
-                .replace(/([A-Z])/g, ' $1')
-                .replace(/^./, (str) => str.toUpperCase())
-                .trim();
-
-            let effectDescription = itemData.description || '';
-            if (!effectDescription && itemData.effect) {
-                if (itemData.effect.type === 'evolution') {
+                let effectDescription = itemData.description || '';
+                if (!effectDescription && itemData.effect?.type === 'evolution') {
                     effectDescription = 'Causes certain species to evolve when held or used';
                 }
-            }
 
-            return {
-                id: evoId,
-                name: formattedName,
-                count: count,
-                cost: itemData.cost || 0,
-                effect: itemData.effect || null,
-                effectDescription
-            };
-        });
+                items.push({
+                    id,
+                    name: formattedName,
+                    count,
+                    type: 'evo',
+                    cost: itemData.cost || 0,
+                    effect: itemData.effect || null,
+                    effectDescription
+                });
+            }
+        }
+    }
+
+    // 2. Process Mega Stones
+    if (inventoryStore.megaStones) {
+        for (const [id, count] of Object.entries(inventoryStore.megaStones)) {
+            if (count > 0) {
+                // Adjust lookup object name if your mega stone JSON uses a different import name
+                const itemData = (typeof megaStones !== 'undefined' ? megaStones[id] : {}) || {};
+                const formattedName = itemData.name || id
+                    .replace(/([A-Z])/g, ' $1')
+                    .replace(/^./, (str) => str.toUpperCase())
+                    .trim();
+
+                items.push({
+                    id,
+                    name: formattedName,
+                    count,
+                    type: 'mega',
+                    cost: itemData.cost || 0,
+                    effect: itemData.effect || null,
+                    effectDescription: itemData.description || 'Triggers Mega Evolution in battle when held by the matching species'
+                });
+            }
+        }
+    }
+
+    return items;
 });
 
 async function useEvoItem(itemId) {
@@ -385,13 +410,22 @@ async function useEvoItem(itemId) {
 }
 
 function handleHeldItem() {
-    if (selectedPokemon.value.heldItem && selectedPokemon.value.heldItem !== "") {
-        inventoryStore.AddEvoItem(selectedPokemon.value.heldItem)
-        selectedPokemon.value.heldItem = ""
-        console.log(`Removed held item.`)
-    }
-    else {
-        openEvoItemModal()
+    const currentItem = selectedPokemon.value?.heldItem;
+
+    if (currentItem) {
+        // Check if item is a Mega Stone based on name pattern
+        const isMegaStone = currentItem.toLowerCase().includes('mega') || currentItem.toLowerCase().endsWith('ite');
+
+        if (isMegaStone) {
+            inventoryStore.AddMegaStone(currentItem);
+        } else {
+            inventoryStore.AddEvoItem(currentItem);
+        }
+
+        selectedPokemon.value.heldItem = "";
+        console.log(`Removed ${currentItem} from ${selectedPokemon.value.name}.`);
+    } else {
+        openEvoItemModal();
     }
 }
 

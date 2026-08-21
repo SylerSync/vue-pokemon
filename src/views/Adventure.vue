@@ -295,9 +295,7 @@
                         'is-empty': !poke,
                         'is-lead': index === 0 && poke,
                         'is-fainted': poke && (poke.currentHp <= 0)
-                    }"
-                    @click="poke ? openPokemonModal(poke, index) : null"
-                    >
+                    }" @click="poke ? openPokemonModal(poke, index) : null">
                     <!-- FILLED SLOT -->
                     <template v-if="poke">
                         <div class="sprite-circle">
@@ -325,7 +323,7 @@
                             <div class="hp-numeric-row">
                                 <span class="hp-num">
                                     {{ Math.max(0, poke?.currentHp ?? poke?.totalHp ?? 0) }} / {{ poke?.totalHp ??
-                                    poke?.maxHp ?? 0 }}
+                                        poke?.maxHp ?? 0 }}
                                 </span>
                             </div>
                         </div>
@@ -345,9 +343,64 @@
 
     <Modal v-if="isPokemonModalOpen" @close="closePokemonModal">
         <div class="pokemon-details-container">
-            <h3 class="pokemon-title">{{selectedPokemon?.name}}</h3>
+            <h3 class="pokemon-title pkmn-name">{{ selectedPokemon?.name }} Lvl {{ selectedPokemon.level }}</h3>
+            <img :src="selectedPokemon?.sprite" />
+            <div class="pokemon-detail-body">
+                <p>Status: {{ selectedPokemon.status ?? "none" }}</p>
+                <p>Held Item: {{ selectedPokemon.heldItem || "none" }}</p>
+                <div class="hp-gauge-container">
+                    <span class="hp-label">HP</span>
+                    <div class="hp-bar-track">
+                        <div class="hp-bar-fill" :class="getHpBarSeverity(selectedPokemon)"
+                            :style="{ width: getHpPercentage(selectedPokemon) + '%' }"></div>
+                    </div>
+                </div>
+                <div class="exp-gauge-container">
+                    <span class="exp-label">EXP</span>
+                    <div class="exp-bar-track">
+                        <div class="exp-bar-fill" :style="{ width: getExpPercentage(selectedPokemon) + '%' }"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="move-grid">
+                <div v-for="move of selectedPokemon.moves" class="move-card"
+                    :style="{ backgroundColor: pokemonStore.typeColors[move.type] }">
+                    <span class="move-name">{{ move.name }}</span>
+                    <span class="move-pp">{{ move.currentPP }}/{{ move.maxPP }}</span>
+                </div>
+            </div>
+            <div class="pokemon-details-buttons">
+                <Button @click="openUseItemModal">Use Item</Button>
+                <Button @click="openHeldItemModal(!selectedPokemon?.heldItem)">
+                    {{ selectedPokemon?.heldItem ? 'Remove Item' : 'Give Item' }}
+                </Button>
+            </div>
         </div>
-        
+
+    </Modal>
+
+    <Modal v-if="isHeldItemModalOpen" @close="closeHeldItemModal">
+        <DataTable :value="heldItems" paginator :rows="5">
+            <Column header="Item">
+                <template #body="{ data }">
+                    <span>{{ data.name }}</span>
+                </template>
+            </Column>
+            <Column header="Count">
+                <template #body="{ data }">
+                    <span>{{ data.quantity }}</span>
+                </template>
+            </Column>
+            <Column header="Give Item">
+                <template #body="{data}">
+                    <Button @click="giveHeldItem(data)">Give</Button>
+                </template>
+            </Column>
+        </DataTable>
+    </Modal>
+
+    <Modal v-if="isUseItemModalOpen" @close="closeUseItemModal">
+
     </Modal>
 
     <PokemonBattle v-if="isBattleModalOpen" :auto-start="true" :team="pokemonStore.pokemonParty" :opponent="wildPokemon"
@@ -366,7 +419,6 @@ import sleepIcon from '@/assets/statusIcons/sleep.png';
 import frozenIcon from '@/assets/statusIcons/frozen.png';
 import burnIcon from '@/assets/statusIcons/burn.png';
 import poisonIcon from '@/assets/statusIcons/poison.png';
-import Card from "primevue/card"
 import Tag from 'primevue/tag'
 import Column from 'primevue/column'
 import Button from 'primevue/button'
@@ -379,6 +431,7 @@ import { useSettingsStore } from '@/stores/settingsStore';
 import tms from '@/assets/data/tms.json'
 import evolutionItems from "@/assets/data/evolutionItems.json"
 import megaEvoStones from "@/assets/data/megaEvos.json"
+import expChart from "@/assets/data/levelThresholds.json"
 
 // Import Maps
 import overworldMap from '@/assets/data/mapData/map1.json';
@@ -397,6 +450,8 @@ const isPokeBoxModalOpen = ref(false)
 const isShopModalOpen = ref(false)
 const isPartyModalOpen = ref(false)
 const isPokemonModalOpen = ref(false)
+const isHeldItemModalOpen = ref(false)
+const isUseItemModalOpen = ref(false)
 
 // Ref values
 const starters = ref({})
@@ -415,6 +470,39 @@ const STATUS_ICONS = {
     poison: poisonIcon
 };
 
+const heldItems = computed(() => {
+    const allHeld = [];
+
+    // Map Evolution Items
+    if (inventoryStore.evoItems) {
+        for (const [key, quantity] of Object.entries(inventoryStore.evoItems)) {
+            if (quantity > 0) {
+                allHeld.push({
+                    id: key,
+                    name: key.replace(/-/g, ' '), // e.g. "fire-stone" -> "fire stone"
+                    quantity,
+                    type: 'evo'
+                });
+            }
+        }
+    }
+
+    // Map Mega Stones
+    if (inventoryStore.megaStones) {
+        for (const [key, quantity] of Object.entries(inventoryStore.megaStones)) {
+            if (quantity > 0) {
+                allHeld.push({
+                    id: key,
+                    name: key.replace(/-/g, ' '),
+                    quantity,
+                    type: 'mega'
+                });
+            }
+        }
+    }
+
+    return allHeld;
+});
 
 // Control Functions
 // #region CONTROLS
@@ -816,18 +904,83 @@ function closePartyModal() {
     isPartyModalOpen.value = false
 }
 
-function openPokemonModal(poke, index){
+function openPokemonModal(poke, index) {
     selectedPokemon.value = poke
     selectedIndex.value = index
-    isGameplayPause.value = true
     isPokemonModalOpen.value = true
 }
 
-function closePokemonModal(){
+function closePokemonModal() {
     isGameplayPause.value = false
     isPokemonModalOpen.value = false
     selectedPokemon.value = null
     selectedIndex.value = null
+}
+
+function getExpPercentage(pokemon) {
+    if (!pokemon || pokemon.level >= 100) return 100;
+
+    const requiredExp = expChart[pokemon.level + 1];
+    if (!requiredExp) return 0;
+
+    return Math.min(100, Math.floor(((pokemon.currentExp || 0) / requiredExp) * 100));
+}
+
+function openHeldItemModal(isGive) {
+    if (isGive) {
+        isHeldItemModalOpen.value = true;
+    } else {
+        const currentItem = selectedPokemon.value?.heldItem;
+
+        if (currentItem) {
+            // Check if held item is a Mega Stone or Evolution Item and return it to inventory
+            if (megaEvoStones[currentItem]) {
+                inventoryStore.AddMegaStone(currentItem);
+            } else if (evolutionItems[currentItem]) {
+                inventoryStore.AddEvoItem(currentItem);
+            }
+
+            // Clear held item from the Pokemon
+            selectedPokemon.value.heldItem = "";
+            console.log(`Removed ${currentItem} and returned it to inventory.`);
+        }
+    }
+}
+function closeHeldItemModal() {
+    isHeldItemModalOpen.value = false
+}
+function openUseItemModal() {
+    isUseItemModalOpen.value = true
+}
+function closeUseItemModal() {
+    isUseItemModalOpen.value = false
+}
+
+function giveHeldItem(item){
+    let itemName = item.id
+    if(evolutionItems[itemName]){
+        if(inventoryStore.UseEvoItem(itemName)){
+            selectedPokemon.value.heldItem = itemName
+            closeHeldItemModal()
+            return
+        }
+        else{
+            errorStore.SetErrorDetails("Inventory Issue", `we could not give the pokemon a(n) ${itemName} at this time.`)
+            return
+        }
+    }
+    if(megaEvoStones[itemName]){
+        if(inventoryStore.UseMegaStone(itemName)){
+            selectedPokemon.value.heldItem = itemName
+            closeHeldItemModal()
+            return
+        }
+        else{
+            errorStore.SetErrorDetails("Inventory Issue", `we could not give the pokemon a(n) ${itemName} at this time.`)
+            return
+        }
+    }
+    errorStore.SetErrorDetails("Collection Issue", `Unable to find item ${itemName} at this time.`)
 }
 
 
@@ -1626,7 +1779,6 @@ canvas {
     opacity: 0.9;
 }
 
-
 /* ==========================================================================
    4. POKÉBOX SYSTEM (WIDE SPLIT & STORAGE)
    ========================================================================== */
@@ -1995,6 +2147,7 @@ canvas {
 
 
 }
+
 /* ==========================================================================
    PARTY DISPLAY SECTION
    ========================================================================== */
@@ -2151,9 +2304,17 @@ canvas {
     transition: width 0.3s ease;
 }
 
-.hp-bar-fill.ok { background: #22c55e; }
-.hp-bar-fill.warn { background: #eab308; }
-.hp-bar-fill.crit { background: #ef4444; }
+.hp-bar-fill.ok {
+    background: #22c55e;
+}
+
+.hp-bar-fill.warn {
+    background: #eab308;
+}
+
+.hp-bar-fill.crit {
+    background: #ef4444;
+}
 
 .hp-numeric-row {
     text-align: right;
@@ -2173,7 +2334,7 @@ canvas {
     min-height: 56px;
 }
 
-.pkmn-slot-card:hover{
+.pkmn-slot-card:hover {
     cursor: pointer;
     border: 2px CanvasText solid;
 }
@@ -2271,17 +2432,93 @@ canvas {
 /* ==========================================================================
    POKEMON DETAILS DISPLAY SECTION
    ========================================================================== */
-.pokemon-details-container{
+.pokemon-details-container {
     background-color: Canvas;
     border: 3px solid CanvasText;
     border-radius: 5px;
+    padding: 10px;
 }
 
-.pokemon-details-container h3{
+.pokemon-details-container h3 {
     border-bottom: 1px solid CanvasText;
-    padding:0rem 1rem 0rem 1rem;
+    padding: 0rem 1rem 0rem 1rem;
+    text-align: center;
 }
 
+.pokemon-details-container img {
+    display: flex;
+    margin: auto;
+}
+
+.pokemon-detail-body {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 1rem;
+    width: 100%;
+    box-sizing: border-box;
+
+}
+
+.pokemon-details-buttons {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    gap: 1rem;
+}
+
+.exp-gauge-container {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    margin-top: 0.2rem;
+}
+
+.exp-label {
+    font-size: 0.65rem;
+    font-weight: 800;
+    color: #3b82f6;
+    /* Blue EXP label */
+}
+
+.exp-bar-track {
+    flex: 1;
+    height: 6px;
+    /* Slightly thinner than HP track for visual hierarchy */
+    background: #0f172a;
+    border: 1px solid #64748b;
+    border-radius: 3px;
+    padding: 1px;
+    box-sizing: border-box;
+}
+
+.exp-bar-fill {
+    height: 100%;
+    border-radius: 2px;
+    background: #3b82f6;
+    /* Classic cyan/blue Pokemon EXP bar */
+    transition: width 0.3s ease;
+}
+
+.move-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin: 10px;
+}
+
+.move-card {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    min-width: 150px;
+    max-height: 100px;
+}
+
+.move-card span {
+    text-transform: capitalize;
+    color: Canvas;
+}
 
 @media (max-width: 768px) {
     .grid-container {
