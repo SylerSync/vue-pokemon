@@ -65,8 +65,8 @@ const testGodPokemon = {
             maxPP: 99,
         },
         {
-            name: 'status-test',
-            type: 'electric',
+            name: 'grassy-terrain',
+            type: 'grass',
             power: null,
             currentPP: 99,
             maxPP: 99,
@@ -76,7 +76,7 @@ const testGodPokemon = {
             targetsSelf: false,        // target is 'selected-pokemon'
             statChanges: [],
             statChance: 0,
-            ailment: 'paralysis',
+            ailment: null,
             ailmentChance: 0,          // ⚠️ see below
             drain: 0,
             healing: 0,
@@ -597,7 +597,7 @@ export const usePokemonStore = defineStore("pokemonStore", {
 
 
     state: () => ({
-        caughtPokemon: [testBulbasaur,testCharizard,testEevee,testGligar],
+        caughtPokemon: [testBulbasaur,testCharizard,testEevee,testGligar,testGodPokemon],
         pokemonParty: [],
         wishlistPokemon: [],
         typeColors: {

@@ -34,6 +34,11 @@
           <!-- in battle -->
           <div v-else class="arena">
             <div class="battlefield">
+              <div v-if="weather.type || terrain.type" class="field-chips">
+                <span v-if="weather.type" class="field-chip">{{ WEATHER_LABEL[weather.type] }} · {{ weather.turns
+                  }}</span>
+                <span v-if="terrain.type" class="field-chip">{{ terrain.type }} terrain · {{ terrain.turns }}</span>
+              </div>
               <!-- opponent: info left, sprite right -->
               <div class="combatant combatant-foe">
                 <div class="combatant-info">
@@ -430,6 +435,46 @@ function foeSideOf(pokemon) {
   return sides.value[sideKey(pokemon) === 'ally' ? 'foe' : 'ally'];
 }
 
+const weather = ref({ type: null, turns: 0 });  // 'rain' | 'sun' | 'sandstorm' | 'hail' | 'snow'
+const terrain = ref({ type: null, turns: 0 });  // 'electric' | 'grassy' | 'misty' | 'psychic'
+
+const WEATHER_MOVES = {
+  'rain-dance': 'rain', 'sunny-day': 'sun',
+  sandstorm: 'sandstorm', hail: 'hail', snowscape: 'snow',
+};
+const WEATHER_START_MSG = {
+  rain: 'It started to rain!',
+  sun: 'The sunlight turned harsh!',
+  sandstorm: 'A sandstorm kicked up!',
+  hail: 'It started to hail!',
+  snow: 'It started to snow!',
+};
+const WEATHER_END_MSG = {
+  rain: 'The rain stopped.', sun: 'The harsh sunlight faded.',
+  sandstorm: 'The sandstorm subsided.', hail: 'The hail stopped.', snow: 'The snow stopped.',
+};
+const WEATHER_LABEL = {
+  rain: 'Rain', sun: 'Sun', sandstorm: 'Sandstorm', hail: 'Hail', snow: 'Snow',
+};
+
+const TERRAIN_MOVES = {
+  'electric-terrain': 'electric', 'grassy-terrain': 'grassy',
+  'misty-terrain': 'misty', 'psychic-terrain': 'psychic',
+};
+const TERRAIN_START_MSG = {
+  electric: 'An electric current ran across the battlefield!',
+  grassy: 'Grass grew to cover the battlefield!',
+  misty: 'Mist swirled around the battlefield!',
+  psychic: 'The battlefield got weird!',
+};
+
+function isGrounded(pokemon) {
+  if (field.value.gravity > 0) return true;
+  if (pokemon.minorStatus?.includes('ingrain')) return true;
+  if (pokemon.minorStatus?.includes('no-type-immunity')) return true; // smack down
+  return !pokemon.types.includes('flying');
+}
+
 // Hardcoded moves that have special/unique effects that arn't listed in pokeapi
 const SELF_KO_MOVES = new Set([
   'self-destruct', 'explosion', 'misty-explosion',
@@ -598,6 +643,10 @@ const CONDITIONAL_POWER = {
   revenge: (u) => u.turn?.damageTaken > 0 ? 2 : 1,
   assurance: (u, t) => t.turn?.wasHit ? 2 : 1,
   'stomping-tantrum': (u) => u.turn?.moveFailedLastTurn ? 2 : 1,
+
+  'rising-voltage': (u, t) => terrain.value.type === 'electric' && isGrounded(t) ? 2 : 1,
+  'expanding-force': (u) => terrain.value.type === 'psychic' && isGrounded(u) ? 1.5 : 1,
+  'misty-explosion': (u) => terrain.value.type === 'misty' && isGrounded(u) ? 1.5 : 1,
 };
 
 // Hard coded moves for copy logic
@@ -617,7 +666,10 @@ const UNCOPYABLE = new Set([
   'beak-blast', 'baneful-bunker', 'spiky-shield', "king-s-shield",
 ]);
 
-const NATURE_POWER_MOVE = 'tri-attack';  // no terrain system → default
+const NATURE_POWER_BY_TERRAIN = {
+  electric: 'thunderbolt', grassy: 'energy-ball',
+  misty: 'moonblast', psychic: 'psychic',
+};
 
 // Protection Moves
 const PROTECT_MOVES = {
@@ -951,6 +1003,8 @@ function startBattle() {
   userPokemon.value.bide = null
   sides.value.ally = freshSide()
   sides.value.foe = freshSide()
+  weather.value = { type: null, turns: 0 };
+  terrain.value = { type: null, turns: 0 };
   battleStarted.value = true;
   selectedTargetPokemon.value = userPokemon.value;
   log(`A wild ${foe.value.name} appeared!`);
@@ -1099,6 +1153,8 @@ function statOf(pokemon, name) {
   if (name === 'attack' && pokemon.status === 'burn') value *= 0.5;
   if (name === 'speed' && pokemon.status === 'paralysis') value *= 0.5;
   if (name === 'speed' && sideOf(pokemon).tailwind > 0) value *= 2;
+  if (name === 'special-defense' && weather.value.type === 'sandstorm' && pokemon.types.includes('rock')) value *= 1.5;
+  if (name === 'defense' && weather.value.type === 'snow' && pokemon.types.includes('ice')) value *= 1.5;
   return Math.floor(value);
 }
 
@@ -1437,7 +1493,8 @@ async function useMove(user, target, move, opts = {}) {
 
   // --- two-turn moves ---
   const charge = TWO_TURN_MOVES[move.name];
-  if (charge && !releasing && !hitsSelf) {
+  const sunCharged = ['solar-beam', 'solar-blade'].includes(move.name) && weather.value.type === 'sun';
+  if (charge && !releasing && !hitsSelf && !sunCharged) {
     if (field.value.gravity > 0 && ['fly', 'bounce', 'sky-attack'].includes(move.name)) {
       log(`${user.name} can't fly under intense gravity!`);
       user.turn.moveFailed = true;
@@ -1472,6 +1529,15 @@ async function useMove(user, target, move, opts = {}) {
     return;
   }
 
+  // --- psychic terrain shields grounded targets from priority ---
+  if (terrain.value.type === 'psychic' && (move.priority ?? 0) > 0 &&
+    target !== user && !move.targetsSelf && isGrounded(target)) {
+    log(`${target.name} is protected by the psychic terrain!`);
+    user.turn.moveFailed = true;
+    await delay(800);
+    return;
+  }
+
   // --- target is off the field ---
   if (isSemiInvulnerable(target) && target !== user) {
     const through = HITS_THROUGH[target.charging.move.name] ?? [];
@@ -1484,9 +1550,15 @@ async function useMove(user, target, move, opts = {}) {
   }
 
   // --- accuracy (null = never misses) ---
-  if (move.accuracy != null) {
+  let accuracy = move.accuracy;
+  if (['thunder', 'hurricane'].includes(move.name)) {
+    if (weather.value.type === 'rain') accuracy = null;
+    else if (weather.value.type === 'sun') accuracy = 50;
+  }
+  if (move.name === 'blizzard' && ['hail', 'snow'].includes(weather.value.type)) accuracy = null;
+  if (accuracy != null) {
     if (move.category === 'ohko') {
-      if (randInt(1, 100) > move.accuracy + (user.level - target.level)) {
+      if (randInt(1, 100) > accuracy + (user.level - target.level)) {
         log(`${user.name}'s attack missed!`);
         user.turn.moveFailed = true;
         await delay(800);
@@ -1498,7 +1570,7 @@ async function useMove(user, target, move, opts = {}) {
         : (target.stages?.evasion ?? 0);
       const accMod =
         stageMultiplier(user.stages?.accuracy ?? 0, true) / stageMultiplier(evasion, true);
-      if (randInt(1, 100) > move.accuracy * accMod) {
+      if (randInt(1, 100) > accuracy * accMod) {
         log(`${user.name}'s attack missed!`);
         user.turn.moveFailed = true;
         user.locked = null;
@@ -1604,6 +1676,12 @@ async function useMove(user, target, move, opts = {}) {
 
   // --- Logic for protection moves
   const screen = SCREEN_MOVES[move.name];
+  if (screen === 'auroraVeil' && !['hail', 'snow'].includes(weather.value.type)) {
+    log('But it failed!');
+    user.turn.moveFailed = true;
+    await delay(800);
+    return;
+  }
   if (screen) {
     const side = sideOf(user);
     if (side[screen] > 0) {
@@ -1646,6 +1724,34 @@ async function useMove(user, target, move, opts = {}) {
     return;
   }
 
+  // --- Logic for Weather Moves
+  const weatherType = WEATHER_MOVES[move.name];
+  if (weatherType) {
+    if (weather.value.type === weatherType) {
+      log('But it failed!');
+      user.turn.moveFailed = true;
+    } else {
+      weather.value = { type: weatherType, turns: 5 };
+      log(WEATHER_START_MSG[weatherType]);
+    }
+    await delay(800);
+    return;
+  }
+
+  // --- Logic for Terrain Moves
+  const terrainType = TERRAIN_MOVES[move.name];
+  if (terrainType) {
+    if (terrain.value.type === terrainType) {
+      log('But it failed!');
+      user.turn.moveFailed = true;
+    } else {
+      terrain.value = { type: terrainType, turns: 5 };
+      log(TERRAIN_START_MSG[terrainType]);
+    }
+    await delay(800);
+    return;
+  }
+
   // --- Logic for Hazard Moves
   const hazard = HAZARD_MOVES[move.name];
   if (hazard) {
@@ -1683,6 +1789,7 @@ async function useMove(user, target, move, opts = {}) {
 
   // --- Logic for Defog
   if (move.name === 'defog') {
+    if (terrain.value.type) { terrain.value = { type: null, turns: 0 }; }
     clearHazards(sideOf(user));
     clearHazards(foeSideOf(user));
     const theirs = foeSideOf(user);
@@ -1726,7 +1833,7 @@ async function useMove(user, target, move, opts = {}) {
     await delay(600);
   }
 
-  // --- Logic for the moves Momic and Sketch
+  // --- Logic for the moves Mimic and Sketch
   if (move.name === 'mimic' || move.name === 'sketch') {
     const copy = target.lastUsedMove;
     if (!copy || UNCOPYABLE.has(copy.name) ||
@@ -1804,6 +1911,17 @@ async function useMove(user, target, move, opts = {}) {
     return;
   }
 
+  // --- Logic for weather ball
+  if (move.name === 'weather-ball' && weather.value.type) {
+    const t = { rain: 'water', sun: 'fire', sandstorm: 'rock', hail: 'ice', snow: 'ice' }[weather.value.type];
+    move = { ...move, type: t, power: 100 };
+  }
+  // --- Logic for terrain pulse
+  if (move.name === 'terrain-pulse' && terrain.value.type && isGrounded(user)) {
+    const t = { electric: 'electric', grassy: 'grass', misty: 'fairy', psychic: 'psychic' }[terrain.value.type];
+    move = { ...move, type: t, power: 100 };
+  }
+
   // --- damage ---
   if (move.power) {
     const hits = rollHitCount(move);
@@ -1875,7 +1993,7 @@ async function useMove(user, target, move, opts = {}) {
   if (statChanges.length) {
     const chance = move.statChance || 100;
     if (randInt(1, 100) <= chance) {
-      const recipient = move.targetsSelf ? user : target;
+      const recipient = (move.targetsSelf || /^damage[+-]raise$/.test(move.category)) ? user : target;
       for (const { stat, change } of statChanges) {
         const blocked = change < 0
           && recipient !== user
@@ -1923,7 +2041,12 @@ async function useMove(user, target, move, opts = {}) {
 
   // --- healing ---
   if ((move.healing ?? 0) > 0) {
-    const amount = Math.floor(user.totalHp * (move.healing / 100));
+    let healPct = move.healing;
+    if (['moonlight', 'synthesis', 'morning-sun'].includes(move.name)) {
+      healPct = weather.value.type === 'sun' ? 66 : weather.value.type ? 25 : 50;
+    }
+    if (move.name === 'shore-up' && weather.value.type === 'sandstorm') healPct = 66;
+    const amount = Math.floor(user.totalHp * (healPct / 100));
     const before = user.currentHp;
     user.currentHp = Math.min(user.totalHp, user.currentHp + amount);
     log(
@@ -1951,9 +2074,11 @@ function calculateDamage(attacker, defender, move, opts = {}) {
   const {
     critical = Math.random() < critChance,
     randomFactor = randInt(85, 100) / 100,
-    weatherMod = 1,
     otherMod = 1,
   } = opts;
+
+  const weatherMod = opts.weatherMod ?? weatherDamageMod(move);
+  const terrainMod = opts.terrainMod ?? terrainDamageMod(move, attacker, defender);
 
   if (move.class === 'status' || !move.power) {
     return { damage: 0, effectiveness: 1, critical: false, immune: false };
@@ -1995,7 +2120,7 @@ function calculateDamage(attacker, defender, move, opts = {}) {
 
   const damage = Math.max(
     1,
-    Math.floor(base * weatherMod * critMod * randomFactor * stab * effectiveness * otherMod * screenMod)
+    Math.floor(base * weatherMod * terrainMod * critMod * randomFactor * stab * effectiveness * otherMod * screenMod)
   );
 
   return { damage, effectiveness, critical, immune: false };
@@ -2005,6 +2130,8 @@ function rawStat(pokemon, name) {
   const raw = pokemon.stats.find(s => s.name === name)?.stat ?? 1;
   let value = raw;
   if (name === 'attack' && pokemon.status === 'burn') value *= 0.5;
+  if (name === 'special-defense' && weather.value.type === 'sandstorm' && pokemon.types.includes('rock')) value *= 1.5;
+  if (name === 'defense' && weather.value.type === 'snow' && pokemon.types.includes('ice')) value *= 1.5;
   return Math.floor(value);
 }
 
@@ -2013,6 +2140,35 @@ function typeEffectiveness(moveType, defenderTypes) {
     (mult, t) => mult * (pokemonStore.typeChart[moveType]?.[t] ?? 1),
     1
   );
+}
+
+function weatherDamageMod(move) {
+  const w = weather.value.type;
+  if (!w) return 1;
+  if (w === 'rain') {
+    if (move.type === 'water') return 1.5;
+    if (move.type === 'fire') return 0.5;
+  }
+  if (w === 'sun') {
+    if (move.type === 'fire') return 1.5;
+    if (move.type === 'water') return 0.5;
+  }
+  // Solar Beam / Solar Blade are halved in any non-sun weather
+  if (w !== 'sun' && ['solar-beam', 'solar-blade'].includes(move.name)) return 0.5;
+  return 1;
+}
+
+function terrainDamageMod(move, attacker, defender) {
+  const t = terrain.value.type;
+  if (!t) return 1;
+  if (t === 'electric' && move.type === 'electric' && isGrounded(attacker)) return 1.3;
+  if (t === 'grassy') {
+    if (move.type === 'grass' && isGrounded(attacker)) return 1.3;
+    if (['earthquake', 'magnitude', 'bulldoze'].includes(move.name)) return 0.5;
+  }
+  if (t === 'psychic' && move.type === 'psychic' && isGrounded(attacker)) return 1.3;
+  if (t === 'misty' && move.type === 'dragon' && isGrounded(defender)) return 0.5;
+  return 1;
 }
 
 function stageMultiplier(stage, isAccuracy = false) {
@@ -2078,6 +2234,20 @@ async function inflictStatus(target, ailment, move, user) {
     && MAJOR_STATUSES.has(ailment)) {
     log(`${target.name} is protected by Safeguard!`);
     user.turn.moveFailed = true;
+    await delay(800);
+    return;
+  }
+
+  if (terrain.value.type === 'electric' && ailment === 'sleep' && isGrounded(target)) {
+    log(`${target.name} can't sleep on the electric terrain!`);
+    if (user) user.turn.moveFailed = true;
+    await delay(800);
+    return;
+  }
+  if (terrain.value.type === 'misty' && isGrounded(target) &&
+    (MAJOR_STATUSES.has(ailment) || ailment === 'confusion')) {
+    log(`${target.name} is protected by the misty terrain!`);
+    if (user) user.turn.moveFailed = true;
     await delay(800);
     return;
   }
@@ -2249,7 +2419,7 @@ async function resolveCalledMove(user, target, move) {
     }
 
     case 'nature-power':
-      return await fetchMoveByName(NATURE_POWER_MOVE);
+      return await fetchMoveByName(NATURE_POWER_BY_TERRAIN[terrain.value.type] ?? 'tri-attack');
 
     case 'sleep-talk':
     case 'assist': {
@@ -2287,6 +2457,8 @@ async function fetchMoveByName(name) {
 
 async function endOfTurn(target, reciver) {
   await endOfTurnIngrain(target)
+  await endOfTurnGrassy(target)
+  await endOfTurnWeather(target)
   await endOfTurnDamage(target)
   await endOfTurnTrap(target)
   await endOfTurnLeechSeed(target, reciver)
@@ -2407,6 +2579,39 @@ async function endOfTurnField() {
   for (const k of Object.keys(field.value)) {
     if (field.value[k] > 0 && --field.value[k] === 0) log(`The ${k} wore off!`);
   }
+  if (weather.value.type && --weather.value.turns <= 0) {
+    log(WEATHER_END_MSG[weather.value.type]);
+    weather.value = { type: null, turns: 0 };
+  }
+  if (terrain.value.type && --terrain.value.turns <= 0) {
+    log(`The ${terrain.value.type} terrain disappeared!`);
+    terrain.value = { type: null, turns: 0 };
+  }
+}
+
+async function endOfTurnWeather(pokemon) {
+  const w = weather.value.type;
+  if (pokemon.currentHp <= 0) return;
+  const immune = w === 'sandstorm'
+    ? pokemon.types.some(t => ['rock', 'ground', 'steel'].includes(t))
+    : pokemon.types.includes('ice');
+  if ((w === 'sandstorm' || w === 'hail') && !immune) {
+    const amount = Math.max(1, Math.floor(pokemon.totalHp / 16));
+    pokemon.currentHp = Math.max(0, pokemon.currentHp - amount);
+    log(`${pokemon.name} is buffeted by the ${w}!`);
+    await delay(800);
+  }
+}
+
+async function endOfTurnGrassy(pokemon) {
+  if (terrain.value.type !== 'grassy') return;
+  if (pokemon.currentHp <= 0 || pokemon.currentHp >= pokemon.totalHp) return;
+  if (!isGrounded(pokemon) || isHealBlocked(pokemon)) return;
+  const amount = Math.max(1, Math.floor(pokemon.totalHp / 16));
+  const before = pokemon.currentHp;
+  pokemon.currentHp = Math.min(pokemon.totalHp, pokemon.currentHp + amount);
+  log(`${pokemon.name} was healed by the grassy terrain! (+${pokemon.currentHp - before} HP)`);
+  await delay(800);
 }
 
 /* ------------------------------------------------------------------ *
@@ -2606,6 +2811,7 @@ async function switchActivePokemon(pokemon) {
     await endOfTurnPerish(pokemon);
     if (await endOfTurn(foe.value, pokemon)) return;
     if (await endOfTurn(pokemon, foe.value)) return;
+    await endOfTurnField();
   } finally {
     isResolving.value = false;
   }
@@ -3244,114 +3450,6 @@ onMounted(() => {
   margin-top: auto;
 }
 
-/* .move-swap-container {
-  display: flex;
-  flex-direction: column;
-  gap: 1.25rem;
-  padding: 0.5rem;
-  color: #2c3e50;
-}
-
-.modal-header h3 {
-  margin: 0 0 0.25rem 0;
-  font-size: 1.25rem;
-  text-transform: capitalize;
-}
-
-.highlight-move {
-  color: #e74c3c;
-  font-weight: bold;
-}
-
-.modal-header p {
-  margin: 0;
-  color: #666;
-  font-size: 0.9rem;
-}
-
-.section-title {
-  font-size: 0.8rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: #888;
-  margin-bottom: 0.5rem;
-  display: block;
-}
-
-
-.current-moves {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 0.75rem;
-}
-
-.move-card {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  padding: 0.85rem;
-  border-radius: 8px;
-  border: 2px solid #e2e8f0;
-  background: Canvas;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  overflow: hidden;
-}
-
-.move-card:hover {
-  transform: translateY(-2px);
-  border-color: #3b82f6;
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
-}
-
-.cancel-card:hover {
-  border-color: #ef4444;
-  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.15);
-}
-
-.card-top {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 0.5rem;
-}
-
-.move-title {
-  font-weight: 700;
-  font-size: 1rem;
-  text-transform: capitalize;
-}
-
-.type-pill {
-  color: CanvasText;
-  font-size: 0.7rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  padding: 0.2rem 0.5rem;
-  border-radius: 4px;
-  text-shadow: 0px 1px 2px rgba(0, 0, 0, 0.4);
-}
-
-.card-details {
-  font-size: 0.85rem;
-  color: #475569;
-}
-
-.hover-action {
-  margin-top: 0.5rem;
-  font-size: 0.75rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  color: #2563eb;
-  text-align: right;
-}
-
-.hover-action.cancel {
-  color: #dc2626;
-} */
-
 .status-icon {
   flex: none;
   height: 1.125em;
@@ -3519,5 +3617,21 @@ onMounted(() => {
   .status-chip {
     background: var(--p-surface-700);
   }
+}
+
+.field-chips {
+  display: flex;
+  gap: 0.375rem;
+}
+
+.field-chip {
+  padding: 0.125rem 0.5rem;
+  border-radius: 999px;
+  font-size: 0.625rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: capitalize;
+  background: var(--p-surface-200);
+  background-color: black;
 }
 </style>
