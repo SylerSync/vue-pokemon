@@ -339,6 +339,9 @@ async function checkForStarter() {
         await generateStarterList()
         isStarterModalOpen.value = true
     }
+    if(pokemonStore.caughtPokemon.length > 0 && pokemonStore.pokemonParty.length === 0){
+        pokemonStore.pokemonParty.push(pokemonStore.caughtPokemon[0])
+    }
 }
 
 async function generateStarterList() {
