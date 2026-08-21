@@ -32,58 +32,34 @@ const testGodPokemon = {
             maxPP: 99,
         },
         {
-            name: 'rapid-spin',
-            type: 'normal',
-            power: 50,
-            maxPP: 40,
-            currentPP: 40,
-            accuracy: 100,
-            priority: 0,
-            damageClass: 'physical',
-            targetsSelf: false,      // target is 'selected-pokemon'
-            statChanges: [{ stat: 'speed', change: 1 }],
-            statChance: 100,
-            ailment: null,
-            ailmentChance: 0,
-            drain: 0,
-            healing: 0,
-            flinchChance: 0,
-            critRate: 0,
-            minTurns: 0,
-            maxTurns: 0,
-            minHits: null,
-            maxHits: null,
-            category: 'damage-raise',
+            name: 'swords-dance', type: 'normal', power: null,
+            maxPP: 20, currentPP: 20, accuracy: null, priority: 0,
+            damageClass: 'status', targetsSelf: true,
+            statChanges: [{ stat: 'attack', change: 2 }], statChance: 0,
+            ailment: null, ailmentChance: 0,
+            drain: 0, healing: 0, flinchChance: 0, critRate: 0,
+            minTurns: 0, maxTurns: 0, minHits: null, maxHits: null,
+            category: 'net-good-stats'
         },
         {
-            name: "pass-turn",
-            type: "normal",
-            class: "special",
-            power: 0,
-            accuracy: 100,
-            currentPP: 99,
-            maxPP: 99,
+            name: 'substitute', type: 'normal', power: null,
+            maxPP: 10, currentPP: 10, accuracy: null, priority: 0,
+            damageClass: 'status', targetsSelf: true,
+            statChanges: [], statChance: 0,
+            ailment: null, ailmentChance: 0,
+            drain: 0, healing: 0, flinchChance: 0, critRate: 0,
+            minTurns: 0, maxTurns: 0, minHits: null, maxHits: null,
+            category: 'unique'
         },
         {
-            name: 'grassy-terrain',
-            type: 'grass',
-            power: null,
-            currentPP: 99,
-            maxPP: 99,
-            accuracy: 100,
-            priority: 0,
-            damageClass: 'status',
-            targetsSelf: false,        // target is 'selected-pokemon'
-            statChanges: [],
-            statChance: 0,
-            ailment: null,
-            ailmentChance: 0,          // ⚠️ see below
-            drain: 0,
-            healing: 0,
-            flinchChance: 0,
-            critRate: 0,
-            minTurns: 0,               // null in API
-            maxTurns: 0,               // null in API
+            name: 'baton-pass', type: 'normal', power: null,
+            maxPP: 40, currentPP: 40, accuracy: null, priority: 0,
+            damageClass: 'status', targetsSelf: true,
+            statChanges: [], statChance: 0,
+            ailment: null, ailmentChance: 0,
+            drain: 0, healing: 0, flinchChance: 0, critRate: 0,
+            minTurns: 0, maxTurns: 0, minHits: null, maxHits: null,
+            category: 'unique'
         },
     ]
 }
@@ -597,7 +573,7 @@ export const usePokemonStore = defineStore("pokemonStore", {
 
 
     state: () => ({
-        caughtPokemon: [testBulbasaur,testCharizard,testEevee,testGligar,testGodPokemon],
+        caughtPokemon: [testBulbasaur, testCharizard, testEevee, testGligar, testGodPokemon],
         pokemonParty: [],
         wishlistPokemon: [],
         typeColors: {
