@@ -295,7 +295,9 @@
                         'is-empty': !poke,
                         'is-lead': index === 0 && poke,
                         'is-fainted': poke && (poke.currentHp <= 0)
-                    }">
+                    }"
+                    @click="poke ? openPokemonModal(poke, index) : null"
+                    >
                     <!-- FILLED SLOT -->
                     <template v-if="poke">
                         <div class="sprite-circle">
@@ -339,6 +341,13 @@
                 </div>
             </div>
         </div>
+    </Modal>
+
+    <Modal v-if="isPokemonModalOpen" @close="closePokemonModal">
+        <div class="pokemon-details-container">
+            <h3 class="pokemon-title">{{selectedPokemon?.name}}</h3>
+        </div>
+        
     </Modal>
 
     <PokemonBattle v-if="isBattleModalOpen" :auto-start="true" :team="pokemonStore.pokemonParty" :opponent="wildPokemon"
@@ -387,12 +396,15 @@ const isStarterModalOpen = ref(false)
 const isPokeBoxModalOpen = ref(false)
 const isShopModalOpen = ref(false)
 const isPartyModalOpen = ref(false)
+const isPokemonModalOpen = ref(false)
 
 // Ref values
 const starters = ref({})
 const wildPokemon = ref(null)
-const isEncounterLoading = ref(false);
+const isGameplayPause = ref(false);
 const isEncounterAnimating = ref(false);
+const selectedPokemon = ref(null)
+const selectedIndex = ref(null)
 
 // static values
 const STATUS_ICONS = {
@@ -572,7 +584,7 @@ async function generateWildPokemon() {
 async function startWildEncounter() {
     enableBattleMusic()
     clearInputs()
-    isEncounterLoading.value = true
+    isGameplayPause.value = true
     const [didGen] = await Promise.all([
         generateWildPokemon(),
         triggerEncounterAnimation()
@@ -586,7 +598,7 @@ async function startWildEncounter() {
         errorStore.SetErrorDetails("Generation Issue", "There was an issue generating the Wild Pokemon.");
     }
 
-    isEncounterLoading.value = false;
+    isGameplayPause.value = false;
 }
 
 function onBattleEnd() {
@@ -597,7 +609,7 @@ function onBattleEnd() {
             canContinue = true
         }
     }
-    isEncounterLoading.value = false
+    isGameplayPause.value = false
     isBattleModalOpen.value = false
     if (!canContinue) {
         handlePartyFainted()
@@ -656,12 +668,12 @@ function triggerEncounterAnimation() {
 
 function openShopModal() {
     clearInputs()
-    isEncounterLoading.value = true
+    isGameplayPause.value = true
     isShopModalOpen.value = true
 }
 
 function closeShopModal() {
-    isEncounterLoading.value = false
+    isGameplayPause.value = false
     isShopModalOpen.value = false
 }
 
@@ -795,13 +807,27 @@ const paddedParty = computed(() => {
 
 function openPartyModal() {
     clearInputs()
-    isEncounterLoading.value = true
+    isGameplayPause.value = true
     isPartyModalOpen.value = true
 }
 
 function closePartyModal() {
-    isEncounterLoading.value = false
+    isGameplayPause.value = false
     isPartyModalOpen.value = false
+}
+
+function openPokemonModal(poke, index){
+    selectedPokemon.value = poke
+    selectedIndex.value = index
+    isGameplayPause.value = true
+    isPokemonModalOpen.value = true
+}
+
+function closePokemonModal(){
+    isGameplayPause.value = false
+    isPokemonModalOpen.value = false
+    selectedPokemon.value = null
+    selectedIndex.value = null
 }
 
 
@@ -1338,7 +1364,7 @@ function drawMap() {
 }
 
 function handleKeyDown(event) {
-    if (isMenuOpen.value || isBattleModalOpen.value || isDoorwayModalOpen.value || isEncounterLoading.value) return;
+    if (isMenuOpen.value || isBattleModalOpen.value || isDoorwayModalOpen.value || isGameplayPause.value) return;
 
     const keysToDisableScroll = ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', ' '];
     if (keysToDisableScroll.includes(event.key)) {
@@ -1969,7 +1995,9 @@ canvas {
 
 
 }
-
+/* ==========================================================================
+   PARTY DISPLAY SECTION
+   ========================================================================== */
 .party-list-container {
     width: 100%;
     max-width: 26rem;
@@ -2145,6 +2173,11 @@ canvas {
     min-height: 56px;
 }
 
+.pkmn-slot-card:hover{
+    cursor: pointer;
+    border: 2px CanvasText solid;
+}
+
 .empty-slot-bar {
     display: flex;
     align-items: center;
@@ -2164,6 +2197,9 @@ canvas {
     border-radius: 3px;
 }
 
+/* ==========================================================================
+   POKEMART DISPLAY SECTION
+   ========================================================================== */
 .pokeball-icon {
     font-size: 0.9rem;
     opacity: 0.5;
@@ -2231,6 +2267,21 @@ canvas {
     display: flex;
     justify-content: center;
 }
+
+/* ==========================================================================
+   POKEMON DETAILS DISPLAY SECTION
+   ========================================================================== */
+.pokemon-details-container{
+    background-color: Canvas;
+    border: 3px solid CanvasText;
+    border-radius: 5px;
+}
+
+.pokemon-details-container h3{
+    border-bottom: 1px solid CanvasText;
+    padding:0rem 1rem 0rem 1rem;
+}
+
 
 @media (max-width: 768px) {
     .grid-container {
