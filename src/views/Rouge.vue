@@ -12,6 +12,7 @@
  * Fully seeded — the same seed always produces the same route.
  */
 import { ref, computed, onMounted, nextTick } from 'vue'
+import PokemonBattle from '@/components/PokemonBattle.vue'
 
 const props = defineProps({
   seed: { type: String, default: '' },
@@ -169,6 +170,7 @@ const hp = ref(66)
 const maxHp = ref(66)
 const money = ref(900)
 const scroller = ref(null)
+const wildBattle = ref(false)
 
 const nodes = computed(() => map.value.nodes)
 const byId = computed(() => Object.fromEntries(nodes.value.map(n => [n.id, n])))
@@ -208,6 +210,7 @@ function enter (n) {
   hp.value = Math.max(1, Math.min(maxHp.value, hp.value + fx.hp))
   money.value = Math.max(0, money.value + fx.money)
   emit('node-entered', { node: n, poi: fx })
+  if(n.id === 'grass') {wildBattle.value = true}
   if (n.id === 'gym') emit('run-complete', { seed: seed.value, path: [...visited.value] })
 }
 
@@ -332,6 +335,10 @@ const hpPct = computed(() => Math.round((hp.value / maxHp.value) * 100))
       </aside>
     </div>
   </div>
+
+  <PokemonBattle v-if="wildBattle">
+
+  </PokemonBattle>
 </template>
 
 <style scoped>
