@@ -420,7 +420,7 @@ export const useInventoryStore = defineStore("inventoryStore", {
 
             return true
         },
-        AddEvoItem(stoneName) {
+        AddMegaStone(stoneName) {
             if (!this.megaStones) {
                 this.megaStones = {}
             }
