@@ -1346,9 +1346,9 @@ function statOf(pokemon, name) {
 }
 
 async function pickMove(pokemon) {
-  // const move = await getMove('rollout')
-  // let moveInfo = await getMoveData(move)
-  // return moveInfo
+  //const move = await getMove('sand-attack')
+  //let moveInfo = await getMoveData(move)
+  //return moveInfo
   if (pokemon.charging) return pokemon.charging.move;
   if (pokemon.locked) return pokemon.locked.move;
   if (pokemon.bide) return pokemon.bide.move;

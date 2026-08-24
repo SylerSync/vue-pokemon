@@ -443,8 +443,34 @@
         </div>
     </Modal>
 
-    <PokemonBattle v-if="isBattleModalOpen" :auto-start="true" :team="pokemonStore.pokemonParty" :opponent="wildPokemon"
-        :isWild="true" @end="onBattleEnd" @close="wildPokemon = null" />
+    <Modal v-if="isTrainerModalOpen" @close="closeTrainerModal">
+        <div>
+            <label class="w-full text-left text-sm font-semibold mb-1">Region</label>
+            <Select v-model="selectedRegion" :options="regionOptions" optionLabel="label" optionValue="value"
+                placeholder="Select Region" class="w-48 selector" @change="onRegionChange" />
+        </div>
+        <div>
+            <label class="w-full text-left text-sm font-semibold mb-1">Role</label>
+            <Select v-model="selectedRole" :options="roleOptions" optionLabel="label" optionValue="value"
+                placeholder="Select Role" class="w-48 selector" @change="onRoleChange" />
+        </div>
+        <div>
+            <label class="w-full text-left text-sm font-semibold mb-1">Trainer</label>
+            <Select v-model="selectedTrainer" :options="trainerOptions" optionLabel="label" optionValue="value"
+                placeholder="Select Trainer" class="w-48 selector" />
+        </div>
+        <Button @click="openTrainerBattleModal">
+            Battle
+        </Button>
+    </Modal>
+
+    <PokemonBattle 
+    v-if="isBattleModalOpen" 
+    :auto-start="true" 
+    :team="selectedPokemonTeam" 
+    :opponent="oppPokemon" 
+    :opp-team="opponentTeam"
+    :isWild="isWildBattle" @end="onBattleEnd" @close="resetBattleDetails" />
 </template>
 
 <script setup>
@@ -454,6 +480,7 @@ import { useInventoryStore } from '@/stores/inventoryStore';
 import { useErrorStore } from '@/stores/errorStore'
 import * as pokemonHelper from "@/assets/helpers/pokemonHelper.js"
 import SelectButton from 'primevue/selectbutton';
+import Select from "primevue/select"
 import paralysisIcon from '@/assets/statusIcons/paralysis.png';
 import sleepIcon from '@/assets/statusIcons/sleep.png';
 import frozenIcon from '@/assets/statusIcons/frozen.png';
@@ -472,6 +499,8 @@ import tms from '@/assets/data/tms.json'
 import evolutionItems from "@/assets/data/evolutionItems.json"
 import megaEvoStones from "@/assets/data/megaEvos.json"
 import expChart from "@/assets/data/levelThresholds.json"
+import gymData from "@/assets/data/trainers.json"
+import * as pokemonApi from "@/api/pokeapi"
 
 // Import Maps
 import overworldMap from '@/assets/data/mapData/map1.json';
@@ -492,15 +521,23 @@ const isPartyModalOpen = ref(false)
 const isPokemonModalOpen = ref(false)
 const isHeldItemModalOpen = ref(false)
 const isUseItemModalOpen = ref(false)
+const isTrainerModalOpen = ref(false)
 
 // Ref values
 const starters = ref({})
-const wildPokemon = ref(null)
 const isGameplayPause = ref(false);
 const isEncounterAnimating = ref(false);
 const selectedPokemon = ref(null)
 const selectedIndex = ref(null)
 const itemTab = ref("recovery")
+const isWildBattle = ref(true)
+const opponentTeam = ref(null)
+const selectedTrainer = ref(null)
+const oppPokemon = ref(null)
+const selectedRegion = ref(null)
+const selectedRole = ref("gym_leaders")
+const selectedPokemonTeam = ref(null)
+const userPokemon = ref(null)
 
 // static values
 const STATUS_ICONS = {
@@ -710,7 +747,7 @@ async function generateWildPokemon() {
         errorStore.SetErrorDetails("Collection Issue", `An error occured trying to generate ${randPoke.name}`)
         return false
     }
-    wildPokemon.value = wildPoke
+    oppPokemon.value = wildPoke
 
     return true
 }
@@ -726,7 +763,7 @@ async function startWildEncounter() {
 
     // 3. Open battle or handle failure
     if (didGen) {
-        openBattleModal();
+        openBattleModal(true);
     } else {
         disableBattleMusic();
         errorStore.SetErrorDetails("Generation Issue", "There was an issue generating the Wild Pokemon.");
@@ -748,6 +785,12 @@ function onBattleEnd() {
     if (!canContinue) {
         handlePartyFainted()
     }
+    // Reset battle values
+    oppPokemon.value = null
+    opponentTeam.value = null
+    selectedTrainer.value = null
+    opponentTeam.value = null
+    selectedPokemon.value = null
 }
 
 function handlePartyFainted() {
@@ -1138,7 +1181,109 @@ function useRecoveryItem(item) {
     }
 }
 
+// Trainer battle section
 
+const regionOptions = Object.keys(gymData).map(region => ({
+    label: region.toUpperCase(),
+    value: region
+}));
+
+const roleOptions = computed(() => {
+    if (!selectedRegion.value) return [];
+
+    const region = gymData[selectedRegion.value];
+    if (!region) return [];
+
+    const roles = [];
+    if (region.gym_leaders) roles.push({ label: 'Gym Leaders', value: 'gym_leaders' });
+    if (region.elite_four) roles.push({ label: 'Elite Four', value: 'elite_four' });
+    if (region.champion) roles.push({ label: 'Champion', value: 'champion' });
+
+    return roles;
+});
+
+function onRegionChange() {
+    selectedRole.value = null;
+    selectedTrainer.value = null
+}
+
+const trainerOptions = computed(() => {
+    if (!selectedRegion.value || !selectedRole.value) return [];
+
+    const rawData = gymData[selectedRegion.value]?.[selectedRole.value];
+    if (!rawData) return [];
+
+    // Champion might be a single object OR an array with 1 item
+    if (selectedRole.value === 'champion') {
+        const championObj = Array.isArray(rawData) ? rawData[0] : rawData;
+        if (!championObj) return [];
+
+        return [{ label: `${championObj.name} (${championObj.type})`, value: championObj }];
+    }
+
+    // Gym Leaders and Elite Four are arrays
+    if (!Array.isArray(rawData)) return [];
+
+    return rawData.map(t => ({
+        label: `${t.name} (${t.type})`,
+        value: t
+    }));
+});
+
+function onRoleChange() {
+    selectedTrainer.value = null;
+}
+
+function openTrainerModal(){
+    clearInputs()
+    isGameplayPause.value = true
+    isTrainerModalOpen.value = true
+
+}
+
+function closeTrainerModal(){
+    isGameplayPause.value = false
+    isTrainerModalOpen.value = false
+}
+
+async function openTrainerBattleModal() {
+    if (!selectedTrainer.value) {
+        errorStore.SetErrorDetails("Selection Issue", `You must select and opponent to battle.`)
+        return
+    }
+
+    // 1. Assign pokemon party
+    selectedPokemonTeam.value = pokemonStore.pokemonParty
+
+    // 2. Hydrate the opponent's team using the 'roster' array + await
+    opponentTeam.value = await pokemonApi.fetchTrainerTeam(selectedTrainer.value.roster)
+
+    // Verify hydration succeeded
+    if (!opponentTeam.value || opponentTeam.value.length < 1) {
+        console.error(`Failed to hydrate opponent team!`)
+        errorStore.SetErrorDetails("Collection Issue", `Unable to collect opponent team details.`)
+        return
+    }
+
+    // 3. Assign active battle fighters
+    userPokemon.value = selectedPokemonTeam.value[0]
+    oppPokemon.value = opponentTeam.value[0]
+    isTrainerModalOpen.value = false
+    isWildBattle.value = false
+    openBattleModal(false)
+}
+
+function resetBattleDetails(){
+    oppPokemon.value = null
+    userPokemon.value = null
+    opponentTeam.value = null
+    isWildBattle.value = true
+    selectedTrainer.value = null
+    selectedRegion.value = null
+    selectedRole.value = null
+    selectedPokemonTeam.value = null
+    userPokemon.value = null
+}
 
 
 // #endregion
@@ -1247,8 +1392,11 @@ function selectMenuOption(option) {
     }
 }
 
-function openBattleModal() {
+function openBattleModal(isWild) {
     clearInputs();
+    if(isWild){
+        isWildBattle.value = true
+    }
     isBattleModalOpen.value = true;
 }
 
@@ -1308,6 +1456,8 @@ function enterBuilding() {
         const spawnX = Math.floor(pokeCenterMap.width / 2);
         const spawnY = pokeCenterMap.height - 2;
         loadMap(pokeCenterMap, 'PokeCenter', spawnX, spawnY);
+    } else if(activeBuildingName.value === "Gym"){
+        openTrainerModal()
     }
 
     closeModals();
@@ -1539,7 +1689,7 @@ function handleNewTileStep(tileX, tileY) {
         // Tall Grass Encounter Roll
         if (isGrassTile(tileX, tileY)) {
             if (Math.random() < ENCOUNTER_CHANCE) {
-                startWildEncounter()
+                startWildEncounter(true)
             }
         }
     }
