@@ -15,9 +15,9 @@ const testGodPokemon = {
     minorStatus: [],
     stats: [
         { name: "hp", stat: 999 },
-        { name: "attack", stat: 10 },
+        { name: "attack", stat: 999 },
         { name: "defense", stat: 999 },
-        { name: "special-attack", stat: 999 },
+        { name: "special-attack", stat: 909 },
         { name: "special-defense", stat: 999 },
         { name: "speed", stat: 999 } // Ensures you always go first
     ],
@@ -32,7 +32,7 @@ const testGodPokemon = {
             maxPP: 99,
         },
         {
-            name: 'rollout', type: 'normal', power: 30,
+            name: 'pass-turn', type: 'normal', power: 0,
             maxPP: 20, currentPP: 20, accuracy: null, priority: 0,
             damageClass: 'physical', targetsSelf: false,
             statChanges: [], statChance: 0,
@@ -42,9 +42,9 @@ const testGodPokemon = {
             category: 'damage'
         },
         {
-            name: 'substitute', type: 'normal', power: null,
-            maxPP: 10, currentPP: 10, accuracy: null, priority: 0,
-            damageClass: 'status', targetsSelf: true,
+            name: 'revival-blessing', type: 'normal', power: 0,
+            maxPP: 40, currentPP: 40, accuracy: null, priority: 0,
+            damageClass: 'status', targetsSelf: false,
             statChanges: [], statChance: 0,
             ailment: null, ailmentChance: 0,
             drain: 0, healing: 0, flinchChance: 0, critRate: 0,
@@ -52,14 +52,14 @@ const testGodPokemon = {
             category: 'unique'
         },
         {
-            name: 'defense-curl', type: 'normal', power: null,
-            maxPP: 40, currentPP: 40, accuracy: null, priority: 0,
-            damageClass: 'status', targetsSelf: true,
-            statChanges: [{ stat: 'defense', change: 1 }], statChance: 0,
+            name: 'guillotine', type: 'normal', power: null,
+            maxPP: 10, currentPP: 10, accuracy: 30, priority: 0,
+            damageClass: 'physical', targetsSelf: false,
+            statChanges: [], statChance: 0,
             ailment: null, ailmentChance: 0,
             drain: 0, healing: 0, flinchChance: 0, critRate: 0,
             minTurns: 0, maxTurns: 0, minHits: null, maxHits: null,
-            category: 'net-good-stats'
+            category: 'ohko'
         },
     ]
 }
@@ -289,14 +289,14 @@ const testCharizard = {
             "maxTurns": 0
         },
         {
-            "name": "slash",
-            "type": "normal",
-            "power": 70,
+            "name": "burn-up",
+            "type": "fire",
+            "power": 130,
             "currentPP": 20,
             "maxPP": 20,
             "accuracy": 100,
             "priority": 0,
-            "damageClass": "physical",
+            "damageClass": "special",
             "targetsSelf": false,
             "statChanges": [],
             "statChance": 0,
@@ -305,7 +305,7 @@ const testCharizard = {
             "drain": 0,
             "healing": 0,
             "flinchChance": 0,
-            "critRate": 1,
+            "critRate": 0,
             "trap": false,
             "minTurns": 0,
             "maxTurns": 0
@@ -371,13 +371,14 @@ const testRayquaza = {
             maxPP: 5
         },
         {
-            name: "dragon-dance",
-            type: "dragon",
-            power: null,
-            accuracy: null,
-            damageClass: "status",
-            currentPP: 20,
-            maxPP: 20
+            name: 'future-sight', type: 'psychic', power: 120,
+            maxPP: 10, currentPP: 10, accuracy: 100, priority: 0,
+            damageClass: 'special', targetsSelf: false,
+            statChanges: [], statChance: 0,
+            ailment: null, ailmentChance: 0,
+            drain: 0, healing: 0, flinchChance: 0, critRate: 0,
+            minTurns: 0, maxTurns: 0, minHits: null, maxHits: null,
+            category: 'unique'
         }
     ]
 };
@@ -573,7 +574,7 @@ export const usePokemonStore = defineStore("pokemonStore", {
 
 
     state: () => ({
-        caughtPokemon: [testBulbasaur, testCharizard, testEevee, testGligar, testGodPokemon],
+        caughtPokemon: [testBulbasaur, testCharizard, testEevee, testGligar, testGodPokemon, testRayquaza],
         pokemonParty: [],
         wishlistPokemon: [],
         typeColors: {
