@@ -110,9 +110,14 @@
                 :style="{ backgroundColor: pokemonStore.typeColors[move.type] }"
                 :disabled="isResolving || move.disabled || move.currentPP == 0
                   || (userPokemon.charging && userPokemon.charging.move.name !== move.name) || (userPokemon.locked && userPokemon.locked.move.name !== move.name) || (userPokemon.bide && userPokemon.bide.move.name !== move.name)
-                  || (userPokemon.minorStatus?.includes('torment') && userPokemon.lastUsedMove?.name == move.name) || isFainted(userPokemon)" @click="battleTurn(move)">
+                  || (userPokemon.minorStatus?.includes('torment') && userPokemon.lastUsedMove?.name == move.name) || isFainted(userPokemon)"
+                @click="battleTurn(move)
+                  || (userPokemon.encore && move.name !== userPokemon.encore.move.name) || (userPokemon.minorStatus?.includes('taunt') && move.damageClass === 'status')">
                 <span class="move-name">{{ move.name }}</span>
                 <span class="move-power">{{ move.currentPP }}/{{ move.maxPP }}</span>
+              </button>
+              <button v-if="allMovesUnusable" class="move-btn" @click="battleTurn(makeStruggle())">
+                Struggle
               </button>
             </div>
             <!-- Mega Evolution Button -->
@@ -348,6 +353,9 @@ const evoOverlay = ref({
   currentMon: null,
   nextEvoMon: null
 })
+const allMovesUnusable = computed(() =>
+  (userPokemon.value?.moves ?? []).every(m => m.currentPP === 0 || m.disabled)
+);
 
 const userPokemon = ref(null);
 const selectedTargetPokemon = ref(null);
@@ -433,7 +441,17 @@ const MINOR_LABEL = {
   ingrain: 'Ingrained', embargo: 'Embargo', 'heal-block': 'Heal Block',
   nightmare: 'Nightmare', torment: 'Torment', infatuation: 'Infatuated',
   disable: 'Disabled', yawn: 'Drowsy', trap: 'Trapped',
-  'no-type-immunity': 'Grounded',
+  'no-type-immunity': 'Grounded', taunt: 'Taunted', curse: 'Cursed',
+  'aqua-ring': 'Aqua Ring', 'magnet-rise': 'Magnet Rise'
+};
+const AILMENT_OVERRIDES = {
+  toxic: 'bad-poison',
+  'smack-down': 'no-type-immunity',
+  'thousand-arrows': 'no-type-immunity',
+  'tri-attack': () => ['burn', 'freeze', 'paralysis'][randInt(0, 2)],
+  'throat-chop': null,   // 'silence' — no sound-move system, drop it
+  'tar-shot': null,
+  telekinesis: null,
 };
 
 function minorDetail(p, s) {
@@ -580,6 +598,7 @@ function isGrounded(pokemon) {
   if (field.value.gravity > 0) return true;
   if (pokemon.minorStatus?.includes('ingrain')) return true;
   if (pokemon.minorStatus?.includes('no-type-immunity')) return true; // smack down
+  if (pokemon.minorStatus?.includes('magnet-rise')) return false;
   return !pokemon.types.includes('flying');
 }
 
@@ -588,6 +607,10 @@ const SELF_KO_MOVES = new Set([
   'self-destruct', 'explosion', 'misty-explosion',
   'memento', 'healing-wish', 'lunar-dance',
 ]);
+
+const FUTURE_MOVES = new Set(['future-sight', 'doom-desire']);
+const futureAttacks = ref({ ally: null, foe: null });  // aimed AT that side
+const wishes = ref({ ally: null, foe: null });         // healing FOR that side
 
 const RECHARGE_MOVES = new Set([
   'hyper-beam', 'giga-impact', 'blast-burn', 'hydro-cannon', 'frenzy-plant',
@@ -598,6 +621,7 @@ const RECHARGE_MOVES = new Set([
 const TWO_TURN_MOVES = {
   // semi-invulnerable — can't be touched during the charge turn
   fly: { message: (n) => `${n} flew up high!`, invulnerable: true },
+  'sky-drop': { message: (n) => `${n} flew up high!`, invulnerable: true },
   bounce: { message: (n) => `${n} sprang up!`, invulnerable: true },
   dig: { message: (n) => `${n} burrowed its way under the ground!`, invulnerable: true },
   dive: { message: (n) => `${n} hid underwater!`, invulnerable: true },
@@ -752,6 +776,12 @@ const VARIABLE_POWER_MOVES = {
     const pp = slot?.currentPP ?? 0;
     return [200, 80, 60, 50][pp] ?? 40;
   },
+
+  'rage-fist': (u) => Math.min(350, 50 * (1 + (u.timesHit ?? 0))),
+  'last-respects': (u) => {
+    const party = sideKey(u) === 'ally' ? team.value : (props.oppTeam ?? []);
+    return 50 * (1 + party.filter(p => p.currentHp <= 0).length);
+  },
 };
 
 const CONDITIONAL_POWER = {
@@ -788,7 +818,7 @@ const UNCOPYABLE = new Set([
   'endure', 'protect', 'feint', 'follow-me', 'helping-hand', 'snatch',
   'thief', 'covet', 'trick', 'switcheroo', 'bestow', 'chatter',
   'sketch', 'mimic', 'quash', 'after-you', 'belch', 'shell-trap',
-  'beak-blast', 'baneful-bunker', 'spiky-shield', "king-s-shield",
+  'beak-blast', 'baneful-bunker', 'spiky-shield', "kings-shield",
 ]);
 
 const NATURE_POWER_BY_TERRAIN = {
@@ -800,7 +830,8 @@ const NATURE_POWER_BY_TERRAIN = {
 const PROTECT_MOVES = {
   protect: 'protect', detect: 'protect',
   'spiky-shield': 'protect', 'baneful-bunker': 'protect',
-  "king-s-shield": 'protect', 'wide-guard': 'protect',
+  "kings-shield": 'protect', 'wide-guard': 'protect',
+  obstruct: 'protect', 'silk-trap': 'protect', 'burning-bulwark': 'protect',
   endure: 'endure',
 };
 const SCREEN_MOVES = {
@@ -861,8 +892,269 @@ const SELF_SWITCH_MOVES = {
   'chilly-reception': { weather: 'snow' }, // pairs with the weather system you just built
 };
 
+const FIRST_TURN_MOVES = new Set(['fake-out', 'first-impression']);
+
 // volatiles Baton Pass hands to the recipient
 const PASSED_VOLATILES = ['confusion', 'leech-seed', 'perish-song', 'ingrain', 'embargo', 'heal-block'];
+
+const STATUS_HANDLERS = {
+  haze: async () => {
+    userPokemon.value.stages = freshStages();
+    foe.value.stages = freshStages();
+    log('All stat changes were eliminated!');
+  },
+
+  'focus-energy': async (user) => {
+    if ((user.critStages ?? 0) >= 2) return failMove(user);
+    user.critStages = 2;
+    log(`${user.name} is getting pumped!`);
+  },
+  'laser-focus': async (user) => {
+    user.critStages = 3;   // guaranteed crit; cleared after the next damaging move
+    log(`${user.name} concentrated intensely!`);
+  },
+
+  encore: async (user, target) => {
+    const last = target.lastUsedMove;
+    if (!last || target.encore || UNCOPYABLE.has(last.name)) return failMove(user);
+    const slot = target.moves?.find(m => m.name === last.name);
+    if (!slot || slot.currentPP === 0) return failMove(user);
+    target.encore = { move: slot, turns: 3 };
+    log(`${target.name} received an encore!`);
+  },
+
+  taunt: async (user, target) => {
+    if (target.minorStatus?.includes('taunt')) return failMove(user);
+    target.minorStatus.push('taunt');
+    target.tauntTurns = 3;
+    log(`${target.name} fell for the taunt!`);
+  },
+
+  curse: async (user, target) => {
+    if (user.types.includes('ghost')) {
+      if (target.minorStatus?.includes('curse')) return failMove(user);
+      user.currentHp = Math.max(0, user.currentHp - Math.floor(user.totalHp / 2));
+      target.minorStatus.push('curse');
+      log(`${user.name} cut its own HP and laid a curse on ${target.name}!`);
+    } else {
+      for (const [stat, change] of [['attack', 1], ['defense', 1], ['speed', -1]]) {
+        const ok = applyStatChange(user, stat, change);
+        if (ok) log(`${user.name}'s ${STAT_LABEL[stat]} ${change > 0 ? 'rose' : 'fell'}!`);
+      }
+    }
+  },
+
+  'belly-drum': async (user) => {
+    const cost = Math.floor(user.totalHp / 2);
+    if (user.currentHp <= cost || user.stages.attack >= 6) return failMove(user);
+    user.currentHp -= cost;
+    user.stages.attack = 6;
+    log(`${user.name} cut its own HP and maximized its Attack!`);
+  },
+
+  'pain-split': async (user, target) => {
+    if (target.substitute > 0) return failMove(user);
+    const avg = Math.floor((user.currentHp + target.currentHp) / 2);
+    user.currentHp = Math.min(user.totalHp, avg);
+    target.currentHp = Math.min(target.totalHp, avg);
+    log('The battlers shared their pain!');
+  },
+
+  wish: async (user) => {
+    const side = sideKey(user);
+    if (wishes.value[side]) return failMove(user);
+    wishes.value[side] = { turnsLeft: 2, amount: Math.floor(user.totalHp / 2), name: user.name };
+    log(`${user.name} made a wish!`);
+  },
+
+  'destiny-bond': async (user) => {
+    user.destinyBond = true;
+    log(`${user.name} is hoping to take its attacker down with it!`);
+  },
+
+  'psych-up': async (user, target) => {
+    user.stages = { ...target.stages };
+    log(`${user.name} copied ${target.name}'s stat changes!`);
+  },
+
+  stockpile: async (user) => {
+    if ((user.stockpile ?? 0) >= 3) return failMove(user);
+    user.stockpile = (user.stockpile ?? 0) + 1;
+    applyStatChange(user, 'defense', 1);
+    applyStatChange(user, 'special-defense', 1);
+    log(`${user.name} stockpiled ${user.stockpile}!`);
+  },
+
+  'mean-look': async (user, target, move) => trapCleanly(user, target, move),
+  block: async (user, target, move) => trapCleanly(user, target, move),
+  'spider-web': async (user, target, move) => trapCleanly(user, target, move),
+
+  'aqua-ring': async (user) => {
+    if (user.minorStatus?.includes('aqua-ring')) return failMove(user);
+    user.minorStatus.push('aqua-ring');
+    log(`${user.name} surrounded itself with a veil of water!`);
+  },
+
+  'magnet-rise': async (user) => {
+    if (user.minorStatus?.includes('magnet-rise')) return failMove(user);
+    user.minorStatus.push('magnet-rise');
+    user.magnetRiseTurns = 5;
+    log(`${user.name} levitated with electromagnetism!`);
+  },
+
+  'topsy-turvy': async (user, target) => {
+    if (!Object.values(target.stages).some(v => v !== 0)) return failMove(user);
+    for (const k in target.stages) target.stages[k] = -target.stages[k];
+    log(`${target.name}'s stat changes were all reversed!`);
+  },
+
+  'heal-bell': async (user) => cureTeam(user),
+  aromatherapy: async (user) => cureTeam(user),
+
+  'court-change': async () => {
+    [sides.value.ally, sides.value.foe] = [sides.value.foe, sides.value.ally];
+    log('The effects of the battlefield were swapped!');
+  },
+
+  'lock-on': async (user, target) => { user.lockOn = true; log(`${user.name} took aim at ${target.name}!`); },
+  'mind-reader': async (user, target) => { user.lockOn = true; log(`${user.name} sensed ${target.name}'s movements!`); },
+
+  spite: async (user, target) => {
+    const last = target.lastUsedMove;
+    const slot = last && target.moves?.find(m => m.name === last.name);
+    if (!slot || slot.currentPP == null || slot.currentPP <= 0) return failMove(user);
+    const cut = Math.min(4, slot.currentPP);
+    slot.currentPP -= cut;
+    log(`${target.name}'s ${prettyName(slot.name)} lost ${cut} PP!`);
+  },
+
+  octolock: async (user, target, move) => trapCleanly(user, target, move),
+
+  refresh: async (user) => {
+    if (!['burn', 'poison', 'bad-poison', 'paralysis'].includes(user.status)) return failMove(user);
+    user.status = null; user.badPoisonTurns = 0;
+    log(`${user.name} became healthy!`);
+  },
+
+  'psycho-shift': async (user, target, move) => {
+    if (!user.status || target.status) return failMove(user);
+    const s = user.status;
+    await inflictStatus(target, s, user, move);   // respects Safeguard, terrain, immunities
+    if (target.status === s) {
+      user.status = null; user.sleepTurns = 0; user.badPoisonTurns = 0;
+      log(`${user.name} shifted its status onto ${target.name}!`);
+    } else failMove(user);
+  },
+
+  acupressure: async (user) => {
+    const open = Object.keys(user.stages).filter(k => user.stages[k] < 6);
+    if (!open.length) return failMove(user);
+    const stat = open[randInt(0, open.length - 1)];
+    applyStatChange(user, stat, 2);
+    log(`${user.name}'s ${STAT_LABEL[stat] ?? stat} sharply rose!`);
+  },
+
+  // --- stat swap family ---
+  'power-swap': async (u, t) => { swapStages(u, t, ['attack', 'special-attack']); log('Attack and Sp. Atk changes were swapped!'); },
+  'guard-swap': async (u, t) => { swapStages(u, t, ['defense', 'special-defense']); log('Defense and Sp. Def changes were swapped!'); },
+  'heart-swap': async (u, t) => { swapStages(u, t, Object.keys(u.stages)); log('All stat changes were swapped!'); },
+  'speed-swap': async (u, t) => {
+    const us = baseStat(u, 'speed'), ts = baseStat(t, 'speed');
+    (u.statOverrides ??= {}).speed = ts;
+    (t.statOverrides ??= {}).speed = us;
+    log('The battlers swapped Speed!');
+  },
+  'power-split': async (u, t) => { splitStats(u, t, ['attack', 'special-attack']); log('The battlers shared their power!'); },
+  'guard-split': async (u, t) => { splitStats(u, t, ['defense', 'special-defense']); log('The battlers shared their protection!'); },
+  'power-trick': async (u) => { u.powerTrick = !u.powerTrick; log(`${u.name} switched its Attack and Defense!`); },
+
+  // --- type changers ---
+  soak: async (u, t) => changeType(u, t, ['water'], 'became Water type'),
+  'magic-powder': async (u, t) => changeType(u, t, ['psychic'], 'became Psychic type'),
+  'forests-curse': async (u, t) => addType(u, t, 'grass'),
+  'trick-or-treat': async (u, t) => addType(u, t, 'ghost'),
+  'reflect-type': async (u, t) => { setTypes(u, [...t.types]); log(`${u.name} copied ${t.name}'s type!`); },
+  camouflage: async (u) => {
+    const map = { electric: 'electric', grassy: 'grass', misty: 'fairy', psychic: 'psychic' };
+    setTypes(u, [map[terrain.value.type] ?? 'normal']);
+    log(`${u.name} transformed its type!`);
+  },
+  conversion: async (u) => {
+    const t = u.moves?.[0]?.type;
+    if (!t) return failMove(u);
+    setTypes(u, [t]);
+    log(`${u.name} became ${t} type!`);
+  },
+  'conversion-2': async (u, t) => {
+    const lastType = t.lastUsedMove?.type;
+    if (!lastType) return failMove(u);
+    const resists = Object.keys(TYPE_CHART).filter(k => (TYPE_CHART[lastType]?.[k] ?? 1) < 1);
+    if (!resists.length) return failMove(u);
+    setTypes(u, [resists[randInt(0, resists.length - 1)]]);
+    log(`${u.name} became ${u.types[0]} type!`);
+  },
+
+  electrify: async (user, target) => {
+    if (target.turn?.hasMoved) return failMove(user);
+    target.turn.electrified = true;
+    log(`${target.name}'s moves were electrified!`);
+  },
+
+  'tidy-up': async (user) => {
+    for (const side of ['ally', 'foe']) for (const k of HAZARD_KEYS) sides.value[side][k] = 0;
+    userPokemon.value.substitute = 0;
+    foe.value.substitute = 0;
+    applyStatChange(user, 'attack', 1);
+    applyStatChange(user, 'speed', 1);
+    log('Tidying up complete! Attack and Speed rose!');
+  },
+
+  'revival-blessing': async (user) => {
+    if (sideKey(user) === 'ally') {
+      if (!team.value.some(p => isFainted(p))) return failMove(user);
+      log('Choose a Pokémon to revive!');
+      const pick = await requestSwitchPick('fainted');
+      pick.currentHp = Math.floor(pick.totalHp / 2);
+      sidePanel.value = 'log';
+      log(`${pick.name} was revived and is ready to fight!`);
+    } else {
+      const pool = props.isWild ? [] : (props.oppTeam ?? []).filter(p => p.currentHp <= 0);
+      if (!pool.length) return failMove(user);
+      const pick = pool[randInt(0, pool.length - 1)];
+      pick.currentHp = Math.floor(pick.totalHp / 2);
+      log(`${foe.value.name} revived ${pick.name}!`);
+    }
+  },
+};
+
+const PROTECT_PUNISH = {
+  'baneful-bunker': async (attacker) => inflictStatus(attacker, 'poison', null, null),
+  'burning-bulwark': async (attacker) => inflictStatus(attacker, 'burn', null, null),
+  obstruct: async (attacker) => {
+    if (applyStatChange(attacker, 'defense', -2)) log(`${attacker.name}'s Defense harshly fell!`);
+  },
+  'silk-trap': async (attacker) => {
+    if (applyStatChange(attacker, 'speed', -1)) log(`${attacker.name}'s Speed fell!`);
+  },
+};
+
+function trapCleanly(user, target, move) {
+  if (target.trapped || target.types.includes('ghost')) return failMove(user);
+  target.trapped = { move: move.name, turns: Infinity, noChip: true };
+  if (!target.minorStatus.includes('trap')) target.minorStatus.push('trap');
+  log(`${target.name} can no longer escape!`);
+}
+
+async function cureTeam(user) {
+  const group = sideKey(user) === 'ally'
+    ? team.value
+    : (props.isWild ? [foe.value] : props.oppTeam ?? [foe.value]);
+  let cured = false;
+  for (const p of group) {
+    if (p.status) { p.status = null; p.sleepTurns = 0; p.badPoisonTurns = 0; cured = true; }
+  }
+  cured ? log('A bell chimed! All status problems were healed!') : failMove(user);
+}
 
 const pendingSwitch = ref(null);   // { side, mode: 'phaze' | 'self', baton, shedSub, escapesWild }
 const awaitingSwitchPick = ref(false);
@@ -930,6 +1222,8 @@ const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 const randInt = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
 
 const hasMegaEvo = ref(false)
+
+const failMove = (user) => { log('But it failed!'); user.turn.moveFailed = true; };
 
 function checkMegaEvo() {
   canMegaEvolve.value = false
@@ -1026,6 +1320,64 @@ async function handleMegaEvo(pokemon) {
   }
 }
 
+// --- type mutation with automatic restore ---
+function setTypes(p, types) {
+  if (!p.originalTypes) p.originalTypes = [...p.types];
+  p.types = types;
+}
+
+// --- base stat resolution (Power Trick / splits / Speed Swap) ---
+function baseStat(p, name) {
+  if (p.powerTrick) {
+    if (name === 'attack') name = 'defense';
+    else if (name === 'defense') name = 'attack';
+  }
+  return p.statOverrides?.[name] ?? p.stats[name];
+}
+
+let teamPickFilter = 'healthy';
+function requestSwitchPick(filter = 'healthy') {
+  teamPickFilter = filter;
+  awaitingSwitchPick.value = true;
+  sidePanel.value = 'team';
+  return new Promise((resolve) => {
+    resolveSwitchPick = (pokemon) => {
+      awaitingSwitchPick.value = false;
+      resolveSwitchPick = null;
+      resolve(pokemon);
+    };
+  });
+}
+
+function effectivePriority(user, move) {
+  let p = move?.priority ?? 0;
+  if (move?.name === 'grassy-glide' && terrain.value.type === 'grassy' && isGrounded(user)) p += 1;
+  return p;
+}
+
+const uproarActive = () =>
+  [userPokemon.value, foe.value].some(p => p?.locked?.move?.name === 'uproar');
+
+function swapStages(u, t, keys) {
+  for (const k of keys) [u.stages[k], t.stages[k]] = [t.stages[k], u.stages[k]];
+}
+function splitStats(u, t, keys) {
+  for (const k of keys) {
+    const avg = Math.floor((baseStat(u, k) + baseStat(t, k)) / 2);
+    (u.statOverrides ??= {})[k] = avg;
+    (t.statOverrides ??= {})[k] = avg;
+  }
+}
+function changeType(u, t, types, msg) {
+  if (t.types.length === types.length && types.every(x => t.types.includes(x))) return failMove(u);
+  setTypes(t, types);
+  log(`${t.name} ${msg}!`);
+}
+function addType(u, t, type) {
+  if (t.types.includes(type)) return failMove(u);
+  setTypes(t, [...t.types, type]);
+  log(`${type} type was added to ${t.name}!`);
+}
 
 function makeCombatant(source) {
   return {
@@ -1033,6 +1385,17 @@ function makeCombatant(source) {
     stages: freshStages(),
     status: null,
     flinched: false,
+    timesHit: 0,
+  };
+}
+
+function makeStruggle() {
+  return {
+    name: 'struggle', type: 'typeless', power: 50, maxPP: null, currentPP: null,
+    accuracy: null, priority: 0, damageClass: 'physical', targetsSelf: false,
+    statChanges: [], statChance: 0, ailment: null, ailmentChance: 0,
+    drain: 0, healing: 0, flinchChance: 0, critRate: 0,
+    minTurns: 0, maxTurns: 0, minHits: null, maxHits: null, category: null,
   };
 }
 
@@ -1162,6 +1525,19 @@ function resetVolatiles(p) {
   p.chain = null;
   p.raging = false;
   p.defenseCurled = false;
+  p.turnsOnField = 0;
+  p.critStages = 0;
+  p.stockpile = 0;
+  p.destinyBond = false;
+  p.encore = null;
+  p.tauntTurns = 0;
+  p.magnetRiseTurns = 0;
+  p.turnsOnField = 0;
+  if (p.originalTypes) { p.types = p.originalTypes; p.originalTypes = null; }
+  p.statOverrides = null;
+  p.powerTrick = false;
+  p.lockOn = false;
+  p.usedMoves = [];
 }
 
 /* ------------------------------------------------------------------ *
@@ -1185,6 +1561,9 @@ function startBattle() {
   weather.value = { type: null, turns: 0 };
   terrain.value = { type: null, turns: 0 };
   echoedVoice.value = { count: 0, lastTurn: -1 };
+  futureAttacks.value = { ally: null, foe: null };
+  wishes.value = { ally: null, foe: null };
+  userPokemon.value.timesHit = 0;
   battleStarted.value = true;
   selectedTargetPokemon.value = userPokemon.value;
   log(`A wild ${foe.value.name} appeared!`);
@@ -1195,6 +1574,7 @@ function endBattle(outcome = 'ended') {
   if (activeMegaPokemon.value || activeTransformPokemon.value) {
     syncBattleForm()
   }
+  resetVolatiles(userPokemon.value)
   battleStarted.value = false;
   isResolving.value = false;
   canMegaEvolve.value = false
@@ -1222,11 +1602,20 @@ async function battleTurn(playerMove, item = null) {
     turnValue++
     let player = userPokemon.value;
     startTurn(player);
+    player.turnsOnField = (player.turnsOnField ?? 0) + 1;
     player.turn.pendingMove = playerMove;
     let wild = foe.value;
     startTurn(wild);
+    wild.turnsOnField = (wild.turnsOnField ?? 0) + 1;
     const wildMove = await pickMove(wild);
     wild.turn.pendingMove = wildMove;
+
+    for (const [mon, mv] of [[player, playerMove], [wild, wildMove]]) {
+      if (mv?.name === 'focus-punch') {
+        log(`${mon.name} is tightening its focus!`);
+        await delay(600);
+      }
+    }
 
     // --- item branch: using an item costs your turn ---
     if (item) {
@@ -1255,6 +1644,7 @@ async function battleTurn(playerMove, item = null) {
       await endOfTurnPerish(player);
       if (await endOfTurn(wild, player)) return;
       if (await endOfTurn(player, wild)) return;
+      await endOfTurnDelayed();
       await endOfTurnField();
 
       player.protecting = null;
@@ -1266,8 +1656,8 @@ async function battleTurn(playerMove, item = null) {
     // --- normal turn: order by speed, ties broken randomly ---
     const playerSpeed = statOf(player, 'speed');
     const wildSpeed = statOf(wild, 'speed');
-    const playerPriority = playerMove?.priority ?? 0;
-    const wildPriority = wildMove?.priority ?? 0;
+    const playerPriority = effectivePriority(player, playerMove) ?? 0;
+    const wildPriority = effectivePriority(wild, wildMove) ?? 0;
     const slower = field.value.trickRoom > 0;
     const playerFirst =
       playerPriority !== wildPriority
@@ -1301,6 +1691,7 @@ async function battleTurn(playerMove, item = null) {
     await endOfTurnPerish(player);
     if (await endOfTurn(wild, player)) return;
     if (await endOfTurn(player, wild)) return;
+    await endOfTurnDelayed();
     await endOfTurnField();
 
     player.protecting = null;
@@ -1335,7 +1726,7 @@ async function battleTurn(playerMove, item = null) {
 }
 
 function statOf(pokemon, name) {
-  const raw = pokemon.stats.find(s => s.name === name)?.stat ?? 1;
+  const raw = baseStat(pokemon, name) ?? 1;
   let value = raw * stageMultiplier(pokemon.stages?.[name] ?? 0);
   if (name === 'attack' && pokemon.status === 'burn') value *= 0.5;
   if (name === 'speed' && pokemon.status === 'paralysis') value *= 0.5;
@@ -1346,12 +1737,13 @@ function statOf(pokemon, name) {
 }
 
 async function pickMove(pokemon) {
-  //const move = await getMove('sand-attack')
-  //let moveInfo = await getMoveData(move)
-  //return moveInfo
+  // const move = await getMove('water-gun')
+  // let moveInfo = await getMoveData(move)
+  // return moveInfo
   if (pokemon.charging) return pokemon.charging.move;
   if (pokemon.locked) return pokemon.locked.move;
   if (pokemon.bide) return pokemon.bide.move;
+  if (pokemon.encore?.move.currentPP > 0) return pokemon.encore.move;
   const moves = pokemon.moves ?? [];
   let disabledMoves = []
   if (pokemon.minorStatus?.includes("torment") && pokemon.lastUsedMove) {
@@ -1360,6 +1752,11 @@ async function pickMove(pokemon) {
   if (pokemon.minorStatus?.includes("disable") && pokemon.lastUsedMove) {
     disabledMoves.push(moves.findIndex(m => m.disabled))
   }
+  moves.forEach((m, i) => {
+    if (m.currentPP != null && m.currentPP <= 0 && !disabledMoves.includes(i)) disabledMoves.push(i);
+    if (pokemon.minorStatus?.includes('taunt') && m.damageClass === 'status') disabledMoves.push(i);
+  });
+  if (disabledMoves.length >= moves.length) return makeStruggle();
   let selectedMoveIndex = getRandomWithExclusions(0, moves.length - 1, disabledMoves);
   return moves[selectedMoveIndex];
 }
@@ -1519,6 +1916,7 @@ async function handleFaint(pokemon) {
   pokemon.mustRecharge = false;
   pokemon.locked = null;
   pokemon.bide = null
+  resetVolatiles(pokemon);
 
   if (activeTransformPokemon.value?.pokemon === pokemon) {
     activeTransformPokemon.value = null;
@@ -1557,6 +1955,7 @@ async function handleFaint(pokemon) {
         const randomIndex = indexes[Math.floor(Math.random() * indexes.length)]
         foe.value = props.oppTeam[randomIndex]
         startTurn(foe.value)
+        foe.value.turnsOnField = 0;
         return true
       }
       else {
@@ -1572,8 +1971,16 @@ async function handleFaint(pokemon) {
   allyFaintedThisTurn.value = true
 
   if (next) {
-    sidePanel.value = 'team';
-    await resolvePendingSwitch()
+    log('Choose your next Pokémon!');
+    const incoming = await requestSwitchPick();
+    userPokemon.value = incoming;
+    if (incoming.currentHp == null) incoming.currentHp = incoming.totalHp;
+    startTurn(incoming);
+    sidePanel.value = 'log';
+    log(`Go, ${incoming.name}!`);
+    await applyHazards(incoming);
+    await handleFaint(incoming);   // hazards can chain-KO — recursion re-prompts or ends the battle
+    incoming.turnsOnField = 0;
     return true;
   }
 
@@ -1643,6 +2050,12 @@ async function useMove(user, target, move, opts = {}) {
     user.disabled = false
     await delay(800);
   }
+  if (user.minorStatus?.includes('taunt') && move.damageClass === 'status') {
+    log(`${user.name} can't use ${prettyName(move.name)} after the taunt!`);
+    user.turn.moveFailed = true;
+    await delay(800);
+    return;
+  }
 
   if (!continuing && !opts.copied && move.currentPP != null) move.currentPP--;
 
@@ -1663,6 +2076,14 @@ async function useMove(user, target, move, opts = {}) {
   } else {
     log(`${user.name} used ${prettyName(move.name)}!`);
     await playAnim(actor, 'lunge', 300);
+  }
+
+  if (user.turn?.electrified && move.type !== 'electric') move = { ...move, type: 'electric' };
+
+  // Last Resort tracking
+  if (!hitsSelf) {
+    if (!user.usedMoves) user.usedMoves = [];
+    if (!user.usedMoves.includes(move.name)) user.usedMoves.push(move.name);
   }
 
   // --- escalating chains: any different move breaks the streak ---
@@ -1719,6 +2140,8 @@ async function useMove(user, target, move, opts = {}) {
   // --- target used protection move
   if (target.protecting === 'protect' && target !== user && !move.targetsSelf) {
     log(`${target.name} protected itself!`);
+    const punish = PROTECT_PUNISH[target.lastUsedMove.name];
+    if (punish && move.damageClass === 'physical') await punish(user, target);
     user.turn.moveFailed = true;
     await delay(800);
     return;
@@ -1744,6 +2167,41 @@ async function useMove(user, target, move, opts = {}) {
     }
   }
 
+  // --- first-turn-only moves ---
+  if (FIRST_TURN_MOVES.has(move.name) && (user.turnsOnField ?? 1) > 1) {
+    log('But it failed!');
+    user.turn.moveFailed = true;
+    await delay(800);
+    return;
+  }
+
+  // --- Sucker Punch
+  if (move.name === 'sucker-punch') {
+    const pending = target.turn?.pendingMove;
+    if (target.turn?.hasMoved || !pending?.power) {
+      log('But it failed!');
+      user.turn.moveFailed = true;
+      await delay(800);
+      return;
+    }
+  }
+
+  // --- Focus Punch
+  if (move.name === 'focus-punch' && user.turn.damageTaken > 0) {
+    log(`${user.name} lost its focus and couldn't move!`);
+    user.turn.moveFailed = true;
+    await delay(800);
+    return;
+  }
+
+  // --- Dream Eater
+  if (move.name === 'dream-eater' && target.status !== 'sleep') {
+    log('But it failed!');
+    user.turn.moveFailed = true;
+    await delay(800);
+    return;
+  }
+
   // --- accuracy (null = never misses) ---
   let accuracy = move.accuracy;
   if (['thunder', 'hurricane'].includes(move.name)) {
@@ -1751,7 +2209,9 @@ async function useMove(user, target, move, opts = {}) {
     else if (weather.value.type === 'sun') accuracy = 50;
   }
   if (move.name === 'blizzard' && ['hail', 'snow'].includes(weather.value.type)) accuracy = null;
-  if (accuracy != null) {
+  if (user.lockOn) {
+    user.lockOn = false;   // guaranteed hit, consumed (works for OHKO moves too)
+  } else if (accuracy != null) {
     if (move.category === 'ohko') {
       if (randInt(1, 100) > accuracy + (user.level - target.level)) {
         log(`${user.name}'s attack missed!`);
@@ -1961,6 +2421,13 @@ async function useMove(user, target, move, opts = {}) {
     return;
   }
 
+  const handler = STATUS_HANDLERS[move.name];
+  if (handler && !hitsSelf) {
+    await handler(user, target, move);
+    await delay(800);
+    return;
+  }
+
   // --- Logic for Hazard Moves
   const hazard = HAZARD_MOVES[move.name];
   if (hazard) {
@@ -2105,6 +2572,26 @@ async function useMove(user, target, move, opts = {}) {
     return
   }
 
+  // --- Logic for Rest ---
+  if (move.name === 'rest') {
+    const blocked =
+      user.currentHp >= user.totalHp ||
+      (terrain.value.type === 'electric' && isGrounded(user)) ||
+      (terrain.value.type === 'misty' && isGrounded(user));
+    if (blocked || uproarActive()) {
+      log('But it failed!');
+      user.turn.moveFailed = true;
+    } else {
+      user.status = 'sleep';
+      user.sleepTurns = 2;
+      user.badPoisonTurns = 0;
+      user.currentHp = user.totalHp;
+      log(`${user.name} slept and became healthy!`);
+    }
+    await delay(800);
+    return;
+  }
+
   // --- Logic for the move Substitute
   if (move.name === 'substitute') {
     const cost = Math.floor(user.totalHp / 4);
@@ -2118,6 +2605,16 @@ async function useMove(user, target, move, opts = {}) {
     }
     await delay(800);
     return;
+  }
+
+  // --- Logic for Spit Up
+  if (move.name === 'spit-up') {
+    if (!(user.stockpile > 0)) { log('But it failed!'); user.turn.moveFailed = true; await delay(800); return; }
+    const n = user.stockpile;
+    user.stockpile = 0;
+    applyStatChange(user, 'defense', -n);
+    applyStatChange(user, 'special-defense', -n);
+    move = { ...move, power: 100 * n };
   }
 
   // --- Logic for weather ball
@@ -2159,6 +2656,64 @@ async function useMove(user, target, move, opts = {}) {
     if (chainStep > 1) {
       log(`${prettyName(move.name)} is building momentum! (${power} power)`);
       await delay(400);
+    }
+  }
+
+  // --- delayed attacks ---
+  if (FUTURE_MOVES.has(move.name) && !hitsSelf) {
+    if (futureAttacks.value[victim]) {
+      log('But it failed!');
+      user.turn.moveFailed = true;
+    } else {
+      futureAttacks.value[victim] = { turnsLeft: 3, move, attacker: user };
+      log(`${user.name} foresaw an attack!`);
+    }
+    await delay(800);
+    return;
+  }
+
+  if (move.name === 'uproar' && target.status === 'sleep') {
+    target.status = null; target.sleepTurns = 0;
+    log(`${target.name} woke up in the uproar!`);
+    await delay(600);
+  }
+
+  // --- conditional-use failures ---
+  if (move.name === 'synchronoise' && !user.types.some(t => target.types.includes(t))) {
+    log("But it failed!"); user.turn.moveFailed = true; await delay(800); return;
+  }
+  if (move.name === 'steel-roller' && !terrain.value.type) {
+    log('But it failed!'); user.turn.moveFailed = true; await delay(800); return;
+  }
+  const TYPE_BURNERS = { 'burn-up': 'fire', 'double-shock': 'electric' };
+  const burnType = TYPE_BURNERS[move.name];
+  if (burnType && !user.types.includes(burnType)) {
+    log('But it failed!'); user.turn.moveFailed = true; await delay(800); return;
+  }
+  if (move.name === 'last-resort') {
+    const others = user.moves?.filter(m => m.name !== 'last-resort') ?? [];
+    if (!others.length || !others.every(m => user.usedMoves?.includes(m.name))) {
+      log('But it failed!'); user.turn.moveFailed = true; await delay(800); return;
+    }
+  }
+
+  // --- party-scaled multi-hits ---
+  if (move.name === 'beat-up') {
+    const party = actor === 'ally' ? team.value : (props.isWild ? [user] : props.oppTeam ?? [user]);
+    const crew = party.filter(p => !isFainted(p) && !p.status);
+    if (!crew.length) { log('But it failed!'); user.turn.moveFailed = true; await delay(800); return; }
+    const per = 5 + Math.floor(crew.reduce((a, p) => a + (p.stats?.attack ?? 50), 0) / crew.length / 10);
+    move = { ...move, power: per, minHits: crew.length, maxHits: crew.length };
+  }
+  if (move.name === 'population-bomb') move = { ...move, minHits: 4, maxHits: 10 };
+
+  const SCREEN_BREAKERS = new Set(['brick-break', 'psychic-fangs', 'raging-bull']);
+  if (SCREEN_BREAKERS.has(move.name) && !hitsSelf) {
+    const s = sides.value[victim];
+    if (s.reflect || s.lightScreen || s.auroraVeil) {
+      s.reflect = s.lightScreen = s.auroraVeil = 0;
+      log('The wall shattered!');
+      await delay(500);
     }
   }
 
@@ -2234,6 +2789,30 @@ async function useMove(user, target, move, opts = {}) {
     }
   }
 
+  // --- effects that trigger on the KO itself ---
+  if (target.currentHp <= 0 && dealt > 0 && !hitsSelf) {
+    if (move.name === 'fell-stinger') {
+      const applied = applyStatChange(user, 'attack', 3);
+      if (applied) { log(`${user.name}'s Attack rose drastically!`); await delay(600); }
+    }
+    if (target.destinyBond) {
+      log(`${target.name} took ${user.name} down with it!`);
+      user.currentHp = 0;
+      await delay(800);
+    }
+  }
+
+  if (['steel-roller', 'ice-spinner'].includes(move.name) && dealt > 0 && terrain.value.type) {
+    log(`The ${terrain.value.type} terrain was destroyed!`);
+    terrain.value = { type: null, turns: 0 };
+    await delay(500);
+  }
+  if (burnType) {
+    setTypes(user, user.types.filter(t => t !== burnType));
+    log(`${user.name} burned itself out!`);
+    await delay(500);
+  }
+
   // fainted — skip every secondary effect
   if (target.currentHp <= 0) return;
 
@@ -2243,7 +2822,7 @@ async function useMove(user, target, move, opts = {}) {
     const chance = move.statChance || 100;
     if (randInt(1, 100) <= chance) {
       const recipient = (move.targetsSelf || /^damage[+-]raise$/.test(move.category)) ? user : target;
-      for (const { stat, change } of statChanges) {
+      for (let { stat, change } of statChanges) {
         const blocked = change < 0
           && recipient !== user
           && sideOf(recipient).mist > 0;
@@ -2255,6 +2834,7 @@ async function useMove(user, target, move, opts = {}) {
           continue;
         }
 
+        change = (move.name === 'growth' && weather.value.type === 'sun') ? change * 2 : change;
         const applied = applyStatChange(recipient, stat, change);
         log(statChangeMessage(recipient.name, stat, applied, change));
         await delay(700);
@@ -2263,12 +2843,27 @@ async function useMove(user, target, move, opts = {}) {
   }
 
   // --- status ailment ---
-  if (move.ailment && !LOCKING_MOVES[move.name]) {
+  let ailment = move.ailment;
+  if (move.name in AILMENT_OVERRIDES) {
+    const o = AILMENT_OVERRIDES[move.name];
+    ailment = typeof o === 'function' ? o() : o;
+  }
+  if (ailment && !LOCKING_MOVES[move.name]) {
     const chance = move.ailmentChance || 100;
     if (randInt(1, 100) <= chance) {
       const recipient = move.targetsSelf ? user : target;
-      await inflictStatus(recipient, move.ailment, move, user);
+      await inflictStatus(recipient, ailment, move, user);
     }
+  }
+
+  if ((user.critStages ?? 0) >= 3) user.critStages = 0;
+
+  // Struggle recoil
+  if (move.name === 'struggle' && dealt > 0) {
+    const recoil = Math.max(1, Math.floor(user.totalHp / 4));
+    user.currentHp = Math.max(0, user.currentHp - recoil);
+    log(`${user.name} is damaged by recoil!`);
+    await delay(600);
   }
 
   // --- drain / recoil ---
@@ -2286,6 +2881,17 @@ async function useMove(user, target, move, opts = {}) {
       log(`${user.name} is hit with ${amount} recoil!`);
     }
     await delay(700);
+  }
+
+  // Logic for Swallow
+  if (move.name === 'swallow') {
+    if (!(user.stockpile > 0)) { log('But it failed!'); user.turn.moveFailed = true; await delay(800); return; }
+    const pct = [null, 25, 50, 100][user.stockpile];
+    const n = user.stockpile;
+    user.stockpile = 0;
+    applyStatChange(user, 'defense', -n);
+    applyStatChange(user, 'special-defense', -n);
+    move = { ...move, healing: pct };
   }
 
   // --- healing ---
@@ -2369,6 +2975,11 @@ function calculateDamage(attacker, defender, move, opts = {}) {
   }
 
   let effectiveness = typeEffectiveness(move.type, defender.types);
+  if (move.type === 'ground') {
+    effectiveness = isGrounded(defender)
+      ? typeEffectiveness('ground', defender.types.filter(t => t !== 'flying'))
+      : 0;
+  }
   const grounded = defender.minorStatus?.includes('no-type-immunity') || (move.type === 'ground' && defender.minorStatus?.includes('ingrain'))
     || (field.value.gravity > 0 && (move.type === 'ground' && defender.types.includes('flying')));
   if (grounded && effectiveness == 0) effectiveness = 1
@@ -2411,7 +3022,7 @@ function calculateDamage(attacker, defender, move, opts = {}) {
 }
 
 function rawStat(pokemon, name) {
-  const raw = pokemon.stats.find(s => s.name === name)?.stat ?? 1;
+  const raw = baseStat(pokemon, name) ?? 1;
   let value = raw;
   if (name === 'attack' && pokemon.status === 'burn') value *= 0.5;
   if (name === 'special-defense' && weather.value.type === 'sandstorm' && pokemon.types.includes('rock')) value *= 1.5;
@@ -2433,6 +3044,7 @@ function weatherDamageMod(move) {
     if (move.type === 'water') return 1.5;
     if (move.type === 'fire') return 0.5;
   }
+  if (w === 'sun' && move.name === 'hydro-steam') return 1.5;
   if (w === 'sun') {
     if (move.type === 'fire') return 1.5;
     if (move.type === 'water') return 0.5;
@@ -2446,6 +3058,7 @@ function terrainDamageMod(move, attacker, defender) {
   const t = terrain.value.type;
   if (!t) return 1;
   if (t === 'electric' && move.type === 'electric' && isGrounded(attacker)) return 1.3;
+  if (t === 'electric' && move.name === 'psyblade') return 1.5;
   if (t === 'grassy') {
     if (move.type === 'grass' && isGrounded(attacker)) return 1.3;
     if (['earthquake', 'magnitude', 'bulldoze'].includes(move.name)) return 0.5;
@@ -2466,6 +3079,7 @@ function recordDamage(target, move, amount) {
     const applied = applyStatChange(target, 'attack', 1);
     if (applied) log(`${target.name}'s rage is building!`);
   }
+  if (amount > 0) target.timesHit = (target.timesHit ?? 0) + 1;
   target.turn.damageTaken += amount;
   target.turn.wasHit = true;
   target.turn.lastDamageTaken = amount;
@@ -2544,6 +3158,12 @@ async function inflictStatus(target, ailment, move, user) {
   if (MAJOR_STATUSES.has(ailment)) {
     if (target.status) {
       log(`But ${target.name} is already ${target.status}!`);
+      user.turn.moveFailed = true;
+      await delay(700);
+      return;
+    }
+    if (ailment === 'sleep' && uproarActive()) {
+      log(`But the uproar kept the ${target.name} awake!`);
       user.turn.moveFailed = true;
       await delay(700);
       return;
@@ -2769,17 +3389,17 @@ function applyBatonPayload(p, payload) {
 }
 
 // same promise pattern as your openReplaceMoveModal
-function requestSwitchPick() {
-  awaitingSwitchPick.value = true;
-  sidePanel.value = 'team';
-  return new Promise((resolve) => {
-    resolveSwitchPick = (pokemon) => {
-      awaitingSwitchPick.value = false;
-      resolveSwitchPick = null;
-      resolve(pokemon);
-    };
-  });
-}
+// function requestSwitchPick() {
+//   awaitingSwitchPick.value = true;
+//   sidePanel.value = 'team';
+//   return new Promise((resolve) => {
+//     resolveSwitchPick = (pokemon) => {
+//       awaitingSwitchPick.value = false;
+//       resolveSwitchPick = null;
+//       resolve(pokemon);
+//     };
+//   });
+// }
 
 /** Resolves any queued switch. Returns true if the battle ended / turn should stop. */
 async function resolvePendingSwitch(skipTurn = null) {
@@ -2877,22 +3497,78 @@ async function endOfTurn(target, reciver) {
     target.embargoTurns = null
     log(`${target.name}'s embargo has ended`)
   }
+  if (target.encore && --target.encore.turns <= 0) {
+    target.encore = null;
+    log(`${target.name}'s encore ended!`);
+  }
+  if (target.tauntTurns > 0 && --target.tauntTurns <= 0) {
+    target.minorStatus = target.minorStatus.filter(s => s !== 'taunt');
+    log(`${target.name}'s taunt wore off!`);
+  }
+  if (target.trapped?.move === 'octolock') {
+    const a = applyStatChange(target, 'defense', -1);
+    const b = applyStatChange(target, 'special-defense', -1);
+    if (a || b) { log(`${target.name}'s defenses are being squeezed!`); await delay(600); }
+  }
+  if (target.magnetRiseTurns > 0 && --target.magnetRiseTurns <= 0) {
+    target.minorStatus = target.minorStatus.filter(s => s !== 'magnet-rise');
+    log(`${target.name}'s electromagnetism wore off!`);
+  }
   return false
 }
 
 async function endOfTurnDamage(pokemon) {
   if (pokemon.currentHp <= 0) return;
+
+  // --- nightmare: only while asleep; ends on waking ---
   if (pokemon.minorStatus?.includes('nightmare')) {
-    log(`${pokemon.name} is locked in a nightmare!`);
-    const nightmareDamage = Math.max(1, Math.floor(pokemon.totalHp * (1 / 4)));
-    pokemon.currentHp = Math.max(0, pokemon.currentHp - nightmareDamage);
-    await delay(800)
+    if (pokemon.status === 'sleep') {
+      log(`${pokemon.name} is locked in a nightmare!`);
+      const dmg = Math.max(1, Math.floor(pokemon.totalHp / 4));
+      pokemon.currentHp = Math.max(0, pokemon.currentHp - dmg);
+      await delay(800);
+    } else {
+      pokemon.minorStatus = pokemon.minorStatus.filter(s => s !== 'nightmare');
+    }
   }
-  const chip = { burn: 1 / 16, poison: 1 / 8, 'bad-poison': 1 / 8 }[pokemon.status];
+  if (pokemon.currentHp <= 0) return;
+
+  // --- curse ---
+  if (pokemon.minorStatus?.includes('curse')) {
+    const dmg = Math.max(1, Math.floor(pokemon.totalHp / 4));
+    pokemon.currentHp = Math.max(0, pokemon.currentHp - dmg);
+    log(`${pokemon.name} is afflicted by the curse!`);
+    await delay(700);
+  }
+  if (pokemon.currentHp <= 0) return;
+
+  // --- trap chip + countdown (Bind/Wrap/etc.) ---
+  // mean-look/block/spider-web set noChip: they hold without hurting
+  if (pokemon.trapped) {
+    if (!pokemon.trapped.noChip) {
+      const dmg = Math.max(1, Math.floor(pokemon.totalHp / 8));
+      pokemon.currentHp = Math.max(0, pokemon.currentHp - dmg);
+      log(`${pokemon.name} is hurt by ${prettyName(pokemon.trapped.move)}!`);
+      await delay(800);
+    }
+    if (Number.isFinite(pokemon.trapped.turns) && --pokemon.trapped.turns <= 0) {
+      log(`${pokemon.name} was freed from ${prettyName(pokemon.trapped.move)}!`);
+      pokemon.trapped = null;
+      pokemon.minorStatus = pokemon.minorStatus.filter(s => s !== 'trap');
+    }
+  }
+  if (pokemon.currentHp <= 0) return;
+
+  // --- status chip ---
+  let chip = { burn: 1 / 16, poison: 1 / 8 }[pokemon.status];
+  if (pokemon.status === 'bad-poison') {
+    pokemon.badPoisonTurns = Math.min(15, (pokemon.badPoisonTurns ?? 0) + 1);
+    chip = pokemon.badPoisonTurns / 16;   // 1/16, 2/16, 3/16...
+  }
   if (!chip) return;
   const amount = Math.max(1, Math.floor(pokemon.totalHp * chip));
   pokemon.currentHp = Math.max(0, pokemon.currentHp - amount);
-  log(`${pokemon.name} is hurt by its ${pokemon.status}!`);
+  log(`${pokemon.name} is hurt by ${pokemon.status === 'bad-poison' ? 'poison' : `its ${pokemon.status}`}!`);
   await delay(800);
 }
 
@@ -2960,7 +3636,7 @@ async function endOfTurnPerish(pokemon) {
 }
 
 async function endOfTurnIngrain(pokemon) {
-  if (!pokemon.minorStatus?.includes('ingrain')) return;
+  if (!pokemon.minorStatus?.includes('ingrain') || !pokemon.minorStatus?.includes('aqua-ring')) return;
   if (pokemon.currentHp <= 0) return;
 
   if (isHealBlocked(pokemon)) {
@@ -3020,6 +3696,47 @@ async function endOfTurnGrassy(pokemon) {
   pokemon.currentHp = Math.min(pokemon.totalHp, pokemon.currentHp + amount);
   log(`${pokemon.name} was healed by the grassy terrain! (+${pokemon.currentHp - before} HP)`);
   await delay(800);
+}
+
+async function endOfTurnFuture(side) {
+  const fa = futureAttacks.value[side];
+  console.log(fa)
+  if (!fa || --fa.turnsLeft > 0) return;
+  console.log("test")
+  futureAttacks.value[side] = null;
+  const target = side === 'ally' ? userPokemon.value : foe.value;
+  if (!target || isFainted(target)) return;
+  log(`${target.name} took the ${prettyName(fa.move.name)} attack!`);
+  const results = calculateDamage(fa.attacker, target, fa.move, {});
+  if (results.immune) { log('It had no effect...'); await delay(700); return; }
+  if (target.substitute > 0) {
+    target.substitute = Math.max(0, target.substitute - results.damage);
+    log(target.substitute > 0 ? 'The substitute took the hit!' : "The substitute broke!");
+  } else {
+    const dealt = Math.min(results.damage, target.currentHp);
+    target.currentHp -= dealt;
+    recordDamage(target, fa.move, dealt);
+  }
+  await delay(800);
+  await handleFaint(target);
+}
+
+async function endOfTurnWish(side) {
+  const w = wishes.value[side];
+  if (!w || --w.turnsLeft > 0) return;
+  wishes.value[side] = null;
+  const p = side === 'ally' ? userPokemon.value : foe.value;
+  if (!p || isFainted(p) || p.currentHp >= p.totalHp || isHealBlocked(p)) return;
+  p.currentHp = Math.min(p.totalHp, p.currentHp + w.amount);
+  log(`${w.name}'s wish came true!`);
+  await delay(700);
+}
+
+async function endOfTurnDelayed() {
+  await endOfTurnFuture('foe');
+  await endOfTurnFuture('ally');
+  await endOfTurnWish('foe');
+  await endOfTurnWish('ally');
 }
 
 /* ------------------------------------------------------------------ *
@@ -3160,8 +3877,11 @@ function checkPokemonFlees(pokemon) {
 async function switchActivePokemon(pokemon) {
   // mid-turn pick for U-turn / Baton Pass / etc.
   if (awaitingSwitchPick.value) {
-    if (isFainted(pokemon)) return;
-    if (pokemon.instanceId === userPokemon.value?.instanceId) return;
+    if (teamPickFilter === 'fainted') {
+      if (!isFainted(pokemon)) return;
+    } else {
+      if (isFainted(pokemon) || pokemon.instanceId === userPokemon.value?.instanceId) return;
+    }
     resolveSwitchPick?.(pokemon);
     return;
   }
@@ -3217,6 +3937,7 @@ async function switchActivePokemon(pokemon) {
     await endOfTurnPerish(pokemon);
     if (await endOfTurn(foe.value, pokemon)) return;
     if (await endOfTurn(pokemon, foe.value)) return;
+    await endOfTurnDelayed();
     await endOfTurnField();
   } finally {
     isResolving.value = false;
