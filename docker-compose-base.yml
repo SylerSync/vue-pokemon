@@ -1,0 +1,5 @@
+services:
+  pokevue-frontend:
+    restart: always
+    image: pokevue-frontend-img
+    build: .

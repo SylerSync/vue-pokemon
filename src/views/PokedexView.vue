@@ -11,6 +11,7 @@ import InputGroupAddon from 'primevue/inputgroupaddon';
 import Search from '@primeicons/vue/search';
 import { Checkbox } from 'primevue';
 import Select from 'primevue/select';
+import * as PokemonAPI from '@/api/PokemonAPI';
 import { getIndex } from '@/api/pokeapi.js';
 import { getPokemon } from '@/api/pokeapi.js';
 import { getPokemonByGen } from '@/api/pokeapi.js';
@@ -26,16 +27,16 @@ const text1 = ref(null);
 const selectedRegion = ref(null);
 const showModal = ref(false);
 const regions = ref([
-    { region: "All", gen: 0 },
-    { region: "Kanto", gen: 1 },
-    { region: "Johto", gen: 2 },
-    { region: "Hoenn", gen: 3 },
-    { region: "Sinnoh", gen: 4 },
-    { region: "Unova", gen: 5 },
-    { region: "Kalos", gen: 6 },
-    { region: "Alola", gen: 7 },
-    { region: "Galar", gen: 8 },
-    { region: "Paldea", gen: 9 }
+  { region: "All", gen: 0 },
+  { region: "Kanto", gen: 1 },
+  { region: "Johto", gen: 2 },
+  { region: "Hoenn", gen: 3 },
+  { region: "Sinnoh", gen: 4 },
+  { region: "Unova", gen: 5 },
+  { region: "Kalos", gen: 6 },
+  { region: "Alola", gen: 7 },
+  { region: "Galar", gen: 8 },
+  { region: "Paldea", gen: 9 }
 ]);
 const pokemonStore = usePokemonStore();
 const showWishListed = ref(false);
@@ -44,13 +45,13 @@ const showCaught = ref(false);
 // let bgmTrack = null;
 
 function toggleModal() {
-    showModal.value = !showModal.value;
+  showModal.value = !showModal.value;
 }
 
 function wishList() {
-    if (selectedPokemon.value) {
-        pokemonStore.addWishlistPokemon(selectedPokemon.value);
-    }
+  if (selectedPokemon.value) {
+    pokemonStore.addWishlistPokemon(selectedPokemon.value);
+  }
 }
 
 function checkWishList(name) {
@@ -58,34 +59,39 @@ function checkWishList(name) {
 }
 
 async function selectPokemon(pokemon) {
-    isLoading.value = true;
-    // trys to get both the pokemon's species and individual information based off the name
-    try {
+  isLoading.value = true;
+  // trys to get both the pokemon's species and individual information based off the name
+  try {
+    const res1 = await getPokemon(pokemon);
+    const res2 = await getSpecies(pokemon);
+    selectedPokemon.value = { ...res1, ...res2 };
+  } catch {
+    // if recalling the information fails try to get information by remove text after the -
+    // This is for fixing the issue where "PokemonName"-"Form" is the provided name which getSpecies returns null for
+    if (pokemon.includes("-")) {
+      let name = pokemon.split('-')[0];
+      try {
         const res1 = await getPokemon(pokemon);
-        const res2 = await getSpecies(pokemon);
+        const res2 = await getSpecies(name);
         selectedPokemon.value = { ...res1, ...res2 };
-    } catch {
-      // if recalling the information fails try to get information by remove text after the -
-      // This is for fixing the issue where "PokemonName"-"Form" is the provided name which getSpecies returns null for
-      if(pokemon.includes("-")){
-        let name = pokemon.split('-')[0];
-        try {
-            const res1 = await getPokemon(pokemon);
-            const res2 = await getSpecies(name);
-            selectedPokemon.value = { ...res1, ...res2 };
-        } catch {
+      } catch {
 
-        }
       }
-    } finally {
-        isLoading.value = false;
     }
+  } finally {
+    isLoading.value = false;
+  }
 }
 
-onMounted(() => {
-    getIndex().then(results => {
-    allPokemon.value = results.results;
-    });
+onMounted(async () => {
+  try {
+    allPokemon.value = await PokemonAPI.getIndex()
+  } catch (ex) {
+    console.log(`Failed to load list, using PokeAPI fallback: ${ex}`)
+    const results = await getIndex()
+    allPokemon.value = results.results
+  }
+  pokemon.value = allPokemon.value
 });
 
 const pokemonList = computed(() => {
@@ -106,22 +112,22 @@ const pokemonList = computed(() => {
     filteredPokemon = filteredPokemon.filter(p => p.caught)
   }
   if (text1.value) {
-      filteredPokemon = filteredPokemon.filter(p => p.name.includes(text1.value));
+    filteredPokemon = filteredPokemon.filter(p => p.name.includes(text1.value));
   }
-  
+
   // console.log(filteredPokemon)
   return filteredPokemon;
 });
 
 watchEffect(() => {
-    //Because region information isn't stored in the pokemon list. When filtered 
-    // by region a new api call is run to grab the list of pokemon from the selected region
-    if (selectedRegion.value && selectedRegion.value.gen != 0) {
-      getPokemonByGen(selectedRegion.value.gen).then(results => {
-          pokemon.value = results.pokemon_species;
-      });
+  //Because region information isn't stored in the pokemon list. When filtered 
+  // by region a new api call is run to grab the list of pokemon from the selected region
+  if (selectedRegion.value && selectedRegion.value.gen != 0) {
+    getPokemonByGen(selectedRegion.value.gen).then(results => {
+      pokemon.value = results.pokemon_species;
+    });
   } else {
-      pokemon.value = allPokemon.value;
+    pokemon.value = allPokemon.value;
   }
 });
 
@@ -147,101 +153,111 @@ watchEffect(() => {
 </script>
 
 <template>
-    <Modal v-if="showModal" @close="toggleModal">
-      <div class="flex justify-center">
-        <Card class="pokemon-card">
-            <template #title>
-              <span class="name">{{ selectedPokemon.name }}</span>
-              <span class="dex-no">#{{ String(selectedPokemon.id).padStart(4, '0') }}</span>
-            </template>
-            <template #subtitle>
-              <div class="types">
-                <span v-for="type in selectedPokemon.types" :key="type" class="type-chip"> | {{type.type.name}} </span>
-              </div>
-            </template>
-            <template #content>
-                  <dl class="measures">
-                      <div>                      
-                        <dt>Height</dt>
-                        <dd>{{ selectedPokemon.height }} m</dd>
-                      </div>
-                      <div>
-                        <dt>Weight</dt>
-                        <dd>{{ selectedPokemon.weight }} kgs</dd>
-                      </div>
-                  </dl>
-                  <section class="block">
-                      <h3>Abilities</h3>
-                      <ul class="abilities">
-                        <li v-for="ability in selectedPokemon.abilities" :key="ability.ability.name">{{ability.ability.name}}</li>
-                      </ul>
-                  </section>
-                  <section class="block">
-                      <h3>Base Stats</h3>
-                      <div v-for="stat in selectedPokemon.stats" :key="stat.stat.name">
-                        <span class="stat-name">{{stat.stat.name}}: </span>
-                        <span class="stat-value">{{stat.base_stat}}</span>
-                        </div>
-                  </section>
-            </template>
-        </Card>
-    </div>
-        <!-- <button label="Cry" class="w-full" @click="PlayCry(selectPokemon.cries.latest)" /> -->
-    </Modal>
-
-    <Splitter class="pokedex">
-        <SplitterPanel :size="25" :minSize="15" class="list-panel"> 
-            <div class="list-header">
-                <span>Pokedex</span>
-                <div class="space-y-4 max-w-xs mx-auto">
-                    <InputGroup>
-                        <InputGroupAddon>
-                            <Search />
-                        </InputGroupAddon>
-                        <InputText v-model="text1" placeholder="Search" />
-                        <Select v-model="selectedRegion" :options="regions" optionLabel="region" placeholder="Region" class="w-full md:w-56 name" />
-                        <InputGroupAddon>
-                            <span class="name">Wish <Checkbox v-model="showWishListed" :binary="true" /></span>
-                        </InputGroupAddon>
-                        <InputGroupAddon>
-                            <span class="name">Caught <Checkbox v-model="showCaught" :binary="true" /></span>
-                        </InputGroupAddon>
-                    </InputGroup>
-                </div>
+  <Modal v-if="showModal" @close="toggleModal">
+    <div class="flex justify-center">
+      <Card class="pokemon-card">
+        <template #title>
+          <span class="name">{{ selectedPokemon.name }}</span>
+          <span class="dex-no">#{{ String(selectedPokemon.id).padStart(4, '0') }}</span>
+        </template>
+        <template #subtitle>
+          <div class="types">
+            <span v-for="type in selectedPokemon.types" :key="type" class="type-chip"> | {{ type.type.name }} </span>
+          </div>
+        </template>
+        <template #content>
+          <dl class="measures">
+            <div>
+              <dt>Height</dt>
+              <dd>{{ selectedPokemon.height }} m</dd>
             </div>
-            <VirtualScroller :items="pokemonList" :itemSize="44" class="list-scroller">
-                <template v-slot:item="{ item }">
-                    <div @click="selectPokemon(item.name)" class="list-row" :class="{selected: selectedPokemon?.name == item.name}">
-                      <span v-if="item.caught"><img src="../assets/pokeball.png" alt="(Caught)" class="marker">&nbsp;</span>
-                      <span v-if="item.wishList" class="star">&#9734;&nbsp;</span>
-                       <span class="name">{{ item.name }}</span>
-                    </div>
-                </template>
-            </VirtualScroller>
-        </SplitterPanel>
-        <SplitterPanel class="detail-panel" :size="75"> 
-            <Card v-if="selectedPokemon" class="detail-card">
-                <template #header>
-                    <div class="art">
-                        <img v-if="selectedPokemon" :alt="selectedPokemon.name" :src="selectedPokemon.sprites.other['official-artwork'].front_default" />
-                    </div>
-                </template>
-                <template #title><span class="name">{{ selectedPokemon.name }}</span></template>
-                <template #subtitle><span v-for="type in selectedPokemon.types" :key="type" class="name"> | {{type.type.name}} </span></template>
-                <template #content>
-                    <p class="m-0">
-                        {{ selectedPokemon.flavor_text_entries.find(entry => entry.language.name === 'en')?.flavor_text.replaceAll("", " ") || 'No dex entry available.' }}
-                    </p>
-                </template>
-                <template #footer>
-                    <div class="flex gap-3 mt-1">
-                        <Button label="Details" class="w-full" @click="toggleModal" />
-                        <Button v-if="!checkWishList(selectedPokemon.name)" label="Whishlist" class="w-full" @click="wishList" />
-                    </div>
-                </template>
-            </Card>
-        </SplitterPanel>
-    </Splitter>
+            <div>
+              <dt>Weight</dt>
+              <dd>{{ selectedPokemon.weight }} kgs</dd>
+            </div>
+          </dl>
+          <section class="block">
+            <h3>Abilities</h3>
+            <ul class="abilities">
+              <li v-for="ability in selectedPokemon.abilities" :key="ability.ability.name">{{ ability.ability.name }}
+              </li>
+            </ul>
+          </section>
+          <section class="block">
+            <h3>Base Stats</h3>
+            <div v-for="stat in selectedPokemon.stats" :key="stat.stat.name">
+              <span class="stat-name">{{ stat.stat.name }}: </span>
+              <span class="stat-value">{{ stat.base_stat }}</span>
+            </div>
+          </section>
+        </template>
+      </Card>
+    </div>
+    <!-- <button label="Cry" class="w-full" @click="PlayCry(selectPokemon.cries.latest)" /> -->
+  </Modal>
+
+  <Splitter class="pokedex">
+    <SplitterPanel :size="25" :minSize="15" class="list-panel">
+      <div class="list-header">
+        <span>Pokedex</span>
+        <div class="space-y-4 max-w-xs mx-auto">
+          <InputGroup>
+            <InputGroupAddon>
+              <Search />
+            </InputGroupAddon>
+            <InputText v-model="text1" placeholder="Search" />
+            <Select v-model="selectedRegion" :options="regions" optionLabel="region" placeholder="Region"
+              class="w-full md:w-56 name" />
+            <InputGroupAddon>
+              <span class="name">Wish
+                <Checkbox v-model="showWishListed" :binary="true" />
+              </span>
+            </InputGroupAddon>
+            <InputGroupAddon>
+              <span class="name">Caught
+                <Checkbox v-model="showCaught" :binary="true" />
+              </span>
+            </InputGroupAddon>
+          </InputGroup>
+        </div>
+      </div>
+      <VirtualScroller :items="pokemonList" :itemSize="44" class="list-scroller">
+        <template v-slot:item="{ item }">
+          <div @click="selectPokemon(item.name)" class="list-row"
+            :class="{ selected: selectedPokemon?.name == item.name }">
+            <span v-if="item.caught"><img src="../assets/pokeball.png" alt="(Caught)" class="marker">&nbsp;</span>
+            <span v-if="item.wishList" class="star">&#9734;&nbsp;</span>
+            <span class="name">{{ item.name }}</span>
+          </div>
+        </template>
+      </VirtualScroller>
+    </SplitterPanel>
+    <SplitterPanel class="detail-panel" :size="75">
+      <Card v-if="selectedPokemon" class="detail-card">
+        <template #header>
+          <div class="art">
+            <img v-if="selectedPokemon" :alt="selectedPokemon.name"
+              :src="selectedPokemon.sprites.other['official-artwork'].front_default" />
+          </div>
+        </template>
+        <template #title><span class="name">{{ selectedPokemon.name }}</span></template>
+        <template #subtitle><span v-for="type in selectedPokemon.types" :key="type" class="name"> | {{ type.type.name }}
+          </span></template>
+        <template #content>
+          <p class="m-0">
+            {{selectedPokemon.flavor_text_entries.find(entry => entry.language.name ===
+              'en')?.flavor_text.replaceAll("", " ") || 'No dex entry available.'}}
+          </p>
+        </template>
+        <template #footer>
+          <div class="flex gap-3 mt-1">
+            <Button label="Details" class="w-full" @click="toggleModal" />
+            <Button v-if="!checkWishList(selectedPokemon.name)" label="Whishlist" class="w-full" @click="wishList" />
+          </div>
+        </template>
+      </Card>
+    </SplitterPanel>
+  </Splitter>
 </template>
 
 <style scoped>
@@ -342,7 +358,7 @@ watchEffect(() => {
   overflow: hidden;
 }
 
-.measures > div {
+.measures>div {
   padding: 0.75rem 1rem;
   background: var(--p-content-background);
 }
@@ -363,7 +379,7 @@ watchEffect(() => {
 }
 
 /* ---- blocks ---- */
-.block + .block {
+.block+.block {
   margin-top: 1.5rem;
 }
 

@@ -15,4 +15,14 @@ export default defineConfig({
       '@': fileURLToPath(new URL('./src', import.meta.url)),
     },
   },
+  // Connection to the api
+  server: {
+    proxy: {
+      '/api': {
+        target: 'https://localhost:7139',
+        changeOrigin: true,
+        secure: false,   // accepts the self-signed dev cert
+      },
+    },
+  },
 })
