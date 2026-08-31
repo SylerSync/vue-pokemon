@@ -60,27 +60,7 @@ function checkWishList(name) {
 
 async function selectPokemon(pokemon) {
   isLoading.value = true;
-  // trys to get both the pokemon's species and individual information based off the name
-  try {
-    const res1 = await getPokemon(pokemon);
-    const res2 = await getSpecies(pokemon);
-    selectedPokemon.value = { ...res1, ...res2 };
-  } catch {
-    // if recalling the information fails try to get information by remove text after the -
-    // This is for fixing the issue where "PokemonName"-"Form" is the provided name which getSpecies returns null for
-    if (pokemon.includes("-")) {
-      let name = pokemon.split('-')[0];
-      try {
-        const res1 = await getPokemon(pokemon);
-        const res2 = await getSpecies(name);
-        selectedPokemon.value = { ...res1, ...res2 };
-      } catch {
-
-      }
-    }
-  } finally {
-    isLoading.value = false;
-  }
+  selectedPokemon.value = pokemonList.value.find(p => p.name === pokemon)
 }
 
 onMounted(async () => {
@@ -162,7 +142,7 @@ watchEffect(() => {
         </template>
         <template #subtitle>
           <div class="types">
-            <span v-for="type in selectedPokemon.types" :key="type" class="type-chip"> | {{ type.type.name }} </span>
+            <span v-for="type in selectedPokemon.types" :key="type" class="type-chip"> | {{ type }} </span>
           </div>
         </template>
         <template #content>
@@ -176,18 +156,25 @@ watchEffect(() => {
               <dd>{{ selectedPokemon.weight }} kgs</dd>
             </div>
           </dl>
-          <section class="block">
-            <h3>Abilities</h3>
-            <ul class="abilities">
-              <li v-for="ability in selectedPokemon.abilities" :key="ability.ability.name">{{ ability.ability.name }}
-              </li>
-            </ul>
-          </section>
+          <div v-if="selectedPokemon.evolutionReqs.length > 0">
+            <section class="block">
+              <ul class="abilities" v-for="evo in selectedPokemon.evolutionReqs" :key="evo">
+                <li v-if="evo.nextEvo">Evolution: {{ evo.nextEvo }}
+                </li>
+                <li v-if="evo.level">Level: {{ evo.level }}
+                </li>
+                <li v-if="evo.item">Item: {{ evo.item }}
+                </li>
+                <li v-if="evo.heldItem">Held Item: {{ evo.heldItem }}
+                </li>
+              </ul>
+            </section>
+          </div>
           <section class="block">
             <h3>Base Stats</h3>
-            <div v-for="stat in selectedPokemon.stats" :key="stat.stat.name">
-              <span class="stat-name">{{ stat.stat.name }}: </span>
-              <span class="stat-value">{{ stat.base_stat }}</span>
+            <div v-for="stat in selectedPokemon.stats" :key="stat">
+              <span class="stat-name">{{ stat.name }}: </span>
+              <span class="stat-value">{{ stat.baseStat }}</span>
             </div>
           </section>
         </template>
@@ -236,17 +223,15 @@ watchEffect(() => {
       <Card v-if="selectedPokemon" class="detail-card">
         <template #header>
           <div class="art">
-            <img v-if="selectedPokemon" :alt="selectedPokemon.name"
-              :src="selectedPokemon.sprites.other['official-artwork'].front_default" />
+            <img v-if="selectedPokemon" :alt="selectedPokemon.name" :src="selectedPokemon.sprites.front" />
           </div>
         </template>
         <template #title><span class="name">{{ selectedPokemon.name }}</span></template>
-        <template #subtitle><span v-for="type in selectedPokemon.types" :key="type" class="name"> | {{ type.type.name }}
+        <template #subtitle><span v-for="type in selectedPokemon.types" :key="type" class="name"> | {{ type }}
           </span></template>
         <template #content>
           <p class="m-0">
-            {{selectedPokemon.flavor_text_entries.find(entry => entry.language.name ===
-              'en')?.flavor_text.replaceAll("", " ") || 'No dex entry available.'}}
+            {{ selectedPokemon.flavorText || 'No dex entry available.' }}
           </p>
         </template>
         <template #footer>
