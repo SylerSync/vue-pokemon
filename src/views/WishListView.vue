@@ -1,81 +1,83 @@
 <template>
-    <section class="wishlist">
-        <header class="list-head">
-            <h1>Wish List</h1>
-            <span class="count">{{ pokemon.length }} {{ pokemon.length === 1 ? 'entry' : 'entries' }}</span>
-        </header>
-        <DataTable :value="pokemon" removableSort class="wishlist-table" :pt="{ table: { style: 'min-width: 34rem' } }">
-            <Column header="Pokemon" field="name" sortable>
-                <template #body="{ data }">
-                    <div class="cell-pokemon">
-                        <div class="thumb">
-                            <img :src="data.sprites.other['official-artwork'].front_default" :alt="data.name" class="w-12 rounded-md shadow" />
-                        </div>
-                        <div class="ident">
-                            <span class="font-medium">{{ data.name }}</span>
-                        </div>
-                    </div>
-                </template>
-            </Column>
-            <Column header="Primary Type" field="type1" sortable>
-                <template #body="{ data }">
-                    <div class="cell-types">
-                        <Tag :value="data.types[0].type.name" severity="secondary" />
-                    </div>
-                </template>
-            </Column>
-            <Column header="Secondary Type" field="type2" sortable>
-                <template #body="{ data }">
-                    <div class="cell-types">
-                        <Tag v-if="data.types[1]" :value="data.types[1].type.name" severity="secondary" />
-                        <Tag v-else severity="secondary">None</Tag>
-                    </div>
-                </template>
-            </Column>
-            <Column header="DexNumber" field="id" sortable>
-                <template #body="{ data }">
-                    <div>
-                        <span class="dex-no">#{{ String(data.id).padStart(4, '0') }}</span>
-                    </div>
-                </template>
-            </Column>
-            <Column header="Status" field="caught" sortable class="col-status">
-                <template #body="{ data }">
-                    <Tag :value="getSeverityLabel(data.caught)" :severity="getSeverity(data.caught)" />
-                </template>
-            </Column>
-            <Column>
-                <template #body="{ data }">
-                    <button @click="toggleModal(data)">Remove</button>
-                </template>
-            </Column>
-            <template #empty>
-                <p class="empty">Nothing on your wish list yet.</p>
-            </template>
-        </DataTable>
-    </section>
-    <Teleport to="body" v-if="showModal">
-        <Modal @close="toggleModal(selectedPokemon)">
-            <div class="confirm">
-              <h2 class="confirm-title">Remove from wish list?</h2>
-              <p class="confirm-body">
-                <span class="subject">{{ selectedPokemon.name }}</span>
-                will be removed from your wish list.
-              </p>
-              <div class="confirm-actions">
-                <button class="btn btn-ghost" @click="toggleModal(selectedPokemon)">
-                  Cancel
-                </button>
-                <button class="btn btn-danger" @click="removeFromWishList(selectedPokemon)">
-                  Remove
-                </button>
-              </div>
+  <section class="wishlist">
+    <header class="list-head">
+      <h1>Wish List</h1>
+      <span class="count">{{ pokemon.length }} {{ pokemon.length === 1 ? 'entry' : 'entries' }}</span>
+    </header>
+    <DataTable :value="pokemon" removableSort class="wishlist-table" :pt="{ table: { style: 'min-width: 34rem' } }">
+      <Column header="Pokemon" field="name" sortable>
+        <template #body="{ data }">
+          <div class="cell-pokemon">
+            <div class="thumb">
+              <img :src="data.sprites.front" :alt="data.name"
+                class="w-12 rounded-md shadow" />
             </div>
-        </Modal>
-    </Teleport>
+            <div class="ident">
+              <span class="font-medium">{{ data.name }}</span>
+            </div>
+          </div>
+        </template>
+      </Column>
+      <Column header="Primary Type" field="type1" sortable>
+        <template #body="{ data }">
+          <div class="cell-types">
+            <Tag :value="data.types[0]" severity="secondary" />
+          </div>
+        </template>
+      </Column>
+      <Column header="Secondary Type" field="type2" sortable>
+        <template #body="{ data }">
+          <div class="cell-types">
+            <Tag v-if="data.types[1]" :value="data.types[1]" severity="secondary" />
+            <Tag v-else severity="secondary">None</Tag>
+          </div>
+        </template>
+      </Column>
+      <Column header="DexNumber" field="id" sortable>
+        <template #body="{ data }">
+          <div>
+            <span class="dex-no">#{{ String(data.id).padStart(4, '0') }}</span>
+          </div>
+        </template>
+      </Column>
+      <Column header="Status" field="caught" sortable class="col-status">
+        <template #body="{ data }">
+          <Tag :value="getSeverityLabel(data.caught)" :severity="getSeverity(data.caught)" />
+        </template>
+      </Column>
+      <Column>
+        <template #body="{ data }">
+          <Button severity="danger" @click="toggleModal(data)">Remove</Button>
+        </template>
+      </Column>
+      <template #empty>
+        <p class="empty">Nothing on your wish list yet.</p>
+      </template>
+    </DataTable>
+  </section>
+  <Teleport to="body" v-if="showModal">
+    <Modal @close="toggleModal(selectedPokemon)">
+      <div class="confirm">
+        <h2 class="confirm-title">Remove from wish list?</h2>
+        <p class="confirm-body">
+          <span class="subject">{{ selectedPokemon.name }}</span>
+          will be removed from your wish list.
+        </p>
+        <div class="confirm-actions">
+          <button class="btn btn-ghost" @click="toggleModal(selectedPokemon)">
+            Cancel
+          </button>
+          <button class="btn btn-danger" @click="removeFromWishList(selectedPokemon)">
+            Remove
+          </button>
+        </div>
+      </div>
+    </Modal>
+  </Teleport>
 </template>
 
 <script setup>
+import Button from 'primevue/button';
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
 import ColumnGroup from 'primevue/columngroup';   // optional
@@ -84,46 +86,56 @@ import Tag from 'primevue/tag';
 import { usePokemonStore } from '@/stores/pokemonStore';
 import { ref, onMounted, computed, watchEffect } from 'vue';
 import Modal from '@/components/Modal.vue';
+import * as PokemonAPI from '@/api/PokemonAPI';
 
 const pokemonStore = usePokemonStore();
 const showModal = ref(false);
 const selectedPokemon = ref(null);
+const allPokemon = ref(null)
 
 // ads a caught value to the objects and brings the types up to the top of the
 //  json object so that it can be referenced by primevue's sortable field
-const pokemon = computed(() =>
-    pokemonStore.wishlistPokemon.map(p => ({
-        ...p,
-        caught: pokemonStore.pokemonIsCaught(p.name),
-        type1: p.types[0].type.name,
-        type2: p.types[1] ? p.types[1].type.name : null
+const pokemon = computed(() => {
+  if (!allPokemon.value) return []
+  return allPokemon.value
+    .filter(p => pokemonStore.wishlistPokemon.includes(p.name))
+    .map(p => ({
+      ...p,
+      caught: pokemonStore.pokemonIsCaught(p.name),
+      type1: p.types[0],
+      type2: p.types[1] ? p.types[1] : null
     }))
+}
 );
 
 const getSeverity = (caught) => {
-    if (caught) {
-        return 'success';
-    } else {
-        return 'danger';
-    }
+  if (caught) {
+    return 'success';
+  } else {
+    return 'danger';
+  }
 };
 const getSeverityLabel = (caught) => {
-    if (caught) {
-        return 'Captured';
-    } else {
-        return 'Still Searching';
-    }
+  if (caught) {
+    return 'Captured';
+  } else {
+    return 'Still Searching';
+  }
 };
 
-function removeFromWishList(pokemon){
-    pokemonStore.removeWishlistPokemon(pokemon.name)
-    showModal.value = false;
+async function removeFromWishList(pokemon) {
+  await pokemonStore.removeWishlistPokemon(pokemon)
+  showModal.value = false;
 }
 
 function toggleModal(pokemon) {
-    selectedPokemon.value = pokemon;
-    showModal.value = !showModal.value;
+  selectedPokemon.value = pokemon;
+  showModal.value = !showModal.value;
 }
+
+onMounted(() => {
+  PokemonAPI.getIndex().then(results => allPokemon.value = results)
+})
 </script>
 
 <style scoped>
@@ -319,13 +331,16 @@ function toggleModal(pokemon) {
 }
 
 @media (prefers-color-scheme: dark) {
-  .thumb { background: var(--p-surface-800); }
+  .thumb {
+    background: var(--p-surface-800);
+  }
 }
 
 @media (max-width: 24rem) {
   .confirm-actions {
     flex-direction: column-reverse;
   }
+
   .btn {
     width: 100%;
   }

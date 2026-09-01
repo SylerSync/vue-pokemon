@@ -10,6 +10,7 @@ export const useAuthStore = defineStore('auth', () => {
     const result = await PokemonAPI.login(username, password)
     user.value = result
     localStorage.setItem('user', JSON.stringify(result))
+    // pokemonStore.setWishlistPokemon(result.wishList)
     return result
   }
 

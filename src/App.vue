@@ -9,6 +9,7 @@ import Badge from 'primevue/badge';
 import 'primeicons/primeicons.css';
 import { useSettingsStore } from '@/stores/settingsStore';
 import { useInventoryStore } from './stores/inventoryStore';
+import { usePokemonStore } from '@/stores/pokemonStore';
 import { computed } from "vue";
 import ErrorModal from '@/components/ErrorModal.vue'
 import router from '@/router';
@@ -16,6 +17,7 @@ import { useAuthStore } from '@/stores/auth'
 
 const settingsStore = useSettingsStore();
 const inventoryStore = useInventoryStore();
+const pokemonStore = usePokemonStore();
 const auth = useAuthStore()
 
 // Map IDs to PokeAPI sprite URLs
@@ -47,6 +49,7 @@ const pokeballOptions = computed(() => {
 function onAuthClick() {
     if (auth.isLoggedIn) {
         auth.logout()
+        pokemonStore.$reset()
     } else {
         router.push('/login')
     }
@@ -60,7 +63,7 @@ function onAuthClick() {
             <Tab class="custom-tab" value="/dex" as="router-link" to="/dex">Pokedex</Tab>
             <Tab class="custom-tab" value="/wildPokemon" as="router-link" to="/wildPokemon">Wild Pokemon</Tab>
             <Tab class="custom-tab" value="/pokebox" as="router-link" to="/pokebox">PokeBox</Tab>
-            <Tab class="custom-tab" value="/wishList" as="router-link" to="/wishList">WishList</Tab>
+            <Tab v-if="auth.isLoggedIn" class="custom-tab" value="/wishList" as="router-link" to="/wishList">WishList</Tab>
             <Tab class="custom-tab" value="/shop" as="router-link" to="/shop">Shop</Tab>
             <Tab class="custom-tab" value="/trainers" as="router-link" to="/trainers">Trainers</Tab>
             <Tab class="custom-tab" value="/rouge" as="router-link" to="/rouge">Rouge Map</Tab>

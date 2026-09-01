@@ -40,8 +40,10 @@ import InputText from 'primevue/inputtext';
 import Button from 'primevue/button';
 import router from '@/router';
 import { useAuthStore } from '@/stores/auth'
+import { usePokemonStore } from '@/stores/pokemonStore'
 
 const auth = useAuthStore()
+const pokemonStore = usePokemonStore()
 
 const email = ref('');
 const password = ref('');
@@ -50,10 +52,8 @@ async function submit() {
     console.log(email.value)
     console.log(password.value)
     try {
-        auth.login(email.value, password.value)
-        // const user = await PokemonAPI.login(email.value, password.value)
-        // TODO: stash the token / redirect
-        // sessionStorage.setItem('user_name', user.email)
+        await auth.login(email.value, password.value)
+        pokemonStore.initializeStore()
         router.go(-1)
     } catch (e) {
         console.log(e.status === 401

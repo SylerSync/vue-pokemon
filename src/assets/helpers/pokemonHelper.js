@@ -333,7 +333,6 @@ export async function handleMegaEvo(currPokemon) {
   return megaPokemon
 }
 
-
 async function calculateMaxAndMinLevels(pokemonSpecies, name) {
   let max = 100;
   let min = pokemonSpecies.is_legendary ? 85 : pokemonSpecies.is_mythical ? 75 : 1

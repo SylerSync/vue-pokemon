@@ -30,3 +30,5 @@ const post = (path, body) =>
 
 export const getIndex = () => get('pokemon')
 export const login = (email, password) => post('user/authenticate', {email, password})
+export const addToWishList = (pokemonName, user) => post('user/newWishList', {pokemonName, user})
+export const removeFromWishList = (pokemonName, user) => post('user/removeWishList', {pokemonName, user})
