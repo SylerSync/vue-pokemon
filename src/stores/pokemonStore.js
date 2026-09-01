@@ -1,4 +1,5 @@
 import { defineStore } from "pinia"
+import * as PokemonAPI from '@/api/PokemonAPI';
 
 
 const testGodPokemon = {
@@ -574,9 +575,9 @@ export const usePokemonStore = defineStore("pokemonStore", {
 
 
     state: () => ({
-        caughtPokemon: [testBulbasaur, testCharizard, testEevee, testGligar, testGodPokemon],
-        partyIds: [],
-        wishlistPokemon: [],
+        caughtPokemon: [testBulbasaur, testCharizard, testEevee, testGligar, testGodPokemon, testRayquaza],
+        pokemonParty: [],
+        wishlistPokemon: localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')).wishList : [],
         typeColors: {
             normal: '#A8A878',
             fire: '#F08030',
@@ -643,10 +644,18 @@ export const usePokemonStore = defineStore("pokemonStore", {
             return state.starters[region] || []
         },
         pokemonIsInWishList: (state) => (pokemonName) => {
-            return state.wishlistPokemon.some(pokemon => pokemon.name === pokemonName);
+            pokemonName = pokemonName.toLowerCase();
+            return state.wishlistPokemon.some(pokemon => pokemon === pokemonName.valueOf());
         }
     },
     actions: {
+        // StoreSetup
+        initializeStore() {
+            let user = JSON.parse(localStorage.getItem('user'))
+            if (user && user.wishList) {
+                this.wishlistPokemon = user.wishList
+            }
+        },
         // Caught Pokemon controls
         addPokemon(pokemon) {
             const instanceId = crypto.randomUUID();
@@ -669,11 +678,16 @@ export const usePokemonStore = defineStore("pokemonStore", {
             }
         },
         // Wishlist Controls
-        addWishlistPokemon(pokemon) {
-            this.wishlistPokemon.push(pokemon)
+        async addWishlistPokemon(pokemon) {
+            let user = JSON.parse(localStorage.getItem('user'))
+            let results = await PokemonAPI.addToWishList(pokemon.name, user.email)
+            this.wishlistPokemon = results.wishList
         },
-        removeWishlistPokemon(pokemon) {
-            this.wishlistPokemon = this.wishlistPokemon.filter(pok => pok.name !== pokemon)
+        async removeWishlistPokemon(pokemon) {
+            let user = JSON.parse(localStorage.getItem('user'))
+            console.log("Removing from wishlist:", pokemon.name, "for user:", user.email);
+            let results = await PokemonAPI.removeFromWishList(pokemon.name, user.email)
+            this.wishlistPokemon = results.wishList
         },
         // Pokemon Party controls
         addPokemonParty(pokemon) {
@@ -702,10 +716,9 @@ export const usePokemonStore = defineStore("pokemonStore", {
             const targetId = typeof pokemon === 'string' ? pokemon : pokemon.instanceId;
             this.partyIds = this.partyIds.filter(id => id !== targetId);
             return true;
+        },
+        setWishlistPokemon(pokemonList) {
+            this.wishlistPokemon = pokemonList;
         }
-    },
-    persist: {
-        key: "pokemon-store-save",
-        pick: ['caughtPokemon', 'wishlistPokemon', 'partyIds']
     }
 })

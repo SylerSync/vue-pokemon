@@ -36,3 +36,5 @@ export const useIten = (email, itemId, quantity) => post('inventory/useItem', {e
 export const addItem = (email, itemId, quantity) => post('inventory/addItem', {email, itemId, quantity})
 export const addFunds = (email, amount) => post(`addFunds/${email}/${amount}`)
 export const getAllItems = () => get('item') // Get full item catalog
+export const addToWishList = (pokemonName, user) => post('user/newWishList', {pokemonName, user})
+export const removeFromWishList = (pokemonName, user) => post('user/removeWishList', {pokemonName, user})

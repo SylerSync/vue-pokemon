@@ -18,6 +18,7 @@ import { getPokemonByGen } from '@/api/pokeapi.js';
 import { getSpecies } from '@/api/pokeapi.js';
 import Modal from '@/components/Modal.vue';
 import { usePokemonStore } from '@/stores/pokemonStore';
+import { useAuthStore } from '@/stores/auth';
 
 const selectedPokemon = ref();
 const pokemon = ref([]);
@@ -39,8 +40,10 @@ const regions = ref([
   { region: "Paldea", gen: 9 }
 ]);
 const pokemonStore = usePokemonStore();
+const authStore = useAuthStore();
 const showWishListed = ref(false);
 const showCaught = ref(false);
+const user = ref(localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')) : null);
 
 // let bgmTrack = null;
 
@@ -48,14 +51,14 @@ function toggleModal() {
   showModal.value = !showModal.value;
 }
 
-function wishList() {
-  if (selectedPokemon.value) {
-    pokemonStore.addWishlistPokemon(selectedPokemon.value);
+async function addWishList() {
+  if (selectedPokemon.value && user.value) {
+    await pokemonStore.addWishlistPokemon(selectedPokemon.value);
   }
 }
 
 function checkWishList(name) {
-  return pokemonStore.pokemonIsInWishList(name)
+  return pokemonStore.pokemonIsInWishList(name);
 }
 
 async function selectPokemon(pokemon) {
@@ -94,8 +97,6 @@ const pokemonList = computed(() => {
   if (text1.value) {
     filteredPokemon = filteredPokemon.filter(p => p.name.includes(text1.value));
   }
-
-  // console.log(filteredPokemon)
   return filteredPokemon;
 });
 
@@ -237,7 +238,7 @@ watchEffect(() => {
         <template #footer>
           <div class="flex gap-3 mt-1">
             <Button label="Details" class="w-full" @click="toggleModal" />
-            <Button v-if="!checkWishList(selectedPokemon.name)" label="Whishlist" class="w-full" @click="wishList" />
+            <Button v-if="!checkWishList(selectedPokemon.name) && authStore.isLoggedIn" label="Whishlist" class="w-full" @click="addWishList" />
           </div>
         </template>
       </Card>
