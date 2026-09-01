@@ -1,4 +1,5 @@
 const BASE = 'https://pokeapi.co/api/v2'
+import * as pokemonHelper from "@/assets/helpers/pokemonHelper"
 
 // makes an api call using the provided path and foutputs the result formatted into json
 async function get(path) {
@@ -32,25 +33,11 @@ export async function fetchTrainerTeam(roster) {
     // 3. Fetch full move details for the first 4 moves in parallel
     const movePromises = basePokemon.moves.slice(0, 4).map(async (m) => {
       try {
-        const moveData = await getMove(m.move.name);
-        return {
-          name: m.move.name,
-          type: moveData.type?.name || 'normal',
-          class: moveData.damage_class?.name || 'physical', // 'physical', 'special', or 'status'
-          power: moveData.power || 0,
-          accuracy: moveData.accuracy || 100,
-          pp: moveData.pp || 15
-        };
+        const move = await getMove(m.move.name);
+        return await pokemonHelper.getMoveData(move)
+
       } catch (error) {
         console.error(`Failed to fetch details for move ${m.move.name}:`, error);
-        return {
-          name: m.move.name,
-          type: 'normal',
-          class: 'physical',
-          power: 50,
-          accuracy: 100,
-          pp: 15
-        };
       }
     });
 

@@ -1281,7 +1281,6 @@ function resetBattleDetails(){
     selectedTrainer.value = null
     selectedRegion.value = null
     selectedRole.value = null
-    selectedPokemonTeam.value = null
     userPokemon.value = null
 }
 
