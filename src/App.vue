@@ -4,15 +4,19 @@ import TabList from 'primevue/tablist';
 import Tab from 'primevue/tab';
 import Checkbox from "primevue/checkbox";
 import SelectButton from 'primevue/selectbutton';
+import Button from 'primevue/button'
 import Badge from 'primevue/badge';
 import 'primeicons/primeicons.css';
 import { useSettingsStore } from '@/stores/settingsStore';
 import { useInventoryStore } from './stores/inventoryStore';
 import { computed } from "vue";
 import ErrorModal from '@/components/ErrorModal.vue'
+import router from '@/router';
+import { useAuthStore } from '@/stores/auth'
 
 const settingsStore = useSettingsStore();
 const inventoryStore = useInventoryStore();
+const auth = useAuthStore()
 
 // Map IDs to PokeAPI sprite URLs
 const pokeballIcons = {
@@ -40,18 +44,26 @@ const pokeballOptions = computed(() => {
     return [standardPokeball, ...storeBalls];
 });
 
+function onAuthClick() {
+    if (auth.isLoggedIn) {
+        auth.logout()
+    } else {
+        router.push('/login')
+    }
+}
+
 </script>
 
 <template>
-      <Tabs :value="$route.path">
-                <TabList>
+    <Tabs :value="$route.path">
+        <TabList>
             <Tab class="custom-tab" value="/dex" as="router-link" to="/dex">Pokedex</Tab>
             <Tab class="custom-tab" value="/wildPokemon" as="router-link" to="/wildPokemon">Wild Pokemon</Tab>
             <Tab class="custom-tab" value="/pokebox" as="router-link" to="/pokebox">PokeBox</Tab>
             <Tab class="custom-tab" value="/wishList" as="router-link" to="/wishList">WishList</Tab>
             <Tab class="custom-tab" value="/shop" as="router-link" to="/shop">Shop</Tab>
             <Tab class="custom-tab" value="/trainers" as="router-link" to="/trainers">Trainers</Tab>
-            <Tab class="custom-tab" value="/trainers" as="router-link" to="/rouge">Rouge Map</Tab>
+            <Tab class="custom-tab" value="/rouge" as="router-link" to="/rouge">Rouge Map</Tab>
             <Tab class="custom-tab" value="/adventure" as="router-link" to="/adventure">Adventure</Tab>
             <SelectButton v-model="inventoryStore.selectedPokeball" :options="pokeballOptions" optionLabel="label"
                 optionValue="id" :optionDisabled="(option) => option.count <= 0" aria-labelledby="basic"
@@ -69,14 +81,13 @@ const pokeballOptions = computed(() => {
                 <Checkbox v-model="settingsStore.muteAudio" :binary="true" inputId="muteAudio" />
                 <label for="muteAudio" class="toggle-label">Mute Audio</label>
             </div>
-            <Tab class="custom-tab" value="/login" as="router-link" to="/login" @click="onAuthClick">
-                {{ auth.isLoggedIn ? 'Logout' : 'Login' }}
-            </Tab>
+            <Button class="auth-button" :class="{ 'auth-button-out': auth.isLoggedIn }"
+                :label="auth.isLoggedIn ? 'Logout' : 'Login'"
+                :icon="auth.isLoggedIn ? 'pi pi-sign-out' : 'pi pi-sign-in'" variant="outlined" severity="secondary"
+                @click="onAuthClick" />
         </TabList>
-          </Tabs>
-
-
-      <router-view />
+    </Tabs>
+    <router-view />
     <ErrorModal />
 </template>
 
@@ -161,5 +172,38 @@ custom-tab.p-tab-active {
 :deep(.custom-select-button .p-togglebutton.p-disabled) {
     opacity: 0.4;
     cursor: not-allowed;
+}
+
+.auth-button.p-button {
+    border: 2px solid black;
+    border-radius: 5px;
+    margin: 10px;
+    padding: 0.4rem 0.9rem;
+    background: transparent;
+    color: CanvasText;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.auth-button.p-button:hover {
+    border-color: CanvasText;
+    background-color: rgba(0, 0, 0, 0.08);
+    color: CanvasText;
+}
+
+.auth-button.p-button:focus-visible {
+    outline: 2px solid CanvasText;
+    outline-offset: 2px;
+}
+
+.auth-button-out.p-button {
+    opacity: 0.75;
+}
+
+.auth-button-out.p-button:hover {
+    opacity: 1;
+    border-color: #b91c1c;
+    color: #b91c1c;
+    background-color: rgba(185, 28, 28, 0.08);
 }
 </style>
