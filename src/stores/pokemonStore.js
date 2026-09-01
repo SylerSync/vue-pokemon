@@ -577,7 +577,7 @@ export const usePokemonStore = defineStore("pokemonStore", {
     state: () => ({
         caughtPokemon: [testBulbasaur, testCharizard, testEevee, testGligar, testGodPokemon, testRayquaza],
         pokemonParty: [],
-        wishlistPokemon: localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')).wishList : [],
+        wishlistPokemon: [],
         typeColors: {
             normal: '#A8A878',
             fire: '#F08030',
@@ -649,13 +649,6 @@ export const usePokemonStore = defineStore("pokemonStore", {
         }
     },
     actions: {
-        // StoreSetup
-        initializeStore() {
-            let user = JSON.parse(localStorage.getItem('user'))
-            if (user && user.wishList) {
-                this.wishlistPokemon = user.wishList
-            }
-        },
         // Caught Pokemon controls
         addPokemon(pokemon) {
             const instanceId = crypto.randomUUID();
@@ -719,6 +712,12 @@ export const usePokemonStore = defineStore("pokemonStore", {
         },
         setWishlistPokemon(pokemonList) {
             this.wishlistPokemon = pokemonList;
+        },
+        async getUserData(email){
+            var user = await PokemonAPI.getUserData(email);
+            if(user == null) return;
+            console.log(user);
+            this.wishlistPokemon = user.wishList || []
         }
     }
 })

@@ -38,3 +38,4 @@ export const addFunds = (email, amount) => post(`addFunds/${email}/${amount}`)
 export const getAllItems = () => get('item') // Get full item catalog
 export const addToWishList = (pokemonName, user) => post('user/newWishList', {pokemonName, user})
 export const removeFromWishList = (pokemonName, user) => post('user/removeWishList', {pokemonName, user})
+export const getUserData = (email) => get(`user/getUserData/${email}`)

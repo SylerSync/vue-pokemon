@@ -74,29 +74,35 @@ onMounted(async () => {
     const results = await getIndex()
     allPokemon.value = results.results
   }
+  try {
+    var data = JSON.parse(localStorage.getItem('user') || '')
+    pokemonStore.getUserData(data.email)
+  }
+  catch {
+    console.log("An error occured loading user data.")
+  }
   pokemon.value = allPokemon.value
 });
 
 const pokemonList = computed(() => {
-  // adds whishList and caught values needed for sorting to the object
-  for (let pok of pokemon.value) {
-    pok.wishList = pokemonStore.pokemonIsInWishList(pok.name);
-    pok.caught = pokemonStore.pokemonIsCaught(pok.name);
-  };
-
-  let filteredPokemon = [];
-
-  filteredPokemon = pokemon.value
+  // Map to a new array rather than mutating pokemon.value objects directly
+  let filteredPokemon = pokemon.value.map(pok => ({
+    ...pok,
+    wishList: checkWishList(pok.name), // Returns true/false boolean!
+    caught: pokemonStore.pokemonIsCaught(pok.name)
+  }));
 
   if (showWishListed.value) {
-    filteredPokemon = filteredPokemon.filter(p => p.wishList)
+    filteredPokemon = filteredPokemon.filter(p => p.wishList);
   }
   if (showCaught.value) {
-    filteredPokemon = filteredPokemon.filter(p => p.caught)
+    filteredPokemon = filteredPokemon.filter(p => p.caught);
   }
   if (text1.value) {
-    filteredPokemon = filteredPokemon.filter(p => p.name.includes(text1.value));
+    const searchTerm = text1.value.toLowerCase();
+    filteredPokemon = filteredPokemon.filter(p => p.name.toLowerCase().includes(searchTerm));
   }
+
   return filteredPokemon;
 });
 
@@ -238,7 +244,8 @@ watchEffect(() => {
         <template #footer>
           <div class="flex gap-3 mt-1">
             <Button label="Details" class="w-full" @click="toggleModal" />
-            <Button v-if="!checkWishList(selectedPokemon.name) && authStore.isLoggedIn" label="Whishlist" class="w-full" @click="addWishList" />
+            <Button v-if="!checkWishList(selectedPokemon.name) && authStore.isLoggedIn" label="Whishlist" class="w-full"
+              @click="addWishList" />
           </div>
         </template>
       </Card>
