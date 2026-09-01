@@ -6,6 +6,7 @@ import router from './router'
 import PrimeVue from 'primevue/config';
 import Aura from '@primeuix/themes/aura';
 import piniaPluginPersistedstate  from 'pinia-plugin-persistedstate';
+import './assets/main.css'
 
 const app = createApp(App)
 const pinia = createPinia()

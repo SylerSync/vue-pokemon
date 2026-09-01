@@ -40,7 +40,6 @@ const pokeballOptions = computed(() => {
     return [standardPokeball, ...storeBalls];
 });
 
-
 </script>
 
 <template>
@@ -70,7 +69,9 @@ const pokeballOptions = computed(() => {
                 <Checkbox v-model="settingsStore.muteAudio" :binary="true" inputId="muteAudio" />
                 <label for="muteAudio" class="toggle-label">Mute Audio</label>
             </div>
-                    
+            <Tab class="custom-tab" value="/login" as="router-link" to="/login" @click="onAuthClick">
+                {{ auth.isLoggedIn ? 'Logout' : 'Login' }}
+            </Tab>
         </TabList>
           </Tabs>
 
