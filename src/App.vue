@@ -36,14 +36,9 @@ const pokeballOptions = computed(() => {
         count: '∞'
     };
 
-    const storeBalls = Object.keys(inventoryStore.pokeballs).map((key) => ({
-        id: key,
-        label: key.charAt(0).toUpperCase() + key.slice(1),
-        icon: pokeballIcons[key] || pokeballIcons.pokeball,
-        count: inventoryStore.pokeballs[key].count
-    }));
+    
 
-    return [standardPokeball, ...storeBalls];
+    return [standardPokeball];
 });
 
 function onAuthClick() {

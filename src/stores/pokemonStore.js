@@ -7,7 +7,7 @@ export const usePokemonStore = defineStore("pokemonStore", {
     state: () => ({
         caughtPokemon: [],
         pokemonParty: [],
-        wishlistPokemon: localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')).wishList : [],
+        wishlistPokemon: [],
         typeColors: {
             normal: '#A8A878',
             fire: '#F08030',
@@ -62,6 +62,11 @@ export const usePokemonStore = defineStore("pokemonStore", {
         }
     }),
     getters: {
+        pokemonParty: (state) => {
+            return state.partyIds
+                .map(id => state.caughtPokemon.find(p => p.instanceId === id))
+                .filter(Boolean); // Filters out any missing or released Pokemon
+        },
         pokemonIsCaught: (state) => (pokemonName) => {
             return state.caughtPokemon.some(pokemon => pokemon.name === pokemonName);
         },
@@ -74,13 +79,6 @@ export const usePokemonStore = defineStore("pokemonStore", {
         }
     },
     actions: {
-        // StoreSetup
-        initializeStore() {
-            let user = JSON.parse(localStorage.getItem('user'))
-            if (user && user.wishList) {
-                this.wishlistPokemon = user.wishList
-            }
-        },
         // Caught Pokemon controls
         async addPokemon(pokemon) {
             pokemon.moves.forEach(move => {
@@ -135,7 +133,12 @@ export const usePokemonStore = defineStore("pokemonStore", {
             }
         },
         releasePokemon(index) {
-            this.caughtPokemon.splice(index, 1)
+            const released = this.caughtPokemon[index];
+            if (released) {
+                // Remove from party if present
+                this.partyIds = this.partyIds.filter(id => id !== released.instanceId);
+                this.caughtPokemon.splice(index, 1);
+            }
         },
         // Wishlist Controls
         async addWishlistPokemon(pokemon) {
@@ -151,36 +154,40 @@ export const usePokemonStore = defineStore("pokemonStore", {
         },
         // Pokemon Party controls
         addPokemonParty(pokemon) {
-            if (this.pokemonParty.length >= 6) {
+            if (this.partyIds.length >= 6) {
                 console.log("Party is full (max 6)");
                 return false;
             }
 
-            // Check if this exact Pokemon is already in the active party
-            const alreadyInParty = this.pokemonParty.some(p => p.instanceId === pokemon.instanceId);
+            const targetId = typeof pokemon === 'string' ? pokemon : pokemon.instanceId;
 
-            if (!alreadyInParty) {
-                // Push the direct reference from caughtPokemon (no copying/spreading)
-                this.pokemonParty.push(pokemon);
+            if (!this.partyIds.includes(targetId)) {
+                this.partyIds.push(targetId);
                 return true;
             }
             return false;
         },
 
         removePokemonParty(pokemon) {
-            if (!pokemon) return;
+            if (!pokemon) return false;
 
-            // Prevent leaving the party completely empty if needed
-            if (this.pokemonParty.length <= 1) {
+            if (this.partyIds.length <= 1) {
                 console.log("Cannot remove the last Pokemon from party.");
                 return false;
             }
 
-            this.pokemonParty = this.pokemonParty.filter(p => p.instanceId !== pokemon.instanceId);
+            const targetId = typeof pokemon === 'string' ? pokemon : pokemon.instanceId;
+            this.partyIds = this.partyIds.filter(id => id !== targetId);
             return true;
         },
         setWishlistPokemon(pokemonList) {
             this.wishlistPokemon = pokemonList;
+        },
+        async getUserData(email){
+            var user = await PokemonAPI.getUserData(email);
+            if(user == null) return;
+            console.log(user);
+            this.wishlistPokemon = user.wishList || []
         }
     }
 })
