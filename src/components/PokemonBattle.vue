@@ -98,12 +98,12 @@
                     </span>
                   </div>
                 </div>
-                <img v-if="userPokemon.shiny" :src="userPokemon.sprite.shinyBack ?? userPokemon.sprite.shinyBack" :alt="userPokemon.name"
+                <img v-if="userPokemon.shiny" :src="userPokemon.sprites.shinyBack ?? userPokemon.sprites.shinyBack" :alt="userPokemon.name"
                   class="battle-sprite sprite-ally" :class="[
                     anim?.actor === 'ally' ? `anim-${anim.type}` : null,
                     { 'mega-evolving': isMegaEvolving }
                   ]" />
-                  <img v-else :src="userPokemon.sprite.back ?? userPokemon.sprite.back" :alt="userPokemon.name"
+                  <img v-else :src="userPokemon.sprites.back ?? userPokemon.sprites.back" :alt="userPokemon.name"
                   class="battle-sprite sprite-ally" :class="[
                     anim?.actor === 'ally' ? `anim-${anim.type}` : null,
                     { 'mega-evolving': isMegaEvolving }
@@ -113,7 +113,7 @@
             <!-- moves -->
             <div class="moves">
               <button v-for="move in userPokemon.moves" :key="move.name" class="move"
-                :style="{ backgroundColor: pokemonStore.typeColors[move.type] }"
+                :style="{ backgroundColor: pokemonStore.typeColors[move.type.toLowerCase()] }"
                 :disabled="isResolving || move.disabled || move.currentPP == 0
                   || (userPokemon.charging && userPokemon.charging.move.name !== move.name) || (userPokemon.locked && userPokemon.locked.move.name !== move.name) || (userPokemon.bide && userPokemon.bide.move.name !== move.name)
                   || (userPokemon.minorStatus?.includes('torment') && userPokemon.lastUsedMove?.name == move.name) || isFainted(userPokemon)"
@@ -149,10 +149,11 @@
                   </div>
                 </template>
               </SelectButton>
-              <button :disabled="isResolving || !inventoryStore.selectedPokeball"
+              <br />
+              <Button severity="secondary" :disabled="isResolving || !inventoryStore.selectedPokeball"
                 @click="battleTurn(null, inventoryStore.selectedPokeball)">
                 Catch Pokemon
-              </button>
+            </Button>
             </div>
           </div>
         </SplitterPanel>
@@ -3828,11 +3829,11 @@ async function handleUseRecoveryItem(item, targetPokemon) {
 
 async function throwPokeball(pokeball) {
   let target = props.opponent
-  if (!inventoryStore.UsePokeball(pokeball)) {
+  if (!inventoryStore.UseItem(pokeball)) {
     log(`You have no ${pokeball.label} left.`);
     return false;
   }
-  const ball = inventoryStore.SelectedPokeballData(pokeball)
+  const ball = inventoryStore.selectedPokeball(pokeball)
 
   log(`You threw a ${pokeball} at ${target.name}...`);
   await delay(800);

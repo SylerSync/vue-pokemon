@@ -501,7 +501,7 @@ function closeRefillPPModalOpen() {
                     <!-- TYPE BADGES -->
                     <div class="types-row">
                         <span v-for="type in selectedPokemon.types" :key="type" class="type-pill"
-                            :style="{ backgroundColor: pokemonStore.typeColors[type] || 'var(--p-primary-color)' }">
+                            :style="{ backgroundColor: pokemonStore.typeColors[type.toLowerCase()] || 'var(--p-primary-color)' }">
                             {{ type }}
                         </span>
                     </div>
@@ -541,7 +541,7 @@ function closeRefillPPModalOpen() {
                     <div v-for="move in selectedPokemon.moves" :key="move.name" class="move-card">
                         <div class="move-main">
                             <span class="move-name">{{ move.name }}</span>
-                            <span class="move-type" :style="{ color: pokemonStore.typeColors[move.type] || 'inherit' }">
+                            <span class="move-type" :style="{ color: pokemonStore.typeColors[move.type.toLowerCase()] || 'inherit' }">
                                 {{ move.type }}
                             </span>
                         </div>
@@ -635,7 +635,7 @@ function closeRefillPPModalOpen() {
                 <Column field="moveName" header="Move" style="width: 35%">
                     <template #body="slotProps">
                         <span class="tm-type-pill"
-                            :style="{ backgroundColor: pokemonStore.typeColors[slotProps.data.type] || '#777' }">
+                            :style="{ backgroundColor: pokemonStore.typeColors[slotProps.data.type.toLowerCase()] || '#777' }">
                             {{ slotProps.data.moveName }}
                         </span>
                     </template>
