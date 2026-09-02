@@ -7,6 +7,7 @@ async function request(path, options = {}) {
     let message = `${res.status} ${res.statusText}`
     try {
       const body = await res.json()
+      console.log(body)
       if (body?.message) message = body.message
     } catch {
     }
@@ -32,3 +33,4 @@ export const getIndex = () => get('pokemon')
 export const login = (email, password) => post('user/authenticate', {email, password})
 export const addToWishList = (pokemonName, user) => post('user/newWishList', {pokemonName, user})
 export const removeFromWishList = (pokemonName, user) => post('user/removeWishList', {pokemonName, user})
+export const catchPokemon = (userId, pokemon) => post('pokebox/addPokemonToBox', {userId, pokemon})
