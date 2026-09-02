@@ -7,6 +7,7 @@ async function request(path, options = {}) {
     let message = `${res.status} ${res.statusText}`
     try {
       const body = await res.json()
+      console.log(body)
       if (body?.message) message = body.message
     } catch {
     }
@@ -39,3 +40,5 @@ export const getAllItems = () => get('item') // Get full item catalog
 export const addToWishList = (pokemonName, user) => post('user/newWishList', {pokemonName, user})
 export const removeFromWishList = (pokemonName, user) => post('user/removeWishList', {pokemonName, user})
 export const getUserData = (email) => get(`user/getUserData/${email}`)
+export const catchPokemon = (userId, pokemon) => post('pokebox/addPokemonToBox', {userId, pokemon})
+export const getUserPokemon = (userId) => get(`pokebox/getPokeBox/${encodeURIComponent(userId)}`)

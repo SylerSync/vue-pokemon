@@ -1,4 +1,5 @@
 <script setup>
+import { onMounted } from 'vue';
 import Tabs from 'primevue/tabs';
 import TabList from 'primevue/tablist';
 import Tab from 'primevue/tab';
@@ -49,6 +50,12 @@ function onAuthClick() {
         router.push('/login')
     }
 }
+
+onMounted(() => {
+    if (auth.isLoggedIn) {
+        pokemonStore.getUserData(auth.user.email)
+    }
+});
 
 </script>
 
