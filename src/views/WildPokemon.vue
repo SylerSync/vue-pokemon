@@ -417,7 +417,8 @@ async function getWildPokemonData(region) {
       <template #header>
         <div class="sprite-container">
           <span class="favPokemon" v-if="pokemonStore.pokemonIsInWishList(pokemon.name)">&#9734;</span>
-          <img class="pokemon-sprite" :src="pokemon.sprite" :alt="pokemon.name" />
+          <img v-if="pokemon.shiny" class="pokemon-sprite" :src="pokemon.shinySprite" :alt="pokemon.name" />
+          <img v-else class="pokemon-sprite" :src="pokemon.sprite" :alt="pokemon.name" />
         </div>
 
       </template>
@@ -428,7 +429,8 @@ async function getWildPokemonData(region) {
   <Modal v-if="isCatchModalOpen" @close="closeCatchModal">
     <div v-if="selectedPokemon" class="catchModal">
       <h2>{{ selectedPokemon.name }}</h2>
-      <img :src="selectedPokemon.sprite" :alt="selectedPokemon.name">
+      <img v-if="selectedPokemon.shiny" class="pokemon-sprite" :src="selectedPokemon.shinySprite" :alt="selectedPokemon.name" />
+      <img v-else class="pokemon-sprite" :src="selectedPokemon.sprite" :alt="selectedPokemon.name" />
 
       <h3>Types:</h3>
       <div v-for="type of selectedPokemon.types" :key="type">

@@ -18,7 +18,8 @@
               </template>
               <template #option="slotProps">
                 <div class="option-row" :class="{ fainted: isFainted(slotProps.option) }">
-                  <img v-if="slotProps.option.sprite" :src="slotProps.option.sprite" alt="" class="option-sprite" />
+                  <img v-if="slotProps.option.shiny" :src="slotProps.option.sprites.shinyFront" alt="" class="option-sprite" />
+                  <img v-else :src="slotProps.option.sprites.front" alt="" class="option-sprite" />
                   <span class="option-name">
                     {{ slotProps.option.name }} · Lv {{ slotProps.option.level }}
                   </span>
@@ -62,7 +63,7 @@
                       <div class="hp-fill" :class="hpTone(foe)" :style="{ width: hpPercent(foe) + '%' }" />
                     </div>
                     <span class="hp-text">
-                      {{ Math.max(0, foe.currentHp) }}/{{ foe.totalHp }}
+                      {{ Math.max(0, foe.currentHP) }}/{{ foe.totalHP }}
                     </span>
                   </div>
                 </div>
@@ -93,11 +94,16 @@
                         :style="{ width: hpPercent(userPokemon) + '%' }" />
                     </div>
                     <span class="hp-text">
-                      {{ Math.max(0, userPokemon.currentHp) }}/{{ userPokemon.totalHp }}
+                      {{ Math.max(0, userPokemon.currentHP) }}/{{ userPokemon.totalHP }}
                     </span>
                   </div>
                 </div>
-                <img :src="userPokemon.backSprite ?? userPokemon.sprite" :alt="userPokemon.name"
+                <img v-if="userPokemon.shiny" :src="userPokemon.sprite.shinyBack ?? userPokemon.sprite.shinyBack" :alt="userPokemon.name"
+                  class="battle-sprite sprite-ally" :class="[
+                    anim?.actor === 'ally' ? `anim-${anim.type}` : null,
+                    { 'mega-evolving': isMegaEvolving }
+                  ]" />
+                  <img v-else :src="userPokemon.sprite.back ?? userPokemon.sprite.back" :alt="userPokemon.name"
                   class="battle-sprite sprite-ally" :class="[
                     anim?.actor === 'ally' ? `anim-${anim.type}` : null,
                     { 'mega-evolving': isMegaEvolving }
@@ -179,7 +185,7 @@
                 <div class="team-info">
                   <span class="team-name">{{ pokemon.name }}</span>
                   <span class="team-hp">
-                    {{ Math.max(0, pokemon.currentHp ?? pokemon.totalHp) }} / {{ pokemon.totalHp }} HP
+                    {{ Math.max(0, pokemon.currentHP ?? pokemon.totalHP) }} / {{ pokemon.totalHP }} HP
                   </span>
                 </div>
                 <span v-if="pokemon.instanceId === userPokemon?.instanceId" class="active-tag">ACTIVE</span>
@@ -197,8 +203,8 @@
                     <div v-if="slotProps.value" class="target-option">
                       <span class="target-name">{{ slotProps.value.name }}</span>
                       <span class="target-hp-text">
-                        {{ Math.max(0, slotProps.value.currentHp ?? slotProps.value.totalHp) }}/{{
-                          slotProps.value.totalHp }}
+                        {{ Math.max(0, slotProps.value.currentHP ?? slotProps.value.totalHP) }}/{{
+                          slotProps.value.totalHP }}
                       </span>
                     </div>
                     <span v-else class="placeholder">{{ slotProps.placeholder }}</span>
@@ -208,8 +214,8 @@
                       <div class="target-head">
                         <span class="target-name">{{ slotProps.option.name }}</span>
                         <span class="target-hp-text">
-                          {{ Math.max(0, slotProps.option.currentHp ?? slotProps.option.totalHp) }}/{{
-                            slotProps.option.totalHp }} HP
+                          {{ Math.max(0, slotProps.option.currentHP ?? slotProps.option.totalHP) }}/{{
+                            slotProps.option.totalHP }} HP
                         </span>
                       </div>
                       <div class="hp-track">
@@ -269,6 +275,7 @@ import SelectButton from 'primevue/selectbutton';
 import Badge from 'primevue/badge';
 import expChart from "@/assets/data/levelThresholds.json"
 import * as pokeapi from "@/api/pokeapi";
+import * as PokemonAPI from "@/api/PokemonAPI.js"
 import * as pokemonHelper from "@/assets/helpers/pokemonHelper.js"
 import paralysisIcon from '@/assets/statusIcons/paralysis.png';
 import sleepIcon from '@/assets/statusIcons/sleep.png';
@@ -678,13 +685,13 @@ const FIXED_DAMAGE_MOVES = {
   'dragon-rage': () => 40,
   'sonic-boom': () => 20,
   psywave: (user) => Math.max(1, Math.floor(user.level * (randInt(0, 100) + 50) / 100)),
-  'super-fang': (user, target) => Math.max(1, Math.floor(target.currentHp / 2)),
-  'natures-madness': (user, target) => Math.max(1, Math.floor(target.currentHp / 2)),
-  ruination: (user, target) => Math.max(1, Math.floor(target.currentHp / 2)),
+  'super-fang': (user, target) => Math.max(1, Math.floor(target.currentHP / 2)),
+  'natures-madness': (user, target) => Math.max(1, Math.floor(target.currentHP / 2)),
+  ruination: (user, target) => Math.max(1, Math.floor(target.currentHP / 2)),
   // null = the move fails
   endeavor: (user, target) =>
-    target.currentHp > user.currentHp ? target.currentHp - user.currentHp : null,
-  'final-gambit': (user) => Math.max(1, user.currentHp),
+    target.currentHP > user.currentHP ? target.currentHP - user.currentHP : null,
+  'final-gambit': (user) => Math.max(1, user.currentHP),
 };
 
 // each returns a base power; move.power is null for all of these
@@ -715,14 +722,14 @@ const VARIABLE_POWER_MOVES = {
   reversal: (u) => flailPower(u),
 
   // --- user's remaining HP (higher = stronger) ---
-  eruption: (u) => Math.max(1, Math.floor(150 * (u.currentHp / u.totalHp))),
-  'water-spout': (u) => Math.max(1, Math.floor(150 * (u.currentHp / u.totalHp))),
-  'dragon-energy': (u) => Math.max(1, Math.floor(150 * (u.currentHp / u.totalHp))),
+  eruption: (u) => Math.max(1, Math.floor(150 * (u.currentHP / u.totalHP))),
+  'water-spout': (u) => Math.max(1, Math.floor(150 * (u.currentHP / u.totalHP))),
+  'dragon-energy': (u) => Math.max(1, Math.floor(150 * (u.currentHP / u.totalHP))),
 
   // --- target's remaining HP ---
-  'wring-out': (u, t) => Math.max(1, Math.floor(120 * (t.currentHp / t.totalHp))),
-  'crush-grip': (u, t) => Math.max(1, Math.floor(120 * (t.currentHp / t.totalHp))),
-  'hard-press': (u, t) => Math.max(1, Math.floor(100 * (t.currentHp / t.totalHp))),
+  'wring-out': (u, t) => Math.max(1, Math.floor(120 * (t.currentHP / t.totalHP))),
+  'crush-grip': (u, t) => Math.max(1, Math.floor(120 * (t.currentHP / t.totalHP))),
+  'hard-press': (u, t) => Math.max(1, Math.floor(100 * (t.currentHP / t.totalHP))),
 
   // --- target's positive stat stages ---
   punishment: (u, t) => {
@@ -774,7 +781,7 @@ const VARIABLE_POWER_MOVES = {
   'rage-fist': (u) => Math.min(350, 50 * (1 + (u.timesHit ?? 0))),
   'last-respects': (u) => {
     const party = sideKey(u) === 'ally' ? team.value : (props.oppTeam ?? []);
-    return 50 * (1 + party.filter(p => p.currentHp <= 0).length);
+    return 50 * (1 + party.filter(p => p.currentHP <= 0).length);
   },
 };
 
@@ -782,7 +789,7 @@ const CONDITIONAL_POWER = {
   facade: (u) => ['burn', 'poison', 'bad-poison', 'paralysis'].includes(u.status) ? 2 : 1,
   hex: (u, t) => t.status ? 2 : 1,
   venoshock: (u, t) => ['poison', 'bad-poison'].includes(t.status) ? 2 : 1,
-  brine: (u, t) => t.currentHp <= t.totalHp / 2 ? 2 : 1,
+  brine: (u, t) => t.currentHP <= t.totalHP / 2 ? 2 : 1,
   'barb-barrage': (u, t) => ['poison', 'bad-poison'].includes(t.status) ? 2 : 1,
   'infernal-parade': (u, t) => t.status ? 2 : 1,
   retaliate: () => allyFaintedLastTurn.value ? 2 : 1,
@@ -927,7 +934,7 @@ const STATUS_HANDLERS = {
   curse: async (user, target) => {
     if (user.types.includes('ghost')) {
       if (target.minorStatus?.includes('curse')) return failMove(user);
-      user.currentHp = Math.max(0, user.currentHp - Math.floor(user.totalHp / 2));
+      user.currentHP = Math.max(0, user.currentHP - Math.floor(user.totalHP / 2));
       target.minorStatus.push('curse');
       log(`${user.name} cut its own HP and laid a curse on ${target.name}!`);
     } else {
@@ -939,25 +946,25 @@ const STATUS_HANDLERS = {
   },
 
   'belly-drum': async (user) => {
-    const cost = Math.floor(user.totalHp / 2);
-    if (user.currentHp <= cost || user.stages.attack >= 6) return failMove(user);
-    user.currentHp -= cost;
+    const cost = Math.floor(user.totalHP / 2);
+    if (user.currentHP <= cost || user.stages.attack >= 6) return failMove(user);
+    user.currentHP -= cost;
     user.stages.attack = 6;
     log(`${user.name} cut its own HP and maximized its Attack!`);
   },
 
   'pain-split': async (user, target) => {
     if (target.substitute > 0) return failMove(user);
-    const avg = Math.floor((user.currentHp + target.currentHp) / 2);
-    user.currentHp = Math.min(user.totalHp, avg);
-    target.currentHp = Math.min(target.totalHp, avg);
+    const avg = Math.floor((user.currentHP + target.currentHP) / 2);
+    user.currentHP = Math.min(user.totalHP, avg);
+    target.currentHP = Math.min(target.totalHP, avg);
     log('The battlers shared their pain!');
   },
 
   wish: async (user) => {
     const side = sideKey(user);
     if (wishes.value[side]) return failMove(user);
-    wishes.value[side] = { turnsLeft: 2, amount: Math.floor(user.totalHp / 2), name: user.name };
+    wishes.value[side] = { turnsLeft: 2, amount: Math.floor(user.totalHP / 2), name: user.name };
     log(`${user.name} made a wish!`);
   },
 
@@ -1108,14 +1115,14 @@ const STATUS_HANDLERS = {
       if (!team.value.some(p => isFainted(p))) return failMove(user);
       log('Choose a Pokémon to revive!');
       const pick = await requestSwitchPick('fainted');
-      pick.currentHp = Math.floor(pick.totalHp / 2);
+      pick.currentHP = Math.floor(pick.totalHP / 2);
       sidePanel.value = 'log';
       log(`${pick.name} was revived and is ready to fight!`);
     } else {
-      const pool = props.isWild ? [] : (props.oppTeam ?? []).filter(p => p.currentHp <= 0);
+      const pool = props.isWild ? [] : (props.oppTeam ?? []).filter(p => p.currentHP <= 0);
       if (!pool.length) return failMove(user);
       const pick = pool[randInt(0, pool.length - 1)];
-      pick.currentHp = Math.floor(pick.totalHp / 2);
+      pick.currentHP = Math.floor(pick.totalHP / 2);
       log(`${foe.value.name} revived ${pick.name}!`);
     }
   },
@@ -1165,7 +1172,7 @@ function weightRatioPower(userHg, targetHg) {
 }
 
 function flailPower(u) {
-  const x = Math.floor((48 * u.currentHp) / u.totalHp);
+  const x = Math.floor((48 * u.currentHP) / u.totalHP);
   return x < 1 ? 200 : x < 5 ? 150 : x < 13 ? 100 : x < 22 ? 80 : x < 43 ? 40 : 20;
 }
 
@@ -1262,12 +1269,12 @@ function syncBattleForm() {
 
   const base = pokemonStore.caughtPokemon.find(p => p.instanceId === active.instanceId);
   if (base) {
-    if (active.currentHp <= 0) {
-      base.currentHp = 0;
+    if (active.currentHP <= 0) {
+      base.currentHP = 0;
       base.totalFaints = (base.totalFaints || 0) + 1;
     } else {
-      const hpRatio = active.currentHp / active.totalHp;
-      base.currentHp = Math.max(1, Math.round(base.totalHp * hpRatio));
+      const hpRatio = active.currentHP / active.totalHP;
+      base.currentHP = Math.max(1, Math.round(base.totalHP * hpRatio));
     }
     base.level = active.level;
     base.currentExp = active.currentExp;
@@ -1394,12 +1401,12 @@ function makeStruggle() {
 }
 
 function isFainted(p) {
-  return (p?.currentHp ?? p?.totalHp ?? 0) <= 0;
+  return (p?.currentHP ?? p?.totalHP ?? 0) <= 0;
 }
 
 function hpPercent(p) {
-  const max = p?.totalHp;
-  const cur = p?.currentHp ?? max;
+  const max = p?.totalHP;
+  const cur = p?.currentHP ?? max;
   if (!max || typeof cur !== 'number') return 0;
   return Math.max(0, Math.min(100, (cur / max) * 100));
 }
@@ -1470,14 +1477,14 @@ async function applyHazards(pokemon) {
 
   if (side.stealthRock) {
     const eff = typeEffectiveness('rock', pokemon.types);
-    const dmg = Math.max(1, Math.floor(pokemon.totalHp * (eff / 8)));
-    pokemon.currentHp = Math.max(0, pokemon.currentHp - dmg);
+    const dmg = Math.max(1, Math.floor(pokemon.totalHP * (eff / 8)));
+    pokemon.currentHP = Math.max(0, pokemon.currentHP - dmg);
     log(`Pointed stones dug into ${pokemon.name}!`);
     await delay(800);
   }
   if (side.spikes > 0 && grounded) {
     const frac = [0, 1 / 8, 1 / 6, 1 / 4][side.spikes];
-    pokemon.currentHp = Math.max(0, pokemon.currentHp - Math.max(1, Math.floor(pokemon.totalHp * frac)));
+    pokemon.currentHP = Math.max(0, pokemon.currentHP - Math.max(1, Math.floor(pokemon.totalHP * frac)));
     log(`${pokemon.name} was hurt by spikes!`);
     await delay(800);
   }
@@ -1540,8 +1547,8 @@ function resetVolatiles(p) {
 
 function startBattle() {
   if (!userPokemon.value) return;
-  if (userPokemon.value.currentHp == null) {
-    userPokemon.value.currentHp = userPokemon.value.totalHp;
+  if (userPokemon.value.currentHP == null) {
+    userPokemon.value.currentHP = userPokemon.value.totalHP;
   }
   checkMegaEvo()
   userPokemon.value.stages = freshStages();
@@ -1852,9 +1859,9 @@ function recalcStats(pokemon) {
     base_stat: s.base_stat,
     stat: Math.floor(((2 * s.base_stat * pokemon.level) / 100) + 5)
   }))
-  let oldHp = pokemon.totalHp
-  pokemon.totalHp = Math.floor(((2 * pokemon.stats.find(s => s.name == "hp")?.base_stat * pokemon.level) / 100) + pokemon.level + 10)
-  pokemon.currentHp += pokemon.totalHp - oldHp
+  let oldHp = pokemon.totalHP
+  pokemon.totalHP = Math.floor(((2 * pokemon.stats.find(s => s.name == "hp")?.base_stat * pokemon.level) / 100) + pokemon.level + 10)
+  pokemon.currentHP += pokemon.totalHP - oldHp
 }
 
 //Check for new moves by level
@@ -1941,7 +1948,7 @@ async function handleFaint(pokemon) {
       let indexes = []
       for (const [index, poke] of props.oppTeam.entries()) {
         // if (foe.value)
-        if (poke.currentHp > 0) {
+        if (poke.currentHP > 0) {
           indexes.push(index)
         }
       }
@@ -1968,7 +1975,7 @@ async function handleFaint(pokemon) {
     log('Choose your next Pokémon!');
     const incoming = await requestSwitchPick();
     userPokemon.value = incoming;
-    if (incoming.currentHp == null) incoming.currentHp = incoming.totalHp;
+    if (incoming.currentHP == null) incoming.currentHP = incoming.totalHP;
     startTurn(incoming);
     sidePanel.value = 'log';
     log(`Go, ${incoming.name}!`);
@@ -2231,7 +2238,7 @@ async function useMove(user, target, move, opts = {}) {
   }
 
   if (SELF_KO_MOVES.has(move.name)) {
-    user.currentHp = 0;
+    user.currentHP = 0;
   }
 
   let dealt = 0;
@@ -2250,7 +2257,7 @@ async function useMove(user, target, move, opts = {}) {
       await delay(800);
       return;
     }
-    target.currentHp = 0;
+    target.currentHP = 0;
     await playAnim(victim, 'hit', 400);
     log("It's a one-hit KO!");
     await delay(800);
@@ -2273,8 +2280,8 @@ async function useMove(user, target, move, opts = {}) {
       await delay(800);
       return;
     }
-    dealt = Math.min(amount, target.currentHp);
-    target.currentHp = Math.max(0, target.currentHp - amount);
+    dealt = Math.min(amount, target.currentHP);
+    target.currentHP = Math.max(0, target.currentHP - amount);
     await playAnim(victim, 'hit', 400);
     log(`${user.name} dealt ${dealt} damage.`);
 
@@ -2283,7 +2290,7 @@ async function useMove(user, target, move, opts = {}) {
     await delay(600);
 
     if (move.name === 'final-gambit') {
-      user.currentHp = 0;
+      user.currentHP = 0;
       log(`${user.name} gave it everything it had!`);
       await delay(600);
     }
@@ -2311,10 +2318,10 @@ async function useMove(user, target, move, opts = {}) {
       log(`${target.name}'s HP was not restored due to Heal Block!`);
       user.turn.moveFailed = true;
     } else {
-      const amount = Math.max(1, Math.floor(target.totalHp / 4));
-      const before = target.currentHp;
-      target.currentHp = Math.min(target.totalHp, target.currentHp + amount);
-      log(`${target.name} restored ${target.currentHp - before} HP!`);
+      const amount = Math.max(1, Math.floor(target.totalHP / 4));
+      const before = target.currentHP;
+      target.currentHP = Math.min(target.totalHP, target.currentHP + amount);
+      log(`${target.name} restored ${target.currentHP - before} HP!`);
     }
     await delay(800);
     return;
@@ -2495,8 +2502,8 @@ async function useMove(user, target, move, opts = {}) {
       await delay(800);
       return;
     }
-    dealt = Math.min(stored, target.currentHp);
-    target.currentHp = Math.max(0, target.currentHp - stored);
+    dealt = Math.min(stored, target.currentHP);
+    target.currentHP = Math.max(0, target.currentHP - stored);
     await playAnim(victim, 'hit', 400);
     log(`${user.name} dealt ${dealt} damage.`);
     recordDamage(target, { damageClass: null }, dealt);
@@ -2532,8 +2539,8 @@ async function useMove(user, target, move, opts = {}) {
       userPokemon.value.name = user.name
       userPokemon.value.id = user.id
       userPokemon.value.level = user.level
-      userPokemon.value.totalHp = user.totalHp
-      userPokemon.value.currentHp = user.currentHp
+      userPokemon.value.totalHP = user.totalHP
+      userPokemon.value.currentHP = user.currentHP
       userPokemon.value.baseExp = user.baseExp
       userPokemon.value.currentExp = user.currentExp
       userPokemon.value.captureRate = user.captureRate
@@ -2550,8 +2557,8 @@ async function useMove(user, target, move, opts = {}) {
       foe.value.name = user.name
       foe.value.id = user.id
       foe.value.level = user.level
-      foe.value.totalHp = user.totalHp
-      foe.value.currentHp = user.currentHp
+      foe.value.totalHP = user.totalHP
+      foe.value.currentHP = user.currentHP
       foe.value.baseExp = user.baseExp
       foe.value.currentExp = user.currentExp
       foe.value.captureRate = user.captureRate
@@ -2569,7 +2576,7 @@ async function useMove(user, target, move, opts = {}) {
   // --- Logic for Rest ---
   if (move.name === 'rest') {
     const blocked =
-      user.currentHp >= user.totalHp ||
+      user.currentHP >= user.totalHP ||
       (terrain.value.type === 'electric' && isGrounded(user)) ||
       (terrain.value.type === 'misty' && isGrounded(user));
     if (blocked || uproarActive()) {
@@ -2579,7 +2586,7 @@ async function useMove(user, target, move, opts = {}) {
       user.status = 'sleep';
       user.sleepTurns = 2;
       user.badPoisonTurns = 0;
-      user.currentHp = user.totalHp;
+      user.currentHP = user.totalHP;
       log(`${user.name} slept and became healthy!`);
     }
     await delay(800);
@@ -2588,12 +2595,12 @@ async function useMove(user, target, move, opts = {}) {
 
   // --- Logic for the move Substitute
   if (move.name === 'substitute') {
-    const cost = Math.floor(user.totalHp / 4);
-    if (user.currentHp <= cost || user.substitute) {
+    const cost = Math.floor(user.totalHP / 4);
+    if (user.currentHP <= cost || user.substitute) {
       log('But it failed!');
       user.turn.moveFailed = true;
     } else {
-      user.currentHp -= cost;
+      user.currentHP -= cost;
       user.substitute = cost;
       log(`${user.name} put in a substitute!`);
     }
@@ -2730,7 +2737,7 @@ async function useMove(user, target, move, opts = {}) {
       }
       effectiveness = results.effectiveness;
       anyCrit ||= results.critical;
-      const surviving = target.protecting === 'endure' && target.currentHp > 0;
+      const surviving = target.protecting === 'endure' && target.currentHP > 0;
       // Checks for substitute to give tamage to instead
       if (target.substitute > 0 && !move.targetsSelf) {
         target.substitute -= results.damage;
@@ -2741,14 +2748,14 @@ async function useMove(user, target, move, opts = {}) {
         continue;  // no HP loss, no recordDamage
       }
 
-      dealt += Math.min(results.damage, target.currentHp);
+      dealt += Math.min(results.damage, target.currentHP);
 
-      target.currentHp = surviving
-        ? Math.max(1, target.currentHp - results.damage)
-        : Math.max(0, target.currentHp - results.damage);
+      target.currentHP = surviving
+        ? Math.max(1, target.currentHP - results.damage)
+        : Math.max(0, target.currentHP - results.damage);
       await playAnim(victim, 'hit', 250);
       landed++;
-      if (target.currentHp <= 0) break;
+      if (target.currentHP <= 0) break;
     }
 
     if (!hitsSelf && dealt > 0) recordDamage(target, move, dealt);
@@ -2784,14 +2791,14 @@ async function useMove(user, target, move, opts = {}) {
   }
 
   // --- effects that trigger on the KO itself ---
-  if (target.currentHp <= 0 && dealt > 0 && !hitsSelf) {
+  if (target.currentHP <= 0 && dealt > 0 && !hitsSelf) {
     if (move.name === 'fell-stinger') {
       const applied = applyStatChange(user, 'attack', 3);
       if (applied) { log(`${user.name}'s Attack rose drastically!`); await delay(600); }
     }
     if (target.destinyBond) {
       log(`${target.name} took ${user.name} down with it!`);
-      user.currentHp = 0;
+      user.currentHP = 0;
       await delay(800);
     }
   }
@@ -2808,7 +2815,7 @@ async function useMove(user, target, move, opts = {}) {
   }
 
   // fainted — skip every secondary effect
-  if (target.currentHp <= 0) return;
+  if (target.currentHP <= 0) return;
 
   // --- stat changes ---
   const statChanges = move.statChanges ?? [];
@@ -2854,8 +2861,8 @@ async function useMove(user, target, move, opts = {}) {
 
   // Struggle recoil
   if (move.name === 'struggle' && dealt > 0) {
-    const recoil = Math.max(1, Math.floor(user.totalHp / 4));
-    user.currentHp = Math.max(0, user.currentHp - recoil);
+    const recoil = Math.max(1, Math.floor(user.totalHP / 4));
+    user.currentHP = Math.max(0, user.currentHP - recoil);
     log(`${user.name} is damaged by recoil!`);
     await delay(600);
   }
@@ -2867,11 +2874,11 @@ async function useMove(user, target, move, opts = {}) {
       if (isHealBlocked(user)) {
         log(`${user.name}'s HP was not restored due to Heal Block!`);
       } else {
-        user.currentHp = Math.min(user.totalHp, user.currentHp + amount);
+        user.currentHP = Math.min(user.totalHP, user.currentHP + amount);
         log(`${user.name} drained ${amount} HP!`);
       }
     } else {
-      user.currentHp = Math.max(0, user.currentHp - amount);
+      user.currentHP = Math.max(0, user.currentHP - amount);
       log(`${user.name} is hit with ${amount} recoil!`);
     }
     await delay(700);
@@ -2895,12 +2902,12 @@ async function useMove(user, target, move, opts = {}) {
       healPct = weather.value.type === 'sun' ? 66 : weather.value.type ? 25 : 50;
     }
     if (move.name === 'shore-up' && weather.value.type === 'sandstorm') healPct = 66;
-    const amount = Math.floor(user.totalHp * (healPct / 100));
-    const before = user.currentHp;
-    user.currentHp = Math.min(user.totalHp, user.currentHp + amount);
+    const amount = Math.floor(user.totalHP * (healPct / 100));
+    const before = user.currentHP;
+    user.currentHP = Math.min(user.totalHP, user.currentHP + amount);
     log(
-      user.currentHp > before
-        ? `${user.name} restored ${user.currentHp - before} HP!`
+      user.currentHP > before
+        ? `${user.name} restored ${user.currentHP - before} HP!`
         : `${user.name}'s HP is already full!`
     );
     await delay(700);
@@ -2925,21 +2932,21 @@ async function useMove(user, target, move, opts = {}) {
         await delay(700);
       }
       if (selfSwitch.shedTail) {
-        const cost = Math.floor(user.totalHp / 2);
-        if (user.currentHp <= cost) {
+        const cost = Math.floor(user.totalHP / 2);
+        if (user.currentHP <= cost) {
           log('But it failed!');
           user.turn.moveFailed = true;
           await delay(800);
           return;
         }
-        user.currentHp -= cost;
+        user.currentHP -= cost;
         log(`${user.name} shed its tail to create a decoy!`);
         await delay(700);
       }
       pendingSwitch.value = {
         side: actor, mode: 'self',
         baton: !!selfSwitch.baton,
-        shedSub: selfSwitch.shedTail ? Math.floor(user.totalHp / 4) : 0,
+        shedSub: selfSwitch.shedTail ? Math.floor(user.totalHP / 4) : 0,
         escapesWild: !!selfSwitch.escapesWild,
       };
     }
@@ -3418,7 +3425,7 @@ async function resolvePendingSwitch(skipTurn = null) {
       return false; // wild mons have no bench — U-turn etc. is just damage
     }
 
-    const options = props.oppTeam?.filter(p => p !== foe.value && p.currentHp > 0) ?? [];
+    const options = props.oppTeam?.filter(p => p !== foe.value && p.currentHP > 0) ?? [];
     if (!options.length) {
       if (req.mode === 'phaze') { log('But it failed!'); await delay(700); }
       return false;
@@ -3466,7 +3473,7 @@ async function resolvePendingSwitch(skipTurn = null) {
     ? `${incoming.name} was dragged out!`
     : `${userPokemon.value.name}, come back! Go, ${incoming.name}!`);
   userPokemon.value = incoming;
-  if (incoming.currentHp == null) incoming.currentHp = incoming.totalHp;
+  if (incoming.currentHP == null) incoming.currentHP = incoming.totalHP;
   startTurn(incoming);
   if (payload) applyBatonPayload(incoming, payload);
   if (req.shedSub) incoming.substitute = req.shedSub;
@@ -3512,36 +3519,36 @@ async function endOfTurn(target, reciver) {
 }
 
 async function endOfTurnDamage(pokemon) {
-  if (pokemon.currentHp <= 0) return;
+  if (pokemon.currentHP <= 0) return;
 
   // --- nightmare: only while asleep; ends on waking ---
   if (pokemon.minorStatus?.includes('nightmare')) {
     if (pokemon.status === 'sleep') {
       log(`${pokemon.name} is locked in a nightmare!`);
-      const dmg = Math.max(1, Math.floor(pokemon.totalHp / 4));
-      pokemon.currentHp = Math.max(0, pokemon.currentHp - dmg);
+      const dmg = Math.max(1, Math.floor(pokemon.totalHP / 4));
+      pokemon.currentHP = Math.max(0, pokemon.currentHP - dmg);
       await delay(800);
     } else {
       pokemon.minorStatus = pokemon.minorStatus.filter(s => s !== 'nightmare');
     }
   }
-  if (pokemon.currentHp <= 0) return;
+  if (pokemon.currentHP <= 0) return;
 
   // --- curse ---
   if (pokemon.minorStatus?.includes('curse')) {
-    const dmg = Math.max(1, Math.floor(pokemon.totalHp / 4));
-    pokemon.currentHp = Math.max(0, pokemon.currentHp - dmg);
+    const dmg = Math.max(1, Math.floor(pokemon.totalHP / 4));
+    pokemon.currentHP = Math.max(0, pokemon.currentHP - dmg);
     log(`${pokemon.name} is afflicted by the curse!`);
     await delay(700);
   }
-  if (pokemon.currentHp <= 0) return;
+  if (pokemon.currentHP <= 0) return;
 
   // --- trap chip + countdown (Bind/Wrap/etc.) ---
   // mean-look/block/spider-web set noChip: they hold without hurting
   if (pokemon.trapped) {
     if (!pokemon.trapped.noChip) {
-      const dmg = Math.max(1, Math.floor(pokemon.totalHp / 8));
-      pokemon.currentHp = Math.max(0, pokemon.currentHp - dmg);
+      const dmg = Math.max(1, Math.floor(pokemon.totalHP / 8));
+      pokemon.currentHP = Math.max(0, pokemon.currentHP - dmg);
       log(`${pokemon.name} is hurt by ${prettyName(pokemon.trapped.move)}!`);
       await delay(800);
     }
@@ -3551,7 +3558,7 @@ async function endOfTurnDamage(pokemon) {
       pokemon.minorStatus = pokemon.minorStatus.filter(s => s !== 'trap');
     }
   }
-  if (pokemon.currentHp <= 0) return;
+  if (pokemon.currentHP <= 0) return;
 
   // --- status chip ---
   let chip = { burn: 1 / 16, poison: 1 / 8 }[pokemon.status];
@@ -3560,17 +3567,17 @@ async function endOfTurnDamage(pokemon) {
     chip = pokemon.badPoisonTurns / 16;   // 1/16, 2/16, 3/16...
   }
   if (!chip) return;
-  const amount = Math.max(1, Math.floor(pokemon.totalHp * chip));
-  pokemon.currentHp = Math.max(0, pokemon.currentHp - amount);
+  const amount = Math.max(1, Math.floor(pokemon.totalHP * chip));
+  pokemon.currentHP = Math.max(0, pokemon.currentHP - amount);
   log(`${pokemon.name} is hurt by ${pokemon.status === 'bad-poison' ? 'poison' : `its ${pokemon.status}`}!`);
   await delay(800);
 }
 
 async function endOfTurnTrap(pokemon) {
-  if (!pokemon.trapped || pokemon.currentHp <= 0) return;
+  if (!pokemon.trapped || pokemon.currentHP <= 0) return;
 
-  const amount = Math.max(1, Math.floor(pokemon.totalHp / 8));
-  pokemon.currentHp = Math.max(0, pokemon.currentHp - amount);
+  const amount = Math.max(1, Math.floor(pokemon.totalHP / 8));
+  pokemon.currentHP = Math.max(0, pokemon.currentHP - amount);
   log(`${pokemon.name} is hurt by ${pokemon.trapped.move}!`);
   await delay(800);
 
@@ -3594,11 +3601,11 @@ async function endOfTurnHealBlock(pokemon) {
 
 async function endOfTurnLeechSeed(target, receiver) {
   if (!target.minorStatus?.includes('leech-seed')) return;
-  if (target.currentHp <= 0 || !receiver) return;
+  if (target.currentHP <= 0 || !receiver) return;
 
-  const seedDamage = Math.max(1, Math.floor(target.totalHp / 8));
-  const drained = Math.min(seedDamage, target.currentHp);
-  target.currentHp = Math.max(0, target.currentHp - seedDamage);
+  const seedDamage = Math.max(1, Math.floor(target.totalHP / 8));
+  const drained = Math.min(seedDamage, target.currentHP);
+  target.currentHP = Math.max(0, target.currentHP - seedDamage);
   log(`${target.name}'s health was sapped by Leech Seed!`);
   await delay(800);
 
@@ -3608,15 +3615,15 @@ async function endOfTurnLeechSeed(target, receiver) {
     return;
   }
 
-  if (receiver.currentHp > 0) {
-    receiver.currentHp = Math.min(receiver.totalHp, receiver.currentHp + drained);
+  if (receiver.currentHP > 0) {
+    receiver.currentHP = Math.min(receiver.totalHP, receiver.currentHP + drained);
     await delay(400);
   }
 }
 
 async function endOfTurnPerish(pokemon) {
   if (!pokemon.minorStatus?.includes('perish-song')) return;
-  if (pokemon.currentHp <= 0) return;
+  if (pokemon.currentHP <= 0) return;
 
   pokemon.perishTurns = (pokemon.perishTurns) - 1;
   log(`${pokemon.name}'s perish count fell to ${pokemon.perishTurns}!`);
@@ -3625,25 +3632,25 @@ async function endOfTurnPerish(pokemon) {
   if (pokemon.perishTurns <= 0) {
     pokemon.minorStatus = pokemon.minorStatus.filter(s => s !== 'perish-song');
     pokemon.perishTurns = 0;
-    pokemon.currentHp = 0;
+    pokemon.currentHP = 0;
   }
 }
 
 async function endOfTurnIngrain(pokemon) {
   if (!pokemon.minorStatus?.includes('ingrain') || !pokemon.minorStatus?.includes('aqua-ring')) return;
-  if (pokemon.currentHp <= 0) return;
+  if (pokemon.currentHP <= 0) return;
 
   if (isHealBlocked(pokemon)) {
     log(`${pokemon.name}'s roots can't absorb nutrients due to Heal Block!`);
     await delay(700);
     return;
   }
-  if (pokemon.currentHp >= pokemon.totalHp) return;
+  if (pokemon.currentHP >= pokemon.totalHP) return;
 
-  const amount = Math.max(1, Math.floor(pokemon.totalHp / 16));
-  const before = pokemon.currentHp;
-  pokemon.currentHp = Math.min(pokemon.totalHp, pokemon.currentHp + amount);
-  log(`${pokemon.name} absorbed nutrients with its roots! (+${pokemon.currentHp - before} HP)`);
+  const amount = Math.max(1, Math.floor(pokemon.totalHP / 16));
+  const before = pokemon.currentHP;
+  pokemon.currentHP = Math.min(pokemon.totalHP, pokemon.currentHP + amount);
+  log(`${pokemon.name} absorbed nutrients with its roots! (+${pokemon.currentHP - before} HP)`);
   await delay(800);
 }
 
@@ -3669,13 +3676,13 @@ async function endOfTurnField() {
 
 async function endOfTurnWeather(pokemon) {
   const w = weather.value.type;
-  if (pokemon.currentHp <= 0) return;
+  if (pokemon.currentHP <= 0) return;
   const immune = w === 'sandstorm'
     ? pokemon.types.some(t => ['rock', 'ground', 'steel'].includes(t))
     : pokemon.types.includes('ice');
   if ((w === 'sandstorm' || w === 'hail') && !immune) {
-    const amount = Math.max(1, Math.floor(pokemon.totalHp / 16));
-    pokemon.currentHp = Math.max(0, pokemon.currentHp - amount);
+    const amount = Math.max(1, Math.floor(pokemon.totalHP / 16));
+    pokemon.currentHP = Math.max(0, pokemon.currentHP - amount);
     log(`${pokemon.name} is buffeted by the ${w}!`);
     await delay(800);
   }
@@ -3683,20 +3690,20 @@ async function endOfTurnWeather(pokemon) {
 
 async function endOfTurnGrassy(pokemon) {
   if (terrain.value.type !== 'grassy') return;
-  if (pokemon.currentHp <= 0 || pokemon.currentHp >= pokemon.totalHp) return;
+  if (pokemon.currentHP <= 0 || pokemon.currentHP >= pokemon.totalHP) return;
   if (!isGrounded(pokemon) || isHealBlocked(pokemon)) return;
-  const amount = Math.max(1, Math.floor(pokemon.totalHp / 16));
-  const before = pokemon.currentHp;
-  pokemon.currentHp = Math.min(pokemon.totalHp, pokemon.currentHp + amount);
-  log(`${pokemon.name} was healed by the grassy terrain! (+${pokemon.currentHp - before} HP)`);
+  const amount = Math.max(1, Math.floor(pokemon.totalHP / 16));
+  const before = pokemon.currentHP;
+  pokemon.currentHP = Math.min(pokemon.totalHP, pokemon.currentHP + amount);
+  log(`${pokemon.name} was healed by the grassy terrain! (+${pokemon.currentHP - before} HP)`);
   await delay(800);
 }
 
 async function endOfTurnFuture(side) {
   const fa = futureAttacks.value[side];
-  console.log(fa)
+  // console.log(fa)
   if (!fa || --fa.turnsLeft > 0) return;
-  console.log("test")
+  // console.log("test")
   futureAttacks.value[side] = null;
   const target = side === 'ally' ? userPokemon.value : foe.value;
   if (!target || isFainted(target)) return;
@@ -3707,8 +3714,8 @@ async function endOfTurnFuture(side) {
     target.substitute = Math.max(0, target.substitute - results.damage);
     log(target.substitute > 0 ? 'The substitute took the hit!' : "The substitute broke!");
   } else {
-    const dealt = Math.min(results.damage, target.currentHp);
-    target.currentHp -= dealt;
+    const dealt = Math.min(results.damage, target.currentHP);
+    target.currentHP -= dealt;
     recordDamage(target, fa.move, dealt);
   }
   await delay(800);
@@ -3720,8 +3727,8 @@ async function endOfTurnWish(side) {
   if (!w || --w.turnsLeft > 0) return;
   wishes.value[side] = null;
   const p = side === 'ally' ? userPokemon.value : foe.value;
-  if (!p || isFainted(p) || p.currentHp >= p.totalHp || isHealBlocked(p)) return;
-  p.currentHp = Math.min(p.totalHp, p.currentHp + w.amount);
+  if (!p || isFainted(p) || p.currentHP >= p.totalHP || isHealBlocked(p)) return;
+  p.currentHP = Math.min(p.totalHP, p.currentHP + w.amount);
   log(`${w.name}'s wish came true!`);
   await delay(700);
 }
@@ -3761,10 +3768,9 @@ async function handleUseRecoveryItem(item, targetPokemon) {
 
   switch (item.effectType) {
     case "revive":
-      console.log(target)
-      if (target.currentHp <= 0) {
+      if (target.currentHP <= 0) {
         if (inventoryStore.UseRecovery(item.id)) {
-          target.currentHp = Math.trunc(target.totalHp * item.effect.percent)
+          target.currentHP = Math.trunc(target.totalHP * item.effect.percent)
           battleLog.value.push(`${target.name} has been revived!`)
           selectedTargetPokemon.value = null;
           sidePanel.value = "log"
@@ -3779,21 +3785,21 @@ async function handleUseRecoveryItem(item, targetPokemon) {
         return;
       }
     case "heal":
-      if (target.currentHp <= 0) {
+      if (target.currentHP <= 0) {
         battleLog.value.push(`${target.name} is fainted! Use a Revive instead.`);
         sidePanel.value = 'log';
         await delay(800);
         return;
       }
       else {
-        if (target.currentHp == target.totalHp) {
+        if (target.currentHP == target.totalHP) {
           battleLog.value.push(`${target.name} is already at full HP!`);
           sidePanel.value = 'log';
           await delay(800);
           return;
         }
         if (inventoryStore.UseRecovery(item.id)) {
-          target.currentHp = Math.min(target.totalHp, target.currentHp + item.amount);
+          target.currentHP = Math.min(target.totalHP, target.currentHP + item.effect.amount);
           battleLog.value.push(`${item.name} has been used on ${target.name}.`)
           selectedTargetPokemon.value = null;
           sidePanel.value = "log"
@@ -3837,7 +3843,7 @@ async function throwPokeball(pokeball) {
 
   if (effectiveRoll <= target.captureRate) {
     log(`Gotcha! ${target.name} was caught!`);
-    pokemonStore.addPokemon(target);
+    await pokemonStore.addPokemon(target);
     const reward = Math.trunc(3000 / target.captureRate);
     inventoryStore.AddFunds(reward);
     log(`You earned ₽${reward}.`);
@@ -3913,7 +3919,7 @@ async function switchActivePokemon(pokemon) {
     log(`${userPokemon.value.name}, come back!`);
     await delay(600);
     userPokemon.value = pokemon;
-    if (pokemon.currentHp == null) pokemon.currentHp = pokemon.totalHp;
+    if (pokemon.currentHP == null) pokemon.currentHP = pokemon.totalHP;
     log(`Go, ${pokemon.name}!`);
     sidePanel.value = 'log';
     await delay(600);

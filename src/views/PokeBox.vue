@@ -240,9 +240,9 @@ function handleUseRecoveryItem(item) {
 
     switch (item.effect.type) {
         case "revive":
-            if (target.currentHp <= 0) {
+            if (target.currentHP <= 0) {
                 if (inventoryStore.UseRecovery(item.id)) {
-                    target.currentHp = Math.trunc(target.totalHp * item.effect.percent)
+                    target.currentHP = Math.trunc(target.totalHP * item.effect.percent)
                 }
             }
             else {
@@ -251,17 +251,17 @@ function handleUseRecoveryItem(item) {
             }
             break
         case "heal":
-            if (target.currentHp <= 0) {
+            if (target.currentHP <= 0) {
                 console.warn(`${target.name} has fainted, you must use a revive item to fix this injury!`)
                 return
             }
             else {
-                if (target.currentHp == target.totalHp) {
+                if (target.currentHP == target.totalHP) {
                     console.warn(`${target.name} is already at full health!`)
                     return
                 }
                 if (inventoryStore.UseRecovery(item.id)) {
-                    target.currentHp = Math.min(target.totalHp, target.currentHp + item.effect.amount);
+                    target.currentHP = Math.min(target.totalHP, target.currentHP + item.effect.amount);
                     return
                 }
             }
@@ -299,8 +299,8 @@ function handleUseRecoveryItem(item) {
 
 // Helper functions for health bar calculations
 function hpPercent(p) {
-    if (!p || !p.totalHp) return 0;
-    return Math.max(0, Math.min(100, (p.currentHp / p.totalHp) * 100));
+    if (!p || !p.totalHP) return 0;
+    return Math.max(0, Math.min(100, (p.currentHP / p.totalHP) * 100));
 }
 
 function hpTone(p) {
@@ -471,7 +471,9 @@ function closeRefillPPModalOpen() {
                     </template>
                     <template #header>
                         <div class="sprite-container">
-                            <img class="pokemon-sprite" :src="pokemon.sprite" :alt="pokemon.name" />
+                            <img v-if="pokemon.shiny" class="pokemon-sprite" :src="pokemon.sprites.shinyFront"
+                                :alt="pokemon.name" />
+                            <img v-else class="pokemon-sprite" :src="pokemon.sprites.front" :alt="pokemon.name" />
                         </div>
                     </template>
                 </Card>
@@ -485,7 +487,9 @@ function closeRefillPPModalOpen() {
             <!-- HEADER: Sprite + Name + Level + Types -->
             <div class="pokemon-header">
                 <div class="sprite-wrapper">
-                    <img :src="selectedPokemon.sprite" :alt="selectedPokemon.name" class="pokemon-avatar" />
+                    <img v-if="selectedPokemon.shiny" class="pokemon-sprite" :src="selectedPokemon.sprites.shinyFront"
+                        :alt="selectedPokemon.name" />
+                    <img v-else class="pokemon-sprite" :src="selectedPokemon.sprites.front" :alt="selectedPokemon.name" />
                 </div>
 
                 <div class="header-info">
@@ -510,7 +514,7 @@ function closeRefillPPModalOpen() {
                 <div class="hp-header">
                     <span class="hp-label">HP</span>
                     <span class="hp-value">
-                        {{ Math.max(0, selectedPokemon.currentHp) }} / {{ selectedPokemon.totalHp }}
+                        {{ Math.max(0, selectedPokemon.currentHP) }} / {{ selectedPokemon.totalHP }}
                     </span>
                 </div>
                 <div class="hp-track">

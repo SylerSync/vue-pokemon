@@ -53,6 +53,7 @@ async function submit() {
     console.log(password.value)
     try {
         await auth.login(email.value, password.value)
+        pokemonStore.getUserData(auth.user.email)
         router.go(-1)
     } catch (e) {
         console.log(e.status === 401
