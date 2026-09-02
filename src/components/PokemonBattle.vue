@@ -227,7 +227,7 @@
                 </Select>
               </div>
 
-              <div v-for="item in formattedInventory" :key="item.id" class="item-card">
+              <div v-for="item in formattedInventory" :key="item.itemId" class="item-card">
                 <div class="item-info">
                   <span class="item-name">{{ item.id }}</span>
                   <span class="item-count">x{{ item.count }}</span>
@@ -369,10 +369,10 @@ const selectedTargetPokemon = ref(null);
 
 // Map IDs to PokeAPI sprite URLs
 const pokeballIcons = {
-  pokeball: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/poke-ball.png",
-  greatball: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/great-ball.png",
-  ultraball: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/ultra-ball.png",
-  masterball: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/master-ball.png"
+  "pokeball": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/poke-ball.png",
+  "great-ball": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/great-ball.png",
+  "ultra-ball": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/ultra-ball.png",
+  "master-ball": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/master-ball.png"
 };
 
 const pokeballOptions = computed(() => {
@@ -383,15 +383,22 @@ const pokeballOptions = computed(() => {
     count: '∞'
   };
 
-  const storeBalls = Object.keys(inventoryStore.pokeballs).map((key) => ({
-    id: key,
-    label: key.charAt(0).toUpperCase() + key.slice(1),
-    icon: pokeballIcons[key] || pokeballIcons.pokeball,
-    count: inventoryStore.pokeballs[key].count
-  }));
+  const fullPokeballs = inventoryStore.GetItemsByCategory("pokeballs", true);
+  const formattedPokeballs = fullPokeballs.map((item) => {
+    const ballId = (item.id || item.itemId || '').toLowerCase();
 
-  return [standardPokeball, ...storeBalls];
+    return {
+      id: ballId,
+      label: item.name || (ballId.charAt(0).toUpperCase() + ballId.slice(1)),
+      icon: pokeballIcons[ballId] || pokeballIcons.pokeball,
+      count: item.count
+    };
+  });
+
+  // Return directly to avoid variable shadowing
+  return [standardPokeball, ...formattedPokeballs];
 });
+
 
 /** Working copy of the opponent so the parent's object is never mutated. */
 const foe = ref(null)
@@ -413,26 +420,13 @@ const team = computed(() => {
 
 });
 
-
-
 const formattedInventory = computed(() => {
-  const items = inventoryStore.recoveryItems;
+  const items = inventoryStore.GetRecoveryItems(true);
   if (!items) return [];
 
-  return Object.entries(items)
-    .filter(([key, data]) => data.count > 0) // Only show items you actually own
-    .map(([key, data]) => {
-      // Clean up the name for display (e.g., 'maxrevive' -> 'Max Revive')
-      let displayName = key === 'maxrevive' ? 'Max Revive' : key.charAt(0).toUpperCase() + key.slice(1);
-
-      return {
-        id: key,            // 'potion', 'revive', etc.
-        name: displayName,
-        count: data.count,
-        effect: data.effect // Passes your { type: "heal", amount: 20 } along!
-      };
-    });
+  return Array.isArray(items) ? items : []
 });
+
 
 const MAJOR_STATUSES = new Set([
   'burn', 'freeze', 'paralysis', 'poison', 'bad-poison', 'sleep',
@@ -1433,7 +1427,7 @@ async function playAnim(actor, type, ms) {
 }
 
 function isPokeball(item) {
-  return Object.prototype.hasOwnProperty.call(inventoryStore.pokeballs, item) || item === "pokeball"
+  return Object.prototype.hasOwnProperty.call(inventoryStore.GetItemsByCategory("pokeballs"), item) || item === "pokeball"
 }
 
 function canUseItem(item) {
@@ -3755,22 +3749,24 @@ async function useBattleItem(item) {
 }
 
 async function handleUseRecoveryItem(item, targetPokemon) {
-  if (!inventoryStore.recoveryItems[item.id]) {
+  const recoveryItems = inventoryStore.GetRecoveryItems(true) || []
+  const isRecoveryItem = recoveryItems.some (i => (i.id || i.itemId) === item.id);
+  if (!isRecoveryItem) {
     console.warn(`Can not find item ${item.id} in the inventory.`)
     return
   }
 
   const target = targetPokemon;
   if (!target) return;
-
-  if (item.effect.type === 'heal' && isHealBlocked(target)) {
+  console.log(item)
+  if (item.effectType === 'heal' && isHealBlocked(target)) {
     log(`${target.name} can't be healed right now!`);
     sidePanel.value = 'log';
     await delay(800);
     return;
   }
 
-  switch (item.effect.type) {
+  switch (item.effectType) {
     case "revive":
       if (target.currentHP <= 0) {
         if (inventoryStore.UseRecovery(item.id)) {
@@ -3808,21 +3804,21 @@ async function handleUseRecoveryItem(item, targetPokemon) {
           selectedTargetPokemon.value = null;
           sidePanel.value = "log"
           await delay(800)
-          return
+          return;
         }
       }
-    case "status-heal":
+    case "Status-recovery":
       if (target.status !== "" && target.status) {
-        if (target.status === item.effect.status)
+        if (target.status === item.status)
           target.status = ""
         inventoryStore.UseRecovery(item.id)
-        battleLog.value.push(`${target.name} has been heal from status: ${item.effect.status}`)
+        battleLog.value.push(`${target.name} has been heal from status: ${item.status}`)
         selectedTargetPokemon.value = null;
         await delay(800)
         return
       }
       else {
-        battleLog.value.push(`${target.name} is not effected by ${item.effect.status}. Can't use this item.`)
+        battleLog.value.push(`${target.name} is not effected by ${item.status}. Can't use this item.`)
         sidePanel.value = "log"
         await delay(800)
         return
@@ -3974,11 +3970,13 @@ watch(sidePanel, async (tab) => {
   if (logEl.value) logEl.value.scrollTop = logEl.value.scrollHeight;
 });
 
-onMounted(() => {
+onMounted(async () => {
   if (props.autoStart) {
     userPokemon.value = team.value.find(p => !isFainted(p)) ?? null;
     if (userPokemon.value) startBattle();
   }
+  await inventoryStore.FetchCatalog();
+  await inventoryStore.GetUserInventory();
 });
 </script>
 

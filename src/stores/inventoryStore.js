@@ -6,25 +6,61 @@ export const useInventoryStore = defineStore("inventoryStore", {
         funds: 0,
         items: [],
         catalog: [],
-        loading: false
+        loading: false,
+        selectedPokeball: 'pokeball'
     }),
     getters: {
         GetItemsByCategory: (state) => (category, isUser = false) => {
+            console.log(`Get Items by Category: ${category}.`)
             if (!isUser) {
-                // Return DB catalog items matching the PascalCase 'Category' property
                 return state.catalog.filter((item) => item.category === category);
             }
-            // Return user's owned items matched with DB catalog metadata using PascalCase properties
             return state.items
                 .map((userItem) => {
-                    const metadata = state.catalog.find((c) => c.Id === userItem.itemId) || {};
+                    const metadata = state.catalog.find((c) => c.id === userItem.itemId) || {};
                     return {
                         ...metadata,
-                        ItemId: userItem.itemId,
-                        Count: userItem.count
+                        itemId: userItem.itemId,
+                        count: userItem.count
                     };
                 })
-                .filter((item) => item.category === category && item.Count > 0);
+                .filter((item) => item.category === category && item.count > 0);
+        },
+        GetRecoveryItems: (state) => (isUser = false) => {
+            const RECOVERY_CATS = [
+                "recovery",
+                "Status-recovery",
+                "pp-recovery",
+                "stat-boosters"
+            ];
+
+            if (!isUser) {
+                return state.catalog.filter(catItem =>
+                    catItem && RECOVERY_CATS.includes(catItem.category)
+                );
+            }
+
+            if (!Array.isArray(state.items)) return [];
+
+            return state.items
+                .map(userItem => {
+                    const id = (userItem.itemId || userItem.ItemId || '').toLowerCase();
+                    const count = userItem.count ?? userItem.Count ?? 0;
+
+                    // Look up directly in state.catalog
+                    const catalogData = state.catalog.find(
+                        c => (c.itemId || c.id || '').toLowerCase() === id
+                    );
+
+                    if (!catalogData) return null;
+
+                    return {
+                        ...catalogData,
+                        id,
+                        count
+                    };
+                })
+                .filter(item => item && item.count > 0 && RECOVERY_CATS.includes(item.category));
         }
     },
     actions: {
@@ -44,7 +80,7 @@ export const useInventoryStore = defineStore("inventoryStore", {
             if (user !== null) {
                 try {
                     var response = await pokemonApi.addFunds(user.Email, amount);
-                    
+
                     this.items = response.ftems;
                     this.funds = response.funds;
                 } catch (err) {
@@ -81,7 +117,7 @@ export const useInventoryStore = defineStore("inventoryStore", {
             if (user !== null) {
                 try {
                     var response = await pokemonApi.useItem(user.Email, itemId, quantity);
-                    
+
                     this.items = response.items;
                     this.funds = response.funds;
                 } catch (err) {
