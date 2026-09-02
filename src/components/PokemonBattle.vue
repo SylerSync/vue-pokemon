@@ -18,7 +18,8 @@
               </template>
               <template #option="slotProps">
                 <div class="option-row" :class="{ fainted: isFainted(slotProps.option) }">
-                  <img v-if="slotProps.option.shiny" :src="slotProps.option.sprites.shinyFront" alt="" class="option-sprite" />
+                  <img v-if="slotProps.option.shiny" :src="slotProps.option.sprites.shinyFront" alt=""
+                    class="option-sprite" />
                   <img v-else :src="slotProps.option.sprites.front" alt="" class="option-sprite" />
                   <span class="option-name">
                     {{ slotProps.option.name }} · Lv {{ slotProps.option.level }}
@@ -98,12 +99,12 @@
                     </span>
                   </div>
                 </div>
-                <img v-if="userPokemon.shiny" :src="userPokemon.sprites.shinyBack ?? userPokemon.sprites.shinyBack" :alt="userPokemon.name"
-                  class="battle-sprite sprite-ally" :class="[
+                <img v-if="userPokemon.shiny" :src="userPokemon.sprites.shinyBack ?? userPokemon.sprites.shinyBack"
+                  :alt="userPokemon.name" class="battle-sprite sprite-ally" :class="[
                     anim?.actor === 'ally' ? `anim-${anim.type}` : null,
                     { 'mega-evolving': isMegaEvolving }
                   ]" />
-                  <img v-else :src="userPokemon.sprites.back ?? userPokemon.sprites.back" :alt="userPokemon.name"
+                <img v-else :src="userPokemon.sprites.back ?? userPokemon.sprites.back" :alt="userPokemon.name"
                   class="battle-sprite sprite-ally" :class="[
                     anim?.actor === 'ally' ? `anim-${anim.type}` : null,
                     { 'mega-evolving': isMegaEvolving }
@@ -153,7 +154,7 @@
               <Button severity="secondary" :disabled="isResolving || !inventoryStore.selectedPokeball"
                 @click="battleTurn(null, inventoryStore.selectedPokeball)">
                 Catch Pokemon
-            </Button>
+              </Button>
             </div>
           </div>
         </SplitterPanel>
@@ -381,10 +382,12 @@ const pokeballOptions = computed(() => {
     id: "pokeball",
     label: "Pokeball",
     icon: pokeballIcons.pokeball,
+    catchPower: 0,
     count: '∞'
   };
 
   const fullPokeballs = inventoryStore.GetItemsByCategory("pokeballs", true);
+  console.log(fullPokeballs)
   const formattedPokeballs = fullPokeballs.map((item) => {
     const ballId = (item.id || item.itemId || '').toLowerCase();
 
@@ -392,6 +395,7 @@ const pokeballOptions = computed(() => {
       id: ballId,
       label: item.name || (ballId.charAt(0).toUpperCase() + ballId.slice(1)),
       icon: pokeballIcons[ballId] || pokeballIcons.pokeball,
+      catchPower: item.catchPower,
       count: item.count
     };
   });
@@ -1428,7 +1432,9 @@ async function playAnim(actor, type, ms) {
 }
 
 function isPokeball(item) {
-  return Object.prototype.hasOwnProperty.call(inventoryStore.GetItemsByCategory("pokeballs"), item) || item === "pokeball"
+  var pokeballs = (inventoryStore.GetItemsByCategory("pokeballs", true)).filter(p => p.id === item)
+  console.log(pokeballs)
+  return pokeballs.length > 0 || item === "pokeball"
 }
 
 function canUseItem(item) {
@@ -1622,6 +1628,7 @@ async function battleTurn(playerMove, item = null) {
     // --- item branch: using an item costs your turn ---
     if (item) {
       if (isPokeball(item)) {
+        console.log("Item is pokeball")
         const caught = await throwPokeball(item);
         if (caught) return endBattle('caught');
         if (!battleStarted.value) return; // it fled
@@ -3751,7 +3758,7 @@ async function useBattleItem(item) {
 
 async function handleUseRecoveryItem(item, targetPokemon) {
   const recoveryItems = inventoryStore.GetRecoveryItems(true) || []
-  const isRecoveryItem = recoveryItems.some (i => (i.id || i.itemId) === item.id);
+  const isRecoveryItem = recoveryItems.some(i => (i.id || i.itemId) === item.id);
   if (!isRecoveryItem) {
     console.warn(`Can not find item ${item.id} in the inventory.`)
     return
@@ -3829,18 +3836,23 @@ async function handleUseRecoveryItem(item, targetPokemon) {
 
 async function throwPokeball(pokeball) {
   let target = props.opponent
-  if (!inventoryStore.UseItem(pokeball)) {
+  if (pokeball !== "pokeball" && !inventoryStore.UseItem(pokeball)) {
     log(`You have no ${pokeball.label} left.`);
     return false;
   }
-  const ball = inventoryStore.selectedPokeball(pokeball)
-
+  // Need repairs
+  const ball = pokeballOptions.value.find(
+    b => b.id === inventoryStore.selectedPokeball
+  );
+  console.log(ball)
   log(`You threw a ${pokeball} at ${target.name}...`);
   await delay(800);
 
   const hpBonus = hpPercent(target) < 20 ? 20 : hpPercent(target) < 50 ? 10 : 0;
   const roll = randInt(0, 100) - ball.catchPower - hpBonus;
+  console.log(roll)
   const effectiveRoll = Math.min(100, Math.max(0, roll));
+  console.log(effectiveRoll)
 
   if (effectiveRoll <= target.captureRate) {
     log(`Gotcha! ${target.name} was caught!`);
