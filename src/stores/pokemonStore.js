@@ -6,7 +6,7 @@ export const usePokemonStore = defineStore("pokemonStore", {
 
     state: () => ({
         caughtPokemon: [],
-        pokemonParty: [],
+        partyIds: [],
         wishlistPokemon: [],
         typeColors: {
             normal: '#A8A878',
@@ -128,8 +128,8 @@ export const usePokemonStore = defineStore("pokemonStore", {
             }
 
             // this.caughtPokemon.push(newPokemon)
-            if (this.pokemonParty.length < 6) {
-                this.pokemonParty.push(newPokemon)
+            if (this.partyIds.length < 6) {
+                this.partyIds.push(instanceId);
             }
         },
         releasePokemon(index) {
@@ -188,6 +188,8 @@ export const usePokemonStore = defineStore("pokemonStore", {
             if(user == null) return;
             console.log(user);
             this.wishlistPokemon = user.wishList || []
+            let box = await PokemonAPI.getUserPokemon(email)
+            this.caughtPokemon = box.pokemon || []
         }
     }
 })
