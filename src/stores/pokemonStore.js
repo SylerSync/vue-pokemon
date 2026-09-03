@@ -127,10 +127,6 @@ export const usePokemonStore = defineStore("pokemonStore", {
                 console.error("Error catching Pokemon:", error);
             }
 
-            // this.caughtPokemon.push(newPokemon)
-            if (this.partyIds.length < 6) {
-                this.partyIds.push(instanceId);
-            }
         },
         async releasePokemon(index) {
             const released = this.caughtPokemon[index];

@@ -79,12 +79,12 @@ export const useInventoryStore = defineStore("inventoryStore", {
             var user = JSON.parse(localStorage.getItem('user') || 'null');
             if (user !== null) {
                 try {
-                    var response = await pokemonApi.addFunds(user.Email, amount);
+                    var response = await pokemonApi.addFunds(user.email, amount);
 
                     this.items = response.ftems;
                     this.funds = response.funds;
                 } catch (err) {
-                    console.error(`There was an issue adding funds for ${user.Email}.`, err);
+                    console.error(`There was an issue adding funds for ${user.email}.`, err);
                 }
             }
         },
@@ -103,7 +103,7 @@ export const useInventoryStore = defineStore("inventoryStore", {
                     this.funds = response.funds;
                     return true;
                 } catch (err) {
-                    console.error(`There was an issue buying an item for ${user.Email}.`, err);
+                    console.error(`There was an issue buying an item for ${user.email}.`, err);
                     return false;
                 }
             }
@@ -116,12 +116,12 @@ export const useInventoryStore = defineStore("inventoryStore", {
             var user = JSON.parse(localStorage.getItem('user') || 'null');
             if (user !== null) {
                 try {
-                    var response = await pokemonApi.useItem(user.Email, itemId, quantity);
+                    var response = await pokemonApi.useItem(user.email, itemId, quantity);
 
                     this.items = response.items;
                     this.funds = response.funds;
                 } catch (err) {
-                    console.error(`There was an issue using an item for ${user.Email}.`, err);
+                    console.error(`There was an issue using an item for ${user.email}.`, err);
                 }
             }
         },
@@ -133,11 +133,11 @@ export const useInventoryStore = defineStore("inventoryStore", {
             var user = JSON.parse(localStorage.getItem('user') || 'null');
             if (user !== null) {
                 try {
-                    var response = await pokemonApi.addItem(user.Email, itemId, quantity);
+                    var response = await pokemonApi.addItem(user.email, itemId, quantity);
                     this.items = response.items;
                     this.funds = response.funds;
                 } catch (err) {
-                    console.error(`There was an issue adding an item for ${user.Email}.`, err);
+                    console.error(`There was an issue adding an item for ${user.email}.`, err);
                 }
             }
         },
