@@ -42,3 +42,5 @@ export const removeFromWishList = (pokemonName, user) => post('user/removeWishLi
 export const getUserData = (email) => get(`user/getUserData/${email}`)
 export const catchPokemon = (userId, pokemon) => post('pokebox/addPokemonToBox', {userId, pokemon})
 export const getUserPokemon = (userId) => get(`pokebox/getPokeBox/${encodeURIComponent(userId)}`)
+export const releasePokemon = (userId, pokemon) => post('pokebox/removePokemonFromBox', {userId, pokemon})
+export const updatePokemon = (userId, pokemon) => post('pokebox/updateCaughtPokemon', {userId, pokemon})

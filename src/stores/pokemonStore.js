@@ -120,7 +120,7 @@ export const usePokemonStore = defineStore("pokemonStore", {
                 StatTotal: Math.floor(stat.stat) || 0
             }))
             let user = JSON.parse(localStorage.getItem('user'))
-            try{
+            try {
                 let results = await PokemonAPI.catchPokemon(user.email, newPokemon)
                 this.caughtPokemon = results.pokemon
             } catch (error) {
@@ -128,12 +128,32 @@ export const usePokemonStore = defineStore("pokemonStore", {
             }
 
         },
-        releasePokemon(index) {
+        async releasePokemon(index) {
             const released = this.caughtPokemon[index];
+            let user = JSON.parse(localStorage.getItem('user'))
             if (released) {
                 // Remove from party if present
                 this.partyIds = this.partyIds.filter(id => id !== released.instanceId);
-                this.caughtPokemon.splice(index, 1);
+
+                try {
+                    let results = await PokemonAPI.releasePokemon(user.email, released)
+                    this.caughtPokemon = results.pokemon
+                } catch (error) {
+                    console.error("Error catching Pokemon:", error);
+                }
+            }
+        },
+        async updatePokemon(pokemon) {
+            let user = JSON.parse(localStorage.getItem('user'))
+            try {
+                console.log("Updating Pokemon:", pokemon, "for user:", user.email);
+                let results = await PokemonAPI.updatePokemon(user.email, pokemon)
+                this.caughtPokemon.map(storePokemon => 
+                    storePokemon.instanceId === results.instanceId ? results : storePokemon
+                )
+
+            } catch (error) {
+                console.error("Error catching Pokemon:", error);
             }
         },
         // Wishlist Controls
@@ -179,9 +199,9 @@ export const usePokemonStore = defineStore("pokemonStore", {
         setWishlistPokemon(pokemonList) {
             this.wishlistPokemon = pokemonList;
         },
-        async getUserData(email){
+        async getUserData(email) {
             var user = await PokemonAPI.getUserData(email);
-            if(user == null) return;
+            if (user == null) return;
             console.log(user);
             this.wishlistPokemon = user.wishList || []
             let box = await PokemonAPI.getUserPokemon(email)

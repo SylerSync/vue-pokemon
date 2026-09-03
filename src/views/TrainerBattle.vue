@@ -153,7 +153,7 @@ const filteredPokemon = computed(() => {
 
 function ToggleSelectedPokemon(pokemon) {
     // 1. Find the index of the pokemon in the selected list
-    const index = selectedPokemonTeam.value.findIndex(p => p.instanceId === pokemon.instanceId)
+    const index = selectedPokemonTeam.value.findIndex(p => p._id === pokemon._id)
 
     if (index !== -1) {
         selectedPokemonTeam.value.splice(index, 1)
@@ -476,7 +476,7 @@ function CloseEndModal() {
 }
 
 async function switchActivePokemon(newPokemon) {
-    if (newPokemon.instanceId === usersSelectedPokemon.value?.instanceId) return;
+    if (newPokemon._id === usersSelectedPokemon.value?._id) return;
     if ((newPokemon.currentHp ?? 0) <= 0) {
         battleLog.value.push(`${newPokemon.name} is fainted and cannot fight!`);
         return;
@@ -634,15 +634,17 @@ async function useBattleItem(item) {
                             <template #grid="slotProps">
                                 <div class="pokemon-grid">
                                     <template v-for="(pokemon, index) in (slotProps.items || filteredPokemon)"
-                                        :key="pokemon.instanceId || pokemon.id || index">
+                                        :key="pokemon._id || pokemon.id || index">
                                         <Card v-if="pokemon && (pokemon.currentHp ?? pokemon.currentHP ?? 0) > 0"
                                             class="w-full pokemonCard" @click="ToggleSelectedPokemon(pokemon)"
-                                            :class="{ 'is-selected': selectedPokemonTeam.some(p => p.instanceId === pokemon.instanceId) }">
+                                            :class="{ 'is-selected': selectedPokemonTeam.some(p => p._id === pokemon._id) }">
 
                                             <template #title>{{ pokemon.name }}</template>
                                             <template #header>
                                                 <div class="sprite-container">
-                                                    <img class="pokemon-sprite" :src="pokemon.sprite"
+                                                    <img v-if="pokemon.shiny" class="pokemon-sprite" :src="pokemon.sprites.shinyFront"
+                                                        :alt="pokemon.name" />
+                                                    <img v-else class="pokemon-sprite" :src="pokemon.sprites.front"
                                                         :alt="pokemon.name" />
                                                 </div>
                                             </template>
