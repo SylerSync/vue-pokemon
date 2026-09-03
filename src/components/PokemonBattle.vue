@@ -3767,6 +3767,7 @@ async function useBattleItem(item) {
 }
 
 async function handleUseRecoveryItem(item, targetPokemon) {
+  console.log(item)
   const recoveryItems = inventoryStore.GetRecoveryItems(true) || []
   const isRecoveryItem = recoveryItems.some(i => (i.id || i.itemId) === item.id);
   if (!isRecoveryItem) {
@@ -3787,8 +3788,8 @@ async function handleUseRecoveryItem(item, targetPokemon) {
   switch (item.effectType) {
     case "revive":
       if (target.currentHP <= 0) {
-        if (inventoryStore.UseRecovery(item.id)) {
-          target.currentHP = Math.trunc(target.totalHP * item.effect.percent)
+        if (inventoryStore.UseItem(item.id)) {
+          target.currentHP = Math.trunc(target.totalHP * item.percent)
           battleLog.value.push(`${target.name} has been revived!`)
           selectedTargetPokemon.value = null;
           sidePanel.value = "log"
@@ -3816,8 +3817,9 @@ async function handleUseRecoveryItem(item, targetPokemon) {
           await delay(800);
           return;
         }
-        if (inventoryStore.UseRecovery(item.id)) {
-          target.currentHP = Math.min(target.totalHP, target.currentHP + item.effect.amount);
+        if (inventoryStore.UseItem(item.id)) {
+          
+          target.currentHP = Math.min(target.totalHP, target.currentHP + item.amount);
           battleLog.value.push(`${item.name} has been used on ${target.name}.`)
           selectedTargetPokemon.value = null;
           sidePanel.value = "log"
@@ -3829,7 +3831,7 @@ async function handleUseRecoveryItem(item, targetPokemon) {
       if (target.status !== "" && target.status) {
         if (target.status === item.status)
           target.status = ""
-        inventoryStore.UseRecovery(item.id)
+        inventoryStore.UseItem(item.id)
         battleLog.value.push(`${target.name} has been heal from status: ${item.status}`)
         selectedTargetPokemon.value = null;
         await delay(800)
