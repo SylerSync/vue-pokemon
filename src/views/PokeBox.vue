@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed } from "vue"
+import { ref, computed, onMounted } from "vue"
 import { usePokemonStore } from "@/stores/pokemonStore";
 import Card from "primevue/card"
 import Modal from "@/components/Modal.vue"
@@ -53,7 +53,7 @@ function closeReplaceMoveModal() {
     if (!target || !pendingNewMove.value || pendingTmId.value === null) return;
 
     // Use TM from store
-    if (inventoryStore.UseTM(pendingTmId.value)) {
+    if (inventoryStore.UseItem(pendingTmId.value)) {
         closeTmModal();
     }
     isReplaceModalOpen.value = false;
@@ -69,21 +69,6 @@ const closeTmModal = () => {
     isTmModalOpen.value = false;
 };
 
-const tmInventory = computed(() => {
-    return Object.entries(inventoryStore.tms || {})
-        .filter(([_, count]) => count > 0)
-        .map(([id, count]) => {
-            const tm = tmData[id];
-            return {
-                id,
-                code: tm?.code || id.toUpperCase(),
-                moveName: tm?.moveName || 'Unknown Move',
-                move: tm?.move,
-                type: tm?.type || 'normal',
-                count
-            };
-        });
-});
 
 async function handleUseTM(tmItem) {
     const target = selectedPokemon.value;
@@ -116,7 +101,7 @@ async function handleUseTM(tmItem) {
 
         // 4. Handle Moveset Capacity (Max 4 Moves)
         if (target.moves.length < 4) {
-            if (inventoryStore.UseTM(tmItem.id)) {
+            if (inventoryStore.UseItem(tmItem.id)) {
                 target.moves.push(newMove);
                 closeTmModal();
             }
@@ -195,32 +180,6 @@ const closeDetailModal = () => {
     isDetailModalOpen.value = false
 }
 
-const itemInventory = computed(() => {
-    return Object.entries(inventoryStore.recoveryItems).map(([id, item]) => {
-        const formattedName = id
-            .replace(/([A-Z])/g, ' $1')
-            .replace(/^./, (str) => str.toUpperCase())
-            .replace('revive', ' Revive')
-            .trim();
-
-        let effectDescription = '';
-        if (item.effect.type === 'revive') {
-            effectDescription = `Revives with ${item.effect.percent * 100}% HP`;
-        } else if (item.effect.type === 'heal') {
-            effectDescription = `Heals ${item.effect.amount} HP`;
-        }
-
-        return {
-            id,
-            name: formattedName,
-            count: item.count,
-            cost: item.cost,
-            effect: item.effect,
-            effectDescription
-        };
-    });
-});
-
 const openItemModal = () => {
     isItemModalOpen.value = true
 }
@@ -230,19 +189,15 @@ const closeItemModal = () => {
 }
 
 function handleUseRecoveryItem(item) {
-    if (!inventoryStore.recoveryItems[item.id]) {
-        console.warn(`Can not find item ${item.id} in the inventory.`)
-        return
-    }
-
+    console.log(item)
     const target = selectedPokemon.value;
     if (!target) return;
 
-    switch (item.effect.type) {
+    switch (item.effectType) {
         case "revive":
             if (target.currentHP <= 0) {
-                if (inventoryStore.UseRecovery(item.id)) {
-                    target.currentHP = Math.trunc(target.totalHP * item.effect.percent)
+                if (inventoryStore.UseItem(item.itemId)) {
+                    target.currentHP = Math.trunc(target.totalHP * item.percent)
                 }
             }
             else {
@@ -260,32 +215,32 @@ function handleUseRecoveryItem(item) {
                     console.warn(`${target.name} is already at full health!`)
                     return
                 }
-                if (inventoryStore.UseRecovery(item.id)) {
-                    target.currentHP = Math.min(target.totalHP, target.currentHP + item.effect.amount);
+                if (inventoryStore.UseItem(item.id)) {
+                    target.currentHP = Math.min(target.totalHP, target.currentHP + item.amount);
                     return
                 }
             }
             break
         case "status-heal":
             if (target.status !== "" && target.status) {
-                if (target.status === item.effect.status)
+                if (target.status === item.status)
                     target.status = ""
-                inventoryStore.UseRecovery(item.id)
+                inventoryStore.UseItem(item.itemId)
                 return
             }
             else {
-                console.log(`${target.name} is not effected by ${item.effect.status}. Can't use this item.`)
+                console.log(`${target.name} is not effected by ${item.status}. Can't use this item.`)
             }
             break
         case "pp-heal":
-            if (item.effect.scope === "single") {
+            if (item.scope === "single") {
                 console.log(item)
                 ppRecoveryItem.value = item
                 isRefillPPModalOpen.value = true
-            } else if (item.effect.scope === "all") {
-                if (inventoryStore.UseRecovery(item.id)) {
+            } else if (item.scope === "all") {
+                if (inventoryStore.UseItem(item.itemId)) {
                     for (let move of selectedPokemon.value.moves) {
-                        move.currentPP = Math.min(move.maxPP, move.currentPP + item.effect.amount)
+                        move.currentPP = Math.min(move.maxPP, move.currentPP + item.amount)
                     }
                 }
             }
@@ -317,64 +272,6 @@ function expPercent(pokemon) {
     return Math.min(100, Math.floor((pokemon.currentExp / requiredExp) * 100));
 }
 
-const heldInventory = computed(() => {
-    const items = [];
-
-    // 1. Process Evolution Items
-    if (inventoryStore.evoItems) {
-        for (const [id, count] of Object.entries(inventoryStore.evoItems)) {
-            if (count > 0) {
-                const itemData = evolutionItems[id] || {};
-                const formattedName = itemData.name || id
-                    .replace(/([A-Z])/g, ' $1')
-                    .replace(/^./, (str) => str.toUpperCase())
-                    .trim();
-
-                let effectDescription = itemData.description || '';
-                if (!effectDescription && itemData.effect?.type === 'evolution') {
-                    effectDescription = 'Causes certain species to evolve when held or used';
-                }
-
-                items.push({
-                    id,
-                    name: formattedName,
-                    count,
-                    type: 'evo',
-                    cost: itemData.cost || 0,
-                    effect: itemData.effect || null,
-                    effectDescription
-                });
-            }
-        }
-    }
-
-    // 2. Process Mega Stones
-    if (inventoryStore.megaStones) {
-        for (const [id, count] of Object.entries(inventoryStore.megaStones)) {
-            if (count > 0) {
-                // Adjust lookup object name if your mega stone JSON uses a different import name
-                const itemData = (typeof megaStones !== 'undefined' ? megaStones[id] : {}) || {};
-                const formattedName = itemData.name || id
-                    .replace(/([A-Z])/g, ' $1')
-                    .replace(/^./, (str) => str.toUpperCase())
-                    .trim();
-
-                items.push({
-                    id,
-                    name: formattedName,
-                    count,
-                    type: 'mega',
-                    cost: itemData.cost || 0,
-                    effect: itemData.effect || null,
-                    effectDescription: itemData.description || 'Triggers Mega Evolution in battle when held by the matching species'
-                });
-            }
-        }
-    }
-
-    return items;
-});
-
 async function useEvoItem(itemId) {
     const pokemon = selectedPokemon.value;
     if (!pokemon?.evoDetails || !Array.isArray(pokemon.evoDetails)) {
@@ -395,7 +292,7 @@ async function useEvoItem(itemId) {
 
         if (success) {
             // Deduct stone from inventory
-            inventoryStore.UseEvoItem(itemId, 1);
+            inventoryStore.UseItem(itemId, 1);
 
             // Re-sync active modal reference to newly evolved species
             selectedPokemon.value = pokemonStore.caughtPokemon.find(
@@ -417,9 +314,9 @@ function handleHeldItem() {
         const isMegaStone = currentItem.toLowerCase().includes('mega') || currentItem.toLowerCase().endsWith('ite');
 
         if (isMegaStone) {
-            inventoryStore.AddMegaStone(currentItem);
+            inventoryStore.AddItem(currentItem);
         } else {
-            inventoryStore.AddEvoItem(currentItem);
+            inventoryStore.AddItem(currentItem);
         }
 
         selectedPokemon.value.heldItem = "";
@@ -431,7 +328,7 @@ function handleHeldItem() {
 
 function givePokemonItem(itemID) {
     selectedPokemon.value.heldItem = itemID
-    inventoryStore.UseEvoItem(itemID)
+    inventoryStore.UseItem(itemID)
     closeEvoItemModal()
 }
 
@@ -444,6 +341,67 @@ function closeEvoItemModal() {
 
 function closeRefillPPModalOpen() {
     isRefillPPModalOpen.value = false
+}
+
+onMounted(() => {
+    inventoryStore.GetUserInventory()
+    inventoryStore.FetchCatalog()
+});
+
+function formatItemName(itemId) {
+    if (!itemId) return '';
+    return itemId
+        .split('-')
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(' ');
+}
+
+const combinedInventory = computed(() => {
+    const userItems = Array.isArray(inventoryStore.items) ? inventoryStore.items : [];
+    const catalog = Array.isArray(inventoryStore.catalog) ? inventoryStore.catalog : [];
+
+    let items = [];
+
+    for (let item of userItems) {
+        if (!item) continue;
+
+        // Find metadata from catalog
+        let catalogMatch = catalog.find((i) => i.id === item.itemId || i._id === item.itemId) || {};
+
+        // Create a NEW merged object without mutating the original catalog item
+        items.push({
+            ...catalogMatch,
+            itemId: item.itemId, // 🛡️ Guaranteed string ID for click handlers
+            count: item.count ?? 0
+        });
+    }
+
+    return items;
+});
+
+// Tab 1: Recovery Items (potions, status heals, revives)
+const itemInventory = computed(() => {
+    return combinedInventory.value.filter(
+        (item) => item.category === 'recovery' && item.count > 0
+    );
+});
+
+// Tab 2: Evolution & Held Items
+const heldInventory = computed(() => {
+    return combinedInventory.value.filter(
+        (item) => (item.category === 'evolution-stones' || item.category === 'held-items') && item.count > 0
+    );
+});
+
+// Tab 3: Technical Machines (TMs)
+const tmInventory = computed(() => {
+    return combinedInventory.value.filter(
+        (item) => item.category === 'technicalMachineItem' && item.count > 0
+    );
+});
+
+function useEvolutionStone(item){
+    console.log(item)
 }
 
 </script>
@@ -489,7 +447,8 @@ function closeRefillPPModalOpen() {
                 <div class="sprite-wrapper">
                     <img v-if="selectedPokemon.shiny" class="pokemon-sprite" :src="selectedPokemon.sprites.shinyFront"
                         :alt="selectedPokemon.name" />
-                    <img v-else class="pokemon-sprite" :src="selectedPokemon.sprites.front" :alt="selectedPokemon.name" />
+                    <img v-else class="pokemon-sprite" :src="selectedPokemon.sprites.front"
+                        :alt="selectedPokemon.name" />
                 </div>
 
                 <div class="header-info">
@@ -541,7 +500,8 @@ function closeRefillPPModalOpen() {
                     <div v-for="move in selectedPokemon.moves" :key="move.name" class="move-card">
                         <div class="move-main">
                             <span class="move-name">{{ move.name }}</span>
-                            <span class="move-type" :style="{ color: pokemonStore.typeColors[move.type.toLowerCase()] || 'inherit' }">
+                            <span class="move-type"
+                                :style="{ color: pokemonStore.typeColors[move.type.toLowerCase()] || 'inherit' }">
                                 {{ move.type }}
                             </span>
                         </div>
@@ -596,7 +556,7 @@ function closeRefillPPModalOpen() {
                     <Column header="Action" style="width: 20%">
                         <template #body="slotProps">
                             <Button label="Use" severity="primary" size="small" :disabled="slotProps.data.count <= 0"
-                                @click="handleUseRecoveryItem(slotProps.data)" />
+                                @click="handleUseRecoveryItem(slotProps.data.itemId)" />
                         </template>
                     </Column>
                 </DataTable>
@@ -607,17 +567,17 @@ function closeRefillPPModalOpen() {
                 <h3 class="section-title mb-2">Select Evolution / Held Item</h3>
                 <DataTable :value="heldInventory" responsiveLayout="scroll" class="p-datatable-sm itemMenu">
                     <Column field="name" header="Item" style="width: 25%"></Column>
-                    <Column field="description" header="Effect" style="width: 40%"></Column>
+                    <Column field="effectDescription" header="Effect" style="width: 40%"></Column>
                     <Column field="count" header="In Bag" style="width: 15%"></Column>
                     <Column header="Action" style="width: 20%">
                         <template #body="slotProps">
                             <!-- DIRECT USE (Evolution Stones) -->
                             <Button v-if="slotProps.data.category === 'evolution-stones'" label="Use" severity="warn"
                                 size="small" :disabled="slotProps.data.count <= 0"
-                                @click="useEvolutionStone(slotProps.data)" />
+                                @click="useEvolutionStone(slotProps.data.itemId)" />
                             <!-- EQUIP (Held & Trade Items) -->
                             <Button v-else label="Give" severity="success" size="small"
-                                :disabled="slotProps.data.count <= 0" @click="useEvoItem(slotProps.data.id)" />
+                                :disabled="slotProps.data.count <= 0" @click="useEvoItem(slotProps.data.itemId)" />
                         </template>
                     </Column>
                 </DataTable>
@@ -631,20 +591,32 @@ function closeRefillPPModalOpen() {
             <h3 class="section-title mb-2">Select TM to Teach</h3>
             <DataTable :value="tmInventory" responsiveLayout="scroll" paginator :rows="5"
                 class="p-datatable-sm itemMenu">
-                <Column field="code" header="TM" style="width: 20%"></Column>
-                <Column field="moveName" header="Move" style="width: 35%">
+
+                <!-- TM CODE COLUMN (e.g., "TM01" or fallback formatted itemId) -->
+                <Column header="TM" style="width: 20%">
+                    <template #body="slotProps">
+                        {{ slotProps.data.code || formatItemName(slotProps.data.itemId || slotProps.data.id) }}
+                    </template>
+                </Column>
+
+                <!-- MOVE NAME & TYPE PILL COLUMN -->
+                <Column header="Move" style="width: 35%">
                     <template #body="slotProps">
                         <span class="tm-type-pill"
-                            :style="{ backgroundColor: pokemonStore.typeColors[slotProps.data.type.toLowerCase()] || '#777' }">
-                            {{ slotProps.data.moveName }}
+                            :style="{ backgroundColor: pokemonStore.typeColors?.[slotProps.data.type?.toLowerCase()] || '#777' }">
+                            {{ slotProps.data.moveName || slotProps.data.name }}
                         </span>
                     </template>
                 </Column>
+
+                <!-- IN BAG COUNT COLUMN -->
                 <Column field="count" header="In Bag" style="width: 20%"></Column>
+
+                <!-- ACTION COLUMN -->
                 <Column header="Action" style="width: 25%">
                     <template #body="slotProps">
                         <Button label="Teach" severity="info" size="small" :disabled="slotProps.data.count <= 0"
-                            @click="handleUseTM(slotProps.data)" />
+                            @click="handleUseTM(slotProps.data.itemId || slotProps.data.id)" />
                     </template>
                 </Column>
             </DataTable>

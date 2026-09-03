@@ -153,6 +153,7 @@ export const useInventoryStore = defineStore("inventoryStore", {
             if (user !== null) {
                 try {
                     var response = await pokemonApi.getInventory(user.email);
+                    console.log(response)
                     this.items = response.items;
                     this.funds = response.funds;
                 } catch (err) {
