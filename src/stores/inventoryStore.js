@@ -15,16 +15,19 @@ export const useInventoryStore = defineStore("inventoryStore", {
             if (!isUser) {
                 return state.catalog.filter((item) => item.category === category);
             }
-            return state.items
-                .map((userItem) => {
-                    const metadata = state.catalog.find((c) => c.id === userItem.itemId) || {};
-                    return {
-                        ...metadata,
-                        itemId: userItem.itemId,
-                        count: userItem.count
-                    };
-                })
-                .filter((item) => item.category === category && item.count > 0);
+            console.log("User items:", state.items);
+            if(state.items) {
+                return state.items
+                    .map((userItem) => {
+                        const metadata = state.catalog.find((c) => c.id === userItem.itemId) || {};
+                        return {
+                            ...metadata,
+                            itemId: userItem.itemId,
+                            count: userItem.count
+                        };
+                    })
+                    .filter((item) => item.category === category && item.count > 0);
+            }
         },
         GetRecoveryItems: (state) => (isUser = false) => {
             const RECOVERY_CATS = [

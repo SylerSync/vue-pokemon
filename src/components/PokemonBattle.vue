@@ -68,7 +68,9 @@
                     </span>
                   </div>
                 </div>
-                <img :src="foe.sprite" :alt="foe.name" class="battle-sprite sprite-foe"
+                <img v-if="foe.shiny" :src="foe.shinySprite" :alt="foe.name" class="battle-sprite sprite-foe"
+                  :class="anim?.actor === 'foe' ? `anim-${anim.type}` : null" />
+                  <img v-else :src="foe.sprite" :alt="foe.name" class="battle-sprite sprite-foe"
                   :class="anim?.actor === 'foe' ? `anim-${anim.type}` : null" />
               </div>
               <!-- player: sprite left, info right -->
@@ -326,6 +328,8 @@ const props = defineProps({
 
 });
 
+console.log("PokemonBattle props:", props);
+
 const emit = defineEmits(['close', 'end', 'caught', 'fled']);
 
 const pokemonStore = usePokemonStore();
@@ -389,7 +393,7 @@ const pokeballOptions = computed(() => {
   };
 
   const fullPokeballs = inventoryStore.GetItemsByCategory("pokeballs", true);
-  console.log(fullPokeballs)
+  if (!fullPokeballs) return [standardPokeball];
   const formattedPokeballs = fullPokeballs.map((item) => {
     const ballId = (item.id || item.itemId || '').toLowerCase();
 
@@ -2554,6 +2558,8 @@ async function useMove(user, target, move, opts = {}) {
     if (actor === 'ally') {
 
       userPokemon.value = makeCombatant(target);
+      userPokemon.value.shiny = user.shiny
+      user.shiny ? userPokemon.value.sprites.back = target.shinyBackSprite : userPokemon.value.sprites.back = target.backSprite
       userPokemon.value.name = user.name
       userPokemon.value.id = user.id
       userPokemon.value.level = user.level
@@ -2572,6 +2578,8 @@ async function useMove(user, target, move, opts = {}) {
     }
     else {
       foe.value = makeCombatant(target);
+      foe.value.shiny = user.shiny
+      user.shiny ? foe.value.shinySprite = target.sprites.shinyFront : foe.value.sprite = target.sprites.front
       foe.value.name = user.name
       foe.value.id = user.id
       foe.value.level = user.level
