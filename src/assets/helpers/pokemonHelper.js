@@ -4,6 +4,7 @@ import { getEvoChain } from "@/api/pokeapi"
 import { getMove } from "@/api/pokeapi"
 import { usePokemonStore } from "@/stores/pokemonStore";
 import megaEvos from "@/assets/data/megaEvos.json"
+import * as PokemonAPI from "@/api/PokemonAPI"
 
 const pokemonStore = usePokemonStore()
 
@@ -248,17 +249,16 @@ export function buildEvolvedPokemonObject(baseApiData, currentPokemon) {
   const newTotalHp = Math.floor(((2 * hpBase * currLevel) / 100) + currLevel + 10)
 
   // Calculate HP gain from evolution and scale current HP accordingly
-  const oldTotalHp = currentPokemon.totalHp || newTotalHp;
+  const oldTotalHp = currentPokemon.totalHP || newTotalHp;
   const hpGain = Math.max(0, newTotalHp - oldTotalHp);
-  const newCurrentHp = Math.min(newTotalHp, (currentPokemon.currentHp || 0) + hpGain);
+  const newCurrentHp = Math.min(newTotalHp, (currentPokemon.currentHP || 0) + hpGain);
 
   // Preserve original object properties while overwriting only transformed fields
   return {
     ...currentPokemon,
     name: baseApiData.name,
     id: baseApiData.id,
-    sprite: baseApiData.sprite || baseApiData.sprites?.front_default || currentPokemon.sprite,
-    backSprite: baseApiData.backSprite || baseApiData.sprites?.back_default || currentPokemon.backSprite,
+    sprites: baseApiData.sprites,
     types: baseApiData.types,
     height: baseApiData.height,
     weight: baseApiData.weight,
@@ -320,7 +320,8 @@ export async function handleMegaEvo(currPokemon) {
   }
 
   // 3. Fetch Mega Data (e.g. "rayquaza" & "mega" -> "rayquaza-mega")
-  const apiData = await getPokemonData(baseSpecies, specialForm)
+  const data = await getPokemonData(baseSpecies, specialForm)
+  const apiData = await PokemonAPI.getPokemon(data.id)
 
   if (!apiData) {
     console.error(`Failed to fetch API data for ${baseSpecies} (${specialForm})`)
@@ -331,8 +332,8 @@ export async function handleMegaEvo(currPokemon) {
   const megaPokemon = buildEvolvedPokemonObject(apiData, currPokemon)
 
   // Preserve battle damage taken in base form
-  const damageTaken = currPokemon.totalHp - currPokemon.currentHp
-  megaPokemon.currentHp = Math.max(1, megaPokemon.totalHp - damageTaken)
+  const damageTaken = currPokemon.totalHP - currPokemon.currentHP
+  megaPokemon.currentHp = Math.max(1, megaPokemon.totalHP - damageTaken)
   megaPokemon.isMega = true
 
   console.log("returning mega evolution")

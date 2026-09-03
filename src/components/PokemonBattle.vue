@@ -68,7 +68,9 @@
                     </span>
                   </div>
                 </div>
-                <img :src="foe.sprite" :alt="foe.name" class="battle-sprite sprite-foe"
+                <img v-if="foe.shiny" :src="foe.shinySprite" :alt="foe.name" class="battle-sprite sprite-foe"
+                  :class="anim?.actor === 'foe' ? `anim-${anim.type}` : null" />
+                  <img v-else :src="foe.sprite" :alt="foe.name" class="battle-sprite sprite-foe"
                   :class="anim?.actor === 'foe' ? `anim-${anim.type}` : null" />
               </div>
               <!-- player: sprite left, info right -->
@@ -326,6 +328,8 @@ const props = defineProps({
 
 });
 
+console.log("PokemonBattle props:", props);
+
 const emit = defineEmits(['close', 'end', 'caught', 'fled']);
 
 const pokemonStore = usePokemonStore();
@@ -389,7 +393,7 @@ const pokeballOptions = computed(() => {
   };
 
   const fullPokeballs = inventoryStore.GetItemsByCategory("pokeballs", true);
-  console.log(fullPokeballs)
+  if (!fullPokeballs) return [standardPokeball];
   const formattedPokeballs = fullPokeballs.map((item) => {
     const ballId = (item.id || item.itemId || '').toLowerCase();
 
@@ -2554,6 +2558,8 @@ async function useMove(user, target, move, opts = {}) {
     if (actor === 'ally') {
 
       userPokemon.value = makeCombatant(target);
+      userPokemon.value.shiny = user.shiny
+      user.shiny ? userPokemon.value.sprites.back = target.shinyBackSprite : userPokemon.value.sprites.back = target.backSprite
       userPokemon.value.name = user.name
       userPokemon.value.id = user.id
       userPokemon.value.level = user.level
@@ -2572,6 +2578,8 @@ async function useMove(user, target, move, opts = {}) {
     }
     else {
       foe.value = makeCombatant(target);
+      foe.value.shiny = user.shiny
+      user.shiny ? foe.value.shinySprite = target.sprites.shinyFront : foe.value.sprite = target.sprites.front
       foe.value.name = user.name
       foe.value.id = user.id
       foe.value.level = user.level
@@ -3767,6 +3775,7 @@ async function useBattleItem(item) {
 }
 
 async function handleUseRecoveryItem(item, targetPokemon) {
+  console.log(item)
   const recoveryItems = inventoryStore.GetRecoveryItems(true) || []
   const isRecoveryItem = recoveryItems.some(i => (i.id || i.itemId) === item.id);
   if (!isRecoveryItem) {
@@ -3787,8 +3796,8 @@ async function handleUseRecoveryItem(item, targetPokemon) {
   switch (item.effectType) {
     case "revive":
       if (target.currentHP <= 0) {
-        if (inventoryStore.UseRecovery(item.id)) {
-          target.currentHP = Math.trunc(target.totalHP * item.effect.percent)
+        if (inventoryStore.UseItem(item.id)) {
+          target.currentHP = Math.trunc(target.totalHP * item.percent)
           battleLog.value.push(`${target.name} has been revived!`)
           selectedTargetPokemon.value = null;
           sidePanel.value = "log"
@@ -3816,8 +3825,9 @@ async function handleUseRecoveryItem(item, targetPokemon) {
           await delay(800);
           return;
         }
-        if (inventoryStore.UseRecovery(item.id)) {
-          target.currentHP = Math.min(target.totalHP, target.currentHP + item.effect.amount);
+        if (inventoryStore.UseItem(item.id)) {
+          
+          target.currentHP = Math.min(target.totalHP, target.currentHP + item.amount);
           battleLog.value.push(`${item.name} has been used on ${target.name}.`)
           selectedTargetPokemon.value = null;
           sidePanel.value = "log"
@@ -3829,7 +3839,7 @@ async function handleUseRecoveryItem(item, targetPokemon) {
       if (target.status !== "" && target.status) {
         if (target.status === item.status)
           target.status = ""
-        inventoryStore.UseRecovery(item.id)
+        inventoryStore.UseItem(item.id)
         battleLog.value.push(`${target.name} has been heal from status: ${item.status}`)
         selectedTargetPokemon.value = null;
         await delay(800)

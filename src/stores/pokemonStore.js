@@ -146,7 +146,6 @@ export const usePokemonStore = defineStore("pokemonStore", {
         async updatePokemon(pokemon) {
             let user = JSON.parse(localStorage.getItem('user'))
             try {
-                console.log("Updating Pokemon:", pokemon, "for user:", user.email);
                 let results = await PokemonAPI.updatePokemon(user.email, pokemon)
                 this.caughtPokemon.map(storePokemon => 
                     storePokemon.instanceId === results.instanceId ? results : storePokemon
