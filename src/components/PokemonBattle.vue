@@ -178,18 +178,19 @@
 
             <!-- team -->
             <div v-else-if="sidePanel === 'team'" class="team-body">
-              <div v-for="pokemon in team" :key="pokemon.instanceId" class="team-card" :class="{
+              <div v-for="pokemon in team" :key="pokemon._id" class="team-card" :class="{
                 fainted: isFainted(pokemon),
-                active: pokemon.instanceId === userPokemon?.instanceId
+                active: pokemon._id === userPokemon?._id
               }" @click="switchActivePokemon(pokemon)">
-                <img :src="pokemon.sprite" :alt="pokemon.name" class="team-sprite" />
+                <img v-if="pokemon.shiny" :src="pokemon.sprites.shinyFront" :alt="pokemon.name" class="team-sprite" />
+                <img v-else :src="pokemon.sprites.front" :alt="pokemon.name" class="team-sprite" />
                 <div class="team-info">
                   <span class="team-name">{{ pokemon.name }}</span>
                   <span class="team-hp">
                     {{ Math.max(0, pokemon.currentHP ?? pokemon.totalHP) }} / {{ pokemon.totalHP }} HP
                   </span>
                 </div>
-                <span v-if="pokemon.instanceId === userPokemon?.instanceId" class="active-tag">ACTIVE</span>
+                <span v-if="pokemon._id === userPokemon?._id" class="active-tag">ACTIVE</span>
               </div>
               <p v-if="!team.length" class="empty-msg">No Pokémon caught yet.</p>
             </div>
@@ -342,6 +343,7 @@ const TABS = [
 ];
 
 
+const pokemonInBattle = ref([]);  // Track all pokemon that have been in battle for this fight
 const vTooltip = Tooltip;
 const battleStarted = ref(false);
 const isResolving = ref(false);
@@ -414,7 +416,7 @@ const team = computed(() => {
   }
 
   const filtered = sourceTeam.filter(
-    p => p.instanceId !== activeMegaPokemon.value.instanceId
+    p => p._id !== activeMegaPokemon.value._id
   )
 
   return [...filtered, activeMegaPokemon.value]
@@ -1268,7 +1270,7 @@ function syncBattleForm() {
     : activeMegaPokemon.value;
   if (!active) return;
 
-  const base = pokemonStore.caughtPokemon.find(p => p.instanceId === active.instanceId);
+  const base = pokemonStore.caughtPokemon.find(p => p._id === active._id);
   if (base) {
     if (active.currentHP <= 0) {
       base.currentHP = 0;
@@ -1570,23 +1572,31 @@ function startBattle() {
   selectedTargetPokemon.value = userPokemon.value;
   log(`A wild ${foe.value.name} appeared!`);
   log(`Go, ${userPokemon.value.name}!`);
+  pokemonInBattle.value.push(userPokemon.value._id);
+  console.log("Battle started with userPokemon:", pokemonInBattle.value);
 }
 
-function endBattle(outcome = 'ended') {
+async function endBattle(outcome = 'ended') {
   if (activeMegaPokemon.value || activeTransformPokemon.value) {
     syncBattleForm()
   }
   resetVolatiles(userPokemon.value)
   battleStarted.value = false;
   isResolving.value = false;
-  canMegaEvolve.value = false
+  canMegaEvolve.value = false;
+
+  for (const p of pokemonInBattle.value) {
+    const mon = pokemonStore.caughtPokemon.find(x => x._id === p);
+    if (mon) await pokemonStore.updatePokemon(mon);
+  }
+  
   emit('end', { outcome, opponent: foe.value, pokemon: userPokemon.value });
   emit('close');
 }
 
-function requestClose() {
+async function requestClose() {
   if (isResolving.value) return; // don't close mid-turn
-  endBattle('closed');
+  await endBattle('closed');
 }
 
 /* ------------------------------------------------------------------ *
@@ -1623,7 +1633,7 @@ async function battleTurn(playerMove, item = null) {
     if (item) {
       if (isPokeball(item)) {
         const caught = await throwPokeball(item);
-        if (caught) return endBattle('caught');
+        if (caught) return await endBattle('caught');
         if (!battleStarted.value) return; // it fled
       } else {
         const itemTarget = selectedTargetPokemon.value;
@@ -1830,7 +1840,7 @@ async function checkEvolution(pokemon) {
       const evoSuccess = await pokemonHelper.handleEvolution(pokemon, evo.nextEvo.name);
 
       if (evoSuccess) {
-        const updated = pokemonStore.caughtPokemon.find(p => p.instanceId === pokemon.instanceId)
+        const updated = pokemonStore.caughtPokemon.find(p => p._id === pokemon._id)
         userPokemon.value = updated
         userPokemon.value.heldItem = ""
 
@@ -1943,7 +1953,7 @@ async function handleFaint(pokemon) {
       inventoryStore.AddFunds(reward);
       log(`You earned ₽${reward}.`);
       await delay(100)
-      endBattle('won');
+      await endBattle('won');
       return true;
     } else if (props.oppTeam) {
       let indexes = []
@@ -1961,7 +1971,7 @@ async function handleFaint(pokemon) {
         return true
       }
       else {
-        endBattle('won')
+        await endBattle('won')
       }
     }
   }
@@ -1969,7 +1979,7 @@ async function handleFaint(pokemon) {
   pokemon.status = ""
 
   // Player's Pokémon fainted — switch if anyone is left standing.
-  const next = team.value.find(p => !isFainted(p) && p.instanceId !== pokemon.instanceId);
+  const next = team.value.find(p => !isFainted(p) && p._id !== pokemon._id);
   allyFaintedThisTurn.value = true
 
   if (next) {
@@ -1988,7 +1998,7 @@ async function handleFaint(pokemon) {
 
   log('You have no Pokémon left!');
   await delay(800);
-  endBattle('lost');
+  await endBattle('lost');
   return true;
 }
 
@@ -2545,7 +2555,7 @@ async function useMove(user, target, move, opts = {}) {
       userPokemon.value.baseExp = user.baseExp
       userPokemon.value.currentExp = user.currentExp
       userPokemon.value.captureRate = user.captureRate
-      userPokemon.value.instanceId = user.instanceId
+      userPokemon.value._id = user._id
       userPokemon.value.evoDetails = user.evoDetails
       userPokemon.value.totalKOs = user.totalKOs
       userPokemon.value.totalFaints = user.totalFaints
@@ -2563,7 +2573,7 @@ async function useMove(user, target, move, opts = {}) {
       foe.value.baseExp = user.baseExp
       foe.value.currentExp = user.currentExp
       foe.value.captureRate = user.captureRate
-      foe.value.instanceId = user.instanceId
+      foe.value._id = user._id
       foe.value.evoDetails = user.evoDetails
       foe.value.totalKOs = user.totalKOs
       foe.value.totalFaints = user.totalFaints
@@ -3336,7 +3346,7 @@ async function resolveCalledMove(user, target, move) {
       const pool = move.name === 'sleep-talk'
         ? (user.moves ?? []).filter(m => m.name !== 'sleep-talk')
         : team.value
-          .filter(p => p.instanceId !== user.instanceId)
+          .filter(p => p._id !== user._id)
           .flatMap(p => p.moves ?? []);
       const valid = pool.filter(usable);
       return valid.length ? valid[randInt(0, valid.length - 1)] : null;
@@ -3420,7 +3430,7 @@ async function resolvePendingSwitch(skipTurn = null) {
           : `${foe.value.name} teleported away!`);
         await delay(800);
         emit('fled', foe.value);
-        endBattle('fled');
+        await endBattle('fled');
         return true;
       }
       return false; // wild mons have no bench — U-turn etc. is just damage
@@ -3452,7 +3462,7 @@ async function resolvePendingSwitch(skipTurn = null) {
   // ---------- ally side ----------
   if (isFainted(userPokemon.value)) return false;
   const options = team.value.filter(
-    p => !isFainted(p) && p.instanceId !== userPokemon.value.instanceId
+    p => !isFainted(p) && p._id !== userPokemon.value._id
   );
   if (!options.length) {
     if (req.mode === 'phaze') { log('But it failed!'); await delay(700); }
@@ -3864,7 +3874,7 @@ async function throwPokeball(pokeball) {
     log(`${target.name} fled!`);
     emit('fled', target);
     await delay(800);
-    endBattle('fled');
+    await endBattle('fled');
   }
   return false;
 }
@@ -3884,14 +3894,16 @@ async function switchActivePokemon(pokemon) {
     if (teamPickFilter === 'fainted') {
       if (!isFainted(pokemon)) return;
     } else {
-      if (isFainted(pokemon) || pokemon.instanceId === userPokemon.value?.instanceId) return;
+      if (isFainted(pokemon) || pokemon._id === userPokemon.value?._id) return;
     }
     resolveSwitchPick?.(pokemon);
+    if(!pokemonInBattle.value.includes(pokemon._id)) { pokemonInBattle.value.push(pokemon._id) }
+    console.log('Added pokemon to battle record', pokemonInBattle.value);
     return;
   }
   if (isResolving.value) return;
   if (isFainted(pokemon)) return;
-  if (pokemon.instanceId === userPokemon.value?.instanceId) return;
+  if (pokemon._id === userPokemon.value?._id) return;
   if (battleStarted.value && userPokemon.value?.trapped) {
     log(`${userPokemon.value.name} can't escape ${userPokemon.value.trapped.move}!`);
     sidePanel.value = 'log';
@@ -3920,6 +3932,8 @@ async function switchActivePokemon(pokemon) {
     log(`${userPokemon.value.name}, come back!`);
     await delay(600);
     userPokemon.value = pokemon;
+    if(!pokemonInBattle.value.includes(pokemon._id)) { pokemonInBattle.value.push(pokemon._id) }
+    console.log('Added pokemon to battle record', pokemonInBattle.value);
     if (pokemon.currentHP == null) pokemon.currentHP = pokemon.totalHP;
     log(`Go, ${pokemon.name}!`);
     sidePanel.value = 'log';
